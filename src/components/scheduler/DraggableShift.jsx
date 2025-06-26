@@ -22,8 +22,8 @@ const DraggableShift = ({ shift, employee, isDragOverlay = false }) => {
   const style = {
     transform: CSS.Transform.toString(transform),
     transition: isDragging ? 'none' : transition,
-    opacity: isDragging ? 0.3 : 1,
-    zIndex: isDragOverlay ? 1000 : isDragging ? 999 : 'auto',
+    opacity: 1,
+    zIndex: isDragOverlay ? 1000 : 'auto',
     cursor: isDragging ? 'grabbing' : 'grab',
   };
 
@@ -33,12 +33,12 @@ const DraggableShift = ({ shift, employee, isDragOverlay = false }) => {
       style={style}
       {...attributes}
       {...listeners}
-      className={`${shift.color} border-2 rounded-lg p-3 mb-2 transition-all duration-200 relative group touch-none ${
+      className={`${shift.color} border-2 rounded-lg p-3 mb-2 relative group touch-none ${
         isDragOverlay 
-          ? 'shadow-2xl scale-105 rotate-3 border-indigo-400' 
-          : isDragging 
-            ? 'shadow-lg scale-105' 
-            : 'hover:shadow-lg hover:scale-102 cursor-grab active:cursor-grabbing'
+          ? 'shadow-2xl scale-105 rotate-3 border-indigo-400 transition-all duration-200' 
+          : isDragging
+            ? '' // No special styling during drag to keep original appearance
+            : 'hover:shadow-lg hover:scale-102 cursor-grab active:cursor-grabbing transition-all duration-200'
       }`}
     >
       <div className="flex justify-between items-start mb-1">
@@ -63,11 +63,6 @@ const DraggableShift = ({ shift, employee, isDragOverlay = false }) => {
           <path d="M3,15H21V13H3V15M3,19H21V17H3V19M3,11H21V9H3V11M3,5V7H21V5H3Z" />
         </svg>
       </div>
-
-      {/* Drag preview indicator */}
-      {isDragOverlay && (
-        <div className="absolute inset-0 bg-white bg-opacity-20 rounded-lg border-2 border-dashed border-white"></div>
-      )}
     </div>
   );
 };
