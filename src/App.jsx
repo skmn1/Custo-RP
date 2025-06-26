@@ -3,6 +3,7 @@ import Navbar from './components/Navbar';
 import Dashboard from './pages/Dashboard';
 import SchedulerPage from './pages/SchedulerPage';
 import EmployeesPage from './pages/EmployeesPage';
+import PayrollPage from './pages/PayrollPage';
 
 const App = () => {
   const [currentView, setCurrentView] = useState('scheduler');
@@ -15,6 +16,8 @@ const App = () => {
         return <SchedulerPage />;
       case 'employees':
         return <EmployeesPage />;
+      case 'payroll':
+        return <PayrollPage />;
       default:
         return <Dashboard />;
     }
