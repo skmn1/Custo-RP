@@ -70,6 +70,7 @@ const Navbar = ({ currentView, setCurrentView }) => {
               {navItems.map((item) => (
                 <button
                   key={item.id}
+                  data-nav-item={item.id}
                   onClick={() => setCurrentView(item.id)}
                   className={`${
                     currentView === item.id
@@ -142,6 +143,7 @@ const Navbar = ({ currentView, setCurrentView }) => {
           {navItems.map((item) => (
             <button
               key={item.id}
+              data-nav-item={item.id}
               onClick={() => {
                 setCurrentView(item.id);
                 setIsMobileMenuOpen(false);
