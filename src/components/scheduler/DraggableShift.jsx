@@ -10,13 +10,21 @@ const DraggableShift = ({ shift, employee, isDragOverlay = false }) => {
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: shift.id });
+  } = useSortable({ 
+    id: shift.id,
+    data: {
+      type: 'shift',
+      shift,
+      employee,
+    }
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-    zIndex: isDragOverlay ? 1000 : 'auto',
+    transition: isDragging ? 'none' : transition,
+    opacity: isDragging ? 0.3 : 1,
+    zIndex: isDragOverlay ? 1000 : isDragging ? 999 : 'auto',
+    cursor: isDragging ? 'grabbing' : 'grab',
   };
 
   return (
@@ -25,8 +33,12 @@ const DraggableShift = ({ shift, employee, isDragOverlay = false }) => {
       style={style}
       {...attributes}
       {...listeners}
-      className={`${shift.color} border-2 rounded-lg p-3 mb-2 cursor-move hover:shadow-lg transition-all duration-200 relative group ${
-        isDragOverlay ? 'shadow-2xl scale-105' : ''
+      className={`${shift.color} border-2 rounded-lg p-3 mb-2 transition-all duration-200 relative group touch-none ${
+        isDragOverlay 
+          ? 'shadow-2xl scale-105 rotate-3 border-indigo-400' 
+          : isDragging 
+            ? 'shadow-lg scale-105' 
+            : 'hover:shadow-lg hover:scale-102 cursor-grab active:cursor-grabbing'
       }`}
     >
       <div className="flex justify-between items-start mb-1">
@@ -43,12 +55,19 @@ const DraggableShift = ({ shift, employee, isDragOverlay = false }) => {
         </div>
       )}
       
-      {/* Drag indicator */}
-      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-50 transition-opacity">
-        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+      {/* Enhanced drag indicator */}
+      <div className={`absolute top-2 right-2 transition-opacity ${
+        isDragOverlay ? 'opacity-100' : 'opacity-0 group-hover:opacity-50'
+      }`}>
+        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
           <path d="M3,15H21V13H3V15M3,19H21V17H3V19M3,11H21V9H3V11M3,5V7H21V5H3Z" />
         </svg>
       </div>
+
+      {/* Drag preview indicator */}
+      {isDragOverlay && (
+        <div className="absolute inset-0 bg-white bg-opacity-20 rounded-lg border-2 border-dashed border-white"></div>
+      )}
     </div>
   );
 };

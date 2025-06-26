@@ -31,6 +31,54 @@ h1 {
 
 /* Button styles are now handled by Tailwind CSS and component-specific classes */
 
+/* Enhanced drag and drop styles */
+.drag-cursor {
+  cursor: grab;
+}
+
+.drag-cursor:active {
+  cursor: grabbing;
+}
+
+/* Smooth transitions for scale effects */
+.hover\:scale-102:hover {
+  transform: scale(1.02);
+}
+
+/* Custom scrollbar for better mobile experience */
+.schedule-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.schedule-container::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.schedule-container::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.schedule-container::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Drop zone animation */
+@keyframes dropZonePulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.drop-zone-active {
+  animation: dropZonePulse 1.5s ease-in-out infinite;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

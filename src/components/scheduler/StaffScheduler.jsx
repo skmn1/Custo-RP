@@ -3,6 +3,8 @@ import {
   DndContext,
   DragOverlay,
   closestCenter,
+  pointerWithin,
+  rectIntersection,
 } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -28,10 +30,28 @@ const StaffScheduler = () => {
 
   const { shifts, addShift, deleteShift, moveShift } = useShifts();
   const { currentWeek, navigateWeek, goToCurrentWeek } = useWeekNavigation();
-  const { sensors, activeShift, handleDragStart, handleDragEnd } = useDragAndDrop(shifts, moveShift);
+  const { sensors, activeShift, dragOverDropZone, handleDragStart, handleDragOver, handleDragEnd } = useDragAndDrop(shifts, moveShift);
 
   const weekDays = generateWeekDays(currentWeek);
   const weekStart = weekDays[0];
+
+  // Custom collision detection for better drop zone targeting
+  const customCollisionDetection = (args) => {
+    // First try pointer detection for more precise targeting
+    const pointerIntersections = pointerWithin(args);
+    if (pointerIntersections.length > 0) {
+      return pointerIntersections;
+    }
+
+    // Fallback to rectangle intersection
+    const rectIntersections = rectIntersection(args);
+    if (rectIntersections.length > 0) {
+      return rectIntersections;
+    }
+
+    // Final fallback to closest center
+    return closestCenter(args);
+  };
 
   const handleAddShift = (employeeId, day) => {
     addShift(employeeId, day);
@@ -110,8 +130,9 @@ const StaffScheduler = () => {
           
           <DndContext
             sensors={sensors}
-            collisionDetection={closestCenter}
+            collisionDetection={customCollisionDetection}
             onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
             onDragEnd={handleDragEnd}
           >
             <SortableContext items={shifts.map(s => s.id)} strategy={verticalListSortingStrategy}>
@@ -122,6 +143,7 @@ const StaffScheduler = () => {
                   shifts={shifts}
                   weekDays={weekDays}
                   onDeleteShift={deleteShift}
+                  dragOverDropZone={dragOverDropZone}
                 />
               ))}
             </SortableContext>
