@@ -4,7 +4,7 @@ import { isToday } from 'date-fns';
 import DraggableShift from './DraggableShift';
 import { getShiftsForEmployeeAndDay, isEmployeeOvertime, getEmployeeTotalHours } from '../../utils/shiftUtils';
 
-const DroppableDay = ({ children, employeeId, dayIndex, isTodayCheck, dragOverDropZone, onAddShift, hasShifts, dayShifts, onDeleteShift, employee }) => {
+const DroppableDay = ({ children, employeeId, dayIndex, isTodayCheck, dragOverDropZone, onAddShift, hasShifts, dayShifts, onDeleteShift, onUpdateShift, employee }) => {
   const [isHovered, setIsHovered] = useState(false);
   const droppableId = `${employeeId}-${dayIndex}`;
   const { setNodeRef, isOver } = useDroppable({
@@ -53,6 +53,7 @@ const DroppableDay = ({ children, employeeId, dayIndex, isTodayCheck, dragOverDr
             <DraggableShift
               shift={shift}
               employee={employee}
+              onUpdateShift={onUpdateShift}
             />
             <button
               onClick={() => onDeleteShift(shift.id)}
@@ -91,7 +92,7 @@ const DroppableDay = ({ children, employeeId, dayIndex, isTodayCheck, dragOverDr
   );
 };
 
-const EmployeeRow = ({ employee, shifts, weekDays, onDeleteShift, onAddShift, dragOverDropZone }) => {
+const EmployeeRow = ({ employee, shifts, weekDays, onDeleteShift, onAddShift, onUpdateShift, dragOverDropZone }) => {
   const employeeShifts = shifts.filter(shift => shift.employeeId === employee.id);
   const totalHours = getEmployeeTotalHours(shifts, employee.id);
   const isOvertime = isEmployeeOvertime(shifts, employee.id, employee.maxHours);
@@ -143,6 +144,7 @@ const EmployeeRow = ({ employee, shifts, weekDays, onDeleteShift, onAddShift, dr
               hasShifts={dayShifts.length > 0}
               dayShifts={dayShifts}
               onDeleteShift={onDeleteShift}
+              onUpdateShift={onUpdateShift}
               employee={employee}
             />
           );

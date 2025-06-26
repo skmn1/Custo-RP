@@ -28,7 +28,7 @@ const StaffScheduler = () => {
   const [employees] = useState(initialEmployees);
   const [showAddShiftModal, setShowAddShiftModal] = useState(false);
 
-  const { shifts, addShift, deleteShift, moveShift } = useShifts();
+  const { shifts, addShift, deleteShift, updateShift, moveShift } = useShifts();
   const { currentWeek, navigateWeek, goToCurrentWeek } = useWeekNavigation();
   const { sensors, activeShift, dragOverDropZone, handleDragStart, handleDragOver, handleDragEnd } = useDragAndDrop(shifts, moveShift);
 
@@ -144,6 +144,7 @@ const StaffScheduler = () => {
                   weekDays={weekDays}
                   onDeleteShift={deleteShift}
                   onAddShift={handleAddShift}
+                  onUpdateShift={updateShift}
                   dragOverDropZone={dragOverDropZone}
                 />
               ))}
