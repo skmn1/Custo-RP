@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
-import { format, startOfWeek, endOfWeek, addWeeks, subWeeks, eachDayOfInterval } from 'date-fns';
-import { payrollConfig, getShiftType, calculateOvertimeHours, calculateDoubleTimeHours } from '../data/payroll';
+import { format, startOfWeek, endOfWeek, addWeeks, subWeeks, eachDayOfInterval, isWithinInterval } from 'date-fns';
+import { payrollConfig, getShiftType, calculateOvertimeHours, calculateDoubleTimeHours, historicalPayrollData } from '../data/payroll';
+import { mayPayrollRecords, junePayrollRecords, ytdSummary } from '../data/payrollRecords';
 
 export const usePayroll = (employees, shifts) => {
   const [selectedPayPeriod, setSelectedPayPeriod] = useState(() => {
@@ -10,6 +11,30 @@ export const usePayroll = (employees, shifts) => {
       end: endOfWeek(addWeeks(startOfWeek(now, { weekStartsOn: 1 }), 1), { weekStartsOn: 1 })
     };
   });
+
+  // Check if selected period matches historical data
+  const isHistoricalPeriod = useMemo(() => {
+    const selectedStart = selectedPayPeriod.start;
+    const mayStart = mayPayrollRecords.payPeriod.start;
+    const mayEnd = mayPayrollRecords.payPeriod.end;
+    const juneStart = junePayrollRecords.payPeriod.start;
+    const juneEnd = junePayrollRecords.payPeriod.end;
+    
+    const isMayPeriod = isWithinInterval(selectedStart, { start: mayStart, end: mayEnd });
+    const isJunePeriod = isWithinInterval(selectedStart, { start: juneStart, end: juneEnd });
+    
+    return { isMayPeriod, isJunePeriod, hasHistoricalData: isMayPeriod || isJunePeriod };
+  }, [selectedPayPeriod]);
+
+  // Get historical data if available
+  const getHistoricalData = useCallback(() => {
+    if (isHistoricalPeriod.isMayPeriod) {
+      return mayPayrollRecords;
+    } else if (isHistoricalPeriod.isJunePeriod) {
+      return junePayrollRecords;
+    }
+    return null;
+  }, [isHistoricalPeriod]);
 
   // Calculate individual employee payroll
   const calculateEmployeePayroll = useCallback((employee, employeeShifts, payPeriod) => {
@@ -119,8 +144,42 @@ export const usePayroll = (employees, shifts) => {
     };
   }, []);
 
-  // Calculate payroll for all employees
+  // Calculate payroll for all employees - use historical data if available
   const employeePayrolls = useMemo(() => {
+    const historicalData = getHistoricalData();
+    
+    if (historicalData && isHistoricalPeriod.hasHistoricalData) {
+      // Return historical payroll data
+      return historicalData.employees.map(emp => ({
+        id: emp.id,
+        name: emp.name,
+        role: emp.role,
+        department: emp.department,
+        hourlyRate: emp.hourlyRate,
+        totalHours: emp.hoursWorked.total,
+        regularHours: emp.hoursWorked.regular,
+        overtimeHours: emp.hoursWorked.overtime,
+        doubleTimeHours: emp.hoursWorked.doubleTime,
+        grossPay: emp.grossPay.total,
+        netPay: emp.netPay,
+        taxes: {
+          federal: emp.deductions.federalTax,
+          state: emp.deductions.stateTax,
+          socialSecurity: emp.deductions.socialSecurity,
+          medicare: emp.deductions.medicare,
+        },
+        deductions: {
+          healthInsurance: emp.deductions.healthInsurance,
+          retirement401k: emp.deductions.retirement401k,
+          total: emp.deductions.totalDeductions,
+        },
+        shiftDifferentials: emp.grossPay.shiftDifferentials,
+        shifts: [], // Would be populated from shift data
+        payStub: emp.payStub,
+      }));
+    }
+    
+    // Calculate real-time payroll for current period
     return employees.map(employee => {
       const employeeShifts = shifts.filter(shift => shift.employeeId === employee.id);
       const payrollData = calculateEmployeePayroll(employee, employeeShifts, selectedPayPeriod);
@@ -158,7 +217,7 @@ export const usePayroll = (employees, shifts) => {
         }))
       };
     }).filter(emp => emp.totalHours > 0);
-  }, [employees, shifts, selectedPayPeriod, calculateEmployeePayroll]);
+  }, [employees, shifts, selectedPayPeriod, calculateEmployeePayroll, isHistoricalPeriod, getHistoricalData]);
 
   // Calculate comprehensive payroll statistics
   const payrollSummary = useMemo(() => {
@@ -281,19 +340,59 @@ export const usePayroll = (employees, shifts) => {
     };
   }, [employeePayrolls]);
 
-  // Recent pay periods (mock data for now)
+  // Recent pay periods with historical data
   const recentPayPeriods = useMemo(() => {
-    return [
-      {
+    const periods = [];
+    
+    // Add historical periods
+    periods.push({
+      start: mayPayrollRecords.payPeriod.start,
+      end: mayPayrollRecords.payPeriod.end,
+      grossPay: mayPayrollRecords.summary.totalGrossPay,
+      netPay: mayPayrollRecords.summary.totalNetPay,
+      totalHours: mayPayrollRecords.summary.totalHours,
+      employeeCount: mayPayrollRecords.summary.totalEmployees,
+    });
+    
+    periods.push({
+      start: junePayrollRecords.payPeriod.start,
+      end: junePayrollRecords.payPeriod.end,
+      grossPay: junePayrollRecords.summary.totalGrossPay,
+      netPay: junePayrollRecords.summary.totalNetPay,
+      totalHours: junePayrollRecords.summary.totalHours,
+      employeeCount: junePayrollRecords.summary.totalEmployees,
+    });
+    
+    // Add current period if different
+    const currentPeriodExists = periods.some(p => 
+      p.start.getTime() === selectedPayPeriod.start.getTime()
+    );
+    
+    if (!currentPeriodExists) {
+      periods.push({
         start: selectedPayPeriod.start,
         end: selectedPayPeriod.end,
         grossPay: payrollSummary.totalGrossPay,
         netPay: payrollSummary.totalNetPay,
         totalHours: payrollSummary.totalHours,
         employeeCount: payrollSummary.totalEmployees,
-      }
-    ];
+      });
+    }
+    
+    return periods.sort((a, b) => b.start.getTime() - a.start.getTime());
   }, [selectedPayPeriod, payrollSummary]);
+
+  // Enhanced payroll trends with historical data
+  const payrollTrends = useMemo(() => {
+    if (historicalPayrollData.monthly) {
+      return {
+        monthly: historicalPayrollData.monthly,
+        quarterly: historicalPayrollData.quarterly,
+        yearToDate: ytdSummary,
+      };
+    }
+    return null;
+  }, []);
 
   // Navigation functions
   const navigatePayPeriod = useCallback((direction) => {
@@ -371,6 +470,12 @@ export const usePayroll = (employees, shifts) => {
     rolePayroll,
     topEarners,
     recentPayPeriods,
+    payrollTrends,
+    
+    // Historical data flags
+    isHistoricalPeriod: isHistoricalPeriod.hasHistoricalData,
+    historicalData: getHistoricalData(),
+    ytdSummary,
     
     // Actions
     setSelectedPayPeriod,
