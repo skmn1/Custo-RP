@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Navbar from './components/Navbar';
 import Dashboard from './pages/Dashboard';
 import SchedulerPage from './pages/SchedulerPage';
+import EmployeesPage from './pages/EmployeesPage';
 
 const App = () => {
   const [currentView, setCurrentView] = useState('scheduler');
@@ -12,6 +13,8 @@ const App = () => {
         return <Dashboard />;
       case 'scheduler':
         return <SchedulerPage />;
+      case 'employees':
+        return <EmployeesPage />;
       default:
         return <Dashboard />;
     }
