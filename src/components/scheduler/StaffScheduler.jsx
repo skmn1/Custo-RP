@@ -143,6 +143,7 @@ const StaffScheduler = () => {
                   shifts={shifts}
                   weekDays={weekDays}
                   onDeleteShift={deleteShift}
+                  onAddShift={handleAddShift}
                   dragOverDropZone={dragOverDropZone}
                 />
               ))}

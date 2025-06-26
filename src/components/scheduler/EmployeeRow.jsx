@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import { isToday } from 'date-fns';
 import DraggableShift from './DraggableShift';
 import { getShiftsForEmployeeAndDay, isEmployeeOvertime, getEmployeeTotalHours } from '../../utils/shiftUtils';
 
-const DroppableDay = ({ children, employeeId, dayIndex, isTodayCheck, dragOverDropZone }) => {
+const DroppableDay = ({ children, employeeId, dayIndex, isTodayCheck, dragOverDropZone, onAddShift, hasShifts, dayShifts, onDeleteShift, employee }) => {
+  const [isHovered, setIsHovered] = useState(false);
   const droppableId = `${employeeId}-${dayIndex}`;
   const { setNodeRef, isOver } = useDroppable({
     id: droppableId,
@@ -16,11 +17,12 @@ const DroppableDay = ({ children, employeeId, dayIndex, isTodayCheck, dragOverDr
   });
 
   const isHighlighted = isOver || dragOverDropZone === droppableId;
+  const showCreateShiftSuggestion = isHovered && !hasShifts && !isHighlighted;
 
   return (
     <div
       ref={setNodeRef}
-      className={`relative p-3 border-r border-gray-200 min-h-32 transition-all duration-200 ${
+      className={`relative p-3 border-r border-gray-200 min-h-32 transition-all duration-200 cursor-pointer ${
         isTodayCheck ? 'bg-blue-50' : 'bg-gray-50'
       } ${
         isHighlighted ? 'bg-indigo-100 border-indigo-300 border-2 shadow-md' : 'hover:bg-gray-100'
@@ -28,7 +30,41 @@ const DroppableDay = ({ children, employeeId, dayIndex, isTodayCheck, dragOverDr
       data-employee-id={employeeId}
       data-day={dayIndex}
       data-droppable-id={droppableId}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onClick={() => !hasShifts && onAddShift && onAddShift(employeeId, dayIndex)}
     >
+      {/* Empty state message */}
+      {dayShifts.length === 0 && !showCreateShiftSuggestion && !isHighlighted && (
+        <div className="text-center text-gray-400 text-xs py-6 border-2 border-dashed border-gray-300 rounded-lg transition-all duration-200 hover:border-green-300 hover:text-green-400">
+          <div className="flex flex-col items-center space-y-1">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            <span>No shifts scheduled</span>
+          </div>
+        </div>
+      )}
+
+      {/* Shifts */}
+      <div className="space-y-2">
+        {dayShifts.map(shift => (
+          <div key={shift.id} className="relative group">
+            <DraggableShift
+              shift={shift}
+              employee={employee}
+            />
+            <button
+              onClick={() => onDeleteShift(shift.id)}
+              className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-red-600 flex items-center justify-center shadow-md"
+              title="Delete shift"
+            >
+              ×
+            </button>
+          </div>
+        ))}
+      </div>
+
       {children}
       
       {/* Visual drop indicator */}
@@ -39,11 +75,23 @@ const DroppableDay = ({ children, employeeId, dayIndex, isTodayCheck, dragOverDr
           </div>
         </div>
       )}
+
+      {/* Create shift suggestion */}
+      {showCreateShiftSuggestion && (
+        <div className="absolute inset-0 bg-green-50 bg-opacity-90 rounded-md border-2 border-dashed border-green-300 flex items-center justify-center transition-all duration-200">
+          <div className="bg-white rounded-lg px-3 py-2 text-sm font-medium text-green-700 shadow-sm flex items-center space-x-2">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            <span>Click to create shift</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-const EmployeeRow = ({ employee, shifts, weekDays, onDeleteShift, dragOverDropZone }) => {
+const EmployeeRow = ({ employee, shifts, weekDays, onDeleteShift, onAddShift, dragOverDropZone }) => {
   const employeeShifts = shifts.filter(shift => shift.employeeId === employee.id);
   const totalHours = getEmployeeTotalHours(shifts, employee.id);
   const isOvertime = isEmployeeOvertime(shifts, employee.id, employee.maxHours);
@@ -91,35 +139,12 @@ const EmployeeRow = ({ employee, shifts, weekDays, onDeleteShift, dragOverDropZo
               dayIndex={dayIndex}
               isTodayCheck={isTodayCheck}
               dragOverDropZone={dragOverDropZone}
-            >
-              {dayShifts.length === 0 && (
-                <div className="text-center text-gray-400 text-xs py-6 border-2 border-dashed border-gray-300 rounded-lg transition-all duration-200 hover:border-indigo-300 hover:text-indigo-400">
-                  <div className="flex flex-col items-center space-y-1">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                    <span>Drop shift here</span>
-                  </div>
-                </div>
-              )}
-              <div className="space-y-2">
-                {dayShifts.map(shift => (
-                  <div key={shift.id} className="relative group">
-                    <DraggableShift
-                      shift={shift}
-                      employee={employee}
-                    />
-                    <button
-                      onClick={() => onDeleteShift(shift.id)}
-                      className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-red-600 flex items-center justify-center shadow-md"
-                      title="Delete shift"
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </DroppableDay>
+              onAddShift={onAddShift}
+              hasShifts={dayShifts.length > 0}
+              dayShifts={dayShifts}
+              onDeleteShift={onDeleteShift}
+              employee={employee}
+            />
           );
         })}
       </div>
