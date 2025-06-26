@@ -53,8 +53,14 @@ const StaffScheduler = () => {
     return closestCenter(args);
   };
 
-  const handleAddShift = (employeeId, day) => {
-    addShift(employeeId, day);
+  const handleAddShift = (employeeId, day, shiftData = null) => {
+    if (shiftData) {
+      // Called from AddShiftModal with complete shift data
+      addShift(employeeId, day, shiftData);
+    } else {
+      // Called from quick add (clicking empty cell) - use default values
+      addShift(employeeId, day);
+    }
     setShowAddShiftModal(false);
   };
 
@@ -71,14 +77,21 @@ const StaffScheduler = () => {
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-3">
-              <Button variant="secondary" onClick={goToCurrentWeek}>
-                Today
+              <Button variant="secondary" onClick={goToCurrentWeek} className="flex items-center space-x-2">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <span>Today</span>
               </Button>
-              <Button onClick={() => setShowAddShiftModal(true)}>
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <Button 
+                onClick={() => setShowAddShiftModal(true)}
+                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center space-x-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
-                Add Shift
+                <span className="font-semibold">Add Shift</span>
+                <div className="w-2 h-2 bg-white rounded-full opacity-75"></div>
               </Button>
             </div>
           </div>
