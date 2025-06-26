@@ -166,7 +166,7 @@ const DraggableShift = ({ shift, employee, isDragOverlay = false, onUpdateShift 
       {/* Editable Time Section */}
       <div className="relative">
         <div 
-          className="text-sm font-medium mb-1 cursor-pointer hover:bg-black hover:bg-opacity-10 rounded px-1 py-0.5 transition-colors duration-200 inline-block"
+          className="text-sm font-medium mb-1 cursor-pointer hover:border hover:border-current rounded px-1 py-0.5 transition-all duration-200 inline-block"
           onClick={(e) => {
             e.stopPropagation();
             if (!isDragOverlay && onUpdateShift) {
