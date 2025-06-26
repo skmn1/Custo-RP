@@ -12,7 +12,7 @@ const Modal = ({ isOpen, onClose, title, children, size = 'md', onValidate, vali
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-20 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 bg-gray-300/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div className={`bg-white rounded-lg shadow-xl w-full ${sizes[size]} overflow-hidden`}>
         <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4">
           <div className="flex justify-between items-center">
