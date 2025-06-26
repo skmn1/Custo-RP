@@ -75,6 +75,7 @@ const AddShiftModal = ({ isOpen, onClose, onAddShift, employees, weekDays }) => 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Employee</label>
           <select
+            data-testid="employee-select"
             value={selectedEmployee}
             onChange={(e) => setSelectedEmployee(e.target.value)}
             className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
@@ -92,6 +93,7 @@ const AddShiftModal = ({ isOpen, onClose, onAddShift, employees, weekDays }) => 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Day</label>
           <select
+            data-testid="day-select"
             value={selectedDay}
             onChange={(e) => setSelectedDay(parseInt(e.target.value))}
             className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
@@ -109,6 +111,7 @@ const AddShiftModal = ({ isOpen, onClose, onAddShift, employees, weekDays }) => 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Shift Type</label>
             <select
+              data-testid="shift-type-select"
               value={shiftType}
               onChange={(e) => setShiftType(e.target.value)}
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
@@ -124,6 +127,7 @@ const AddShiftModal = ({ isOpen, onClose, onAddShift, employees, weekDays }) => 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Department</label>
             <select
+              data-testid="department-select"
               value={department}
               onChange={(e) => setDepartment(e.target.value)}
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
@@ -145,6 +149,7 @@ const AddShiftModal = ({ isOpen, onClose, onAddShift, employees, weekDays }) => 
             <div>
               <label className="block text-xs text-gray-600 mb-1">Start Time</label>
               <select
+                data-testid="start-time-select"
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
                 className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
@@ -157,6 +162,7 @@ const AddShiftModal = ({ isOpen, onClose, onAddShift, employees, weekDays }) => 
             <div>
               <label className="block text-xs text-gray-600 mb-1">End Time</label>
               <select
+                data-testid="end-time-select"
                 value={endTime}
                 onChange={(e) => setEndTime(e.target.value)}
                 className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"

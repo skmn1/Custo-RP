@@ -164,6 +164,9 @@ const DraggableShift = ({ shift, employee, isDragOverlay = false, onUpdateShift,
       ref={setNodeRef}
       style={style}
       {...dragHandlers}
+      data-testid="shift-card"
+      data-shift-type={shift.type}
+      data-shift-id={shift.id}
       className={`${shift.color} border-2 rounded-lg p-3 mb-2 relative group touch-none ${
         isDragOverlay 
           ? 'shadow-2xl scale-105 rotate-3 border-indigo-400 transition-all duration-200' 
@@ -180,6 +183,7 @@ const DraggableShift = ({ shift, employee, isDragOverlay = false, onUpdateShift,
       {/* Editable Time Section */}
       <div className="relative">
         <div 
+          data-testid="shift-time-display"
           className="text-sm font-medium mb-1 cursor-pointer hover:border hover:border-current rounded px-1 py-0.5 transition-all duration-200 inline-block"
           onClick={(e) => {
             e.stopPropagation();
@@ -206,7 +210,7 @@ const DraggableShift = ({ shift, employee, isDragOverlay = false, onUpdateShift,
         )}
       </div>
       
-      <div className="text-xs opacity-80">{shift.duration}h</div>
+      <div data-testid="shift-duration" className="text-xs opacity-80">{shift.duration}h</div>
       {employee && (
         <div className="text-xs mt-2 font-medium border-t border-current pt-1 opacity-90">
           {employee.name}
