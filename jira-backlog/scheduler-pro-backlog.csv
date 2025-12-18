@@ -1,0 +1,344 @@
+Summary,Issue Type,Priority,Story Points,Sprint,Epic Link,Description,Acceptance Criteria,Labels
+"Backend Infrastructure Setup",Epic,P0,,,"Backend & Database Infrastructure","Epic for setting up core backend infrastructure including API server, database, and development environment","All backend infrastructure components are operational and ready for development","backend,infrastructure,epic"
+"Authentication & Authorization System",Epic,P0,,,"Authentication & Authorization","Epic for implementing complete authentication and authorization system with JWT and RBAC","Authentication system is complete with all roles and permissions","security,auth,epic"
+"Advanced Scheduling Features",Epic,P1,,,"Advanced Scheduling Features","Epic for building advanced scheduling capabilities including conflict detection, availability, and optimization","Advanced scheduling features enhance the scheduling workflow","scheduling,features,epic"
+"Notifications System",Epic,P1,,,"Notifications System","Epic for implementing multi-channel notification system (email, SMS, push)","Users receive timely notifications through their preferred channels","notifications,communication,epic"
+"Reporting & Analytics",Epic,P1,,,"Reporting & Analytics","Epic for building comprehensive reporting and analytics features","Users can generate and export detailed reports","reporting,analytics,epic"
+"Mobile & PWA",Epic,P2,,,"Mobile & PWA","Epic for implementing Progressive Web App features and mobile optimization","Application works offline and provides mobile-native experience","mobile,pwa,epic"
+"Testing & Quality Assurance",Epic,P1,,,"Testing & Quality","Epic for comprehensive testing strategy and quality assurance","Application meets quality standards with 80%+ test coverage","testing,quality,epic"
+"DevOps & Deployment",Epic,P1,,,"DevOps & Deployment","Epic for setting up CI/CD, monitoring, and production deployment","Application is deployed to production with monitoring and alerts","devops,deployment,epic"
+"Set up Node.js + Express + TypeScript backend",Story,P0,8,Sprint 1,"Backend & Database Infrastructure","Initialize backend API server with Node.js, Express, and TypeScript configuration. Set up project structure with proper folder organization (routes, controllers, services, models).","1. Backend server runs on localhost:3000
+2. TypeScript compilation works without errors
+3. Basic /health endpoint returns 200 OK
+4. Environment variables configured
+5. ESLint and Prettier configured","backend,setup,typescript"
+"Set up PostgreSQL database with Prisma ORM",Story,P0,8,Sprint 1,"Backend & Database Infrastructure","Install and configure PostgreSQL database. Set up Prisma ORM with initial schema and migrations.","1. PostgreSQL database is running locally
+2. Prisma schema file created
+3. Database connection successful
+4. Prisma Client generates without errors
+5. Initial migration applied","database,prisma,setup"
+"Create Organizations table and API",Story,P0,5,Sprint 1,"Backend & Database Infrastructure","Implement Organizations (tenants) table schema and CRUD API endpoints for multi-tenant support.","1. Organizations table created with schema
+2. GET /organizations endpoint returns organizations
+3. POST /organizations creates new organization
+4. PUT /organizations/:id updates organization
+5. Data validation implemented","database,api,multi-tenant"
+"Implement JWT authentication middleware",Story,P0,8,Sprint 1,"Authentication & Authorization","Build JWT-based authentication system with access and refresh tokens. Create middleware for token verification.","1. JWT tokens generate on login
+2. Access token expires after 15 minutes
+3. Refresh token expires after 7 days
+4. Middleware validates tokens correctly
+5. Invalid tokens return 401 error","auth,jwt,middleware"
+"Create User registration and login endpoints",Story,P0,8,Sprint 1,"Authentication & Authorization","Implement user registration (signup) and login endpoints with password hashing using bcrypt.","1. POST /auth/register creates new user
+2. POST /auth/login returns JWT tokens
+3. Passwords hashed with bcrypt (10 rounds)
+4. Email validation prevents duplicates
+5. Input validation with Zod schema","auth,api,security"
+"Set up development environment with Docker",Task,P1,3,Sprint 1,"Backend & Database Infrastructure","Create Docker Compose file for local development with PostgreSQL, Redis, and backend services.","1. Docker Compose file runs all services
+2. Database persists data in volumes
+3. Hot reload works for backend code
+4. Environment variables loaded from .env
+5. Documentation updated","docker,devops,local-dev"
+"Implement error handling middleware",Task,P1,3,Sprint 1,"Backend & Database Infrastructure","Create centralized error handling middleware with proper error codes and logging.","1. All errors caught by middleware
+2. Consistent error response format
+3. Error logging with Winston
+4. 4xx and 5xx errors handled properly
+5. Stack traces in development only","error-handling,middleware,backend"
+"Add input validation with Zod schemas",Task,P1,5,Sprint 1,"Backend & Database Infrastructure","Implement Zod validation schemas for all API request bodies and query parameters.","1. Zod schemas created for all endpoints
+2. Invalid input returns 400 with details
+3. Type-safe validation with TypeScript
+4. Validation errors are descriptive
+5. Reusable validation utilities","validation,zod,backend"
+"Implement Users table and CRUD API",Story,P0,8,Sprint 2,"Authentication & Authorization","Create Users table schema and implement full CRUD operations with proper authentication.","1. Users table created with proper indexes
+2. GET /users returns paginated users
+3. GET /users/:id returns user details
+4. PUT /users/:id updates user
+5. DELETE /users/:id soft deletes user","database,api,users"
+"Build role-based access control (RBAC) system",Story,P0,8,Sprint 2,"Authentication & Authorization","Implement RBAC with roles: admin, manager, employee, viewer. Create permission middleware.","1. User roles stored in database
+2. Permission middleware checks access
+3. Admin has full access
+4. Manager can manage schedules
+5. Employee has read-only access","auth,rbac,security"
+"Create Employees table and API endpoints",Story,P0,8,Sprint 2,"Backend & Database Infrastructure","Implement Employees table schema and full CRUD API for employee management.","1. Employees table created with indexes
+2. GET /employees returns employees with filters
+3. POST /employees creates new employee
+4. PUT /employees/:id updates employee
+5. Organization isolation enforced","database,api,employees"
+"Create Shifts table and API endpoints",Story,P0,8,Sprint 2,"Backend & Database Infrastructure","Implement Shifts table schema and CRUD API for shift management with date filtering.","1. Shifts table created with proper indexes
+2. GET /shifts supports date range filter
+3. POST /shifts creates new shift
+4. PUT /shifts/:id updates shift
+5. DELETE /shifts/:id deletes shift","database,api,shifts"
+"Implement password reset functionality",Story,P1,5,Sprint 2,"Authentication & Authorization","Build password reset flow with email token and secure password update.","1. POST /auth/forgot-password sends reset email
+2. Reset token expires after 1 hour
+3. POST /auth/reset-password updates password
+4. Old tokens invalidated after use
+5. User receives confirmation email","auth,security,password"
+"Add API rate limiting middleware",Task,P1,3,Sprint 2,"Backend & Database Infrastructure","Implement rate limiting to prevent API abuse and DDoS attacks.","1. Anonymous: 100 requests/hour
+2. Authenticated: 1000 requests/hour
+3. Rate limit headers returned
+4. 429 status when limit exceeded
+5. Configurable limits per route","security,middleware,rate-limiting"
+"Set up database migrations system",Task,P0,5,Sprint 2,"Backend & Database Infrastructure","Configure Prisma migrations for database schema changes and version control.","1. Migration files track schema changes
+2. npm run migrate applies migrations
+3. Rollback capability implemented
+4. Migrations tested in CI/CD
+5. Documentation for creating migrations","database,migrations,prisma"
+"Implement session management with refresh tokens",Story,P0,5,Sprint 2,"Authentication & Authorization","Add refresh token rotation and session management for secure authentication.","1. POST /auth/refresh returns new access token
+2. Refresh tokens rotate on use
+3. POST /auth/logout invalidates tokens
+4. Expired sessions return 401
+5. Token blacklist for logout","auth,sessions,security"
+"Add database indexes for performance",Task,P1,3,Sprint 2,"Backend & Database Infrastructure","Add proper indexes on foreign keys and frequently queried columns for query optimization.","1. Indexes on all foreign keys
+2. Composite indexes for common queries
+3. Query performance improved 10x+
+4. EXPLAIN ANALYZE shows index usage
+5. Documentation of indexing strategy","database,performance,optimization"
+"Implement Schedules table and API",Story,P0,8,Sprint 3,"Backend & Database Infrastructure","Create Schedules table for grouping shifts and implement schedule management API.","1. Schedules table created
+2. GET /schedules returns schedules
+3. POST /schedules creates schedule
+4. PUT /schedules/:id updates schedule
+5. Schedule status: draft, published, archived","database,api,schedules"
+"Build shift conflict detection logic",Story,P0,8,Sprint 3,"Advanced Scheduling Features","Implement conflict detection for overlapping shifts, time-off, and availability violations.","1. Detects overlapping shifts for same employee
+2. Checks against time-off requests
+3. Validates employee availability
+4. Returns detailed conflict information
+5. Prevents shift creation with conflicts","scheduling,validation,business-logic"
+"Create Employee Availability system",Story,P1,8,Sprint 3,"Advanced Scheduling Features","Implement employee availability management for weekly recurring availability patterns.","1. Employee_availability table created
+2. GET /employees/:id/availability returns availability
+3. PUT /employees/:id/availability updates availability
+4. Day-of-week and time ranges supported
+5. Validation prevents scheduling outside availability","scheduling,availability,features"
+"Implement Time-Off Requests feature",Story,P1,8,Sprint 3,"Advanced Scheduling Features","Build time-off request system with approval workflow for vacation, sick leave, and personal days.","1. Time_off_requests table created
+2. POST /employees/:id/time-off creates request
+3. PUT /time-off/:id/approve approves request
+4. PUT /time-off/:id/deny denies request
+5. Email notifications sent on status change","scheduling,time-off,workflow"
+"Build Shift Swap request system",Story,P1,8,Sprint 3,"Advanced Scheduling Features","Allow employees to request shift swaps with approval workflow for managers.","1. Shift_swaps table created
+2. POST /shifts/:id/swap creates swap request
+3. Manager approval workflow implemented
+4. Email notifications on requests
+5. Shift reassigned on approval","scheduling,shift-swap,collaboration"
+"Add bulk shift creation endpoint",Story,P2,5,Sprint 3,"Advanced Scheduling Features","Implement bulk shift creation for creating multiple shifts in one API call.","1. POST /shifts/bulk accepts array of shifts
+2. Transactional: all succeed or all fail
+3. Validation on each shift
+4. Returns created shift IDs
+5. Performance tested with 100+ shifts","api,bulk-operations,performance"
+"Implement Overtime tracking and alerts",Story,P1,5,Sprint 3,"Advanced Scheduling Features","Track employee overtime hours and send alerts when approaching limits.","1. Overtime calculated correctly
+2. Weekly overtime threshold configurable
+3. Alerts sent at 90% of limit
+4. GET /employees/:id/overtime returns hours
+5. Dashboard shows overtime statistics","scheduling,overtime,compliance"
+"Add recurring shift templates",Story,P2,5,Sprint 3,"Advanced Scheduling Features","Allow creation of shift templates for recurring weekly/monthly shift patterns.","1. Template schema defined
+2. POST /templates creates template
+3. POST /templates/:id/apply creates shifts from template
+4. Date range specified for application
+5. Templates editable and reusable","scheduling,templates,productivity"
+"Set up Redis cache for sessions",Task,P1,5,Sprint 3,"Backend & Database Infrastructure","Configure Redis for caching sessions, frequently accessed data, and rate limiting.","1. Redis connected to backend
+2. Sessions stored in Redis
+3. Cache TTL configured properly
+4. Cache invalidation on updates
+5. Fallback to database if Redis down","cache,redis,performance"
+"Set up email service with SendGrid",Story,P1,8,Sprint 4,"Notifications System","Integrate SendGrid for transactional email notifications with templating.","1. SendGrid API key configured
+2. Email templates created
+3. Send function with retry logic
+4. Email sent on user registration
+5. Email logging and error handling","notifications,email,integration"
+"Build notification preferences system",Story,P1,5,Sprint 4,"Notifications System","Allow users to customize notification preferences by type and channel.","1. Notification_preferences table created
+2. GET /notifications/preferences returns settings
+3. PUT /notifications/preferences updates settings
+4. Opt-out by notification type
+5. Opt-out by channel (email, SMS, push)","notifications,preferences,ux"
+"Implement in-app notification system",Story,P1,5,Sprint 4,"Notifications System","Create in-app notification center with read/unread status and notification history.","1. Notifications table created
+2. GET /notifications returns user notifications
+3. PUT /notifications/:id/read marks as read
+4. Real-time updates with WebSocket
+5. Notification badge count in UI","notifications,in-app,real-time"
+"Add push notifications with Firebase",Story,P2,8,Sprint 4,"Notifications System","Integrate Firebase Cloud Messaging for browser and mobile push notifications.","1. FCM configured and tested
+2. Service worker registers for push
+3. Push sent on shift assignment
+4. Push notification permissions requested
+5. Notification click opens relevant page","notifications,push,fcm"
+"Create audit logging system",Story,P1,5,Sprint 4,"Backend & Database Infrastructure","Implement comprehensive audit logging for compliance and security tracking.","1. Audit_logs table created
+2. All write operations logged
+3. User actions tracked (who, what, when)
+4. Old and new values stored
+5. Audit log API for querying","security,audit,compliance"
+"Build email notification templates",Task,P1,3,Sprint 4,"Notifications System","Design and implement HTML email templates for all notification types.","1. Welcome email template
+2. Shift assignment template
+3. Password reset template
+4. Schedule change template
+5. Templates responsive on mobile","notifications,email,templates"
+"Implement data export to CSV/Excel",Story,P1,8,Sprint 4,"Reporting & Analytics","Build data export functionality for employees, shifts, and schedules to CSV/Excel format.","1. GET /employees/export returns CSV
+2. GET /shifts/export returns CSV
+3. Date range filtering supported
+4. All fields included in export
+5. Excel format option available","export,reporting,productivity"
+"Add SMS notifications with Twilio",Story,P2,8,Sprint 4,"Notifications System","Integrate Twilio for critical SMS notifications (optional, configurable).","1. Twilio API configured
+2. SMS sent for critical alerts
+3. SMS templates created
+4. Opt-in/opt-out functionality
+5. Cost tracking and limits","notifications,sms,twilio"
+"Create notification service abstraction",Task,P1,3,Sprint 4,"Notifications System","Build unified notification service that handles all channels (email, SMS, push, in-app).","1. NotificationService class created
+2. send() method accepts type and channel
+3. Fallback to alternate channels
+4. Notification queueing with Bull
+5. Retry logic for failed sends","notifications,architecture,service"
+"Build Payroll calculation service",Story,P1,8,Sprint 5,"Reporting & Analytics","Implement payroll calculation based on shifts, hours, and hourly rates.","1. GET /payroll/calculate calculates payroll
+2. Overtime rates applied correctly
+3. Break time deducted from hours
+4. Department and date range filters
+5. Detailed payroll breakdown returned","payroll,calculation,business-logic"
+"Create advanced reporting dashboard",Story,P1,8,Sprint 5,"Reporting & Analytics","Build comprehensive reporting dashboard with labor costs, attendance, and overtime reports.","1. GET /reports/labor-costs returns cost data
+2. GET /reports/attendance returns attendance
+3. GET /reports/overtime returns overtime stats
+4. Date range and department filters
+5. Charts and graphs data included","reporting,dashboard,analytics"
+"Implement PDF report generation",Story,P2,8,Sprint 5,"Reporting & Analytics","Add PDF export for reports and schedules using PDF generation library.","1. POST /reports/export generates PDF
+2. Schedule exported as PDF
+3. Logo and branding included
+4. Charts rendered in PDF
+5. Download link returned","reporting,pdf,export"
+"Add PWA support with service worker",Story,P1,8,Sprint 5,"Mobile & PWA","Implement Progressive Web App features including offline support and installability.","1. Service worker caches assets
+2. Offline fallback page works
+3. App installable on mobile
+4. App manifest configured
+5. Lighthouse PWA score 90+","pwa,mobile,offline"
+"Build custom report builder UI",Story,P3,13,Sprint 5,"Reporting & Analytics","Create custom report builder allowing users to define their own reports with filters and grouping.","1. Report builder UI with drag-drop fields
+2. Custom filters and grouping
+3. Save report templates
+4. Export custom reports to CSV/PDF
+5. Share reports with other users","reporting,custom,advanced"
+"Implement data caching strategy",Task,P1,5,Sprint 5,"Backend & Database Infrastructure","Optimize performance with Redis caching for frequently accessed data.","1. Employee data cached (5 min TTL)
+2. Schedule data cached (1 min TTL)
+3. Cache invalidation on updates
+4. Cache hit ratio 80%+
+5. Performance improvement 5x+","cache,performance,redis"
+"Add mobile-optimized touch interactions",Task,P1,5,Sprint 5,"Mobile & PWA","Optimize drag-and-drop and interactions for mobile touch screens.","1. Touch events work on mobile
+2. Drag-and-drop smooth on mobile
+3. Swipe gestures for navigation
+4. Touch targets 44px minimum
+5. No hover-dependent interactions","mobile,ux,touch"
+"Set up CI/CD pipeline with GitHub Actions",Story,P1,8,Sprint 6,"DevOps & Deployment","Create automated CI/CD pipeline for testing, building, and deploying application.","1. GitHub Actions workflow created
+2. Runs on every push to develop
+3. Linting, type-checking, tests run
+4. Builds Docker images
+5. Deploys to staging automatically","devops,ci-cd,automation"
+"Configure production deployment to AWS",Story,P1,8,Sprint 6,"DevOps & Deployment","Set up production infrastructure on AWS with EC2, RDS, S3, and CloudFront.","1. Backend deployed to EC2
+2. Database on RDS PostgreSQL
+3. Frontend on S3 + CloudFront
+4. SSL certificate configured
+5. Environment variables secured","devops,aws,production"
+"Implement monitoring with Sentry and Datadog",Story,P1,8,Sprint 6,"DevOps & Deployment","Set up error tracking with Sentry and application monitoring with Datadog.","1. Sentry captures frontend errors
+2. Sentry captures backend exceptions
+3. Datadog monitors API performance
+4. Alerts configured for critical issues
+5. Dashboard shows key metrics","devops,monitoring,observability"
+"Write unit tests for backend services",Story,P1,13,Sprint 6,"Testing & Quality","Create comprehensive unit tests for all service layer functions using Jest.","1. Test coverage 80%+ for services
+2. Tests for auth service
+3. Tests for shift service
+4. Tests for employee service
+5. Tests run in CI/CD","testing,unit-tests,quality"
+"Write integration tests for API endpoints",Story,P1,8,Sprint 6,"Testing & Quality","Create integration tests for all API endpoints using Supertest.","1. Test coverage 70%+ for API routes
+2. Tests for auth endpoints
+3. Tests for CRUD operations
+4. Tests for error cases
+5. Database reset between tests","testing,integration-tests,quality"
+"Enhance E2E tests with Cypress",Story,P1,8,Sprint 6,"Testing & Quality","Expand Cypress test coverage for critical user workflows and new features.","1. E2E tests for authentication
+2. E2E tests for shift creation
+3. E2E tests for schedule management
+4. E2E tests for time-off requests
+5. Tests run in CI/CD","testing,e2e,cypress"
+"Perform security audit and penetration testing",Story,P1,8,Sprint 6,"Testing & Quality","Conduct comprehensive security audit and fix vulnerabilities.","1. OWASP Top 10 vulnerabilities checked
+2. SQL injection tests passed
+3. XSS prevention verified
+4. CSRF protection tested
+5. Security report generated","security,testing,audit"
+"Write comprehensive API documentation",Task,P1,5,Sprint 6,"DevOps & Deployment","Create OpenAPI/Swagger documentation for all API endpoints.","1. Swagger UI accessible at /api-docs
+2. All endpoints documented
+3. Request/response schemas defined
+4. Authentication documented
+5. Examples provided","documentation,api,swagger"
+"Create developer onboarding guide",Task,P1,5,Sprint 6,"DevOps & Deployment","Write comprehensive README_DEVELOPER.md with setup instructions and best practices.","1. Local setup instructions
+2. Docker setup documented
+3. Database migration guide
+4. Testing guide included
+5. Troubleshooting section","documentation,onboarding,guide"
+"Optimize database queries and indexes",Task,P1,5,Sprint 6,"Backend & Database Infrastructure","Analyze and optimize slow database queries with proper indexing and query optimization.","1. All slow queries identified (>100ms)
+2. Indexes added for optimization
+3. Query performance improved 10x+
+4. N+1 query problems resolved
+5. Query monitoring in place","database,performance,optimization"
+"Implement load testing with k6",Task,P2,5,Sprint 6,"Testing & Quality","Create load tests to verify system performance under high load.","1. k6 scripts created
+2. Test scenarios: 100, 500, 1000 users
+3. API response times measured
+4. Bottlenecks identified
+5. Performance benchmarks documented","testing,load-testing,performance"
+"Set up database backup and recovery",Task,P1,5,Sprint 6,"DevOps & Deployment","Configure automated database backups and test recovery procedures.","1. Daily automated backups
+2. Point-in-time recovery enabled
+3. Backup retention 30 days
+4. Recovery tested successfully
+5. Backup monitoring alerts","devops,database,backup"
+"Configure HTTPS/SSL certificates",Task,P0,3,Sprint 6,"DevOps & Deployment","Set up SSL certificates for production domain with auto-renewal.","1. SSL certificate installed
+2. HTTPS enforced (redirect HTTP)
+3. Certificate auto-renewal configured
+4. Security headers configured
+5. SSL Labs grade A+","security,ssl,production"
+"Migrate from JavaScript to TypeScript (frontend)",Story,P1,13,Sprint 1,"Testing & Quality","Incrementally migrate React frontend from JavaScript to TypeScript for type safety.","1. TypeScript configured in Vite
+2. tsconfig.json properly configured
+3. All components have TypeScript interfaces
+4. No 'any' types used
+5. Type checking passes","typescript,migration,frontend"
+"Implement global state management with Zustand",Task,P1,8,Sprint 2,"Backend & Database Infrastructure","Replace prop drilling with Zustand for global state management.","1. Zustand store created
+2. Auth state managed globally
+3. Employee data in store
+4. Shift data in store
+5. Performance improved","state-management,zustand,frontend"
+"Add React Error Boundaries",Task,P1,3,Sprint 2,"Testing & Quality","Implement error boundaries for graceful error handling in React components.","1. Error boundary component created
+2. Wraps main app sections
+3. Fallback UI displays on errors
+4. Errors logged to Sentry
+5. User sees friendly error message","error-handling,react,ux"
+"Implement code splitting and lazy loading",Task,P1,5,Sprint 3,"Mobile & PWA","Add React.lazy and Suspense for code splitting to improve initial load time.","1. Routes lazy loaded
+2. Heavy components lazy loaded
+3. Bundle size reduced 50%+
+4. Initial load time < 2s
+5. Loading states displayed","performance,code-splitting,frontend"
+"Add React Query for server state",Task,P1,5,Sprint 3,"Backend & Database Infrastructure","Integrate React Query for server state management, caching, and synchronization.","1. React Query provider configured
+2. API calls use useQuery hooks
+3. Mutations use useMutation
+4. Optimistic updates implemented
+5. Cache invalidation working","react-query,state-management,frontend"
+"Implement virtual scrolling for employee list",Task,P2,5,Sprint 4,"Mobile & PWA","Add react-window for virtual scrolling to handle 1000+ employees efficiently.","1. Virtual scrolling implemented
+2. Handles 1000+ employees smoothly
+3. Performance: 60 FPS maintained
+4. Scroll position preserved
+5. Works on mobile devices","performance,virtual-scroll,optimization"
+"Add form validation with React Hook Form",Task,P1,5,Sprint 4,"Backend & Database Infrastructure","Replace manual form handling with React Hook Form and Zod validation.","1. React Hook Form integrated
+2. Zod schemas for validation
+3. Real-time validation feedback
+4. Form errors displayed clearly
+5. Submission prevented if invalid","forms,validation,ux"
+"Implement Storybook for component documentation",Task,P2,8,Sprint 5,"Testing & Quality","Set up Storybook for component library documentation and visual testing.","1. Storybook configured
+2. All UI components documented
+3. Props documented with types
+4. Interactive examples provided
+5. Accessible via npm run storybook","documentation,storybook,components"
+"Add Husky for Git hooks",Task,P1,3,Sprint 5,"DevOps & Deployment","Configure Husky and lint-staged for pre-commit linting and formatting.","1. Husky installed and configured
+2. Pre-commit hook runs ESLint
+3. Pre-commit hook runs Prettier
+4. Type checking on pre-push
+5. Commit messages validated","devops,git-hooks,quality"
+"Create environment configuration system",Task,P1,3,Sprint 5,"DevOps & Deployment","Set up environment-specific configuration for dev, staging, and production.","1. .env files for each environment
+2. Frontend uses import.meta.env
+3. Backend uses process.env
+4. No secrets in git repository
+5. Configuration documented","configuration,environment,security"
+"Implement GDPR compliance features",Story,P1,8,Sprint 6,"Backend & Database Infrastructure","Add GDPR-required features: data export, data deletion, consent management.","1. GET /users/:id/export returns all user data
+2. DELETE /users/:id permanently deletes data
+3. Consent tracking implemented
+4. Privacy policy endpoint
+5. Data retention policies enforced","compliance,gdpr,legal"
+"Add health check and status endpoints",Task,P1,2,Sprint 6,"DevOps & Deployment","Create health check endpoints for monitoring and load balancer probes.","1. GET /health returns 200 OK
+2. GET /health/db checks database connection
+3. GET /health/redis checks Redis connection
+4. Response includes version number
+5. Used by load balancer","devops,monitoring,health-check"
