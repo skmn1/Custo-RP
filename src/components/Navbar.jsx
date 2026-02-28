@@ -1,10 +1,41 @@
 import React, { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Button from './ui/Button';
 
-const Navbar = ({ currentView, setCurrentView }) => {
+const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Derive the active view from the current URL pathname
+  const currentView = (() => {
+    const path = location.pathname;
+    if (path.startsWith('/pos')) return 'pos';
+    if (path.startsWith('/dashboard')) return 'dashboard';
+    if (path.startsWith('/scheduler')) return 'scheduler';
+    if (path.startsWith('/employees')) return 'employees';
+    if (path.startsWith('/payroll')) return 'payroll';
+    return 'scheduler';
+  })();
+
+  const setCurrentView = (viewId) => {
+    const routes = {
+      dashboard: '/dashboard',
+      scheduler: '/scheduler',
+      employees: '/employees',
+      payroll: '/payroll',
+      pos: '/pos',
+    };
+    navigate(routes[viewId] || '/scheduler');
+  };
 
   const navItems = [
+    { 
+      id: 'pos', 
+      label: 'PoS Locations', 
+      icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4',
+      badge: null
+    },
     { 
       id: 'dashboard', 
       label: 'Dashboard', 

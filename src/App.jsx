@@ -1,33 +1,29 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Dashboard from './pages/Dashboard';
 import SchedulerPage from './pages/SchedulerPage';
 import EmployeesPage from './pages/EmployeesPage';
 import PayrollPage from './pages/PayrollPage';
+import PosListPage from './pages/PosListPage';
+import PosDetailPage from './pages/PosDetailPage';
 
 const App = () => {
-  const [currentView, setCurrentView] = useState('scheduler');
-
-  const renderCurrentView = () => {
-    switch (currentView) {
-      case 'dashboard':
-        return <Dashboard />;
-      case 'scheduler':
-        return <SchedulerPage />;
-      case 'employees':
-        return <EmployeesPage />;
-      case 'payroll':
-        return <PayrollPage />;
-      default:
-        return <Dashboard />;
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar currentView={currentView} setCurrentView={setCurrentView} />
-      {renderCurrentView()}
-    </div>
+    <BrowserRouter>
+      <div className="min-h-screen bg-gray-50">
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Navigate to="/scheduler" replace />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/scheduler" element={<SchedulerPage />} />
+          <Route path="/employees" element={<EmployeesPage />} />
+          <Route path="/payroll" element={<PayrollPage />} />
+          <Route path="/pos" element={<PosListPage />} />
+          <Route path="/pos/:id" element={<PosDetailPage />} />
+        </Routes>
+      </div>
+    </BrowserRouter>
   );
 };
 
