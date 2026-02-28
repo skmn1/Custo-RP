@@ -2,11 +2,13 @@ import { useState, useCallback } from 'react';
 import { posApi } from '../data/pos';
 
 /**
- * usePos — manages PoS data fetching and mutations.
+ * usePos — manages PoS data fetching and mutations,
+ * including employee management scoped to a PoS.
  *
  * Returns:
  *   posList          — array of PoS objects
- *   selectedPos      — single PoS detail (with dashboard)
+ *   selectedPos      — single PoS detail (with dashboard + employees)
+ *   managers         — array of employees with isManager: true
  *   isLoading        — boolean
  *   error            — error object or null
  *   fetchPosList     — (includeInactive?: boolean) => Promise
@@ -14,12 +16,17 @@ import { posApi } from '../data/pos';
  *   createPos        — (data: object) => Promise
  *   updatePos        — (id: number, data: object) => Promise
  *   deletePos        — (id: number) => Promise
+ *   fetchManagers    — () => Promise
+ *   addEmployee      — (posId, data) => Promise
+ *   updateEmployee   — (posId, empId, data) => Promise
+ *   removeEmployee   — (posId, empId) => Promise
  *   clearError       — () => void
  *   clearSelectedPos — () => void
  */
 export const usePos = () => {
   const [posList, setPosList] = useState([]);
   const [selectedPos, setSelectedPos] = useState(null);
+  const [managers, setManagers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -110,9 +117,84 @@ export const usePos = () => {
     }
   }, []);
 
+  // ── Manager list ──
+
+  const fetchManagers = useCallback(async () => {
+    try {
+      const data = await posApi.listManagers();
+      setManagers(data);
+      return data;
+    } catch (err) {
+      setError(err.message || 'Failed to fetch managers');
+      throw err;
+    }
+  }, []);
+
+  // ── Employee CRUD scoped to a PoS ──
+
+  const addEmployee = useCallback(async (posId, data) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const newEmp = await posApi.addEmployee(posId, data);
+      // Refetch detail to stay in sync
+      const updated = await posApi.getById(posId);
+      setSelectedPos(updated);
+      // Refresh managers list in case a new manager was added
+      const mgrs = await posApi.listManagers();
+      setManagers(mgrs);
+      return newEmp;
+    } catch (err) {
+      setError(err.message || 'Failed to add employee');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const updateEmployee = useCallback(async (posId, empId, data) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const updated = await posApi.updateEmployee(posId, empId, data);
+      // Refetch detail to stay in sync
+      const posDetail = await posApi.getById(posId);
+      setSelectedPos(posDetail);
+      // Refresh managers list
+      const mgrs = await posApi.listManagers();
+      setManagers(mgrs);
+      return updated;
+    } catch (err) {
+      setError(err.message || 'Failed to update employee');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const removeEmployee = useCallback(async (posId, empId) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      await posApi.removeEmployee(posId, empId);
+      // Refetch detail
+      const posDetail = await posApi.getById(posId);
+      setSelectedPos(posDetail);
+      // Refresh managers list
+      const mgrs = await posApi.listManagers();
+      setManagers(mgrs);
+    } catch (err) {
+      setError(err.message || 'Failed to remove employee');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   return {
     posList,
     selectedPos,
+    managers,
     isLoading,
     error,
     fetchPosList,
@@ -120,6 +202,10 @@ export const usePos = () => {
     createPos,
     updatePos,
     deletePos,
+    fetchManagers,
+    addEmployee,
+    updateEmployee,
+    removeEmployee,
     clearError,
     clearSelectedPos,
   };

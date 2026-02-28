@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import PosDashboard from '../components/pos/PosDashboard';
+import PosEmployeeList from '../components/pos/PosEmployeeList';
 import PosModal from '../components/pos/PosModal';
 import Button from '../components/ui/Button';
 import { usePos } from '../hooks/usePos';
@@ -9,7 +10,19 @@ import { POS_TYPE_LABELS, POS_TYPE_COLORS, DAYS_OF_WEEK, DAY_LABELS } from '../c
 const PosDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { selectedPos, isLoading, error, fetchPosDetail, updatePos, deletePos } = usePos();
+  const {
+    selectedPos,
+    managers,
+    isLoading,
+    error,
+    fetchPosDetail,
+    updatePos,
+    deletePos,
+    fetchManagers,
+    addEmployee,
+    updateEmployee,
+    removeEmployee,
+  } = usePos();
 
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
@@ -18,7 +31,8 @@ const PosDetailPage = () => {
     if (id) {
       fetchPosDetail(id).catch(() => {});
     }
-  }, [id, fetchPosDetail]);
+    fetchManagers().catch(() => {});
+  }, [id, fetchPosDetail, fetchManagers]);
 
   const handleEdit = useCallback(() => {
     setEditModalOpen(true);
@@ -195,6 +209,17 @@ const PosDetailPage = () => {
         </div>
       </div>
 
+      {/* Employees */}
+      <div className="mb-6">
+        <PosEmployeeList
+          employees={pos.employees || []}
+          posId={pos.id}
+          onAdd={addEmployee}
+          onUpdate={updateEmployee}
+          onRemove={removeEmployee}
+        />
+      </div>
+
       {/* Opening Hours */}
       <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Opening Hours</h2>
@@ -230,6 +255,7 @@ const PosDetailPage = () => {
         onSubmit={handleEditSubmit}
         initialData={pos}
         mode="edit"
+        managers={managers}
       />
 
       {/* Delete Confirmation Dialog */}

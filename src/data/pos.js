@@ -3,7 +3,10 @@
  * In production, this data comes from the Spring Boot backend API.
  */
 
+import { initialEmployees } from './employees';
+
 let nextId = 6;
+let nextEmpId = 13;
 
 export const initialPosData = [
   {
@@ -12,7 +15,7 @@ export const initialPosData = [
     address: '123 Main St, Downtown',
     type: 'BUTCHER',
     phone: '(555) 123-4567',
-    managerId: 1,
+    managerId: 'emp7',
     managerName: 'Jane Smith',
     openingHours: {
       monday: { open: '08:00', close: '20:00', closed: false },
@@ -33,7 +36,7 @@ export const initialPosData = [
     address: '456 Oak Ave, Westside District',
     type: 'GROCERY',
     phone: '(555) 234-5678',
-    managerId: 2,
+    managerId: 'emp8',
     managerName: 'John Doe',
     openingHours: {
       monday: { open: '07:00', close: '21:00', closed: false },
@@ -54,7 +57,7 @@ export const initialPosData = [
     address: '789 Elm Blvd, City Center',
     type: 'FAST_FOOD',
     phone: '(555) 345-6789',
-    managerId: 3,
+    managerId: 'emp9',
     managerName: 'Alice Brown',
     openingHours: {
       monday: { open: '10:00', close: '23:00', closed: false },
@@ -96,7 +99,7 @@ export const initialPosData = [
     address: '654 River Ln, Riverside',
     type: 'BUTCHER',
     phone: '(555) 567-8901',
-    managerId: 1,
+    managerId: 'emp7',
     managerName: 'Jane Smith',
     openingHours: {
       monday: { open: '07:00', close: '18:00', closed: false },
@@ -114,14 +117,14 @@ export const initialPosData = [
 ];
 
 /**
- * Mock dashboard data for PoS detail views.
+ * Mock dashboard extra data for PoS detail views (non-employee fields).
  */
-const dashboardData = {
-  1: { employeeCount: 12, shiftsToday: 5, lastInventoryDate: '2026-02-25', lowStockAlerts: 3 },
-  2: { employeeCount: 8, shiftsToday: 3, lastInventoryDate: '2026-02-27', lowStockAlerts: 0 },
-  3: { employeeCount: 15, shiftsToday: 7, lastInventoryDate: '2026-02-20', lowStockAlerts: 5 },
-  4: { employeeCount: 6, shiftsToday: 2, lastInventoryDate: null, lowStockAlerts: 0 },
-  5: { employeeCount: 4, shiftsToday: 0, lastInventoryDate: '2026-01-30', lowStockAlerts: 1 },
+const dashboardExtra = {
+  1: { shiftsToday: 5, lastInventoryDate: '2026-02-25', lowStockAlerts: 3 },
+  2: { shiftsToday: 3, lastInventoryDate: '2026-02-27', lowStockAlerts: 0 },
+  3: { shiftsToday: 7, lastInventoryDate: '2026-02-20', lowStockAlerts: 5 },
+  4: { shiftsToday: 2, lastInventoryDate: null, lowStockAlerts: 0 },
+  5: { shiftsToday: 0, lastInventoryDate: '2026-01-30', lowStockAlerts: 1 },
 };
 
 /**
@@ -131,6 +134,7 @@ const dashboardData = {
  */
 
 let posStore = [...initialPosData];
+let employeeStore = [...initialEmployees];
 
 const delay = (ms = 300) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -157,13 +161,14 @@ export const posApi = {
       err.status = 404;
       throw err;
     }
+    const posEmployees = employeeStore.filter((e) => e.posId === pos.id);
+    const extra = dashboardExtra[pos.id] || { shiftsToday: 0, lastInventoryDate: null, lowStockAlerts: 0 };
     return {
       ...pos,
-      dashboard: dashboardData[pos.id] || {
-        employeeCount: 0,
-        shiftsToday: 0,
-        lastInventoryDate: null,
-        lowStockAlerts: 0,
+      employees: posEmployees,
+      dashboard: {
+        employeeCount: posEmployees.length,
+        ...extra,
       },
     };
   },
@@ -263,11 +268,97 @@ export const posApi = {
     posStore[index].updatedAt = new Date().toISOString();
   },
 
+  // ── Employee operations scoped to a PoS ──
+
+  /**
+   * GET /api/v1/pos/:posId/employees
+   */
+  async listEmployees(posId) {
+    await delay();
+    return employeeStore.filter((e) => e.posId === Number(posId));
+  },
+
+  /**
+   * Get all employees flagged as managers (for manager dropdown)
+   */
+  async listManagers() {
+    await delay();
+    return employeeStore.filter((e) => e.isManager);
+  },
+
+  /**
+   * POST /api/v1/pos/:posId/employees
+   */
+  async addEmployee(posId, data) {
+    await delay();
+    const avatar = data.name
+      ? data.name.split(' ').map((n) => n.charAt(0)).join('').toUpperCase()
+      : '??';
+    const colors = [
+      'bg-blue-500','bg-green-500','bg-purple-500','bg-orange-500',
+      'bg-pink-500','bg-indigo-500','bg-red-500','bg-yellow-500',
+      'bg-teal-500','bg-cyan-500','bg-rose-500','bg-amber-500','bg-violet-500',
+    ];
+    const newEmp = {
+      id: `emp${nextEmpId++}`,
+      name: data.name,
+      role: data.role || '',
+      avatar,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      email: data.email || '',
+      maxHours: data.maxHours || 40,
+      department: data.department || '',
+      posId: Number(posId),
+      isManager: data.isManager || false,
+    };
+    employeeStore.push(newEmp);
+    return newEmp;
+  },
+
+  /**
+   * PUT /api/v1/pos/:posId/employees/:empId
+   */
+  async updateEmployee(posId, empId, data) {
+    await delay();
+    const idx = employeeStore.findIndex((e) => e.id === empId && e.posId === Number(posId));
+    if (idx === -1) {
+      const err = new Error('Employee not found in this PoS');
+      err.status = 404;
+      throw err;
+    }
+    employeeStore[idx] = {
+      ...employeeStore[idx],
+      ...data,
+      id: employeeStore[idx].id,
+      posId: employeeStore[idx].posId,
+      avatar: data.name
+        ? data.name.split(' ').map((n) => n.charAt(0)).join('').toUpperCase()
+        : employeeStore[idx].avatar,
+    };
+    return { ...employeeStore[idx] };
+  },
+
+  /**
+   * DELETE /api/v1/pos/:posId/employees/:empId
+   */
+  async removeEmployee(posId, empId) {
+    await delay();
+    const idx = employeeStore.findIndex((e) => e.id === empId && e.posId === Number(posId));
+    if (idx === -1) {
+      const err = new Error('Employee not found in this PoS');
+      err.status = 404;
+      throw err;
+    }
+    employeeStore.splice(idx, 1);
+  },
+
   /**
    * Reset store (for testing)
    */
   _reset() {
     posStore = [...initialPosData];
+    employeeStore = [...initialEmployees];
     nextId = 6;
+    nextEmpId = 13;
   },
 };

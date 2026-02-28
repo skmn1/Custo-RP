@@ -10,12 +10,14 @@ const PosListPage = () => {
   const navigate = useNavigate();
   const {
     posList,
+    managers,
     isLoading,
     error,
     fetchPosList,
     createPos,
     updatePos,
     deletePos,
+    fetchManagers,
     clearError,
   } = usePos();
 
@@ -30,7 +32,8 @@ const PosListPage = () => {
   // Fetch on mount and when showInactive changes
   useEffect(() => {
     fetchPosList(showInactive);
-  }, [fetchPosList, showInactive]);
+    fetchManagers().catch(() => {});
+  }, [fetchPosList, fetchManagers, showInactive]);
 
   // Filtered list
   const filteredList = useMemo(() => {
@@ -239,6 +242,7 @@ const PosListPage = () => {
         onSubmit={handleModalSubmit}
         initialData={editingPos}
         mode={modalMode}
+        managers={managers}
       />
 
       {/* Delete Confirmation Dialog */}

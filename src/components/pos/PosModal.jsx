@@ -8,7 +8,7 @@ import {
   DEFAULT_OPENING_HOURS,
 } from '../../constants/pos';
 
-const PosModal = ({ isOpen, onClose, onSubmit, initialData = null, mode = 'create' }) => {
+const PosModal = ({ isOpen, onClose, onSubmit, initialData = null, mode = 'create', managers = [] }) => {
   const isEdit = mode === 'edit';
 
   const emptyForm = {
@@ -139,13 +139,14 @@ const PosModal = ({ isOpen, onClose, onSubmit, initialData = null, mode = 'creat
     setServerError(null);
 
     try {
+      const selectedManager = managers.find((m) => m.id === form.managerId);
       await onSubmit({
         name: form.name.trim(),
         address: form.address.trim(),
         type: form.type,
         phone: form.phone.trim() || null,
-        managerId: form.managerId ? Number(form.managerId) : null,
-        managerName: form.managerName.trim() || null,
+        managerId: form.managerId || null,
+        managerName: selectedManager ? selectedManager.name : null,
         openingHours: form.openingHours,
       });
       onClose();
@@ -274,21 +275,36 @@ const PosModal = ({ isOpen, onClose, onSubmit, initialData = null, mode = 'creat
           />
         </div>
 
-        {/* Manager */}
+        {/* Manager (dropdown from employees with manager status) */}
         <div>
           <label htmlFor="pos-manager" className="block text-sm font-medium text-gray-700 mb-1">
-            Manager Name
+            Manager
           </label>
-          <input
+          <select
             id="pos-manager"
-            data-testid="pos-manager-input"
-            type="text"
-            value={form.managerName}
-            onChange={(e) => handleFieldChange('managerName', e.target.value)}
-            onBlur={() => handleBlur('managerName')}
-            placeholder="e.g. Jane Smith"
+            data-testid="pos-manager-select"
+            value={form.managerId}
+            onChange={(e) => {
+              const id = e.target.value;
+              const mgr = managers.find((m) => m.id === id);
+              handleFieldChange('managerId', id);
+              handleFieldChange('managerName', mgr ? mgr.name : '');
+            }}
+            onBlur={() => handleBlur('managerId')}
             className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
+          >
+            <option value="">— Select a manager —</option>
+            {managers.map((m) => (
+              <option key={m.id} value={m.id}>
+                {m.name} — {m.role}
+              </option>
+            ))}
+          </select>
+          {managers.length === 0 && (
+            <p className="mt-1 text-xs text-gray-500">
+              No managers available. Add an employee with manager status first.
+            </p>
+          )}
         </div>
 
         {/* Opening Hours */}

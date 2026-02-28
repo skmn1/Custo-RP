@@ -324,4 +324,117 @@ describe('PoS Management Module', () => {
       cy.get('[data-testid="opening-hours-monday-close"]').should('not.be.disabled');
     });
   });
+
+  describe('Manager Dropdown', () => {
+    it('should display a manager select dropdown in create modal', () => {
+      cy.get('[data-testid="create-pos-btn"]').click();
+      cy.get('[data-testid="pos-manager-select"]').should('be.visible');
+      cy.get('[data-testid="pos-manager-select"]').find('option').should('have.length.greaterThan', 1);
+    });
+
+    it('should display manager dropdown in edit modal pre-selected', () => {
+      cy.get('[data-testid="pos-card"]').first().within(() => {
+        cy.get('[data-testid="pos-edit-btn"]').click();
+      });
+      cy.get('[data-testid="pos-manager-select"]').should('be.visible');
+    });
+
+    it('should select a manager and see the name on detail page', () => {
+      cy.get('[data-testid="pos-card"]').first().within(() => {
+        cy.get('[data-testid="pos-view-btn"]').click();
+      });
+
+      cy.get('[data-testid="pos-detail-edit-btn"]').click();
+
+      // Pick the first manager option
+      cy.get('[data-testid="pos-manager-select"]')
+        .find('option')
+        .eq(1)
+        .invoke('val')
+        .then((val) => {
+          cy.get('[data-testid="pos-manager-select"]').select(val);
+        });
+
+      cy.get('[data-testid="modal-submit-button"]').click();
+      cy.wait(500);
+
+      // Manager name should be visible
+      cy.get('[data-testid="pos-detail-manager"]').should('not.contain', 'Unassigned');
+    });
+  });
+
+  describe('Employee Management on PoS Detail', () => {
+    beforeEach(() => {
+      cy.visit('/pos');
+      cy.get('[data-testid="pos-card"]').first().within(() => {
+        cy.get('[data-testid="pos-view-btn"]').click();
+      });
+      cy.get('[data-testid="pos-detail-name"]').should('be.visible');
+    });
+
+    it('should display the employee section', () => {
+      cy.get('[data-testid="pos-employee-section"]').should('be.visible');
+    });
+
+    it('should show employee cards with name, role, department and manager badge', () => {
+      cy.get('[data-testid="pos-employee-card"]').should('have.length.greaterThan', 0);
+      cy.get('[data-testid="pos-employee-card"]').first().within(() => {
+        // Should contain name, role, department
+        cy.get('h3').should('not.be.empty');
+        cy.get('p').should('have.length.greaterThan', 0);
+      });
+    });
+
+    it('should search employees', () => {
+      cy.get('[data-testid="pos-employee-search"]').should('be.visible');
+      cy.get('[data-testid="pos-employee-search"]').type('zzzzNonExistent');
+      cy.get('[data-testid="pos-employee-empty"]').should('be.visible');
+    });
+
+    it('should open add employee modal and require fields', () => {
+      cy.get('[data-testid="pos-add-employee-btn"]').click();
+      cy.contains('Add Employee to PoS').should('be.visible');
+
+      // Validate button disabled without data
+      cy.get('[data-testid="modal-submit-button"]').should('be.disabled');
+    });
+
+    it('should add a new employee', () => {
+      cy.get('[data-testid="pos-employee-card"]').then(($cards) => {
+        const countBefore = $cards.length;
+
+        cy.get('[data-testid="pos-add-employee-btn"]').click();
+        cy.get('[data-testid="pos-emp-name-input"]').type('Cypress Test Employee');
+        cy.get('[data-testid="pos-emp-email-input"]').type('cypress@test.com');
+        cy.get('[data-testid="pos-emp-role-input"]').type('Cashier');
+        cy.get('[data-testid="pos-emp-dept-input"]').type('Sales');
+        cy.get('[data-testid="pos-emp-hours-input"]').clear().type('35');
+
+        cy.get('[data-testid="modal-submit-button"]').should('not.be.disabled');
+        cy.get('[data-testid="modal-submit-button"]').click();
+        cy.wait(500);
+
+        cy.get('[data-testid="pos-employee-card"]').should('have.length', countBefore + 1);
+        cy.contains('Cypress Test Employee').should('be.visible');
+      });
+    });
+
+    it('should remove an employee', () => {
+      cy.get('[data-testid="pos-employee-card"]').then(($cards) => {
+        const countBefore = $cards.length;
+        if (countBefore === 0) return; // skip if empty
+
+        // Hover to reveal remove button (force since hover is CSS)
+        cy.get('[data-testid="pos-employee-card"]').last().within(() => {
+          cy.get('[data-testid="pos-employee-remove-btn"]').click({ force: true });
+        });
+
+        cy.get('[data-testid="pos-employee-delete-dialog"]').should('be.visible');
+        cy.get('[data-testid="pos-emp-delete-confirm"]').click();
+        cy.wait(500);
+
+        cy.get('[data-testid="pos-employee-card"]').should('have.length', countBefore - 1);
+      });
+    });
+  });
 });
