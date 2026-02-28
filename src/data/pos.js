@@ -242,27 +242,27 @@ export const posApi = {
       }
     }
 
-    // When the manager changes, sync the isManager flag on employees
+    // When the manager changes, move old manager out and new manager in
     const oldManagerId = posStore[index].managerId;
     const newManagerId = data.managerId !== undefined ? data.managerId : oldManagerId;
 
     if (oldManagerId !== newManagerId) {
-      // Unset isManager on the previous manager employee (if in this PoS)
+      const thisPosId = posStore[index].id;
+      // Remove old manager from this PoS employee list (keep isManager flag –
+      // they remain a manager-capable employee for future assignment)
       if (oldManagerId) {
         const oldMgrIdx = employeeStore.findIndex(
-          (e) => e.id === oldManagerId && e.posId === posStore[index].id
+          (e) => e.id === oldManagerId && e.posId === thisPosId
         );
         if (oldMgrIdx !== -1) {
-          employeeStore[oldMgrIdx] = { ...employeeStore[oldMgrIdx], isManager: false };
+          employeeStore[oldMgrIdx] = { ...employeeStore[oldMgrIdx], posId: null };
         }
       }
-      // Set isManager on the new manager employee (if in this PoS)
+      // Move new manager into this PoS and ensure isManager flag is set
       if (newManagerId) {
-        const newMgrIdx = employeeStore.findIndex(
-          (e) => e.id === newManagerId && e.posId === posStore[index].id
-        );
+        const newMgrIdx = employeeStore.findIndex((e) => e.id === newManagerId);
         if (newMgrIdx !== -1) {
-          employeeStore[newMgrIdx] = { ...employeeStore[newMgrIdx], isManager: true };
+          employeeStore[newMgrIdx] = { ...employeeStore[newMgrIdx], isManager: true, posId: thisPosId };
         }
       }
     }
@@ -309,6 +309,49 @@ export const posApi = {
   async listManagers() {
     await delay();
     return employeeStore.filter((e) => e.isManager);
+  },
+
+  /**
+   * Get all employees NOT assigned to the given PoS (for swap picker).
+   * Enriches each record with the name of the PoS they currently belong to.
+   */
+  async listAvailableEmployees(posId) {
+    await delay();
+    return employeeStore
+      .filter((e) => e.posId !== Number(posId))
+      .map((e) => {
+        const pos = posStore.find((p) => p.id === e.posId);
+        return { ...e, posName: pos ? pos.name : 'Unassigned' };
+      });
+  },
+
+  /**
+   * PUT /api/v1/pos/:posId/employees/:empId/swap
+   * Swaps posId assignments between two employees.
+   */
+  async swapEmployee(posId, currentEmpId, newEmpId) {
+    await delay();
+    const numPosId = Number(posId);
+    const currentIdx = employeeStore.findIndex(
+      (e) => e.id === currentEmpId && e.posId === numPosId
+    );
+    if (currentIdx === -1) {
+      const err = new Error('Current employee not found in this PoS');
+      err.status = 404;
+      throw err;
+    }
+    const newIdx = employeeStore.findIndex((e) => e.id === newEmpId);
+    if (newIdx === -1) {
+      const err = new Error('Replacement employee not found');
+      err.status = 404;
+      throw err;
+    }
+    // Swap posId assignments
+    const currentPosId = employeeStore[currentIdx].posId;
+    const newPosId = employeeStore[newIdx].posId;
+    employeeStore[currentIdx] = { ...employeeStore[currentIdx], posId: newPosId };
+    employeeStore[newIdx] = { ...employeeStore[newIdx], posId: currentPosId };
+    return { swapped: [{ ...employeeStore[currentIdx] }, { ...employeeStore[newIdx] }] };
   },
 
   /**

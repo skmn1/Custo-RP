@@ -22,6 +22,8 @@ const PosDetailPage = () => {
     addEmployee,
     updateEmployee,
     removeEmployee,
+    swapEmployee,
+    fetchAvailableEmployees,
   } = usePos();
 
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -223,6 +225,8 @@ const PosDetailPage = () => {
           onAdd={addEmployee}
           onUpdate={updateEmployee}
           onRemove={removeEmployee}
+          onSwap={swapEmployee}
+          onFetchAvailableEmployees={fetchAvailableEmployees}
         />
       </div>
 

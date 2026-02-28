@@ -39,6 +39,11 @@ const DeleteIcon = ({ className = 'w-4 h-4' }) => (
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
   </svg>
 );
+const SwapIcon = ({ className = 'w-4 h-4' }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
+  </svg>
+);
 
 const ManagerBadge = () => (
   <span className="inline-flex px-2.5 py-0.5 text-xs font-semibold rounded-full bg-amber-100 text-amber-800 border border-amber-200">
@@ -53,7 +58,7 @@ const DeptBadge = ({ dept }) => (
 );
 
 // ── Cards View ──
-const EmpCardsView = ({ employees, onEdit, onRemove }) => (
+const EmpCardsView = ({ employees, onEdit, onRemove, onSwap }) => (
   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
     {employees.map((emp) => (
       <div
@@ -76,6 +81,9 @@ const EmpCardsView = ({ employees, onEdit, onRemove }) => (
             </div>
           </div>
           <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button onClick={() => onSwap(emp)} className="text-emerald-600 hover:text-emerald-800 p-2 rounded-full hover:bg-emerald-50 transition-colors" title="Replace employee" data-testid="pos-employee-swap-btn">
+              <SwapIcon className="w-4.5 h-4.5" />
+            </button>
             <button onClick={() => onEdit(emp)} className="text-indigo-600 hover:text-indigo-800 p-2 rounded-full hover:bg-indigo-50 transition-colors" title="Edit employee" data-testid="pos-employee-edit-btn">
               <EditIcon className="w-4.5 h-4.5" />
             </button>
@@ -104,7 +112,7 @@ const EmpCardsView = ({ employees, onEdit, onRemove }) => (
 );
 
 // ── Grid View (compact, like EmployeeGrid) ──
-const EmpGridView = ({ employees, onEdit, onRemove }) => (
+const EmpGridView = ({ employees, onEdit, onRemove, onSwap }) => (
   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
     {employees.map((emp) => (
       <div
@@ -117,6 +125,9 @@ const EmpGridView = ({ employees, onEdit, onRemove }) => (
             {emp.avatar}
           </div>
           <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button onClick={() => onSwap(emp)} className="text-emerald-600 hover:text-emerald-800 p-1 rounded-full hover:bg-emerald-50 transition-colors" title="Replace" data-testid="pos-employee-swap-btn">
+              <SwapIcon />
+            </button>
             <button onClick={() => onEdit(emp)} className="text-indigo-600 hover:text-indigo-800 p-1 rounded-full hover:bg-indigo-50 transition-colors" title="Edit" data-testid="pos-employee-edit-btn">
               <EditIcon />
             </button>
@@ -146,7 +157,7 @@ const EmpGridView = ({ employees, onEdit, onRemove }) => (
 );
 
 // ── List View (table, like EmployeeList) ──
-const EmpListView = ({ employees, onEdit, onRemove }) => (
+const EmpListView = ({ employees, onEdit, onRemove, onSwap }) => (
   <div className="overflow-hidden rounded-lg border border-gray-200">
     <table className="min-w-full divide-y divide-gray-200">
       <thead className="bg-gray-50">
@@ -181,6 +192,9 @@ const EmpListView = ({ employees, onEdit, onRemove }) => (
             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{emp.email}</td>
             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
               <div className="flex items-center justify-end space-x-2">
+                <button onClick={() => onSwap(emp)} className="text-emerald-600 hover:text-emerald-900 p-1 rounded-full hover:bg-emerald-50 transition-colors" title="Replace" data-testid="pos-employee-swap-btn">
+                  <SwapIcon />
+                </button>
                 <button onClick={() => onEdit(emp)} className="text-indigo-600 hover:text-indigo-900 p-1 rounded-full hover:bg-indigo-50 transition-colors" title="Edit" data-testid="pos-employee-edit-btn">
                   <EditIcon />
                 </button>
@@ -197,12 +211,17 @@ const EmpListView = ({ employees, onEdit, onRemove }) => (
 );
 
 // ── Main Component ──
-const PosEmployeeList = ({ employees = [], posId, onAdd, onUpdate, onRemove }) => {
+const PosEmployeeList = ({ employees = [], posId, onAdd, onUpdate, onRemove, onSwap, onFetchAvailableEmployees }) => {
   const [search, setSearch] = useState('');
   const [viewMode, setViewMode] = useState('cards'); // 'list' | 'grid' | 'cards'
   const [modalOpen, setModalOpen] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [swapTarget, setSwapTarget] = useState(null);
+  const [swapCandidates, setSwapCandidates] = useState([]);
+  const [swapSearch, setSwapSearch] = useState('');
+  const [selectedSwap, setSelectedSwap] = useState(null);
+  const [swapLoading, setSwapLoading] = useState(false);
 
   const [form, setForm] = useState({
     name: '',
@@ -305,6 +324,47 @@ const PosEmployeeList = ({ employees = [], posId, onAdd, onUpdate, onRemove }) =
     setDeleteConfirm(null);
   };
 
+  // --- Swap handlers ---
+  const openSwapModal = async (emp) => {
+    setSwapTarget(emp);
+    setSwapSearch('');
+    setSelectedSwap(null);
+    setSwapLoading(true);
+    try {
+      const candidates = await onFetchAvailableEmployees(posId);
+      setSwapCandidates(candidates);
+    } catch {
+      setSwapCandidates([]);
+    }
+    setSwapLoading(false);
+  };
+
+  const closeSwapModal = () => {
+    setSwapTarget(null);
+    setSelectedSwap(null);
+    setSwapCandidates([]);
+    setSwapSearch('');
+  };
+
+  const handleSwapConfirm = async () => {
+    if (!swapTarget || !selectedSwap) return;
+    try {
+      await onSwap(posId, swapTarget.id, selectedSwap.id);
+    } catch {
+      // error handled by hook
+    }
+    closeSwapModal();
+  };
+
+  const filteredSwapCandidates = swapSearch.trim()
+    ? swapCandidates.filter(
+        (e) =>
+          e.name.toLowerCase().includes(swapSearch.toLowerCase()) ||
+          e.role.toLowerCase().includes(swapSearch.toLowerCase()) ||
+          e.department.toLowerCase().includes(swapSearch.toLowerCase())
+      )
+    : swapCandidates;
+
   // ── View toggle button ──
   const ViewBtn = ({ mode, icon: Icon }) => (
     <button
@@ -323,7 +383,7 @@ const PosEmployeeList = ({ employees = [], posId, onAdd, onUpdate, onRemove }) =
 
   // ── Render the active view ──
   const renderView = () => {
-    const props = { employees: filtered, onEdit: openEdit, onRemove: setDeleteConfirm };
+    const props = { employees: filtered, onEdit: openEdit, onRemove: setDeleteConfirm, onSwap: openSwapModal };
     switch (viewMode) {
       case 'list':
         return <EmpListView {...props} />;
@@ -562,6 +622,98 @@ const PosEmployeeList = ({ employees = [], posId, onAdd, onUpdate, onRemove }) =
           </div>
 
           <div className="text-xs text-gray-500">* Required fields</div>
+        </div>
+      </Modal>
+
+      {/* Swap Employee Modal */}
+      <Modal
+        isOpen={!!swapTarget}
+        onClose={closeSwapModal}
+        title={swapTarget ? `Replace ${swapTarget.name}` : 'Replace Employee'}
+        size="lg"
+        showValidate
+        onValidate={handleSwapConfirm}
+        validateText="Swap Employees"
+        validateDisabled={!selectedSwap}
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-gray-600">
+            Select an employee to swap with{' '}
+            <span className="font-semibold">{swapTarget?.name}</span>.
+            The two employees will exchange their PoS assignments.
+          </p>
+
+          {/* Search */}
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <input
+              type="text"
+              value={swapSearch}
+              onChange={(e) => setSwapSearch(e.target.value)}
+              placeholder="Search by name, role, or department..."
+              className="block w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              data-testid="pos-swap-search"
+            />
+          </div>
+
+          {/* Candidate list */}
+          {swapLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600" />
+            </div>
+          ) : filteredSwapCandidates.length === 0 ? (
+            <div className="text-center py-8 text-sm text-gray-500">
+              {swapSearch ? 'No matching employees found.' : 'No available employees to swap.'}
+            </div>
+          ) : (
+            <div className="max-h-64 overflow-y-auto border border-gray-200 rounded-lg divide-y divide-gray-100">
+              {filteredSwapCandidates.map((emp) => (
+                <div
+                  key={emp.id}
+                  onClick={() => setSelectedSwap(emp)}
+                  data-testid="pos-swap-candidate"
+                  className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${
+                    selectedSwap?.id === emp.id
+                      ? 'bg-indigo-50 border-l-4 border-l-indigo-500'
+                      : 'hover:bg-gray-50 border-l-4 border-l-transparent'
+                  }`}
+                >
+                  <div className={`w-9 h-9 ${emp.color || 'bg-gray-500'} rounded-full flex items-center justify-center text-white font-semibold text-xs shrink-0`}>
+                    {emp.avatar}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium text-gray-900 truncate">{emp.name}</div>
+                    <div className="text-xs text-gray-500 truncate">
+                      {emp.role} • {emp.department}
+                      {emp.posName && <span className="ml-1 text-gray-400">— {emp.posName}</span>}
+                    </div>
+                  </div>
+                  {selectedSwap?.id === emp.id && (
+                    <svg className="w-5 h-5 text-indigo-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {selectedSwap && (
+            <div className="bg-indigo-50 rounded-lg p-3 border border-indigo-200">
+              <div className="flex items-center gap-3">
+                <SwapIcon className="w-5 h-5 text-indigo-600 shrink-0" />
+                <div className="text-sm text-indigo-800">
+                  <span className="font-semibold">{swapTarget?.name}</span>
+                  {' '}⇄{' '}
+                  <span className="font-semibold">{selectedSwap.name}</span>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </Modal>
 

@@ -191,6 +191,38 @@ export const usePos = () => {
     }
   }, []);
 
+  // ── Employee swap ──
+
+  const fetchAvailableEmployees = useCallback(async (posId) => {
+    try {
+      const data = await posApi.listAvailableEmployees(posId);
+      return data;
+    } catch (err) {
+      setError(err.message || 'Failed to fetch available employees');
+      throw err;
+    }
+  }, []);
+
+  const swapEmployee = useCallback(async (posId, currentEmpId, newEmpId) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const result = await posApi.swapEmployee(posId, currentEmpId, newEmpId);
+      // Refetch detail to stay in sync
+      const posDetail = await posApi.getById(posId);
+      setSelectedPos(posDetail);
+      // Refresh managers list
+      const mgrs = await posApi.listManagers();
+      setManagers(mgrs);
+      return result;
+    } catch (err) {
+      setError(err.message || 'Failed to swap employee');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   return {
     posList,
     selectedPos,
@@ -206,6 +238,8 @@ export const usePos = () => {
     addEmployee,
     updateEmployee,
     removeEmployee,
+    swapEmployee,
+    fetchAvailableEmployees,
     clearError,
     clearSelectedPos,
   };
