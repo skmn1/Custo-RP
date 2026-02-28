@@ -242,6 +242,31 @@ export const posApi = {
       }
     }
 
+    // When the manager changes, sync the isManager flag on employees
+    const oldManagerId = posStore[index].managerId;
+    const newManagerId = data.managerId !== undefined ? data.managerId : oldManagerId;
+
+    if (oldManagerId !== newManagerId) {
+      // Unset isManager on the previous manager employee (if in this PoS)
+      if (oldManagerId) {
+        const oldMgrIdx = employeeStore.findIndex(
+          (e) => e.id === oldManagerId && e.posId === posStore[index].id
+        );
+        if (oldMgrIdx !== -1) {
+          employeeStore[oldMgrIdx] = { ...employeeStore[oldMgrIdx], isManager: false };
+        }
+      }
+      // Set isManager on the new manager employee (if in this PoS)
+      if (newManagerId) {
+        const newMgrIdx = employeeStore.findIndex(
+          (e) => e.id === newManagerId && e.posId === posStore[index].id
+        );
+        if (newMgrIdx !== -1) {
+          employeeStore[newMgrIdx] = { ...employeeStore[newMgrIdx], isManager: true };
+        }
+      }
+    }
+
     posStore[index] = {
       ...posStore[index],
       ...data,
