@@ -141,8 +141,12 @@ const PosListPage = () => {
           variant="primary"
           onClick={handleCreate}
           data-testid="create-pos-btn"
+          className="flex items-center space-x-2"
         >
-          + New PoS
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+          <span>New PoS</span>
         </Button>
       </div>
 
@@ -270,10 +274,13 @@ const PosListPage = () => {
           {!search && !typeFilter && (
             <Button
               variant="primary"
-              className="mt-4"
+              className="mt-4 flex items-center space-x-2"
               onClick={handleCreate}
             >
-              + Create PoS
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              <span>Create PoS</span>
             </Button>
           )}
         </div>
