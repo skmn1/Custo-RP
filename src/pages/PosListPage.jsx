@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PosCard from '../components/pos/PosCard';
+import PosListView from '../components/pos/PosListView';
+import PosGridView from '../components/pos/PosGridView';
 import PosModal from '../components/pos/PosModal';
 import Button from '../components/ui/Button';
 import { usePos } from '../hooks/usePos';
@@ -24,6 +26,7 @@ const PosListPage = () => {
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
   const [showInactive, setShowInactive] = useState(false);
+  const [viewMode, setViewMode] = useState('cards'); // 'list' | 'grid' | 'cards'
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('create');
   const [editingPos, setEditingPos] = useState(null);
@@ -143,41 +146,94 @@ const PosListPage = () => {
         </Button>
       </div>
 
-      {/* Filters bar */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-6">
-        <div className="flex-1">
-          <input
-            data-testid="pos-search-input"
-            type="text"
-            placeholder="Search by name or address..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
+      {/* Filters bar + View toggle */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+        <div className="p-4">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            {/* Search + filters */}
+            <div className="flex flex-col sm:flex-row gap-3 flex-1">
+              <div className="flex-1">
+                <input
+                  data-testid="pos-search-input"
+                  type="text"
+                  placeholder="Search by name or address..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+              <select
+                data-testid="pos-type-filter"
+                value={typeFilter}
+                onChange={(e) => setTypeFilter(e.target.value)}
+                className="rounded-lg border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                <option value="">All Types</option>
+                {POS_TYPES.map((t) => (
+                  <option key={t} value={t}>
+                    {POS_TYPE_LABELS[t]}
+                  </option>
+                ))}
+              </select>
+              <label className="inline-flex items-center gap-2 text-sm text-gray-700 cursor-pointer whitespace-nowrap">
+                <input
+                  data-testid="pos-show-inactive-toggle"
+                  type="checkbox"
+                  checked={showInactive}
+                  onChange={(e) => setShowInactive(e.target.checked)}
+                  className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                />
+                Show inactive
+              </label>
+            </div>
+
+            {/* View Mode Toggle */}
+            <div className="flex items-center space-x-2 bg-gray-100 rounded-lg p-1" data-testid="pos-view-toggle">
+              <button
+                onClick={() => setViewMode('list')}
+                data-testid="pos-view-list-btn"
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  viewMode === 'list'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+                title="List view"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                </svg>
+              </button>
+              <button
+                onClick={() => setViewMode('grid')}
+                data-testid="pos-view-grid-btn"
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  viewMode === 'grid'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+                title="Grid view"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                </svg>
+              </button>
+              <button
+                onClick={() => setViewMode('cards')}
+                data-testid="pos-view-cards-btn"
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  viewMode === 'cards'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+                title="Cards view"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+              </button>
+            </div>
+          </div>
         </div>
-        <select
-          data-testid="pos-type-filter"
-          value={typeFilter}
-          onChange={(e) => setTypeFilter(e.target.value)}
-          className="rounded-lg border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        >
-          <option value="">All Types</option>
-          {POS_TYPES.map((t) => (
-            <option key={t} value={t}>
-              {POS_TYPE_LABELS[t]}
-            </option>
-          ))}
-        </select>
-        <label className="inline-flex items-center gap-2 text-sm text-gray-700 cursor-pointer whitespace-nowrap">
-          <input
-            data-testid="pos-show-inactive-toggle"
-            type="checkbox"
-            checked={showInactive}
-            onChange={(e) => setShowInactive(e.target.checked)}
-            className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-          />
-          Show inactive
-        </label>
       </div>
 
       {/* Error */}
@@ -221,6 +277,22 @@ const PosListPage = () => {
             </Button>
           )}
         </div>
+      ) : viewMode === 'list' ? (
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <PosListView
+            posList={filteredList}
+            onView={handleView}
+            onEdit={handleEdit}
+            onDelete={handleDeleteClick}
+          />
+        </div>
+      ) : viewMode === 'grid' ? (
+        <PosGridView
+          posList={filteredList}
+          onView={handleView}
+          onEdit={handleEdit}
+          onDelete={handleDeleteClick}
+        />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {filteredList.map((pos) => (

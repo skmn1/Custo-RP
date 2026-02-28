@@ -41,10 +41,12 @@ const PosDetailPage = () => {
   const handleEditSubmit = useCallback(
     async (data) => {
       await updatePos(id, data);
-      // Refetch detail to get updated dashboard
+      // Refetch detail to get updated dashboard + employee list
       await fetchPosDetail(id);
+      // Refresh managers list (manager assignment may have changed)
+      await fetchManagers();
     },
-    [id, updatePos, fetchPosDetail]
+    [id, updatePos, fetchPosDetail, fetchManagers]
   );
 
   const handleDelete = useCallback(async () => {

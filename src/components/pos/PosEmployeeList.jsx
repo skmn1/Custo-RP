@@ -13,8 +13,193 @@ const DEPARTMENT_SUGGESTIONS = [
   'Front of House', 'Warehouse', 'Administration', 'General',
 ];
 
+// ── SVG icon helpers ──
+const ListIcon = () => (
+  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+  </svg>
+);
+const GridIcon = () => (
+  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+  </svg>
+);
+const CardsIcon = () => (
+  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+  </svg>
+);
+const EditIcon = ({ className = 'w-4 h-4' }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+  </svg>
+);
+const DeleteIcon = ({ className = 'w-4 h-4' }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+  </svg>
+);
+
+const ManagerBadge = () => (
+  <span className="inline-flex px-2.5 py-0.5 text-xs font-semibold rounded-full bg-amber-100 text-amber-800 border border-amber-200">
+    Manager
+  </span>
+);
+
+const DeptBadge = ({ dept }) => (
+  <span className="inline-flex px-2.5 py-0.5 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+    {dept}
+  </span>
+);
+
+// ── Cards View ──
+const EmpCardsView = ({ employees, onEdit, onRemove }) => (
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+    {employees.map((emp) => (
+      <div
+        key={emp.id}
+        data-testid="pos-employee-card"
+        className="bg-white border border-gray-200 rounded-lg p-5 hover:shadow-lg transition-all duration-200 group"
+      >
+        <div className="flex items-start justify-between">
+          <div className="flex items-center space-x-4">
+            <div className={`w-14 h-14 ${emp.color || 'bg-gray-500'} rounded-full flex items-center justify-center text-white font-bold text-base shadow-lg`}>
+              {emp.avatar}
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-base font-semibold text-gray-900 mb-0.5 truncate">{emp.name}</h3>
+              <p className="text-sm text-gray-600 mb-1.5">{emp.role}</p>
+              <div className="flex flex-wrap items-center gap-1.5">
+                <DeptBadge dept={emp.department} />
+                {emp.isManager && <ManagerBadge />}
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button onClick={() => onEdit(emp)} className="text-indigo-600 hover:text-indigo-800 p-2 rounded-full hover:bg-indigo-50 transition-colors" title="Edit employee" data-testid="pos-employee-edit-btn">
+              <EditIcon className="w-4.5 h-4.5" />
+            </button>
+            <button onClick={() => onRemove(emp)} className="text-red-600 hover:text-red-800 p-2 rounded-full hover:bg-red-50 transition-colors" title="Remove employee" data-testid="pos-employee-remove-btn">
+              <DeleteIcon className="w-4.5 h-4.5" />
+            </button>
+          </div>
+        </div>
+        <div className="mt-4 pt-4 border-t border-gray-200">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <dt className="text-xs font-medium text-gray-500">Max Hours</dt>
+              <dd className="mt-0.5 text-sm font-semibold text-gray-900">{emp.maxHours}h/week</dd>
+            </div>
+            <div>
+              <dt className="text-xs font-medium text-gray-500">Email</dt>
+              <dd className="mt-0.5 text-sm text-gray-900 truncate" title={emp.email}>
+                <a href={`mailto:${emp.email}`} className="text-indigo-600 hover:text-indigo-800 transition-colors">{emp.email}</a>
+              </dd>
+            </div>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+);
+
+// ── Grid View (compact, like EmployeeGrid) ──
+const EmpGridView = ({ employees, onEdit, onRemove }) => (
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+    {employees.map((emp) => (
+      <div
+        key={emp.id}
+        data-testid="pos-employee-card"
+        className="bg-white border border-gray-200 rounded-lg p-5 hover:shadow-md transition-shadow duration-200 group"
+      >
+        <div className="flex items-center justify-between mb-3">
+          <div className={`w-12 h-12 ${emp.color || 'bg-gray-500'} rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-md`}>
+            {emp.avatar}
+          </div>
+          <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button onClick={() => onEdit(emp)} className="text-indigo-600 hover:text-indigo-800 p-1 rounded-full hover:bg-indigo-50 transition-colors" title="Edit" data-testid="pos-employee-edit-btn">
+              <EditIcon />
+            </button>
+            <button onClick={() => onRemove(emp)} className="text-red-600 hover:text-red-800 p-1 rounded-full hover:bg-red-50 transition-colors" title="Remove" data-testid="pos-employee-remove-btn">
+              <DeleteIcon />
+            </button>
+          </div>
+        </div>
+        <div className="text-center">
+          <h3 className="text-base font-semibold text-gray-900 mb-1 truncate">{emp.name}</h3>
+          <p className="text-sm text-gray-600 mb-2">{emp.role}</p>
+          <div className="flex flex-wrap items-center justify-center gap-1.5 mb-3">
+            <DeptBadge dept={emp.department} />
+            {emp.isManager && <ManagerBadge />}
+          </div>
+          <div className="space-y-1.5 text-sm">
+            <div className="flex justify-between">
+              <span className="text-gray-500">Max Hours:</span>
+              <span className="font-medium">{emp.maxHours}h/week</span>
+            </div>
+            <div className="text-xs text-gray-400 truncate" title={emp.email}>{emp.email}</div>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+);
+
+// ── List View (table, like EmployeeList) ──
+const EmpListView = ({ employees, onEdit, onRemove }) => (
+  <div className="overflow-hidden rounded-lg border border-gray-200">
+    <table className="min-w-full divide-y divide-gray-200">
+      <thead className="bg-gray-50">
+        <tr>
+          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee</th>
+          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
+          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Max Hours</th>
+          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+          <th className="relative px-6 py-3"><span className="sr-only">Actions</span></th>
+        </tr>
+      </thead>
+      <tbody className="bg-white divide-y divide-gray-200">
+        {employees.map((emp) => (
+          <tr key={emp.id} data-testid="pos-employee-card" className="hover:bg-gray-50 transition-colors">
+            <td className="px-6 py-4 whitespace-nowrap">
+              <div className="flex items-center">
+                <div className={`flex-shrink-0 h-10 w-10 ${emp.color || 'bg-gray-500'} rounded-full flex items-center justify-center text-white font-semibold text-sm`}>
+                  {emp.avatar}
+                </div>
+                <div className="ml-4">
+                  <div className="text-sm font-medium text-gray-900">{emp.name}</div>
+                  {emp.isManager && (
+                    <span className="inline-flex px-1.5 py-0.5 text-xs font-semibold rounded-full bg-amber-100 text-amber-800 mt-0.5">Manager</span>
+                  )}
+                </div>
+              </div>
+            </td>
+            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{emp.role}</td>
+            <td className="px-6 py-4 whitespace-nowrap"><DeptBadge dept={emp.department} /></td>
+            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{emp.maxHours}h/week</td>
+            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{emp.email}</td>
+            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+              <div className="flex items-center justify-end space-x-2">
+                <button onClick={() => onEdit(emp)} className="text-indigo-600 hover:text-indigo-900 p-1 rounded-full hover:bg-indigo-50 transition-colors" title="Edit" data-testid="pos-employee-edit-btn">
+                  <EditIcon />
+                </button>
+                <button onClick={() => onRemove(emp)} className="text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-50 transition-colors" title="Remove" data-testid="pos-employee-remove-btn">
+                  <DeleteIcon />
+                </button>
+              </div>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+);
+
+// ── Main Component ──
 const PosEmployeeList = ({ employees = [], posId, onAdd, onUpdate, onRemove }) => {
   const [search, setSearch] = useState('');
+  const [viewMode, setViewMode] = useState('cards'); // 'list' | 'grid' | 'cards'
   const [modalOpen, setModalOpen] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
@@ -120,6 +305,35 @@ const PosEmployeeList = ({ employees = [], posId, onAdd, onUpdate, onRemove }) =
     setDeleteConfirm(null);
   };
 
+  // ── View toggle button ──
+  const ViewBtn = ({ mode, icon: Icon }) => (
+    <button
+      onClick={() => setViewMode(mode)}
+      data-testid={`pos-emp-view-${mode}-btn`}
+      className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+        viewMode === mode
+          ? 'bg-white text-gray-900 shadow-sm'
+          : 'text-gray-600 hover:text-gray-900'
+      }`}
+      title={`${mode.charAt(0).toUpperCase() + mode.slice(1)} view`}
+    >
+      <Icon />
+    </button>
+  );
+
+  // ── Render the active view ──
+  const renderView = () => {
+    const props = { employees: filtered, onEdit: openEdit, onRemove: setDeleteConfirm };
+    switch (viewMode) {
+      case 'list':
+        return <EmpListView {...props} />;
+      case 'grid':
+        return <EmpGridView {...props} />;
+      default:
+        return <EmpCardsView {...props} />;
+    }
+  };
+
   return (
     <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6" data-testid="pos-employee-section">
       {/* Header */}
@@ -140,10 +354,10 @@ const PosEmployeeList = ({ employees = [], posId, onAdd, onUpdate, onRemove }) =
         </Button>
       </div>
 
-      {/* Search */}
+      {/* Search + View Toggle */}
       {employees.length > 0 && (
-        <div className="mb-5">
-          <div className="relative max-w-md">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
+          <div className="relative max-w-md flex-1">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -158,10 +372,15 @@ const PosEmployeeList = ({ employees = [], posId, onAdd, onUpdate, onRemove }) =
               className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg text-sm bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             />
           </div>
+          <div className="flex items-center space-x-2 bg-gray-100 rounded-lg p-1" data-testid="pos-emp-view-toggle">
+            <ViewBtn mode="list" icon={ListIcon} />
+            <ViewBtn mode="grid" icon={GridIcon} />
+            <ViewBtn mode="cards" icon={CardsIcon} />
+          </div>
         </div>
       )}
 
-      {/* Employee Grid — matches existing EmployeeCards style */}
+      {/* Employee Display */}
       {filtered.length === 0 ? (
         <div className="text-center py-10" data-testid="pos-employee-empty">
           <svg className="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -173,83 +392,7 @@ const PosEmployeeList = ({ employees = [], posId, onAdd, onUpdate, onRemove }) =
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {filtered.map((emp) => (
-            <div
-              key={emp.id}
-              data-testid="pos-employee-card"
-              className="bg-white border border-gray-200 rounded-lg p-5 hover:shadow-lg transition-all duration-200 group"
-            >
-              <div className="flex items-start justify-between">
-                <div className="flex items-center space-x-4">
-                  <div
-                    className={`w-14 h-14 ${emp.color || 'bg-gray-500'} rounded-full flex items-center justify-center text-white font-bold text-base shadow-lg`}
-                  >
-                    {emp.avatar}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-base font-semibold text-gray-900 mb-0.5 truncate">
-                      {emp.name}
-                    </h3>
-                    <p className="text-sm text-gray-600 mb-1.5">{emp.role}</p>
-                    <div className="flex flex-wrap items-center gap-1.5">
-                      <span className="inline-flex px-2.5 py-0.5 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                        {emp.department}
-                      </span>
-                      {emp.isManager && (
-                        <span className="inline-flex px-2.5 py-0.5 text-xs font-semibold rounded-full bg-amber-100 text-amber-800 border border-amber-200">
-                          Manager
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Actions — visible on hover like EmployeeCards */}
-                <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button
-                    onClick={() => openEdit(emp)}
-                    className="text-indigo-600 hover:text-indigo-800 p-2 rounded-full hover:bg-indigo-50 transition-colors"
-                    title="Edit employee"
-                    data-testid="pos-employee-edit-btn"
-                  >
-                    <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    </svg>
-                  </button>
-                  <button
-                    onClick={() => setDeleteConfirm(emp)}
-                    className="text-red-600 hover:text-red-800 p-2 rounded-full hover:bg-red-50 transition-colors"
-                    title="Remove employee"
-                    data-testid="pos-employee-remove-btn"
-                  >
-                    <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-
-              {/* Detail row */}
-              <div className="mt-4 pt-4 border-t border-gray-200">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <dt className="text-xs font-medium text-gray-500">Max Hours</dt>
-                    <dd className="mt-0.5 text-sm font-semibold text-gray-900">{emp.maxHours}h/week</dd>
-                  </div>
-                  <div>
-                    <dt className="text-xs font-medium text-gray-500">Email</dt>
-                    <dd className="mt-0.5 text-sm text-gray-900 truncate" title={emp.email}>
-                      <a href={`mailto:${emp.email}`} className="text-indigo-600 hover:text-indigo-800 transition-colors">
-                        {emp.email}
-                      </a>
-                    </dd>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        renderView()
       )}
 
       {/* Add / Edit Employee Modal */}
@@ -307,48 +450,44 @@ const PosEmployeeList = ({ employees = [], posId, onAdd, onUpdate, onRemove }) =
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Role *</label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    name="role"
-                    data-testid="pos-emp-role-input"
-                    value={form.role}
-                    onChange={handleChange}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors ${
-                      formErrors.role ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-indigo-500'
-                    }`}
-                    placeholder="Enter role"
-                    list="pos-emp-roles"
-                  />
-                  <datalist id="pos-emp-roles">
-                    {ROLE_SUGGESTIONS.map((r) => (
-                      <option key={r} value={r} />
-                    ))}
-                  </datalist>
-                </div>
+                <input
+                  type="text"
+                  name="role"
+                  data-testid="pos-emp-role-input"
+                  value={form.role}
+                  onChange={handleChange}
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors ${
+                    formErrors.role ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-indigo-500'
+                  }`}
+                  placeholder="Enter role"
+                  list="pos-emp-roles"
+                />
+                <datalist id="pos-emp-roles">
+                  {ROLE_SUGGESTIONS.map((r) => (
+                    <option key={r} value={r} />
+                  ))}
+                </datalist>
                 {formErrors.role && <p className="mt-1 text-sm text-red-600">{formErrors.role}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Department *</label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    name="department"
-                    data-testid="pos-emp-dept-input"
-                    value={form.department}
-                    onChange={handleChange}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors ${
-                      formErrors.department ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-indigo-500'
-                    }`}
-                    placeholder="Enter department"
-                    list="pos-emp-depts"
-                  />
-                  <datalist id="pos-emp-depts">
-                    {DEPARTMENT_SUGGESTIONS.map((d) => (
-                      <option key={d} value={d} />
-                    ))}
-                  </datalist>
-                </div>
+                <input
+                  type="text"
+                  name="department"
+                  data-testid="pos-emp-dept-input"
+                  value={form.department}
+                  onChange={handleChange}
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors ${
+                    formErrors.department ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-indigo-500'
+                  }`}
+                  placeholder="Enter department"
+                  list="pos-emp-depts"
+                />
+                <datalist id="pos-emp-depts">
+                  {DEPARTMENT_SUGGESTIONS.map((d) => (
+                    <option key={d} value={d} />
+                  ))}
+                </datalist>
                 {formErrors.department && <p className="mt-1 text-sm text-red-600">{formErrors.department}</p>}
               </div>
             </div>
