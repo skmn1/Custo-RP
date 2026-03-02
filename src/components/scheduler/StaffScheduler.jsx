@@ -12,6 +12,7 @@ import {
 } from '@dnd-kit/sortable';
 
 import { initialEmployees } from '../../data/employees';
+import { useEmployees } from '../../hooks/useEmployees';
 import { useShifts } from '../../hooks/useShifts';
 import { useWeekNavigation } from '../../hooks/useWeekNavigation';
 import { useDragAndDrop } from '../../hooks/useDragAndDrop';
@@ -25,7 +26,8 @@ import StatisticsPanel from './StatisticsPanel';
 import AddShiftModal from './AddShiftModal';
 
 const StaffScheduler = () => {
-  const [employees] = useState(initialEmployees);
+  const { employees: fetchedEmployees, isLoading: employeesLoading } = useEmployees();
+  const employees = fetchedEmployees.length > 0 ? fetchedEmployees : initialEmployees;
   const [showAddShiftModal, setShowAddShiftModal] = useState(false);
 
   const { shifts, addShift, deleteShift, updateShift, moveShift } = useShifts();

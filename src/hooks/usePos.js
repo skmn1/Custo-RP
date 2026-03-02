@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { posApi } from '../data/pos';
+import { posApi } from '../api/posApi';
 
 /**
  * usePos — manages PoS data fetching and mutations,
