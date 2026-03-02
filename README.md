@@ -1,207 +1,302 @@
 # Staff Scheduler Pro
 
-A modern, responsive React application for managing staff schedules with an intuitive drag-and-drop interface.
+A full-stack workforce management platform with a React frontend, Spring Boot REST API, and built-in payroll engine.
 
-## 🚀 Features
+---
 
-- **Weekly Calendar View**: Visual weekly schedule with drag-and-drop shift management
-- **Staff Management**: Complete employee profiles with roles, contact info, and hour tracking
-- **Real-time Analytics**: Live statistics showing total shifts, hours, and schedule optimization insights
-- **Responsive Design**: Fully responsive UI that works seamlessly on desktop, tablet, and mobile devices
-- **Modern UI/UX**: Clean, professional interface built with TailwindCSS v4
-- **Modular Architecture**: Well-structured codebase following React best practices
+## Features
 
-## 🛠️ Tech Stack
+| Module | Highlights |
+|--------|------------|
+| **Scheduler** | Weekly calendar with drag-and-drop shift management, real-time statistics |
+| **Employees** | Full CRUD, search/filter/sort, department & role management |
+| **Payroll** | Automated calculations (overtime, double-time, taxes, benefits), CSV export |
+| **Point of Sale** | PoS location CRUD, employee assignment, cross-location swap |
 
-- **React 18** - Modern React with hooks and functional components
-- **Vite** - Fast build tool and development server
-- **TailwindCSS v4** - Utility-first CSS framework for styling
-- **@dnd-kit** - Modern drag-and-drop library for React
-- **date-fns** - Lightweight date utility library
-- **PostCSS** - CSS processing tool
-- **ESLint** - Code quality and consistency
+## Tech Stack
 
-## 📁 Project Structure
+### Frontend
+- **React 19** with hooks and functional components
+- **Vite 7** — fast HMR and build tooling
+- **TailwindCSS 4** — utility-first styling
+- **@dnd-kit** — accessible drag-and-drop
+- **date-fns** — date utilities
+- **React Router 7** — client-side routing
+
+### Backend
+- **Spring Boot 3.2** — REST API
+- **Spring Data JPA** — persistence layer
+- **H2** — in-memory database (dev), **PostgreSQL** (production profile)
+- **SpringDoc OpenAPI 2.3** — auto-generated Swagger UI
+- **Lombok** — boilerplate reduction
+- **Commons CSV** — payroll CSV export
+
+### Testing
+- **JUnit 5 + Mockito** — 60 backend unit/integration tests
+- **Cypress 14** — end-to-end frontend tests
+- **ESLint** — frontend code quality
+
+---
+
+## Project Structure
 
 ```
 scheduler/
-├── public/
-├── src/
+├── scripts/                   # Run scripts
+│   ├── start-all.sh           # Start backend + frontend
+│   ├── start-backend.sh       # Start Spring Boot API only
+│   ├── start-frontend.sh      # Start Vite dev server only
+│   └── run-tests.sh           # Run all test suites
+├── src/                       # React frontend
+│   ├── api/                   # API client layer
+│   │   ├── config.js          # Base URL, fetch wrapper
+│   │   ├── employeesApi.js    # Employee API calls
+│   │   ├── shiftsApi.js       # Shift API calls
+│   │   ├── payrollApi.js      # Payroll API calls
+│   │   └── posApi.js          # PoS API calls
 │   ├── components/
-│   │   ├── ui/              # Reusable UI components
-│   │   │   ├── Button.jsx
-│   │   │   ├── Modal.jsx
-│   │   │   └── StatCard.jsx
-│   │   ├── scheduler/       # Scheduler-specific components
-│   │   │   ├── StaffScheduler.jsx
-│   │   │   ├── DraggableShift.jsx
-│   │   │   ├── EmployeeRow.jsx
-│   │   │   ├── CalendarHeader.jsx
-│   │   │   ├── StatisticsPanel.jsx
-│   │   │   └── AddShiftModal.jsx
-│   │   └── Navbar.jsx       # Main navigation
-│   ├── pages/
-│   │   ├── Dashboard.jsx    # Landing/dashboard page
-│   │   └── SchedulerPage.jsx # Main scheduler page
-│   ├── hooks/
-│   │   ├── useShifts.js     # Shift management logic
-│   │   ├── useWeekNavigation.js # Week navigation logic
-│   │   └── useDragAndDrop.js # Drag and drop logic
-│   ├── utils/
-│   │   ├── shiftUtils.js    # Shift calculation utilities
-│   │   └── dateUtils.js     # Date formatting utilities
-│   ├── data/
-│   │   ├── employees.js     # Employee mock data
-│   │   └── shifts.js        # Shift mock data
-│   ├── constants/
-│   │   └── scheduler.js     # App constants and settings
-│   ├── App.jsx
-│   ├── main.jsx
-│   └── index.css
-├── package.json
-├── vite.config.js
-├── tailwind.config.js
-└── README.md
+│   │   ├── ui/                # Reusable: Button, Modal, StatCard
+│   │   ├── scheduler/         # StaffScheduler, DraggableShift, etc.
+│   │   ├── employees/         # EmployeeGrid, EmployeeModal, etc.
+│   │   ├── payroll/           # PayrollDashboard, PayrollExport, etc.
+│   │   └── pos/               # PosDashboard, PosModal, etc.
+│   ├── hooks/                 # Custom hooks (useShifts, useEmployees, ...)
+│   ├── pages/                 # Route pages
+│   ├── utils/                 # dateUtils, shiftUtils
+│   ├── data/                  # Fallback mock data
+│   └── constants/             # App-wide constants
+├── staff-scheduler-api/       # Spring Boot backend
+│   └── src/main/java/com/staffscheduler/api/
+│       ├── controller/        # REST controllers (4)
+│       ├── service/           # Business logic (4)
+│       ├── repository/        # Spring Data JPA repos (3)
+│       ├── model/             # JPA entities (3)
+│       ├── dto/               # Data Transfer Objects (7)
+│       ├── config/            # CORS, OpenAPI config
+│       ├── exception/         # Global error handling
+│       └── util/              # PayrollCalculator
+├── cypress/                   # E2E test specs
+├── docs/                      # Architecture & design docs
+└── package.json
 ```
 
-## 🏗️ Architecture
+---
 
-The application follows a modular architecture with clear separation of concerns:
-
-### Components
-- **UI Components**: Reusable, generic components (`Button`, `Modal`, `StatCard`)
-- **Scheduler Components**: Domain-specific components for the scheduling functionality
-- **Layout Components**: Navigation and page structure components
-
-### Hooks
-- **Custom Hooks**: Encapsulate complex state logic and side effects
-- **Separation of Concerns**: Each hook handles a specific aspect of the application
-
-### Utils
-- **Pure Functions**: Utility functions for calculations and data transformations
-- **Reusable Logic**: Common operations that can be used across components
-
-### Data & Constants
-- **Mock Data**: Centralized data management for development and testing
-- **Configuration**: App-wide constants and settings
-
-## 🚀 Getting Started
+## Quick Start
 
 ### Prerequisites
-- Node.js (v16 or higher)
-- npm or yarn package manager
 
-### Installation
+| Tool | Version | Installation |
+|------|---------|-------------|
+| **Node.js** | 16+ | [nodejs.org](https://nodejs.org) |
+| **Java** | 17+ | [SDKMAN](https://sdkman.io): `sdk install java 17.0.13-tem` |
+| **Maven** | 3.8+ | Included in the project via `mvnw`, or install via SDKMAN |
 
-1. Clone the repository:
+### One-Command Start
+
 ```bash
-git clone <repository-url>
-cd scheduler
+# Start both backend (port 8080) and frontend (port 5173)
+npm start
+# — or —
+./scripts/start-all.sh
 ```
 
-2. Install dependencies:
+### Start Individually
+
 ```bash
-npm install
+# Terminal 1 — Backend API
+npm run start:backend
+# — or —
+./scripts/start-backend.sh
+
+# Terminal 2 — Frontend
+npm run start:frontend
+# — or —
+./scripts/start-frontend.sh
 ```
 
-3. Start the development server:
-```bash
-npm run dev
+### URLs
+
+| Service | URL |
+|---------|-----|
+| Frontend | http://localhost:5173 |
+| Backend API | http://localhost:8080/api |
+| Swagger UI | http://localhost:8080/swagger-ui.html |
+| OpenAPI JSON | http://localhost:8080/api-docs |
+| H2 Console | http://localhost:8080/h2-console |
+
+> **Vite Proxy**: The frontend proxies `/api/*` requests to `localhost:8080`, so the app works seamlessly in development.
+
+---
+
+## API Overview
+
+All endpoints are under `/api`. Full interactive documentation is available at the Swagger UI link above.
+
+### Employees — `/api/employees`
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/api/employees` | List all (search, filter, sort) |
+| `GET` | `/api/employees/{id}` | Get by ID |
+| `POST` | `/api/employees` | Create |
+| `PUT` | `/api/employees/{id}` | Update |
+| `DELETE` | `/api/employees/{id}` | Delete |
+| `GET` | `/api/employees/departments` | List distinct departments |
+| `GET` | `/api/employees/roles` | List distinct roles |
+
+### Shifts — `/api/shifts`
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/api/shifts` | List (date range, employee, dept, type) |
+| `GET` | `/api/shifts/{id}` | Get by ID |
+| `POST` | `/api/shifts` | Create |
+| `PUT` | `/api/shifts/{id}` | Update |
+| `PATCH` | `/api/shifts/{id}/move` | Move (drag-and-drop) |
+| `DELETE` | `/api/shifts/{id}` | Delete |
+
+### Payroll — `/api/payroll`
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/api/payroll?startDate=&endDate=` | Summary |
+| `GET` | `/api/payroll/employees?startDate=&endDate=` | Per-employee detail |
+| `GET` | `/api/payroll/departments?startDate=&endDate=` | Department breakdown |
+| `GET` | `/api/payroll/statistics?startDate=&endDate=` | Statistics |
+| `GET` | `/api/payroll/export/csv?startDate=&endDate=` | CSV download |
+
+### Point of Sale — `/api/pos`
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/api/pos` | List locations |
+| `GET` | `/api/pos/{id}` | Detail with employees & dashboard |
+| `POST` | `/api/pos` | Create location |
+| `PUT` | `/api/pos/{id}` | Update location |
+| `DELETE` | `/api/pos/{id}` | Soft-delete (deactivate) |
+| `GET` | `/api/pos/managers` | List managers |
+| `GET` | `/api/pos/{posId}/employees` | Employees in PoS |
+| `GET` | `/api/pos/{posId}/available-employees` | Available for swap |
+| `POST` | `/api/pos/{posId}/employees` | Add employee to PoS |
+| `PUT` | `/api/pos/{posId}/employees/{empId}` | Update employee in PoS |
+| `DELETE` | `/api/pos/{posId}/employees/{empId}` | Remove from PoS |
+| `PUT` | `/api/pos/{posId}/employees/{empId}/swap` | Swap employees |
+
+### Error Format
+
+All errors return a standard envelope:
+
+```json
+{
+  "error": {
+    "code": "NOT_FOUND",
+    "message": "Employee not found with id: emp-999",
+    "details": []
+  }
+}
 ```
 
-4. Open your browser and navigate to `http://localhost:5173`
+| Code | HTTP Status | Meaning |
+|------|-------------|---------|
+| `NOT_FOUND` | 404 | Resource does not exist |
+| `DUPLICATE_RESOURCE` | 409 | Unique constraint violation (e.g. email) |
+| `VALIDATION_ERROR` | 400 | Request body validation failed |
+| `BAD_REQUEST` | 400 | Invalid argument |
+| `INTERNAL_ERROR` | 500 | Unexpected server error |
 
-## 🎯 Usage
+---
 
-### Dashboard
-- Overview of the scheduling system
-- Feature highlights and navigation
+## Testing
 
-### Staff Scheduler
-- **Weekly View**: Navigate between weeks using the arrow buttons
-- **Employee Management**: View employee details in the left sidebar
-- **Drag & Drop**: Drag shifts between employees and days
-- **Add Shifts**: Click the "+" button to add new shifts
-- **Statistics**: View real-time scheduling statistics
+```bash
+# Run all tests (backend + frontend lint)
+npm run test:all
 
-### Key Actions
-1. **Navigate Weeks**: Use the left/right arrows in the calendar header
-2. **Add Shifts**: Click the "Add Shift" button and fill in the details
-3. **Move Shifts**: Drag any shift to reassign it to different employees or days
-4. **View Statistics**: Check the statistics panel for scheduling insights
+# Backend only (60 JUnit tests)
+cd staff-scheduler-api && mvn test
 
-## 🔧 Development
+# Frontend lint
+npm run lint
 
-### Available Scripts
+# Cypress E2E (requires frontend running)
+npm run cy:open    # Interactive
+npm run cy:run     # Headless
+npm run cy:dev     # Start frontend + open Cypress
+```
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build locally
-- `npm run lint` - Run ESLint for code quality
+---
 
-### Code Style
-- Follow React functional component patterns
-- Use custom hooks for complex state logic
-- Maintain consistent file and folder naming
-- Write descriptive component and function names
+## Database
 
-### Adding New Features
+### Development (default)
+H2 in-memory database, auto-seeded with 12 employees, 12 shifts, and 5 PoS locations via `data.sql`.
 
-1. **New Components**: Add to appropriate folder in `src/components/`
-2. **New Hooks**: Add to `src/hooks/` following the `use[Feature]` naming convention
-3. **New Utilities**: Add to `src/utils/` as pure functions
-4. **New Data**: Add to `src/data/` for mock data or constants
+- **H2 Console**: http://localhost:8080/h2-console
+- **JDBC URL**: `jdbc:h2:mem:staffscheduler`
+- **User**: `sa` (no password)
 
-## 🌟 Key Features Explained
+### Production
+Activate the PostgreSQL profile:
 
-### Drag and Drop
-- Powered by `@dnd-kit` for accessibility and performance
-- Supports keyboard navigation and screen readers
-- Smooth animations and visual feedback
+```bash
+./scripts/start-backend.sh postgres
+# — or —
+cd staff-scheduler-api && mvn spring-boot:run -Dspring-boot.run.profiles=postgres
+```
 
-### Responsive Design
-- Mobile-first approach with TailwindCSS
-- Collapsible navigation for mobile devices
-- Optimized layouts for different screen sizes
+Configure connection in `application.yml` or via environment variables:
 
-### State Management
-- Local state with React hooks
-- Custom hooks for complex state logic
-- Separation of concerns between UI and business logic
+```yaml
+spring.datasource.url: jdbc:postgresql://localhost:5432/staff_scheduler
+spring.datasource.username: staff_scheduler_user
+spring.datasource.password: staff_scheduler_password
+```
 
-## 🤝 Contributing
+---
+
+## Development
+
+### Available npm Scripts
+
+| Script | Description |
+|--------|-------------|
+| `npm start` | Start backend + frontend together |
+| `npm run start:backend` | Start Spring Boot API only |
+| `npm run start:frontend` | Start Vite dev server only |
+| `npm run dev` | Start Vite only (alias for `start:frontend`) |
+| `npm run build` | Production build (frontend) |
+| `npm run preview` | Preview production build |
+| `npm run lint` | Run ESLint |
+| `npm run test:all` | Run backend tests + frontend lint |
+| `npm run cy:open` | Open Cypress Test Runner |
+| `npm run cy:run` | Run Cypress headless |
+
+### Architecture
+
+- **Frontend hooks** (`useEmployees`, `useShifts`, etc.) call the API layer (`src/api/`) with automatic fallback to mock data when the backend is offline
+- **Vite proxy** forwards `/api/*` to the backend at port 8080
+- **Backend** follows standard Spring Boot layering: Controller → Service → Repository → JPA Entity
+
+### Adding Features
+
+1. **New API endpoint**: Add controller method → service method → repository query
+2. **New frontend page**: Create page in `src/pages/`, add route in `App.jsx`
+3. **New hook**: Add to `src/hooks/` following the `use[Feature]` convention
+4. **New component**: Add to appropriate `src/components/` subfolder
+
+---
+
+## Contributing
 
 1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/new-feature`
-3. Commit your changes: `git commit -m 'Add new feature'`
-4. Push to the branch: `git push origin feature/new-feature`
-5. Submit a pull request
+2. Create a feature branch: `git checkout -b feature/my-feature`
+3. Commit changes: `git commit -m 'feat: add my feature'`
+4. Push: `git push origin feature/my-feature`
+5. Open a Pull Request
 
-## 📝 License
+---
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+## License
 
-## 🐛 Known Issues
-
-- None currently identified
-
-## 🚀 Future Enhancements
-
-- Backend integration for data persistence
-- User authentication and authorization
-- Email notifications for schedule changes
-- Export schedules to PDF/Excel
-- Advanced scheduling algorithms
-- Team management features
-- Time tracking integration+ Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+MIT License — see [LICENSE](LICENSE) for details.

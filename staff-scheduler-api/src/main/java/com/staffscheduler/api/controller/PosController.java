@@ -1,11 +1,19 @@
 package com.staffscheduler.api.controller;
 
 import com.staffscheduler.api.dto.EmployeeDto;
+import com.staffscheduler.api.dto.ErrorResponse;
 import com.staffscheduler.api.dto.PosDetailDto;
 import com.staffscheduler.api.dto.PosDto;
 import com.staffscheduler.api.service.EmployeeService;
 import com.staffscheduler.api.service.PosService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,33 +36,74 @@ public class PosController {
     // ── PoS CRUD ──
 
     @GetMapping
-    @Operation(summary = "List PoS locations")
+    @Operation(summary = "List PoS locations",
+            description = "Returns all PoS locations. By default only active locations are returned; "
+                    + "set `includeInactive=true` to include deactivated ones.")
+    @ApiResponse(responseCode = "200", description = "PoS list",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = PosDto.class))))
     public ResponseEntity<List<PosDto>> list(
+            @Parameter(description = "Include deactivated PoS locations")
             @RequestParam(required = false, defaultValue = "false") boolean includeInactive) {
         return ResponseEntity.ok(posService.findAll(includeInactive));
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Get PoS detail with employees and dashboard")
-    public ResponseEntity<PosDetailDto> getById(@PathVariable Long id) {
+    @Operation(summary = "Get PoS detail",
+            description = "Returns a single PoS with its assigned employees and dashboard metrics "
+                    + "(employee count, shifts today, last inventory date, low stock alerts).")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "PoS detail",
+                    content = @Content(schema = @Schema(implementation = PosDetailDto.class))),
+            @ApiResponse(responseCode = "404", description = "PoS not found",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    public ResponseEntity<PosDetailDto> getById(
+            @Parameter(description = "PoS ID", example = "1", required = true)
+            @PathVariable Long id) {
         return ResponseEntity.ok(posService.findById(id));
     }
 
     @PostMapping
-    @Operation(summary = "Create PoS location")
+    @Operation(summary = "Create PoS location",
+            description = "Creates a new Point of Sale location. Opening hours are stored as a JSON map "
+                    + "with day names as keys and `{open, close, closed}` objects as values.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "PoS created",
+                    content = @Content(schema = @Schema(implementation = PosDto.class))),
+            @ApiResponse(responseCode = "400", description = "Validation error",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
     public ResponseEntity<PosDto> create(@Valid @RequestBody PosDto dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(posService.create(dto));
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Update PoS location")
-    public ResponseEntity<PosDto> update(@PathVariable Long id, @RequestBody PosDto dto) {
+    @Operation(summary = "Update PoS location", description = "Updates an existing PoS location's details.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "PoS updated",
+                    content = @Content(schema = @Schema(implementation = PosDto.class))),
+            @ApiResponse(responseCode = "404", description = "PoS not found",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    public ResponseEntity<PosDto> update(
+            @Parameter(description = "PoS ID", example = "1", required = true)
+            @PathVariable Long id, @RequestBody PosDto dto) {
         return ResponseEntity.ok(posService.update(id, dto));
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Soft-delete PoS location")
-    public ResponseEntity<Map<String, String>> delete(@PathVariable Long id) {
+    @Operation(summary = "Soft-delete PoS location",
+            description = "Deactivates (soft-deletes) a PoS location. The record is kept but marked inactive.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "PoS deactivated",
+                    content = @Content(schema = @Schema(implementation = Map.class),
+                            examples = @ExampleObject(value = "{\"message\": \"PoS deactivated successfully\"}"))),
+            @ApiResponse(responseCode = "404", description = "PoS not found",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    public ResponseEntity<Map<String, String>> delete(
+            @Parameter(description = "PoS ID", example = "1", required = true)
+            @PathVariable Long id) {
         posService.delete(id);
         return ResponseEntity.ok(Map.of("message", "PoS deactivated successfully"));
     }
@@ -62,7 +111,10 @@ public class PosController {
     // ── Manager list ──
 
     @GetMapping("/managers")
-    @Operation(summary = "List all managers")
+    @Operation(summary = "List all managers",
+            description = "Returns all employees flagged as managers. Useful for the manager dropdown in PoS forms.")
+    @ApiResponse(responseCode = "200", description = "Manager list",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = EmployeeDto.class))))
     public ResponseEntity<List<EmployeeDto>> managers() {
         return ResponseEntity.ok(employeeService.findManagers());
     }
@@ -70,42 +122,99 @@ public class PosController {
     // ── Employee operations scoped to a PoS ──
 
     @GetMapping("/{posId}/employees")
-    @Operation(summary = "List employees in a PoS")
-    public ResponseEntity<List<EmployeeDto>> listEmployees(@PathVariable Long posId) {
+    @Operation(summary = "List employees in a PoS",
+            description = "Returns all employees currently assigned to the specified PoS location.")
+    @ApiResponse(responseCode = "200", description = "Employee list for PoS",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = EmployeeDto.class))))
+    public ResponseEntity<List<EmployeeDto>> listEmployees(
+            @Parameter(description = "PoS ID", example = "1", required = true)
+            @PathVariable Long posId) {
         return ResponseEntity.ok(employeeService.findByPosId(posId));
     }
 
     @GetMapping("/{posId}/available-employees")
-    @Operation(summary = "List employees NOT in this PoS (for swap)")
-    public ResponseEntity<List<EmployeeDto>> availableEmployees(@PathVariable Long posId) {
+    @Operation(summary = "List available employees for swap",
+            description = "Returns employees that are NOT assigned to this PoS, making them eligible for a swap operation.")
+    @ApiResponse(responseCode = "200", description = "Available employees",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = EmployeeDto.class))))
+    public ResponseEntity<List<EmployeeDto>> availableEmployees(
+            @Parameter(description = "PoS ID", example = "1", required = true)
+            @PathVariable Long posId) {
         return ResponseEntity.ok(employeeService.findAvailableForPos(posId));
     }
 
     @PostMapping("/{posId}/employees")
-    @Operation(summary = "Add employee to a PoS")
-    public ResponseEntity<EmployeeDto> addEmployee(@PathVariable Long posId, @Valid @RequestBody EmployeeDto dto) {
+    @Operation(summary = "Add employee to a PoS",
+            description = "Creates a new employee and assigns them to the specified PoS location.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Employee added to PoS",
+                    content = @Content(schema = @Schema(implementation = EmployeeDto.class))),
+            @ApiResponse(responseCode = "400", description = "Validation error",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "PoS not found",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    public ResponseEntity<EmployeeDto> addEmployee(
+            @Parameter(description = "PoS ID", example = "1", required = true)
+            @PathVariable Long posId, @Valid @RequestBody EmployeeDto dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(posService.addEmployee(posId, dto));
     }
 
     @PutMapping("/{posId}/employees/{empId}")
-    @Operation(summary = "Update employee in a PoS")
+    @Operation(summary = "Update employee in a PoS",
+            description = "Updates the details of an employee within the context of a PoS location.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Employee updated",
+                    content = @Content(schema = @Schema(implementation = EmployeeDto.class))),
+            @ApiResponse(responseCode = "404", description = "PoS or employee not found",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
     public ResponseEntity<EmployeeDto> updateEmployee(
-            @PathVariable Long posId, @PathVariable String empId, @RequestBody EmployeeDto dto) {
+            @Parameter(description = "PoS ID", example = "1", required = true)
+            @PathVariable Long posId,
+            @Parameter(description = "Employee ID", example = "emp-1", required = true)
+            @PathVariable String empId, @RequestBody EmployeeDto dto) {
         return ResponseEntity.ok(posService.updateEmployee(posId, empId, dto));
     }
 
     @DeleteMapping("/{posId}/employees/{empId}")
-    @Operation(summary = "Remove employee from a PoS")
-    public ResponseEntity<Map<String, String>> removeEmployee(@PathVariable Long posId, @PathVariable String empId) {
+    @Operation(summary = "Remove employee from a PoS",
+            description = "Removes the employee's PoS assignment (sets posId to null). The employee record is not deleted.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Employee removed from PoS",
+                    content = @Content(schema = @Schema(implementation = Map.class),
+                            examples = @ExampleObject(value = "{\"message\": \"Employee removed successfully\"}"))),
+            @ApiResponse(responseCode = "404", description = "PoS or employee not found",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    public ResponseEntity<Map<String, String>> removeEmployee(
+            @Parameter(description = "PoS ID", example = "1", required = true)
+            @PathVariable Long posId,
+            @Parameter(description = "Employee ID", example = "emp-1", required = true)
+            @PathVariable String empId) {
         posService.removeEmployee(posId, empId);
         return ResponseEntity.ok(Map.of("message", "Employee removed successfully"));
     }
 
     @PutMapping("/{posId}/employees/{currentEmpId}/swap")
-    @Operation(summary = "Swap employee between PoS locations")
+    @Operation(summary = "Swap employee between PoS locations",
+            description = "Swaps an employee in this PoS with another employee. "
+                    + "The current employee is removed and the new employee is assigned to this PoS.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Employees swapped",
+                    content = @Content(schema = @Schema(implementation = Map.class),
+                            examples = @ExampleObject(value = "{\"removedEmployee\": {...}, \"addedEmployee\": {...}}"))),
+            @ApiResponse(responseCode = "404", description = "PoS or employee not found",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
     public ResponseEntity<Map<String, Object>> swapEmployee(
+            @Parameter(description = "PoS ID", example = "1", required = true)
             @PathVariable Long posId,
+            @Parameter(description = "Current employee ID to remove", example = "emp-1", required = true)
             @PathVariable String currentEmpId,
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Body containing the new employee ID",
+                    content = @Content(examples = @ExampleObject(value = "{\"newEmpId\": \"emp-5\"}")))
             @RequestBody Map<String, String> body) {
         String newEmpId = body.get("newEmpId");
         return ResponseEntity.ok(posService.swapEmployee(posId, currentEmpId, newEmpId));
