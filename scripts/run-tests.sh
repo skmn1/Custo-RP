@@ -18,7 +18,9 @@ echo ""
 # ── Backend Tests ──
 echo -e "${GREEN}[1/2]${NC} Backend unit tests (Maven)..."
 if [[ -f "$HOME/.sdkman/bin/sdkman-init.sh" ]]; then
+  set +u  # SDKMAN init references ZSH_VERSION which may be unset
   source "$HOME/.sdkman/bin/sdkman-init.sh"
+  set -u
 fi
 cd "$API_DIR"
 mvn test -q
