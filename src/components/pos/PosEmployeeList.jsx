@@ -211,7 +211,7 @@ const EmpListView = ({ employees, onEdit, onRemove, onSwap }) => (
 );
 
 // ── Main Component ──
-const PosEmployeeList = ({ employees = [], posId, onAdd, onAssign, onUpdate, onRemove, onSwap, onFetchAvailableEmployees }) => {
+const PosEmployeeList = ({ employees = [], posId, posName = '', onAdd, onAssign, onUpdate, onRemove, onSwap, onFetchAvailableEmployees }) => {
   const [search, setSearch] = useState('');
   const [viewMode, setViewMode] = useState('cards'); // 'list' | 'grid' | 'cards'
   const [modalOpen, setModalOpen] = useState(false);
@@ -250,8 +250,8 @@ const PosEmployeeList = ({ employees = [], posId, onAdd, onAssign, onUpdate, onR
     : employees;
 
   // --- Form helpers ---
-  const resetForm = () => {
-    setForm({ name: '', role: '', email: '', department: '', maxHours: 40, isManager: false });
+  const resetForm = (prefillDept = '') => {
+    setForm({ name: '', role: '', email: '', department: prefillDept, maxHours: 40, isManager: false });
     setFormErrors({});
   };
 
@@ -517,7 +517,7 @@ const PosEmployeeList = ({ employees = [], posId, onAdd, onAssign, onUpdate, onR
               </button>
               <button
                 type="button"
-                onClick={() => { setAddMode('create'); resetForm(); }}
+                onClick={() => { setAddMode('create'); resetForm(posName); }}
                 data-testid="pos-emp-mode-create"
                 className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                   addMode === 'create'
@@ -638,6 +638,7 @@ const PosEmployeeList = ({ employees = [], posId, onAdd, onAssign, onUpdate, onR
                   data-testid="pos-emp-name-input"
                   value={form.name}
                   onChange={handleChange}
+                  autoFocus={!editingEmployee && addMode === 'create'}
                   className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors ${
                     formErrors.name ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-indigo-500'
                   }`}
@@ -669,18 +670,25 @@ const PosEmployeeList = ({ employees = [], posId, onAdd, onAssign, onUpdate, onR
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Role *</label>
-                <input
-                  type="text"
-                  name="role"
-                  data-testid="pos-emp-role-input"
-                  value={form.role}
-                  onChange={handleChange}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors ${
-                    formErrors.role ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-indigo-500'
-                  }`}
-                  placeholder="Enter role"
-                  list="pos-emp-roles"
-                />
+                <div className="relative">
+                  <input
+                    type="text"
+                    name="role"
+                    data-testid="pos-emp-role-input"
+                    value={form.role}
+                    onChange={handleChange}
+                    className={`w-full pl-3 pr-8 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors ${
+                      formErrors.role ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-indigo-500'
+                    }`}
+                    placeholder="Enter role"
+                    list="pos-emp-roles"
+                  />
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
                 <datalist id="pos-emp-roles">
                   {ROLE_SUGGESTIONS.map((r) => (
                     <option key={r} value={r} />
@@ -689,24 +697,48 @@ const PosEmployeeList = ({ employees = [], posId, onAdd, onAssign, onUpdate, onR
                 {formErrors.role && <p className="mt-1 text-sm text-red-600">{formErrors.role}</p>}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Point of Sale Department *</label>
-                <input
-                  type="text"
-                  name="department"
-                  data-testid="pos-emp-dept-input"
-                  value={form.department}
-                  onChange={handleChange}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors ${
-                    formErrors.department ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-indigo-500'
-                  }`}
-                  placeholder="Enter point of sale department"
-                  list="pos-emp-depts"
-                />
+                <label className="block text-sm font-medium text-gray-700 mb-2">Point of Sale *</label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    name="department"
+                    data-testid="pos-emp-dept-input"
+                    value={form.department}
+                    onChange={handleChange}
+                    disabled={!editingEmployee && addMode === 'create'}
+                    className={`w-full pl-3 pr-8 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors ${
+                      !editingEmployee && addMode === 'create'
+                        ? 'border-gray-200 bg-gray-100 text-gray-500 cursor-not-allowed'
+                        : formErrors.department
+                        ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
+                        : 'border-gray-300 focus:border-indigo-500'
+                    }`}
+                    placeholder="Point of sale name"
+                    list={(!editingEmployee && addMode === 'create') ? undefined : 'pos-emp-depts'}
+                  />
+                  {(editingEmployee || addMode !== 'create') && (
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  )}
+                  {(!editingEmployee && addMode === 'create') && (
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                      <svg className="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                    </div>
+                  )}
+                </div>
                 <datalist id="pos-emp-depts">
                   {DEPARTMENT_SUGGESTIONS.map((d) => (
                     <option key={d} value={d} />
                   ))}
                 </datalist>
+                {(!editingEmployee && addMode === 'create') && (
+                  <p className="mt-1 text-xs text-indigo-500">Auto-filled from the PoS location</p>
+                )}
                 {formErrors.department && <p className="mt-1 text-sm text-red-600">{formErrors.department}</p>}
               </div>
             </div>

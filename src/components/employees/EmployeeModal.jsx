@@ -116,6 +116,7 @@ const EmployeeModal = ({ isOpen, onClose, onSave, employee, departments, roles }
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
+                autoFocus={!employee}
                 className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors ${
                   errors.name ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-indigo-500'
                 }`}
@@ -157,12 +158,17 @@ const EmployeeModal = ({ isOpen, onClose, onSave, employee, departments, roles }
                   name="role"
                   value={formData.role}
                   onChange={handleChange}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors ${
+                  className={`w-full pl-3 pr-8 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors ${
                     errors.role ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-indigo-500'
                   }`}
                   placeholder="Enter role"
                   list="roles"
                 />
+                <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
                 <datalist id="roles">
                   {roles.map(role => (
                     <option key={role} value={role} />
@@ -182,12 +188,17 @@ const EmployeeModal = ({ isOpen, onClose, onSave, employee, departments, roles }
                   name="department"
                   value={formData.department}
                   onChange={handleChange}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors ${
+                  className={`w-full pl-3 pr-8 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors ${
                     errors.department ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-indigo-500'
                   }`}
                   placeholder="Enter department"
                   list="departments"
                 />
+                <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
                 <datalist id="departments">
                   {departments.map(dept => (
                     <option key={dept} value={dept} />
