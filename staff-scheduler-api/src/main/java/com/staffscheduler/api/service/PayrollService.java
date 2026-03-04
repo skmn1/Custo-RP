@@ -36,9 +36,9 @@ public class PayrollService {
                 .collect(Collectors.groupingBy(Shift::getEmployeeId));
 
         return employees.stream()
+                .filter(emp -> !shiftsByEmployee.getOrDefault(emp.getId(), List.of()).isEmpty())
                 .map(emp -> {
                     List<Shift> empShifts = shiftsByEmployee.getOrDefault(emp.getId(), List.of());
-                    if (empShifts.isEmpty()) return null;
 
                     EmployeePayrollResult calc = PayrollCalculator.calculate(emp.getRole(), empShifts);
 
@@ -56,7 +56,7 @@ public class PayrollService {
                             .id(emp.getId())
                             .name(emp.getName())
                             .role(emp.getRole())
-                            .department(emp.getDepartment())
+                            .department(null)
                             .hourlyRate(calc.baseRate())
                             .totalHours(calc.totalHours())
                             .regularHours(calc.regularHours())
@@ -79,7 +79,6 @@ public class PayrollService {
                             .shifts(shiftDetails)
                             .build();
                 })
-                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
