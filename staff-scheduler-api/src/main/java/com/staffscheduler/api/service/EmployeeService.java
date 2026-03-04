@@ -26,10 +26,9 @@ public class EmployeeService {
 
     // ── Queries ──
 
-    public List<EmployeeDto> findAll(String search, String department, String role, String sort, String order) {
+    public List<EmployeeDto> findAll(String search, String role, String sort, String order) {
         List<Employee> employees = new ArrayList<>(repository.findFiltered(
                 (search != null && search.isBlank()) ? null : search,
-                (department != null && department.isBlank()) ? null : department,
                 (role != null && role.isBlank()) ? null : role));
 
         // Sort in Java for flexibility
@@ -56,13 +55,6 @@ public class EmployeeService {
         return repository.findAll().stream()
                 .filter(e -> e.getPosId() == null || !e.getPosId().equals(posId))
                 .map(this::toDto)
-                .collect(Collectors.toList());
-    }
-
-    public List<String> getDepartments() {
-        return repository.findAll().stream()
-                .map(Employee::getDepartment)
-                .distinct().sorted()
                 .collect(Collectors.toList());
     }
 
@@ -131,7 +123,6 @@ public class EmployeeService {
         if (dto.getRole() != null) entity.setRole(dto.getRole());
         if (dto.getEmail() != null) entity.setEmail(dto.getEmail());
         if (dto.getMaxHours() != null) entity.setMaxHours(dto.getMaxHours());
-        if (dto.getDepartment() != null) entity.setDepartment(dto.getDepartment());
         if (dto.getPosId() != null) entity.setPosId(dto.getPosId());
         if (dto.getIsManager() != null) entity.setIsManager(dto.getIsManager());
         if (dto.getColor() != null) entity.setColor(dto.getColor());
@@ -146,7 +137,6 @@ public class EmployeeService {
                 .color(e.getColor())
                 .email(e.getEmail())
                 .maxHours(e.getMaxHours())
-                .department(e.getDepartment())
                 .posId(e.getPosId())
                 .isManager(e.getIsManager())
                 .build();
@@ -166,7 +156,6 @@ public class EmployeeService {
 
     private Comparator<Employee> getComparator(String field) {
         return switch (field.toLowerCase()) {
-            case "department" -> Comparator.comparing(Employee::getDepartment, String.CASE_INSENSITIVE_ORDER);
             case "role" -> Comparator.comparing(Employee::getRole, String.CASE_INSENSITIVE_ORDER);
             case "email" -> Comparator.comparing(Employee::getEmail, String.CASE_INSENSITIVE_ORDER);
             case "maxhours", "hours" -> Comparator.comparingInt(Employee::getMaxHours);

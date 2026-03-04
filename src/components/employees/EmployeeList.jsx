@@ -1,6 +1,6 @@
 import React from 'react';
 
-const EmployeeList = ({ employees, onEdit, onDelete }) => {
+const EmployeeList = ({ employees, onEdit, onDelete, posList = [] }) => {
   return (
     <div className="overflow-hidden">
       <table className="min-w-full divide-y divide-gray-200">
@@ -13,7 +13,7 @@ const EmployeeList = ({ employees, onEdit, onDelete }) => {
               Role
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Department
+              Point of Sale
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Max Hours
@@ -48,8 +48,8 @@ const EmployeeList = ({ employees, onEdit, onDelete }) => {
                 <div className="text-sm text-gray-900">{employee.role}</div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
-                <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                  {employee.department}
+                <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-indigo-100 text-indigo-800">
+                  {posList.find(p => p.id === employee.posId)?.name ?? '—'}
                 </span>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">

@@ -7,7 +7,7 @@ export const useEmployees = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterDepartment, setFilterDepartment] = useState('');
+  const [filterPos, setFilterPos] = useState('');
   const [filterRole, setFilterRole] = useState('');
   const [sortBy, setSortBy] = useState('name');
   const [sortOrder, setSortOrder] = useState('asc');
@@ -20,7 +20,7 @@ export const useEmployees = () => {
     try {
       const data = await employeesApi.list({
         search: searchTerm || undefined,
-        department: filterDepartment || undefined,
+        posId: filterPos || undefined,
         role: filterRole || undefined,
         sort: sortBy,
         order: sortOrder,
@@ -33,7 +33,7 @@ export const useEmployees = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [searchTerm, filterDepartment, filterRole, sortBy, sortOrder]);
+  }, [searchTerm, filterPos, filterRole, sortBy, sortOrder]);
 
   useEffect(() => {
     fetchEmployees();
@@ -82,11 +82,6 @@ export const useEmployees = () => {
 
   // ── Derived data (computed client-side from fetched list) ──
 
-  const departments = useMemo(
-    () => [...new Set(employees.map(emp => emp.department))].filter(Boolean).sort(),
-    [employees],
-  );
-
   const roles = useMemo(
     () => [...new Set(employees.map(emp => emp.role))].filter(Boolean).sort(),
     [employees],
@@ -94,22 +89,18 @@ export const useEmployees = () => {
 
   const stats = useMemo(() => ({
     totalEmployees: employees.length,
-    totalDepartments: departments.length,
+    totalPosLocations: new Set(employees.map(e => e.posId).filter(Boolean)).size,
+    totalRoles: new Set(employees.map(e => e.role).filter(Boolean)).size,
     averageMaxHours:
       employees.length > 0
         ? employees.reduce((sum, emp) => sum + (emp.maxHours || 0), 0) / employees.length
         : 0,
-    departmentCounts: departments.reduce((acc, dept) => {
-      acc[dept] = employees.filter(emp => emp.department === dept).length;
-      return acc;
-    }, {}),
-  }), [employees, departments]);
+  }), [employees]);
 
   return {
     // Data
     employees,          // already filtered/sorted from API
     allEmployees: employees,
-    departments,
     roles,
     stats,
     isLoading,
@@ -125,8 +116,8 @@ export const useEmployees = () => {
     // Filtering and searching
     searchTerm,
     setSearchTerm,
-    filterDepartment,
-    setFilterDepartment,
+    filterPos,
+    setFilterPos,
     filterRole,
     setFilterRole,
     sortBy,

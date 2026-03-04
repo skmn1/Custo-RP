@@ -35,10 +35,6 @@ public class EmployeeDto {
     @Schema(description = "Maximum weekly working hours", example = "40", minimum = "1", maximum = "168", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer maxHours;
 
-    @NotBlank(message = "Department is required")
-    @Schema(description = "Department name", example = "Kitchen", requiredMode = Schema.RequiredMode.REQUIRED)
-    private String department;
-
     @Schema(description = "Assigned PoS location ID (null if unassigned)", example = "1")
     private Long posId;
 

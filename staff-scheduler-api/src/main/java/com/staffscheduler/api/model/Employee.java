@@ -39,10 +39,6 @@ public class Employee {
     @Column(nullable = false)
     private Integer maxHours;
 
-    @NotBlank(message = "Department is required")
-    @Column(nullable = false, length = 50)
-    private String department;
-
     @Column(name = "pos_id")
     private Long posId;
 

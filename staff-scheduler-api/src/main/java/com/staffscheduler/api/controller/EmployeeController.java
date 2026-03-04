@@ -32,7 +32,7 @@ public class EmployeeController {
     @GetMapping
     @Operation(
             summary = "List employees",
-            description = "Returns all employees with optional search, department/role filtering, and sorting. "
+            description = "Returns all employees with optional search, role filtering, and sorting. "
                     + "When no filters are applied, returns all employees sorted by name ascending.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Employee list returned successfully",
@@ -41,15 +41,13 @@ public class EmployeeController {
     public ResponseEntity<List<EmployeeDto>> list(
             @Parameter(description = "Search by name or email (case-insensitive partial match)", example = "john")
             @RequestParam(required = false) String search,
-            @Parameter(description = "Filter by department name", example = "Kitchen")
-            @RequestParam(required = false) String department,
             @Parameter(description = "Filter by role", example = "Chef")
             @RequestParam(required = false) String role,
-            @Parameter(description = "Sort field", schema = @Schema(allowableValues = {"name", "role", "department", "maxHours"}))
+            @Parameter(description = "Sort field", schema = @Schema(allowableValues = {"name", "role", "maxHours"}))
             @RequestParam(required = false, defaultValue = "name") String sort,
             @Parameter(description = "Sort direction", schema = @Schema(allowableValues = {"asc", "desc"}))
             @RequestParam(required = false, defaultValue = "asc") String order) {
-        return ResponseEntity.ok(service.findAll(search, department, role, sort, order));
+        return ResponseEntity.ok(service.findAll(search, role, sort, order));
     }
 
     @GetMapping("/{id}")
@@ -111,16 +109,6 @@ public class EmployeeController {
             @PathVariable String id) {
         service.delete(id);
         return ResponseEntity.ok(Map.of("message", "Employee deleted successfully"));
-    }
-
-    @GetMapping("/departments")
-    @Operation(summary = "List all departments",
-            description = "Returns a distinct list of department names across all employees.")
-    @ApiResponse(responseCode = "200", description = "Department list",
-            content = @Content(array = @ArraySchema(schema = @Schema(implementation = String.class)),
-                    examples = @ExampleObject(value = "[\"Kitchen\", \"Bar\", \"Service\", \"Management\"]")))
-    public ResponseEntity<List<String>> departments() {
-        return ResponseEntity.ok(service.getDepartments());
     }
 
     @GetMapping("/roles")

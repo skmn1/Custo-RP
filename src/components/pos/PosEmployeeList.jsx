@@ -1,17 +1,12 @@
 import React, { useState } from 'react';
 import Modal from '../ui/Modal';
 import Button from '../ui/Button';
-import ComboBox from '../ui/ComboBox';
+import EmployeeModal from '../employees/EmployeeModal';
 
 const ROLE_SUGGESTIONS = [
   'Store Manager', 'Assistant Manager', 'Cashier', 'Butcher',
   'Baker', 'Deli Clerk', 'Stock Clerk', 'Sales Associate',
   'Shift Lead', 'Technician', 'Cook', 'Server',
-];
-
-const DEPARTMENT_SUGGESTIONS = [
-  'Management', 'Sales', 'Production', 'Kitchen',
-  'Front of House', 'Warehouse', 'Administration',
 ];
 
 // ── SVG icon helpers ──
@@ -52,12 +47,6 @@ const ManagerBadge = () => (
   </span>
 );
 
-const DeptBadge = ({ dept }) => (
-  <span className="inline-flex px-2.5 py-0.5 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-    {dept}
-  </span>
-);
-
 // ── Cards View ──
 const EmpCardsView = ({ employees, onEdit, onRemove, onSwap }) => (
   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -76,7 +65,6 @@ const EmpCardsView = ({ employees, onEdit, onRemove, onSwap }) => (
               <h3 className="text-base font-semibold text-gray-900 mb-0.5 truncate">{emp.name}</h3>
               <p className="text-sm text-gray-600 mb-1.5">{emp.role}</p>
               <div className="flex flex-wrap items-center gap-1.5">
-                <DeptBadge dept={emp.department} />
                 {emp.isManager && <ManagerBadge />}
               </div>
             </div>
@@ -112,7 +100,7 @@ const EmpCardsView = ({ employees, onEdit, onRemove, onSwap }) => (
   </div>
 );
 
-// ── Grid View (compact, like EmployeeGrid) ──
+// ── Grid View ──
 const EmpGridView = ({ employees, onEdit, onRemove, onSwap }) => (
   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
     {employees.map((emp) => (
@@ -140,10 +128,11 @@ const EmpGridView = ({ employees, onEdit, onRemove, onSwap }) => (
         <div className="text-center">
           <h3 className="text-base font-semibold text-gray-900 mb-1 truncate">{emp.name}</h3>
           <p className="text-sm text-gray-600 mb-2">{emp.role}</p>
-          <div className="flex flex-wrap items-center justify-center gap-1.5 mb-3">
-            <DeptBadge dept={emp.department} />
-            {emp.isManager && <ManagerBadge />}
-          </div>
+          {emp.isManager && (
+            <div className="flex justify-center mb-2">
+              <ManagerBadge />
+            </div>
+          )}
           <div className="space-y-1.5 text-sm">
             <div className="flex justify-between">
               <span className="text-gray-500">Max Hours:</span>
@@ -157,15 +146,14 @@ const EmpGridView = ({ employees, onEdit, onRemove, onSwap }) => (
   </div>
 );
 
-// ── List View (table, like EmployeeList) ──
+// ── List View ──
 const EmpListView = ({ employees, onEdit, onRemove, onSwap }) => (
-  <div className="overflow-hidden rounded-lg border border-gray-200">
+  <div className="overflow-x-auto">
     <table className="min-w-full divide-y divide-gray-200">
       <thead className="bg-gray-50">
         <tr>
           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee</th>
           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">PoS Department</th>
           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Max Hours</th>
           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
           <th className="relative px-6 py-3"><span className="sr-only">Actions</span></th>
@@ -173,30 +161,29 @@ const EmpListView = ({ employees, onEdit, onRemove, onSwap }) => (
       </thead>
       <tbody className="bg-white divide-y divide-gray-200">
         {employees.map((emp) => (
-          <tr key={emp.id} data-testid="pos-employee-card" className="hover:bg-gray-50 transition-colors">
+          <tr key={emp.id} className="hover:bg-gray-50 transition-colors group">
             <td className="px-6 py-4 whitespace-nowrap">
-              <div className="flex items-center">
-                <div className={`flex-shrink-0 h-10 w-10 ${emp.color || 'bg-gray-500'} rounded-full flex items-center justify-center text-white font-semibold text-sm`}>
+              <div className="flex items-center gap-3">
+                <div className={`w-9 h-9 ${emp.color || 'bg-gray-500'} rounded-full flex items-center justify-center text-white font-semibold text-xs shrink-0`}>
                   {emp.avatar}
                 </div>
-                <div className="ml-4">
+                <div>
                   <div className="text-sm font-medium text-gray-900">{emp.name}</div>
-                  {emp.isManager && (
-                    <span className="inline-flex px-1.5 py-0.5 text-xs font-semibold rounded-full bg-amber-100 text-amber-800 mt-0.5">Manager</span>
-                  )}
+                  {emp.isManager && <ManagerBadge />}
                 </div>
               </div>
             </td>
-            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{emp.role}</td>
-            <td className="px-6 py-4 whitespace-nowrap"><DeptBadge dept={emp.department} /></td>
-            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{emp.maxHours}h/week</td>
-            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{emp.email}</td>
-            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-              <div className="flex items-center justify-end space-x-2">
-                <button onClick={() => onSwap(emp)} className="text-emerald-600 hover:text-emerald-900 p-1 rounded-full hover:bg-emerald-50 transition-colors" title="Replace" data-testid="pos-employee-swap-btn">
+            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{emp.role}</td>
+            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{emp.maxHours}h/week</td>
+            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 truncate max-w-[160px]">
+              <a href={`mailto:${emp.email}`} className="text-indigo-600 hover:text-indigo-800">{emp.email}</a>
+            </td>
+            <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
+              <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button onClick={() => onSwap(emp)} className="text-emerald-600 hover:text-emerald-800 p-1 rounded-full hover:bg-emerald-50 transition-colors" title="Replace" data-testid="pos-employee-swap-btn">
                   <SwapIcon />
                 </button>
-                <button onClick={() => onEdit(emp)} className="text-indigo-600 hover:text-indigo-900 p-1 rounded-full hover:bg-indigo-50 transition-colors" title="Edit" data-testid="pos-employee-edit-btn">
+                <button onClick={() => onEdit(emp)} className="text-indigo-600 hover:text-indigo-800 p-1 rounded-full hover:bg-indigo-50 transition-colors" title="Edit" data-testid="pos-employee-edit-btn">
                   <EditIcon />
                 </button>
                 <button onClick={() => onRemove(emp)} className="text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-50 transition-colors" title="Remove" data-testid="pos-employee-remove-btn">
@@ -212,58 +199,54 @@ const EmpListView = ({ employees, onEdit, onRemove, onSwap }) => (
 );
 
 // ── Main Component ──
-const PosEmployeeList = ({ employees = [], posId, posName = '', onAdd, onAssign, onUpdate, onRemove, onSwap, onFetchAvailableEmployees }) => {
-  const [search, setSearch] = useState('');
-  const [viewMode, setViewMode] = useState('cards'); // 'list' | 'grid' | 'cards'
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editingEmployee, setEditingEmployee] = useState(null);
+const PosEmployeeList = ({
+  employees = [],
+  posId,
+  posName = '',
+  onAdd,
+  onAssign,
+  onUpdate,
+  onRemove,
+  onSwap,
+  onFetchAvailableEmployees,
+}) => {
+  const [search, setSearch]     = useState('');
+  const [viewMode, setViewMode] = useState('cards');
   const [deleteConfirm, setDeleteConfirm] = useState(null);
-  const [swapTarget, setSwapTarget] = useState(null);
-  const [swapCandidates, setSwapCandidates] = useState([]);
-  const [swapSearch, setSwapSearch] = useState('');
-  const [selectedSwap, setSelectedSwap] = useState(null);
-  const [swapLoading, setSwapLoading] = useState(false);
 
-  // Add mode: 'select' to pick existing employee, 'create' to create new
-  const [addMode, setAddMode] = useState('select');
+  // ── Assign existing modal ──
+  const [assignOpen, setAssignOpen]                 = useState(false);
   const [availableEmployees, setAvailableEmployees] = useState([]);
-  const [availableSearch, setAvailableSearch] = useState('');
-  const [selectedExisting, setSelectedExisting] = useState(null);
-  const [availableLoading, setAvailableLoading] = useState(false);
+  const [availableSearch, setAvailableSearch]       = useState('');
+  const [selectedExisting, setSelectedExisting]     = useState(null);
+  const [availableLoading, setAvailableLoading]     = useState(false);
 
-  const [form, setForm] = useState({
-    name: '',
-    role: '',
-    email: '',
-    department: '',
-    maxHours: 40,
-    isManager: false,
-  });
-  const [formErrors, setFormErrors] = useState({});
+  // ── Shared EmployeeModal (create / edit) ──
+  const [empModalOpen, setEmpModalOpen]     = useState(false);
+  const [editingEmployee, setEditingEmployee] = useState(null);
 
+  // ── Swap modal ──
+  const [swapTarget, setSwapTarget]         = useState(null);
+  const [swapCandidates, setSwapCandidates] = useState([]);
+  const [swapSearch, setSwapSearch]         = useState('');
+  const [selectedSwap, setSelectedSwap]     = useState(null);
+  const [swapLoading, setSwapLoading]       = useState(false);
+
+  // ── Filtered list ──
   const filtered = search.trim()
     ? employees.filter(
         (e) =>
           e.name.toLowerCase().includes(search.toLowerCase()) ||
-          e.role.toLowerCase().includes(search.toLowerCase()) ||
-          e.department.toLowerCase().includes(search.toLowerCase())
+          e.role.toLowerCase().includes(search.toLowerCase())
       )
     : employees;
 
-  // --- Form helpers ---
-  const resetForm = (prefillDept = '') => {
-    setForm({ name: '', role: '', email: '', department: prefillDept, maxHours: 40, isManager: false });
-    setFormErrors({});
-  };
-
-  const openCreate = async () => {
-    setEditingEmployee(null);
-    resetForm();
-    setAddMode('select');
+  // ── Assign existing handlers ──
+  const openAssign = async () => {
     setSelectedExisting(null);
     setAvailableSearch('');
     setAvailableLoading(true);
-    setModalOpen(true);
+    setAssignOpen(true);
     try {
       const available = await onFetchAvailableEmployees(posId);
       setAvailableEmployees(available);
@@ -273,92 +256,48 @@ const PosEmployeeList = ({ employees = [], posId, posName = '', onAdd, onAssign,
     setAvailableLoading(false);
   };
 
+  const handleAssignConfirm = async () => {
+    if (!selectedExisting) return;
+    try {
+      await onAssign(posId, selectedExisting.id);
+      setAssignOpen(false);
+      setSelectedExisting(null);
+    } catch { /* handled by hook */ }
+  };
+
+  // ── EmployeeModal handlers ──
+  const openCreate = () => {
+    setEditingEmployee(null);
+    setEmpModalOpen(true);
+  };
+
   const openEdit = (emp) => {
     setEditingEmployee(emp);
-    setForm({
-      name: emp.name || '',
-      role: emp.role || '',
-      email: emp.email || '',
-      department: emp.department || '',
-      maxHours: emp.maxHours || 40,
-      isManager: emp.isManager || false,
-    });
-    setFormErrors({});
-    setModalOpen(true);
+    setEmpModalOpen(true);
   };
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : name === 'maxHours' ? parseInt(value) || 0 : value,
-    }));
-    if (formErrors[name]) setFormErrors((prev) => ({ ...prev, [name]: '' }));
-  };
-
-  const validate = () => {
-    const errs = {};
-    if (!form.name.trim()) errs.name = 'Name is required';
-    if (!form.email.trim()) errs.email = 'Email is required';
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errs.email = 'Invalid email';
-    if (!form.role.trim()) errs.role = 'Role is required';
-    if (!form.department.trim()) errs.department = 'Department is required';
-    if (!form.maxHours || form.maxHours < 1 || form.maxHours > 80)
-      errs.maxHours = 'Must be 1–80';
-    setFormErrors(errs);
-    return Object.keys(errs).length === 0;
-  };
-
-  const isFormValid =
-    form.name.trim() &&
-    form.email.trim() &&
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email) &&
-    form.role.trim() &&
-    form.department.trim() &&
-    form.maxHours >= 1 &&
-    form.maxHours <= 80;
-
-  const handleSubmit = async () => {
-    if (editingEmployee) {
-      if (!validate()) return;
-      try {
-        await onUpdate(posId, editingEmployee.id, form);
-        setModalOpen(false);
-        resetForm();
-      } catch {
-        // error handled by hook
+  const handleEmpSave = async (formData) => {
+    try {
+      if (editingEmployee) {
+        await onUpdate(posId, editingEmployee.id, { ...formData, isManager: editingEmployee.isManager });
+      } else {
+        await onAdd(posId, { ...formData, isManager: false });
       }
-    } else if (addMode === 'select' && selectedExisting) {
-      try {
-        await onAssign(posId, selectedExisting.id);
-        setModalOpen(false);
-        setSelectedExisting(null);
-      } catch {
-        // error handled by hook
-      }
-    } else if (addMode === 'create') {
-      if (!validate()) return;
-      try {
-        await onAdd(posId, form);
-        setModalOpen(false);
-        resetForm();
-      } catch {
-        // error handled by hook
-      }
-    }
+      setEmpModalOpen(false);
+      setEditingEmployee(null);
+    } catch { /* handled by hook */ }
   };
 
+  // ── Remove handler ──
   const handleRemoveConfirm = async () => {
     if (!deleteConfirm) return;
     try {
       await onRemove(posId, deleteConfirm.id);
-    } catch {
-      // error handled by hook
-    }
+    } catch { /* handled by hook */ }
     setDeleteConfirm(null);
   };
 
-  // --- Swap handlers ---
+  // ── Swap handlers ──
   const openSwapModal = async (emp) => {
     setSwapTarget(emp);
     setSwapSearch('');
@@ -384,9 +323,7 @@ const PosEmployeeList = ({ employees = [], posId, posName = '', onAdd, onAssign,
     if (!swapTarget || !selectedSwap) return;
     try {
       await onSwap(posId, swapTarget.id, selectedSwap.id);
-    } catch {
-      // error handled by hook
-    }
+    } catch { /* handled by hook */ }
     closeSwapModal();
   };
 
@@ -394,8 +331,7 @@ const PosEmployeeList = ({ employees = [], posId, posName = '', onAdd, onAssign,
     ? swapCandidates.filter(
         (e) =>
           e.name.toLowerCase().includes(swapSearch.toLowerCase()) ||
-          e.role.toLowerCase().includes(swapSearch.toLowerCase()) ||
-          e.department.toLowerCase().includes(swapSearch.toLowerCase())
+          e.role.toLowerCase().includes(swapSearch.toLowerCase())
       )
     : swapCandidates;
 
@@ -415,18 +351,16 @@ const PosEmployeeList = ({ employees = [], posId, posName = '', onAdd, onAssign,
     </button>
   );
 
-  // ── Render the active view ──
   const renderView = () => {
     const props = { employees: filtered, onEdit: openEdit, onRemove: setDeleteConfirm, onSwap: openSwapModal };
     switch (viewMode) {
-      case 'list':
-        return <EmpListView {...props} />;
-      case 'grid':
-        return <EmpGridView {...props} />;
-      default:
-        return <EmpCardsView {...props} />;
+      case 'list':  return <EmpListView {...props} />;
+      case 'grid':  return <EmpGridView {...props} />;
+      default:      return <EmpCardsView {...props} />;
     }
   };
+
+  const lockedPosList = posName ? [{ id: posId, name: posName }] : [];
 
   return (
     <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6" data-testid="pos-employee-section">
@@ -438,14 +372,24 @@ const PosEmployeeList = ({ employees = [], posId, posName = '', onAdd, onAssign,
             {employees.length} employee{employees.length !== 1 ? 's' : ''} assigned to this location
           </p>
         </div>
-        <Button variant="primary" size="sm" onClick={openCreate} data-testid="pos-add-employee-btn">
-          <span className="flex items-center gap-1.5">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
-            Add Employee
-          </span>
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="secondary" size="sm" onClick={openAssign} data-testid="pos-assign-employee-btn">
+            <span className="flex items-center gap-1.5">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              Assign Existing
+            </span>
+          </Button>
+          <Button variant="primary" size="sm" onClick={openCreate} data-testid="pos-add-employee-btn">
+            <span className="flex items-center gap-1.5">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              New Employee
+            </span>
+          </Button>
+        </div>
       </div>
 
       {/* Search + View Toggle */}
@@ -467,8 +411,8 @@ const PosEmployeeList = ({ employees = [], posId, posName = '', onAdd, onAssign,
             />
           </div>
           <div className="flex items-center space-x-2 bg-gray-100 rounded-lg p-1" data-testid="pos-emp-view-toggle">
-            <ViewBtn mode="list" icon={ListIcon} />
-            <ViewBtn mode="grid" icon={GridIcon} />
+            <ViewBtn mode="list"  icon={ListIcon} />
+            <ViewBtn mode="grid"  icon={GridIcon} />
             <ViewBtn mode="cards" icon={CardsIcon} />
           </div>
         </div>
@@ -489,322 +433,110 @@ const PosEmployeeList = ({ employees = [], posId, posName = '', onAdd, onAssign,
         renderView()
       )}
 
-      {/* Add / Edit Employee Modal */}
+      {/* ── Assign Existing Modal ── */}
       <Modal
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
-        title={editingEmployee ? 'Edit Employee' : 'Add Employee to PoS'}
+        isOpen={assignOpen}
+        onClose={() => setAssignOpen(false)}
+        title="Assign Existing Employee"
         size="lg"
         showValidate
-        onValidate={handleSubmit}
-        validateText={editingEmployee ? 'Update Employee' : addMode === 'select' ? 'Assign Employee' : 'Create & Add Employee'}
-        validateDisabled={editingEmployee ? !isFormValid : addMode === 'select' ? !selectedExisting : !isFormValid}
+        onValidate={handleAssignConfirm}
+        validateText="Assign Employee"
+        validateDisabled={!selectedExisting}
       >
-        <div className="space-y-6">
-          {/* Mode Toggle (only for adding, not editing) */}
-          {!editingEmployee && (
-            <div className="flex items-center bg-gray-100 rounded-lg p-1" data-testid="pos-emp-add-mode-toggle">
-              <button
-                type="button"
-                onClick={() => { setAddMode('select'); setSelectedExisting(null); }}
-                data-testid="pos-emp-mode-select"
-                className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                  addMode === 'select'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Select Existing
-              </button>
-              <button
-                type="button"
-                onClick={() => { setAddMode('create'); resetForm(posName); }}
-                data-testid="pos-emp-mode-create"
-                className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                  addMode === 'create'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Create New
-              </button>
+        <div className="space-y-4">
+          <p className="text-sm text-gray-600">
+            Select an existing employee to assign to this Point of Sale location.
+          </p>
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
             </div>
-          )}
-
-          {/* SELECT EXISTING employee mode */}
-          {!editingEmployee && addMode === 'select' && (
-            <div className="space-y-4">
-              <p className="text-sm text-gray-600">
-                Select an existing employee to assign to this Point of Sale location.
-              </p>
-              {/* Search */}
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </div>
-                <input
-                  type="text"
-                  value={availableSearch}
-                  onChange={(e) => setAvailableSearch(e.target.value)}
-                  placeholder="Search by name, role, or department..."
-                  className="block w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                  data-testid="pos-assign-search"
-                />
-              </div>
-
-              {/* Candidate list */}
-              {availableLoading ? (
-                <div className="flex items-center justify-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600" />
-                </div>
-              ) : (() => {
-                const filteredAvailable = availableSearch.trim()
-                  ? availableEmployees.filter(
-                      (e) =>
-                        e.name.toLowerCase().includes(availableSearch.toLowerCase()) ||
-                        e.role.toLowerCase().includes(availableSearch.toLowerCase()) ||
-                        (e.department && e.department.toLowerCase().includes(availableSearch.toLowerCase()))
-                    )
-                  : availableEmployees;
-                return filteredAvailable.length === 0 ? (
-                  <div className="text-center py-8 text-sm text-gray-500">
-                    {availableSearch ? 'No matching employees found.' : 'No available employees to assign.'}
-                  </div>
-                ) : (
-                  <div className="max-h-64 overflow-y-auto border border-gray-200 rounded-lg divide-y divide-gray-100">
-                    {filteredAvailable.map((emp) => (
-                      <div
-                        key={emp.id}
-                        onClick={() => setSelectedExisting(emp)}
-                        data-testid="pos-assign-candidate"
-                        className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${
-                          selectedExisting?.id === emp.id
-                            ? 'bg-indigo-50 border-l-4 border-l-indigo-500'
-                            : 'hover:bg-gray-50 border-l-4 border-l-transparent'
-                        }`}
-                      >
-                        <div className={`w-9 h-9 ${emp.color || 'bg-gray-500'} rounded-full flex items-center justify-center text-white font-semibold text-xs shrink-0`}>
-                          {emp.avatar}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="text-sm font-medium text-gray-900 truncate">{emp.name}</div>
-                          <div className="text-xs text-gray-500 truncate">
-                            {emp.role} {emp.department && `• ${emp.department}`}
-                          </div>
-                        </div>
-                        {selectedExisting?.id === emp.id && (
-                          <svg className="w-5 h-5 text-indigo-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                          </svg>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                );
-              })()}
-
-              {selectedExisting && (
-                <div className="bg-indigo-50 rounded-lg p-3 border border-indigo-200">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-9 h-9 ${selectedExisting.color || 'bg-gray-500'} rounded-full flex items-center justify-center text-white font-semibold text-xs shrink-0`}>
-                      {selectedExisting.avatar}
-                    </div>
-                    <div className="text-sm text-indigo-800">
-                      <span className="font-semibold">{selectedExisting.name}</span>
-                      <span className="text-indigo-600"> — {selectedExisting.role}</span>
-                      {selectedExisting.department && (
-                        <span className="text-indigo-500"> • {selectedExisting.department}</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* CREATE NEW or EDIT mode — show the form */}
-          {(editingEmployee || addMode === 'create') && (
-            <>
-          {/* Personal Information */}
-          <div>
-            <h4 className="text-lg font-medium text-gray-900 mb-4">Personal Information</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
-                <input
-                  type="text"
-                  name="name"
-                  data-testid="pos-emp-name-input"
-                  value={form.name}
-                  onChange={handleChange}
-                  autoFocus={!editingEmployee && addMode === 'create'}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors ${
-                    formErrors.name ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-indigo-500'
-                  }`}
-                  placeholder="Enter full name"
-                />
-                {formErrors.name && <p className="mt-1 text-sm text-red-600">{formErrors.name}</p>}
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
-                <input
-                  type="email"
-                  name="email"
-                  data-testid="pos-emp-email-input"
-                  value={form.email}
-                  onChange={handleChange}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors ${
-                    formErrors.email ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-indigo-500'
-                  }`}
-                  placeholder="Enter email address"
-                />
-                {formErrors.email && <p className="mt-1 text-sm text-red-600">{formErrors.email}</p>}
-              </div>
-            </div>
+            <input
+              type="text"
+              value={availableSearch}
+              onChange={(e) => setAvailableSearch(e.target.value)}
+              placeholder="Search by name or role..."
+              className="block w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              data-testid="pos-assign-search"
+            />
           </div>
-
-          {/* Work Information */}
-          <div>
-            <h4 className="text-lg font-medium text-gray-900 mb-4">Work Information</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Role *</label>
-                <ComboBox
-                  name="role"
-                  value={form.role}
-                  onChange={handleChange}
-                  options={ROLE_SUGGESTIONS}
-                  placeholder="Select or type a role"
-                  error={!!formErrors.role}
-                />
-                {formErrors.role && <p className="mt-1 text-sm text-red-600">{formErrors.role}</p>}
+          {availableLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600" />
+            </div>
+          ) : (() => {
+            const filteredAvailable = availableSearch.trim()
+              ? availableEmployees.filter(
+                  (e) =>
+                    e.name.toLowerCase().includes(availableSearch.toLowerCase()) ||
+                    e.role.toLowerCase().includes(availableSearch.toLowerCase())
+                )
+              : availableEmployees;
+            return filteredAvailable.length === 0 ? (
+              <div className="text-center py-8 text-sm text-gray-500">
+                {availableSearch ? 'No matching employees found.' : 'No available employees to assign.'}
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Point of Sale *</label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    name="department"
-                    data-testid="pos-emp-dept-input"
-                    value={form.department}
-                    onChange={handleChange}
-                    disabled={!editingEmployee && addMode === 'create'}
-                    className={`w-full pl-3 pr-8 py-2 border rounded-md appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors ${
-                      !editingEmployee && addMode === 'create'
-                        ? 'border-gray-200 bg-gray-100 text-gray-500 cursor-not-allowed'
-                        : formErrors.department
-                        ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
-                        : 'border-gray-300 focus:border-indigo-500'
+            ) : (
+              <div className="max-h-64 overflow-y-auto border border-gray-200 rounded-lg divide-y divide-gray-100">
+                {filteredAvailable.map((emp) => (
+                  <div
+                    key={emp.id}
+                    onClick={() => setSelectedExisting(emp)}
+                    data-testid="pos-assign-candidate"
+                    className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${
+                      selectedExisting?.id === emp.id
+                        ? 'bg-indigo-50 border-l-4 border-l-indigo-500'
+                        : 'hover:bg-gray-50 border-l-4 border-l-transparent'
                     }`}
-                    placeholder="Point of sale name"
-                    list={(!editingEmployee && addMode === 'create') ? undefined : 'pos-emp-depts'}
-                    style={{ backgroundImage: 'none' }}
-                  />
-                  {(editingEmployee || addMode !== 'create') && (
-                    <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                      <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  >
+                    <div className={`w-9 h-9 ${emp.color || 'bg-gray-500'} rounded-full flex items-center justify-center text-white font-semibold text-xs shrink-0`}>
+                      {emp.avatar}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium text-gray-900 truncate">{emp.name}</div>
+                      <div className="text-xs text-gray-500 truncate">{emp.role}</div>
+                    </div>
+                    {selectedExisting?.id === emp.id && (
+                      <svg className="w-5 h-5 text-indigo-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                       </svg>
-                    </div>
-                  )}
-                  {(!editingEmployee && addMode === 'create') && (
-                    <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                      <svg className="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                      </svg>
-                    </div>
-                  )}
+                    )}
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
+          {selectedExisting && (
+            <div className="bg-indigo-50 rounded-lg p-3 border border-indigo-200">
+              <div className="flex items-center gap-3">
+                <div className={`w-9 h-9 ${selectedExisting.color || 'bg-gray-500'} rounded-full flex items-center justify-center text-white font-semibold text-xs shrink-0`}>
+                  {selectedExisting.avatar}
                 </div>
-                <datalist id="pos-emp-depts">
-                  {DEPARTMENT_SUGGESTIONS.map((d) => (
-                    <option key={d} value={d} />
-                  ))}
-                </datalist>
-                {(!editingEmployee && addMode === 'create') && (
-                  <p className="mt-1 text-xs text-indigo-500">Auto-filled from the PoS location</p>
-                )}
-                {formErrors.department && <p className="mt-1 text-sm text-red-600">{formErrors.department}</p>}
-              </div>
-            </div>
-          </div>
-
-          {/* Schedule & Flags */}
-          <div>
-            <h4 className="text-lg font-medium text-gray-900 mb-4">Schedule & Status</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Maximum Hours per Week *</label>
-                <input
-                  type="number"
-                  name="maxHours"
-                  data-testid="pos-emp-hours-input"
-                  value={form.maxHours}
-                  onChange={handleChange}
-                  min="1"
-                  max="80"
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors ${
-                    formErrors.maxHours ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-indigo-500'
-                  }`}
-                  placeholder="40"
-                />
-                {formErrors.maxHours && <p className="mt-1 text-sm text-red-600">{formErrors.maxHours}</p>}
-                <p className="mt-1 text-xs text-gray-500">Hours between 1 and 80</p>
-              </div>
-              <div className="flex items-end">
-                <div className="bg-gray-50 rounded-lg p-4 w-full">
-                  <label className="flex items-center gap-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      name="isManager"
-                      data-testid="pos-emp-manager-toggle"
-                      checked={form.isManager}
-                      onChange={handleChange}
-                      className="w-5 h-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                    />
-                    <div>
-                      <span className="text-sm font-semibold text-gray-900">Manager Status</span>
-                      <p className="text-xs text-gray-500 mt-0.5">
-                        This employee can be assigned as PoS manager
-                      </p>
-                    </div>
-                  </label>
+                <div className="text-sm text-indigo-800">
+                  <span className="font-semibold">{selectedExisting.name}</span>
+                  <span className="text-indigo-600"> — {selectedExisting.role}</span>
                 </div>
               </div>
             </div>
-          </div>
-
-          {/* Preview */}
-          <div className="bg-gray-50 rounded-lg p-4">
-            <div className="text-sm font-medium text-gray-700 mb-2">Preview</div>
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                {form.name
-                  ? form.name.split(' ').map((n) => n.charAt(0)).join('').toUpperCase()
-                  : '??'}
-              </div>
-              <div>
-                <div className="text-sm font-semibold text-gray-900">{form.name || 'Employee Name'}</div>
-                <div className="text-xs text-gray-600">
-                  {form.role || 'Role'} • {form.department || 'Department'}
-                  {form.isManager && (
-                    <span className="ml-2 inline-flex px-1.5 py-0.5 text-xs font-semibold rounded-full bg-amber-100 text-amber-800">
-                      Manager
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="text-xs text-gray-500">* Required fields</div>
-            </>
           )}
         </div>
       </Modal>
 
-      {/* Swap Employee Modal */}
+      {/* ── Shared EmployeeModal (create / edit) ── */}
+      <EmployeeModal
+        isOpen={empModalOpen}
+        onClose={() => { setEmpModalOpen(false); setEditingEmployee(null); }}
+        onSave={handleEmpSave}
+        employee={editingEmployee}
+        roles={ROLE_SUGGESTIONS}
+        posList={lockedPosList}
+        lockedPosId={posId}
+      />
+
+      {/* ── Swap Employee Modal ── */}
       <Modal
         isOpen={!!swapTarget}
         onClose={closeSwapModal}
@@ -819,10 +551,7 @@ const PosEmployeeList = ({ employees = [], posId, posName = '', onAdd, onAssign,
           <p className="text-sm text-gray-600">
             Select an employee to swap with{' '}
             <span className="font-semibold">{swapTarget?.name}</span>.
-            The two employees will exchange their PoS assignments.
           </p>
-
-          {/* Search */}
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -833,13 +562,11 @@ const PosEmployeeList = ({ employees = [], posId, posName = '', onAdd, onAssign,
               type="text"
               value={swapSearch}
               onChange={(e) => setSwapSearch(e.target.value)}
-              placeholder="Search by name, role, or department..."
+              placeholder="Search by name or role..."
               className="block w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               data-testid="pos-swap-search"
             />
           </div>
-
-          {/* Candidate list */}
           {swapLoading ? (
             <div className="flex items-center justify-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600" />
@@ -866,10 +593,7 @@ const PosEmployeeList = ({ employees = [], posId, posName = '', onAdd, onAssign,
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-medium text-gray-900 truncate">{emp.name}</div>
-                    <div className="text-xs text-gray-500 truncate">
-                      {emp.role} • {emp.department}
-                      {emp.posName && <span className="ml-1 text-gray-400">— {emp.posName}</span>}
-                    </div>
+                    <div className="text-xs text-gray-500 truncate">{emp.role}</div>
                   </div>
                   {selectedSwap?.id === emp.id && (
                     <svg className="w-5 h-5 text-indigo-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -880,14 +604,13 @@ const PosEmployeeList = ({ employees = [], posId, posName = '', onAdd, onAssign,
               ))}
             </div>
           )}
-
           {selectedSwap && (
             <div className="bg-indigo-50 rounded-lg p-3 border border-indigo-200">
               <div className="flex items-center gap-3">
                 <SwapIcon className="w-5 h-5 text-indigo-600 shrink-0" />
                 <div className="text-sm text-indigo-800">
                   <span className="font-semibold">{swapTarget?.name}</span>
-                  {' '}⇄{' '}
+                  {' ⇄ '}
                   <span className="font-semibold">{selectedSwap.name}</span>
                 </div>
               </div>
@@ -896,7 +619,7 @@ const PosEmployeeList = ({ employees = [], posId, posName = '', onAdd, onAssign,
         </div>
       </Modal>
 
-      {/* Delete Confirmation */}
+      {/* ── Delete Confirmation ── */}
       {deleteConfirm && (
         <div className="fixed inset-0 bg-gray-300/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div data-testid="pos-employee-delete-dialog" className="bg-white rounded-lg shadow-xl w-full max-w-sm overflow-hidden">
