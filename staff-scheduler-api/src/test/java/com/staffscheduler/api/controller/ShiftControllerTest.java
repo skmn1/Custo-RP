@@ -40,7 +40,7 @@ class ShiftControllerTest {
         ShiftDto shift = ShiftDto.builder()
                 .id("shift1").employeeId("emp1").date("2026-03-02").day(0)
                 .startTime("07:00").endTime("15:00").duration(8.0)
-                .type("Morning").department("ICU").build();
+                .type("Morning").department("Sales").build();
 
         when(service.findAll(any(), any(), any(), any(), any())).thenReturn(List.of(shift));
 
@@ -68,12 +68,12 @@ class ShiftControllerTest {
         ShiftDto input = ShiftDto.builder()
                 .employeeId("emp1").date("2026-03-04")
                 .startTime("09:00").endTime("17:00")
-                .type("Day").department("ICU").build();
+                .type("Day").department("Sales").build();
 
         ShiftDto created = ShiftDto.builder()
                 .id("shift_new").employeeId("emp1").date("2026-03-04").day(2)
                 .startTime("09:00").endTime("17:00").duration(8.0)
-                .type("Day").department("ICU")
+                .type("Day").department("Sales")
                 .color("bg-green-100 border-green-300 text-green-800").build();
 
         when(service.create(any(ShiftDto.class))).thenReturn(created);
@@ -94,7 +94,7 @@ class ShiftControllerTest {
         ShiftDto moved = ShiftDto.builder()
                 .id("shift1").employeeId("emp2").date("2026-03-05").day(3)
                 .startTime("07:00").endTime("15:00").duration(8.0)
-                .type("Morning").department("ICU").build();
+                .type("Morning").department("Sales").build();
 
         when(service.moveShift(eq("shift1"), any(ShiftMoveDto.class))).thenReturn(moved);
 

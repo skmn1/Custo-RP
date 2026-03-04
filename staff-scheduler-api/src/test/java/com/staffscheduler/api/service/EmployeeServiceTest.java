@@ -35,12 +35,12 @@ class EmployeeServiceTest {
         sampleEmployee = Employee.builder()
                 .id("emp1")
                 .name("Sarah Johnson")
-                .role("Senior Nurse")
+                .role("Sales Associate")
                 .avatar("SJ")
                 .color("bg-blue-500")
-                .email("sarah.johnson@hospital.com")
+                .email("sarah.johnson@company.com")
                 .maxHours(40)
-                .department("ICU")
+                .department("Sales")
                 .posId(1L)
                 .isManager(false)
                 .build();
@@ -54,7 +54,7 @@ class EmployeeServiceTest {
 
         assertThat(result.getId()).isEqualTo("emp1");
         assertThat(result.getName()).isEqualTo("Sarah Johnson");
-        assertThat(result.getEmail()).isEqualTo("sarah.johnson@hospital.com");
+        assertThat(result.getEmail()).isEqualTo("sarah.johnson@company.com");
     }
 
     @Test
@@ -68,10 +68,10 @@ class EmployeeServiceTest {
     @Test
     void findAll_shouldReturnFilteredSortedEmployees() {
         Employee emp2 = Employee.builder()
-                .id("emp2").name("Michael Chen").role("Doctor")
+                .id("emp2").name("Michael Chen").role("Store Manager")
                 .avatar("MC").color("bg-green-500")
-                .email("michael.chen@hospital.com").maxHours(50)
-                .department("Emergency").posId(1L).isManager(false)
+                .email("michael.chen@company.com").maxHours(50)
+                .department("Warehouse").posId(1L).isManager(false)
                 .build();
 
         when(repository.findFiltered(null, null, null)).thenReturn(List.of(sampleEmployee, emp2));
@@ -90,10 +90,10 @@ class EmployeeServiceTest {
 
         EmployeeDto dto = EmployeeDto.builder()
                 .name("Test User")
-                .role("Nurse")
-                .email("test@hospital.com")
+                .role("Cashier")
+                .email("test@company.com")
                 .maxHours(40)
-                .department("ICU")
+                .department("Sales")
                 .build();
 
         EmployeeDto result = service.create(dto);
@@ -106,15 +106,15 @@ class EmployeeServiceTest {
 
     @Test
     void create_shouldThrow_whenEmailDuplicate() {
-        when(repository.findByEmail("sarah.johnson@hospital.com"))
+        when(repository.findByEmail("sarah.johnson@company.com"))
                 .thenReturn(Optional.of(sampleEmployee));
 
         EmployeeDto dto = EmployeeDto.builder()
                 .name("Another User")
-                .role("Nurse")
-                .email("sarah.johnson@hospital.com")
+                .role("Cashier")
+                .email("sarah.johnson@company.com")
                 .maxHours(40)
-                .department("ICU")
+                .department("Sales")
                 .build();
 
         assertThatThrownBy(() -> service.create(dto))
@@ -136,7 +136,7 @@ class EmployeeServiceTest {
 
         assertThat(result.getName()).isEqualTo("Sarah J. Updated");
         assertThat(result.getMaxHours()).isEqualTo(45);
-        assertThat(result.getEmail()).isEqualTo("sarah.johnson@hospital.com"); // unchanged
+        assertThat(result.getEmail()).isEqualTo("sarah.johnson@company.com"); // unchanged
     }
 
     @Test

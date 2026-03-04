@@ -142,6 +142,17 @@ public class PosService {
     }
 
     @Transactional
+    public EmployeeDto assignEmployee(Long posId, String empId) {
+        posRepository.findByIdAndIsActiveTrue(posId)
+                .orElseThrow(() -> new ResourceNotFoundException("PoS", String.valueOf(posId)));
+
+        Employee emp = employeeService.getEntity(empId);
+        emp.setPosId(posId);
+        employeeRepository.save(emp);
+        return employeeService.findById(empId);
+    }
+
+    @Transactional
     public EmployeeDto updateEmployee(Long posId, String empId, EmployeeDto dto) {
         Employee emp = employeeService.getEntity(empId);
         if (!Objects.equals(emp.getPosId(), posId)) {

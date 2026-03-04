@@ -23,35 +23,35 @@ class EmployeeRepositoryTest {
         repository.deleteAll();
 
         repository.save(Employee.builder()
-                .id("emp1").name("Sarah Johnson").role("Senior Nurse")
-                .avatar("SJ").color("bg-blue-500").email("sarah@hospital.com")
-                .maxHours(40).department("ICU").posId(1L).isManager(false)
+                .id("emp1").name("Sarah Johnson").role("Sales Associate")
+                .avatar("SJ").color("bg-blue-500").email("sarah@company.com")
+                .maxHours(40).department("Sales").posId(1L).isManager(false)
                 .build());
 
         repository.save(Employee.builder()
-                .id("emp2").name("Michael Chen").role("Doctor")
-                .avatar("MC").color("bg-green-500").email("michael@hospital.com")
-                .maxHours(50).department("Emergency").posId(1L).isManager(true)
+                .id("emp2").name("Michael Chen").role("Store Manager")
+                .avatar("MC").color("bg-green-500").email("michael@company.com")
+                .maxHours(50).department("Warehouse").posId(1L).isManager(true)
                 .build());
 
         repository.save(Employee.builder()
-                .id("emp3").name("Emily Davis").role("Nurse")
-                .avatar("ED").color("bg-purple-500").email("emily@hospital.com")
-                .maxHours(40).department("ICU").posId(2L).isManager(false)
+                .id("emp3").name("Emily Davis").role("Cashier")
+                .avatar("ED").color("bg-purple-500").email("emily@company.com")
+                .maxHours(40).department("Sales").posId(2L).isManager(false)
                 .build());
     }
 
     @Test
     void findByEmail_shouldReturnEmployee() {
-        assertThat(repository.findByEmail("sarah@hospital.com")).isPresent();
-        assertThat(repository.findByEmail("nonexistent@hospital.com")).isEmpty();
+        assertThat(repository.findByEmail("sarah@company.com")).isPresent();
+        assertThat(repository.findByEmail("nonexistent@company.com")).isEmpty();
     }
 
     @Test
     void findByDepartment_shouldReturnFiltered() {
-        List<Employee> icuEmployees = repository.findByDepartment("ICU");
-        assertThat(icuEmployees).hasSize(2);
-        assertThat(icuEmployees).allMatch(e -> e.getDepartment().equals("ICU"));
+        List<Employee> salesEmployees = repository.findByDepartment("Sales");
+        assertThat(salesEmployees).hasSize(2);
+        assertThat(salesEmployees).allMatch(e -> e.getDepartment().equals("Sales"));
     }
 
     @Test
@@ -76,7 +76,7 @@ class EmployeeRepositoryTest {
 
     @Test
     void findFiltered_shouldFilterByDepartmentAndRole() {
-        List<Employee> result = repository.findFiltered(null, "ICU", "Nurse");
+        List<Employee> result = repository.findFiltered(null, "Sales", "Cashier");
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getName()).isEqualTo("Emily Davis");
     }
@@ -89,7 +89,7 @@ class EmployeeRepositoryTest {
 
     @Test
     void existsByEmailAndIdNot_shouldDetectDuplicate() {
-        assertThat(repository.existsByEmailAndIdNot("sarah@hospital.com", "emp2")).isTrue();
-        assertThat(repository.existsByEmailAndIdNot("sarah@hospital.com", "emp1")).isFalse();
+        assertThat(repository.existsByEmailAndIdNot("sarah@company.com", "emp2")).isTrue();
+        assertThat(repository.existsByEmailAndIdNot("sarah@company.com", "emp1")).isFalse();
     }
 }

@@ -14,10 +14,10 @@ class PayrollCalculatorTest {
 
     @ParameterizedTest
     @CsvSource({
-            "Doctor, 85.00",
-            "Senior Nurse, 35.00",
-            "Nurse, 28.00",
-            "Technician, 22.00",
+            "Sales Associate, 18.00",
+            "Stock Clerk, 17.00",
+            "Cashier, 16.00",
+            "Deli Clerk, 18.00",
             "Unknown Role, 25.00"
     })
     void getBaseRate_shouldReturnCorrectRate(String role, double expected) {
@@ -78,20 +78,20 @@ class PayrollCalculatorTest {
         );
 
         PayrollCalculator.EmployeePayrollResult result =
-                PayrollCalculator.calculate("Nurse", shifts);
+                PayrollCalculator.calculate("Cashier", shifts);
 
-        // 40 hours * $28/hr = $1120 gross (no OT, no shift diffs for regular weekday)
+        // 40 hours * $16/hr = $640 gross (no OT, no shift diffs for regular weekday)
         assertThat(result.totalHours()).isEqualTo(40.0);
         assertThat(result.regularHours()).isEqualTo(40.0);
         assertThat(result.overtimeHours()).isEqualTo(0.0);
-        assertThat(result.baseRate()).isEqualTo(28.0);
-        assertThat(result.grossPay()).isEqualTo(1120.0);
+        assertThat(result.baseRate()).isEqualTo(16.0);
+        assertThat(result.grossPay()).isEqualTo(640.0);
 
         // Verify taxes
-        assertThat(result.federalTax()).isCloseTo(246.40, within(0.01));  // 22%
-        assertThat(result.stateTax()).isCloseTo(89.60, within(0.01));     // 8%
-        assertThat(result.socialSecurity()).isCloseTo(69.44, within(0.01)); // 6.2%
-        assertThat(result.medicare()).isCloseTo(16.24, within(0.01));     // 1.45%
+        assertThat(result.federalTax()).isCloseTo(140.80, within(0.01));  // 22%
+        assertThat(result.stateTax()).isCloseTo(51.20, within(0.01));     // 8%
+        assertThat(result.socialSecurity()).isCloseTo(39.68, within(0.01)); // 6.2%
+        assertThat(result.medicare()).isCloseTo(9.28, within(0.01));     // 1.45%
 
         // Net pay: gross - taxes - benefits > 0
         assertThat(result.netPay()).isPositive();
@@ -108,7 +108,7 @@ class PayrollCalculatorTest {
         );
 
         PayrollCalculator.EmployeePayrollResult result =
-                PayrollCalculator.calculate("Nurse", shifts);
+                PayrollCalculator.calculate("Cashier", shifts);
 
         // 48 total, 40 regular, 8 OT
         assertThat(result.totalHours()).isEqualTo(48.0);
@@ -116,8 +116,8 @@ class PayrollCalculatorTest {
         assertThat(result.overtimeHours()).isEqualTo(8.0);
         assertThat(result.doubleTimeHours()).isEqualTo(0.0);
 
-        // OT pay = 8h * 28 * 1.5 = 336
-        assertThat(result.overtimePay()).isCloseTo(336.0, within(0.01));
+        // OT pay = 8h * 16 * 1.5 = 192
+        assertThat(result.overtimePay()).isCloseTo(192.0, within(0.01));
     }
 
     @Test
@@ -131,7 +131,7 @@ class PayrollCalculatorTest {
         );
 
         PayrollCalculator.EmployeePayrollResult result =
-                PayrollCalculator.calculate("Nurse", shifts);
+                PayrollCalculator.calculate("Cashier", shifts);
 
         // 65 total, 40 regular, 20 OT (60-40), 5 DT (65-60)
         assertThat(result.totalHours()).isEqualTo(65.0);
@@ -139,7 +139,7 @@ class PayrollCalculatorTest {
         assertThat(result.overtimeHours()).isEqualTo(20.0);
         assertThat(result.doubleTimeHours()).isEqualTo(5.0);
 
-        double dtPay = 5.0 * 28.0 * 2.0; // 280
+        double dtPay = 5.0 * 16.0 * 2.0; // 160
         assertThat(result.doubleTimePay()).isCloseTo(dtPay, within(0.01));
     }
 
@@ -150,11 +150,11 @@ class PayrollCalculatorTest {
         );
 
         PayrollCalculator.EmployeePayrollResult result =
-                PayrollCalculator.calculate("Nurse", shifts);
+                PayrollCalculator.calculate("Cashier", shifts);
 
         // Night differential: $3.00/hr * 8h = $24
         assertThat(result.shiftDifferentials()).isCloseTo(24.0, within(0.01));
-        assertThat(result.grossPay()).isCloseTo(8.0 * 28.0 + 24.0, within(0.01));
+        assertThat(result.grossPay()).isCloseTo(8.0 * 16.0 + 24.0, within(0.01));
     }
 
     private Shift createShift(String startTime, String endTime, LocalDate date, double duration) {
@@ -167,7 +167,7 @@ class PayrollCalculatorTest {
                 .endTime(endTime)
                 .duration(duration)
                 .type("Regular")
-                .department("ICU")
+                .department("Sales")
                 .build();
     }
 }

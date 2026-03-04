@@ -30,6 +30,9 @@ export const posApi = {
   /** Add an employee to a PoS. */
   addEmployee: (posId, data) => api.post(`/pos/${posId}/employees`, data),
 
+  /** Assign an existing employee to a PoS. */
+  assignEmployee: (posId, empId) => api.put(`/pos/${posId}/employees/${empId}/assign`),
+
   /** Update an employee within a PoS. */
   updateEmployee: (posId, empId, data) =>
     api.put(`/pos/${posId}/employees/${empId}`, data),
@@ -40,7 +43,7 @@ export const posApi = {
 
   /** Swap two employees within a PoS. */
   swapEmployee: (posId, currentEmpId, newEmpId) =>
-    api.post(`/pos/${posId}/employees/swap`, { currentEmpId, newEmpId }),
+    api.put(`/pos/${posId}/employees/${currentEmpId}/swap`, { newEmpId }),
 
   /** List employees available to be assigned to a PoS. */
   listAvailableEmployees: (posId) =>

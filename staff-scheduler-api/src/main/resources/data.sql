@@ -24,12 +24,12 @@ INSERT INTO point_of_sale (id, name, address, type, phone, manager_id, manager_n
 -- Employees (from src/data/employees.js)
 -- ══════════════════════════════════════════════════════
 INSERT INTO employees (id, name, role, avatar, color, email, max_hours, department, pos_id, is_manager) VALUES
-('emp1',  'Sarah Johnson',   'Senior Nurse',      'SJ', 'bg-blue-500',   'sarah.johnson@hospital.com',   40, 'ICU',            1, false),
-('emp2',  'Michael Chen',    'Doctor',             'MC', 'bg-green-500',  'michael.chen@hospital.com',    50, 'Emergency',      1, false),
-('emp3',  'Emily Rodriguez', 'Nurse',              'ER', 'bg-purple-500', 'emily.rodriguez@hospital.com', 36, 'General',        2, false),
-('emp4',  'David Wilson',    'Technician',         'DW', 'bg-orange-500', 'david.wilson@hospital.com',    40, 'Lab',            2, false),
-('emp5',  'Lisa Thompson',   'Administrator',      'LT', 'bg-pink-500',  'lisa.thompson@hospital.com',   40, 'Administration', 3, false),
-('emp6',  'James Park',      'Radiologist',        'JP', 'bg-indigo-500','james.park@hospital.com',      45, 'Radiology',      3, false),
+('emp1',  'Sarah Johnson',   'Sales Associate',   'SJ', 'bg-blue-500',   'sarah.johnson@company.com',    40, 'Sales',          1, false),
+('emp2',  'Michael Chen',    'Stock Clerk',        'MC', 'bg-green-500',  'michael.chen@company.com',     50, 'Warehouse',      1, false),
+('emp3',  'Emily Rodriguez', 'Cashier',            'ER', 'bg-purple-500', 'emily.rodriguez@company.com',  36, 'Sales',          2, false),
+('emp4',  'David Wilson',    'Deli Clerk',         'DW', 'bg-orange-500', 'david.wilson@company.com',     40, 'Production',     2, false),
+('emp5',  'Lisa Thompson',   'Administrator',      'LT', 'bg-pink-500',  'lisa.thompson@company.com',    40, 'Administration', 3, false),
+('emp6',  'James Park',      'Cook',               'JP', 'bg-indigo-500','james.park@company.com',       45, 'Kitchen',        3, false),
 ('emp7',  'Jane Smith',      'Store Manager',      'JS', 'bg-rose-500',  'jane.smith@company.com',       45, 'Management',     1, true),
 ('emp8',  'John Doe',        'Store Manager',      'JD', 'bg-teal-500',  'john.doe@company.com',         45, 'Management',     2, true),
 ('emp9',  'Alice Brown',     'Store Manager',      'AB', 'bg-amber-500', 'alice.brown@company.com',      45, 'Management',     3, true),
@@ -42,18 +42,18 @@ INSERT INTO employees (id, name, role, avatar, color, email, max_hours, departme
 -- Day mapping: 0=Monday 2026-03-02 .. 6=Sunday 2026-03-08
 -- ══════════════════════════════════════════════════════
 INSERT INTO shifts (id, employee_id, date, day_index, start_time, end_time, duration, type, color, department) VALUES
-('shift1',  'emp1', '2026-03-02', 0, '06:00', '14:00', 8,  'Morning',  'bg-blue-100 border-blue-300 text-blue-800',     'ICU'),
-('shift2',  'emp1', '2026-03-04', 2, '06:00', '14:00', 8,  'Morning',  'bg-blue-100 border-blue-300 text-blue-800',     'ICU'),
-('shift3',  'emp1', '2026-03-06', 4, '14:00', '22:00', 8,  'Evening',  'bg-blue-200 border-blue-400 text-blue-900',     'ICU'),
-('shift4',  'emp2', '2026-03-03', 1, '08:00', '18:00', 10, 'Day',      'bg-green-100 border-green-300 text-green-800',   'Emergency'),
-('shift5',  'emp2', '2026-03-05', 3, '08:00', '18:00', 10, 'Day',      'bg-green-100 border-green-300 text-green-800',   'Emergency'),
-('shift6',  'emp3', '2026-03-02', 0, '22:00', '06:00', 8,  'Night',    'bg-purple-100 border-purple-300 text-purple-800','General'),
-('shift7',  'emp3', '2026-03-04', 2, '14:00', '22:00', 8,  'Evening',  'bg-purple-200 border-purple-400 text-purple-900','General'),
-('shift8',  'emp4', '2026-03-03', 1, '07:00', '15:00', 8,  'Day',      'bg-orange-100 border-orange-300 text-orange-800','Lab'),
-('shift9',  'emp4', '2026-03-05', 3, '07:00', '15:00', 8,  'Day',      'bg-orange-100 border-orange-300 text-orange-800','Lab'),
+('shift1',  'emp1', '2026-03-02', 0, '06:00', '14:00', 8,  'Morning',  'bg-blue-100 border-blue-300 text-blue-800',     'Sales'),
+('shift2',  'emp1', '2026-03-04', 2, '06:00', '14:00', 8,  'Morning',  'bg-blue-100 border-blue-300 text-blue-800',     'Sales'),
+('shift3',  'emp1', '2026-03-06', 4, '14:00', '22:00', 8,  'Evening',  'bg-blue-200 border-blue-400 text-blue-900',     'Sales'),
+('shift4',  'emp2', '2026-03-03', 1, '08:00', '18:00', 10, 'Day',      'bg-green-100 border-green-300 text-green-800',   'Warehouse'),
+('shift5',  'emp2', '2026-03-05', 3, '08:00', '18:00', 10, 'Day',      'bg-green-100 border-green-300 text-green-800',   'Warehouse'),
+('shift6',  'emp3', '2026-03-02', 0, '22:00', '06:00', 8,  'Night',    'bg-purple-100 border-purple-300 text-purple-800','Sales'),
+('shift7',  'emp3', '2026-03-04', 2, '14:00', '22:00', 8,  'Evening',  'bg-purple-200 border-purple-400 text-purple-900','Sales'),
+('shift8',  'emp4', '2026-03-03', 1, '07:00', '15:00', 8,  'Day',      'bg-orange-100 border-orange-300 text-orange-800','Production'),
+('shift9',  'emp4', '2026-03-05', 3, '07:00', '15:00', 8,  'Day',      'bg-orange-100 border-orange-300 text-orange-800','Production'),
 ('shift10', 'emp5', '2026-03-02', 0, '09:00', '17:00', 8,  'Admin',    'bg-pink-100 border-pink-300 text-pink-800',     'Administration'),
 ('shift11', 'emp5', '2026-03-04', 2, '09:00', '17:00', 8,  'Admin',    'bg-pink-100 border-pink-300 text-pink-800',     'Administration'),
-('shift12', 'emp6', '2026-03-03', 1, '10:00', '18:00', 8,  'Day',      'bg-indigo-100 border-indigo-300 text-indigo-800','Radiology');
+('shift12', 'emp6', '2026-03-03', 1, '10:00', '18:00', 8,  'Day',      'bg-indigo-100 border-indigo-300 text-indigo-800','Kitchen');
 
 -- Reset the auto-increment for POS after explicit ID inserts
 ALTER TABLE point_of_sale ALTER COLUMN id RESTART WITH 6;

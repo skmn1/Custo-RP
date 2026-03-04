@@ -36,9 +36,9 @@ class EmployeeControllerTest {
     @Test
     void listEmployees_shouldReturnOk() throws Exception {
         EmployeeDto emp = EmployeeDto.builder()
-                .id("emp1").name("Sarah Johnson").role("Senior Nurse")
-                .avatar("SJ").color("bg-blue-500").email("sarah@hospital.com")
-                .maxHours(40).department("ICU").build();
+                .id("emp1").name("Sarah Johnson").role("Sales Associate")
+                .avatar("SJ").color("bg-blue-500").email("sarah@company.com")
+                .maxHours(40).department("Sales").build();
 
         when(service.findAll(any(), any(), any(), any(), any())).thenReturn(List.of(emp));
 
@@ -52,7 +52,7 @@ class EmployeeControllerTest {
     @Test
     void getById_shouldReturnEmployee() throws Exception {
         EmployeeDto emp = EmployeeDto.builder()
-                .id("emp1").name("Sarah Johnson").role("Senior Nurse").build();
+                .id("emp1").name("Sarah Johnson").role("Sales Associate").build();
 
         when(service.findById("emp1")).thenReturn(emp);
 
@@ -74,13 +74,13 @@ class EmployeeControllerTest {
     @Test
     void createEmployee_shouldReturn201() throws Exception {
         EmployeeDto input = EmployeeDto.builder()
-                .name("Test User").role("Nurse").email("test@hospital.com")
-                .maxHours(40).department("ICU").build();
+                .name("Test User").role("Cashier").email("test@company.com")
+                .maxHours(40).department("Sales").build();
 
         EmployeeDto created = EmployeeDto.builder()
-                .id("emp123").name("Test User").role("Nurse").avatar("TU")
-                .color("bg-blue-500").email("test@hospital.com")
-                .maxHours(40).department("ICU").build();
+                .id("emp123").name("Test User").role("Cashier").avatar("TU")
+                .color("bg-blue-500").email("test@company.com")
+                .maxHours(40).department("Sales").build();
 
         when(service.create(any(EmployeeDto.class))).thenReturn(created);
 
@@ -114,7 +114,7 @@ class EmployeeControllerTest {
 
     @Test
     void getDepartments_shouldReturnList() throws Exception {
-        when(service.getDepartments()).thenReturn(List.of("ICU", "Emergency", "Pharmacy"));
+        when(service.getDepartments()).thenReturn(List.of("Sales", "Warehouse", "Production"));
 
         mockMvc.perform(get("/api/employees/departments"))
                 .andExpect(status().isOk())

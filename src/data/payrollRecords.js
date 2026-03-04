@@ -13,10 +13,10 @@ export const mayPayrollRecords = {
   employees: [
     {
       id: 'emp1',
-      name: 'Dr. Sarah Chen',
-      role: 'Doctor',
-      department: 'ICU',
-      hourlyRate: 85.00,
+      name: 'Sarah Chen',
+      role: 'Sales Associate',
+      department: 'Sales',
+      hourlyRate: 18.00,
       hoursWorked: {
         regular: 140.0,
         overtime: 24.5,
@@ -51,9 +51,9 @@ export const mayPayrollRecords = {
     {
       id: 'emp2',
       name: 'Maria Rodriguez',
-      role: 'Senior Nurse',
-      department: 'Emergency',
-      hourlyRate: 35.00,
+      role: 'Stock Clerk',
+      department: 'Warehouse',
+      hourlyRate: 17.00,
       hoursWorked: {
         regular: 140.0,
         overtime: 32.0,
@@ -88,8 +88,8 @@ export const mayPayrollRecords = {
     {
       id: 'emp3',
       name: 'James Wilson',
-      role: 'Nurse',
-      department: 'Pediatrics',
+      role: 'Cashier',
+      department: 'Sales',
       hourlyRate: 28.00,
       hoursWorked: {
         regular: 148.0,
@@ -125,8 +125,8 @@ export const mayPayrollRecords = {
     {
       id: 'emp4',
       name: 'Lisa Thompson',
-      role: 'Technician',
-      department: 'Radiology',
+      role: 'Deli Clerk',
+      department: 'Production',
       hourlyRate: 22.00,
       hoursWorked: {
         regular: 160.0,
@@ -198,10 +198,10 @@ export const mayPayrollRecords = {
     },
     {
       id: 'emp6',
-      name: 'Dr. Michael Brown',
-      role: 'Doctor',
-      department: 'Surgery',
-      hourlyRate: 85.00,
+      name: 'Michael Brown',
+      role: 'Cook',
+      department: 'Kitchen',
+      hourlyRate: 22.00,
       hoursWorked: {
         regular: 136.0,
         overtime: 20.0,
@@ -236,8 +236,8 @@ export const mayPayrollRecords = {
     {
       id: 'emp7',
       name: 'Amanda Davis',
-      role: 'Nurse',
-      department: 'ICU',
+      role: 'Cashier',
+      department: 'Sales',
       hourlyRate: 28.00,
       hoursWorked: {
         regular: 140.0,
@@ -273,8 +273,8 @@ export const mayPayrollRecords = {
     {
       id: 'emp8',
       name: 'David Martinez',
-      role: 'Technician',
-      department: 'Laboratory',
+      role: 'Stock Clerk',
+      department: 'Warehouse',
       hourlyRate: 22.00,
       hoursWorked: {
         regular: 144.0,
@@ -310,8 +310,8 @@ export const mayPayrollRecords = {
     {
       id: 'emp9',
       name: 'Jennifer Garcia',
-      role: 'Senior Nurse',
-      department: 'Emergency',
+      role: 'Sales Associate',
+      department: 'Sales',
       hourlyRate: 35.00,
       hoursWorked: {
         regular: 140.0,
@@ -346,10 +346,10 @@ export const mayPayrollRecords = {
     },
     {
       id: 'emp10',
-      name: 'Dr. Alex Johnson',
-      role: 'Radiologist',
-      department: 'Radiology',
-      hourlyRate: 75.00,
+      name: 'Alex Johnson',
+      role: 'Butcher',
+      department: 'Production',
+      hourlyRate: 25.00,
       hoursWorked: {
         regular: 136.0,
         overtime: 12.0,
@@ -408,10 +408,10 @@ export const junePayrollRecords = {
   employees: [
     {
       id: 'emp1',
-      name: 'Dr. Sarah Chen',
-      role: 'Doctor',
-      department: 'ICU',
-      hourlyRate: 85.00,
+      name: 'Sarah Chen',
+      role: 'Sales Associate',
+      department: 'Sales',
+      hourlyRate: 18.00,
       hoursWorked: {
         regular: 144.0,
         overtime: 24.0,
@@ -446,9 +446,9 @@ export const junePayrollRecords = {
     {
       id: 'emp2',
       name: 'Maria Rodriguez',
-      role: 'Senior Nurse',
-      department: 'Emergency',
-      hourlyRate: 35.00,
+      role: 'Stock Clerk',
+      department: 'Warehouse',
+      hourlyRate: 17.00,
       hoursWorked: {
         regular: 144.0,
         overtime: 32.5,
@@ -510,12 +510,12 @@ export const ytdSummary = {
   overtimePercentage: 3.71,
   
   departmentBreakdown: {
-    'ICU': { grossPay: 784532.50, hours: 10250.5, employees: 2 },
-    'Emergency': { grossPay: 612834.75, hours: 8965.0, employees: 2 },
-    'Surgery': { grossPay: 502156.00, hours: 5890.0, employees: 1 },
-    'Pediatrics': { grossPay: 284567.50, hours: 4123.5, employees: 1 },
-    'Radiology': { grossPay: 623445.00, hours: 4567.0, employees: 2 },
-    'Laboratory': { grossPay: 89789.50, hours: 1234.5, employees: 1 },
+    'Sales': { grossPay: 784532.50, hours: 10250.5, employees: 2 },
+    'Warehouse': { grossPay: 612834.75, hours: 8965.0, employees: 2 },
+    'Production': { grossPay: 502156.00, hours: 5890.0, employees: 1 },
+    'Kitchen': { grossPay: 284567.50, hours: 4123.5, employees: 1 },
+    'Front of House': { grossPay: 623445.00, hours: 4567.0, employees: 2 },
+    'Management': { grossPay: 89789.50, hours: 1234.5, employees: 1 },
     'Administration': { grossPay: 71318.00, hours: 2753.0, employees: 1 },
   },
   

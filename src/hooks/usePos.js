@@ -152,6 +152,26 @@ export const usePos = () => {
     }
   }, []);
 
+  const assignEmployee = useCallback(async (posId, empId) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const result = await posApi.assignEmployee(posId, empId);
+      // Refetch detail to stay in sync
+      const updated = await posApi.getById(posId);
+      setSelectedPos(updated);
+      // Refresh managers list
+      const mgrs = await posApi.listManagers();
+      setManagers(mgrs);
+      return result;
+    } catch (err) {
+      setError(err.message || 'Failed to assign employee');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   const updateEmployee = useCallback(async (posId, empId, data) => {
     setIsLoading(true);
     setError(null);
@@ -236,6 +256,7 @@ export const usePos = () => {
     deletePos,
     fetchManagers,
     addEmployee,
+    assignEmployee,
     updateEmployee,
     removeEmployee,
     swapEmployee,

@@ -376,7 +376,7 @@ describe('PoS Management Module', () => {
       cy.get('[data-testid="pos-employee-section"]').should('be.visible');
     });
 
-    it('should show employee cards with name, role, department and manager badge', () => {
+    it('should show employee cards with name, role, PoS department and manager badge', () => {
       cy.get('[data-testid="pos-employee-card"]').should('have.length.greaterThan', 0);
       cy.get('[data-testid="pos-employee-card"]').first().within(() => {
         // Should contain name, role, department
@@ -391,21 +391,56 @@ describe('PoS Management Module', () => {
       cy.get('[data-testid="pos-employee-empty"]').should('be.visible');
     });
 
-    it('should open add employee modal and require fields', () => {
+    it('should open add employee modal with select and create mode toggle', () => {
       cy.get('[data-testid="pos-add-employee-btn"]').click();
       cy.contains('Add Employee to PoS').should('be.visible');
 
-      // Validate button disabled without data
+      // Mode toggle should exist
+      cy.get('[data-testid="pos-emp-add-mode-toggle"]').should('be.visible');
+      cy.get('[data-testid="pos-emp-mode-select"]').should('be.visible');
+      cy.get('[data-testid="pos-emp-mode-create"]').should('be.visible');
+
+      // Default mode is select — submit disabled without selection
       cy.get('[data-testid="modal-submit-button"]').should('be.disabled');
     });
 
-    it('should add a new employee', () => {
+    it('should assign an existing employee from the select mode', () => {
       cy.get('[data-testid="pos-employee-card"]').then(($cards) => {
         const countBefore = $cards.length;
 
         cy.get('[data-testid="pos-add-employee-btn"]').click();
+        cy.contains('Add Employee to PoS').should('be.visible');
+
+        // Should be in "Select Existing" mode by default
+        cy.get('[data-testid="pos-emp-mode-select"]').should('be.visible');
+
+        // Wait for available employees to load
+        cy.get('[data-testid="pos-assign-candidate"]', { timeout: 5000 }).should('have.length.greaterThan', 0);
+
+        // Select the first candidate
+        cy.get('[data-testid="pos-assign-candidate"]').first().click();
+
+        // Submit
+        cy.get('[data-testid="modal-submit-button"]').should('not.be.disabled');
+        cy.get('[data-testid="modal-submit-button"]').click();
+        cy.wait(500);
+
+        cy.get('[data-testid="pos-employee-card"]').should('have.length', countBefore + 1);
+      });
+    });
+
+    it('should create a new employee via the create mode', () => {
+      cy.get('[data-testid="pos-employee-card"]').then(($cards) => {
+        const countBefore = $cards.length;
+
+        cy.get('[data-testid="pos-add-employee-btn"]').click();
+
+        // Switch to "Create New" mode
+        cy.get('[data-testid="pos-emp-mode-create"]').click();
+
+        // Fill in the form
         cy.get('[data-testid="pos-emp-name-input"]').type('Cypress Test Employee');
-        cy.get('[data-testid="pos-emp-email-input"]').type('cypress@test.com');
+        cy.get('[data-testid="pos-emp-email-input"]').type('cypress.new@test.com');
         cy.get('[data-testid="pos-emp-role-input"]').type('Cashier');
         cy.get('[data-testid="pos-emp-dept-input"]').type('Sales');
         cy.get('[data-testid="pos-emp-hours-input"]').clear().type('35');
@@ -435,6 +470,71 @@ describe('PoS Management Module', () => {
 
         cy.get('[data-testid="pos-employee-card"]').should('have.length', countBefore - 1);
       });
+    });
+
+    it('should swap an employee and persist in the database', () => {
+      cy.get('[data-testid="pos-employee-card"]').should('have.length.greaterThan', 0);
+
+      // Get the name of the first employee before swap
+      cy.get('[data-testid="pos-employee-card"]').first().within(() => {
+        cy.get('h3').invoke('text').as('originalName');
+      });
+
+      // Open swap modal
+      cy.get('[data-testid="pos-employee-card"]').first().within(() => {
+        cy.get('[data-testid="pos-employee-swap-btn"]').click({ force: true });
+      });
+
+      // Swap modal should be visible
+      cy.contains('Replace').should('be.visible');
+
+      // Wait for swap candidates to load
+      cy.get('[data-testid="pos-swap-candidate"]', { timeout: 5000 }).should('have.length.greaterThan', 0);
+
+      // Select a candidate
+      cy.get('[data-testid="pos-swap-candidate"]').first().click();
+
+      // Get the replacement name
+      cy.get('[data-testid="pos-swap-candidate"]').first().find('.text-sm.font-medium').invoke('text').as('replacementName');
+
+      // Confirm swap
+      cy.get('[data-testid="modal-submit-button"]').click();
+      cy.wait(500);
+
+      // Verify the swap persisted — reload the page and check
+      cy.reload();
+      cy.get('[data-testid="pos-detail-name"]', { timeout: 10000 }).should('be.visible');
+      cy.get('[data-testid="pos-employee-card"]').should('have.length.greaterThan', 0);
+
+      // The replacement name should be in the employee list after reload
+      cy.get('@replacementName').then((replacementName) => {
+        cy.contains(replacementName).should('be.visible');
+      });
+    });
+
+    it('should search available employees in the select mode', () => {
+      cy.get('[data-testid="pos-add-employee-btn"]').click();
+
+      // Wait for candidates to load
+      cy.get('[data-testid="pos-assign-candidate"]', { timeout: 5000 }).should('have.length.greaterThan', 0);
+
+      // Search for a non-existent name
+      cy.get('[data-testid="pos-assign-search"]').type('zzzzNonExistent');
+      cy.get('[data-testid="pos-assign-candidate"]').should('not.exist');
+
+      // Clear search
+      cy.get('[data-testid="pos-assign-search"]').clear();
+      cy.get('[data-testid="pos-assign-candidate"]').should('have.length.greaterThan', 0);
+    });
+
+    it('should show PoS department label in the create form', () => {
+      cy.get('[data-testid="pos-add-employee-btn"]').click();
+
+      // Switch to Create mode
+      cy.get('[data-testid="pos-emp-mode-create"]').click();
+
+      // Verify the department label says "Point of Sale Department"
+      cy.contains('Point of Sale Department').should('be.visible');
     });
   });
 });

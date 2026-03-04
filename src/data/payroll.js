@@ -2,12 +2,15 @@
 export const payrollConfig = {
   // Base hourly rates by role
   baseRates: {
-    'Doctor': 85.00,
-    'Senior Nurse': 35.00,
-    'Nurse': 28.00,
-    'Technician': 22.00,
+    'Store Manager': 35.00,
+    'Assistant Manager': 30.00,
+    'Sales Associate': 18.00,
+    'Cashier': 16.00,
+    'Stock Clerk': 17.00,
+    'Butcher': 25.00,
+    'Cook': 22.00,
+    'Deli Clerk': 18.00,
     'Administrator': 25.00,
-    'Radiologist': 75.00,
   },
   
   // Overtime multipliers
@@ -22,7 +25,7 @@ export const payrollConfig = {
     'Night': 3.00,      // 11 PM - 7 AM
     'Weekend': 2.50,    // Saturday/Sunday
     'Holiday': 5.00,    // Designated holidays
-    'Emergency': 4.00,  // Emergency/on-call shifts
+    'Overtime': 4.00,   // Overtime/on-call shifts
   },
   
   // Tax rates (simplified)
@@ -144,37 +147,37 @@ export const historicalPayrollData = {
   
   // Department historical performance
   departmentTrends: {
-    'ICU': {
+    'Sales': {
       monthlyAvgCost: 22479.17,
       monthlyAvgHours: 359.33,
       overtimePercentage: 4.2,
       turnoverRate: 0.05,
     },
-    'Emergency': {
+    'Warehouse': {
       monthlyAvgCost: 17056.67,
       monthlyAvgHours: 320.5,
       overtimePercentage: 5.1,
       turnoverRate: 0.08,
     },
-    'Surgery': {
+    'Production': {
       monthlyAvgCost: 13927.83,
       monthlyAvgHours: 198.17,
       overtimePercentage: 2.8,
       turnoverRate: 0.03,
     },
-    'Pediatrics': {
+    'Kitchen': {
       monthlyAvgCost: 7871.67,
       monthlyAvgHours: 174.17,
       overtimePercentage: 3.2,
       turnoverRate: 0.04,
     },
-    'Radiology': {
+    'Front of House': {
       monthlyAvgCost: 11490.83,
       monthlyAvgHours: 142.67,
       overtimePercentage: 2.1,
       turnoverRate: 0.02,
     },
-    'Laboratory': {
+    'Management': {
       monthlyAvgCost: 4280.00,
       monthlyAvgHours: 102.0,
       overtimePercentage: 1.8,
@@ -219,12 +222,12 @@ export const budgetTracking = {
   },
   
   departmental: {
-    'ICU': { budgeted: 240000, actual: 269750, variance: 29750 },
-    'Emergency': { budgeted: 190000, actual: 204680, variance: 14680 },
-    'Surgery': { budgeted: 170000, actual: 167134, variance: -2866 },
-    'Pediatrics': { budgeted: 90000, actual: 94460, variance: 4460 },
-    'Radiology': { budgeted: 130000, actual: 137890, variance: 7890 },
-    'Laboratory': { budgeted: 50000, actual: 51360, variance: 1360 },
+    'Sales': { budgeted: 240000, actual: 269750, variance: 29750 },
+    'Warehouse': { budgeted: 190000, actual: 204680, variance: 14680 },
+    'Production': { budgeted: 170000, actual: 167134, variance: -2866 },
+    'Kitchen': { budgeted: 90000, actual: 94460, variance: 4460 },
+    'Front of House': { budgeted: 130000, actual: 137890, variance: 7890 },
+    'Management': { budgeted: 50000, actual: 51360, variance: 1360 },
     'Administration': { budgeted: 36000, actual: 36000, variance: 0 },
   },
 };

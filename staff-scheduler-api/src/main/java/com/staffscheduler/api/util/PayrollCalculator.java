@@ -12,16 +12,16 @@ public class PayrollCalculator {
 
     // Base hourly rates by role
     public static final Map<String, Double> BASE_RATES = Map.of(
-            "Doctor", 85.00,
-            "Senior Nurse", 35.00,
-            "Nurse", 28.00,
-            "Technician", 22.00,
+            "Sales Associate", 18.00,
+            "Stock Clerk", 17.00,
+            "Cashier", 16.00,
+            "Deli Clerk", 18.00,
             "Administrator", 25.00,
-            "Radiologist", 75.00,
+            "Cook", 22.00,
             "Store Manager", 40.00,
             "Assistant Manager", 32.00,
-            "Cashier", 18.00,
-            "Butcher", 30.00
+            "Butcher", 25.00,
+            "Front of House", 16.00
     );
 
     public static final double OT_MULTIPLIER = 1.5;

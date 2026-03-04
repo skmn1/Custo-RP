@@ -10,7 +10,7 @@ const ROLE_SUGGESTIONS = [
 
 const DEPARTMENT_SUGGESTIONS = [
   'Management', 'Sales', 'Production', 'Kitchen',
-  'Front of House', 'Warehouse', 'Administration', 'General',
+  'Front of House', 'Warehouse', 'Administration',
 ];
 
 // ── SVG icon helpers ──
@@ -164,7 +164,7 @@ const EmpListView = ({ employees, onEdit, onRemove, onSwap }) => (
         <tr>
           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee</th>
           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
+          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">PoS Department</th>
           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Max Hours</th>
           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
           <th className="relative px-6 py-3"><span className="sr-only">Actions</span></th>
@@ -211,7 +211,7 @@ const EmpListView = ({ employees, onEdit, onRemove, onSwap }) => (
 );
 
 // ── Main Component ──
-const PosEmployeeList = ({ employees = [], posId, onAdd, onUpdate, onRemove, onSwap, onFetchAvailableEmployees }) => {
+const PosEmployeeList = ({ employees = [], posId, onAdd, onAssign, onUpdate, onRemove, onSwap, onFetchAvailableEmployees }) => {
   const [search, setSearch] = useState('');
   const [viewMode, setViewMode] = useState('cards'); // 'list' | 'grid' | 'cards'
   const [modalOpen, setModalOpen] = useState(false);
@@ -222,6 +222,13 @@ const PosEmployeeList = ({ employees = [], posId, onAdd, onUpdate, onRemove, onS
   const [swapSearch, setSwapSearch] = useState('');
   const [selectedSwap, setSelectedSwap] = useState(null);
   const [swapLoading, setSwapLoading] = useState(false);
+
+  // Add mode: 'select' to pick existing employee, 'create' to create new
+  const [addMode, setAddMode] = useState('select');
+  const [availableEmployees, setAvailableEmployees] = useState([]);
+  const [availableSearch, setAvailableSearch] = useState('');
+  const [selectedExisting, setSelectedExisting] = useState(null);
+  const [availableLoading, setAvailableLoading] = useState(false);
 
   const [form, setForm] = useState({
     name: '',
@@ -248,10 +255,21 @@ const PosEmployeeList = ({ employees = [], posId, onAdd, onUpdate, onRemove, onS
     setFormErrors({});
   };
 
-  const openCreate = () => {
+  const openCreate = async () => {
     setEditingEmployee(null);
     resetForm();
+    setAddMode('select');
+    setSelectedExisting(null);
+    setAvailableSearch('');
+    setAvailableLoading(true);
     setModalOpen(true);
+    try {
+      const available = await onFetchAvailableEmployees(posId);
+      setAvailableEmployees(available);
+    } catch {
+      setAvailableEmployees([]);
+    }
+    setAvailableLoading(false);
   };
 
   const openEdit = (emp) => {
@@ -300,17 +318,32 @@ const PosEmployeeList = ({ employees = [], posId, onAdd, onUpdate, onRemove, onS
     form.maxHours <= 80;
 
   const handleSubmit = async () => {
-    if (!validate()) return;
-    try {
-      if (editingEmployee) {
+    if (editingEmployee) {
+      if (!validate()) return;
+      try {
         await onUpdate(posId, editingEmployee.id, form);
-      } else {
-        await onAdd(posId, form);
+        setModalOpen(false);
+        resetForm();
+      } catch {
+        // error handled by hook
       }
-      setModalOpen(false);
-      resetForm();
-    } catch {
-      // error handled by hook
+    } else if (addMode === 'select' && selectedExisting) {
+      try {
+        await onAssign(posId, selectedExisting.id);
+        setModalOpen(false);
+        setSelectedExisting(null);
+      } catch {
+        // error handled by hook
+      }
+    } else if (addMode === 'create') {
+      if (!validate()) return;
+      try {
+        await onAdd(posId, form);
+        setModalOpen(false);
+        resetForm();
+      } catch {
+        // error handled by hook
+      }
     }
   };
 
@@ -463,10 +496,136 @@ const PosEmployeeList = ({ employees = [], posId, onAdd, onUpdate, onRemove, onS
         size="lg"
         showValidate
         onValidate={handleSubmit}
-        validateText={editingEmployee ? 'Update Employee' : 'Add Employee'}
-        validateDisabled={!isFormValid}
+        validateText={editingEmployee ? 'Update Employee' : addMode === 'select' ? 'Assign Employee' : 'Create & Add Employee'}
+        validateDisabled={editingEmployee ? !isFormValid : addMode === 'select' ? !selectedExisting : !isFormValid}
       >
         <div className="space-y-6">
+          {/* Mode Toggle (only for adding, not editing) */}
+          {!editingEmployee && (
+            <div className="flex items-center bg-gray-100 rounded-lg p-1" data-testid="pos-emp-add-mode-toggle">
+              <button
+                type="button"
+                onClick={() => { setAddMode('select'); setSelectedExisting(null); }}
+                data-testid="pos-emp-mode-select"
+                className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  addMode === 'select'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Select Existing
+              </button>
+              <button
+                type="button"
+                onClick={() => { setAddMode('create'); resetForm(); }}
+                data-testid="pos-emp-mode-create"
+                className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  addMode === 'create'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Create New
+              </button>
+            </div>
+          )}
+
+          {/* SELECT EXISTING employee mode */}
+          {!editingEmployee && addMode === 'select' && (
+            <div className="space-y-4">
+              <p className="text-sm text-gray-600">
+                Select an existing employee to assign to this Point of Sale location.
+              </p>
+              {/* Search */}
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+                <input
+                  type="text"
+                  value={availableSearch}
+                  onChange={(e) => setAvailableSearch(e.target.value)}
+                  placeholder="Search by name, role, or department..."
+                  className="block w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  data-testid="pos-assign-search"
+                />
+              </div>
+
+              {/* Candidate list */}
+              {availableLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600" />
+                </div>
+              ) : (() => {
+                const filteredAvailable = availableSearch.trim()
+                  ? availableEmployees.filter(
+                      (e) =>
+                        e.name.toLowerCase().includes(availableSearch.toLowerCase()) ||
+                        e.role.toLowerCase().includes(availableSearch.toLowerCase()) ||
+                        (e.department && e.department.toLowerCase().includes(availableSearch.toLowerCase()))
+                    )
+                  : availableEmployees;
+                return filteredAvailable.length === 0 ? (
+                  <div className="text-center py-8 text-sm text-gray-500">
+                    {availableSearch ? 'No matching employees found.' : 'No available employees to assign.'}
+                  </div>
+                ) : (
+                  <div className="max-h-64 overflow-y-auto border border-gray-200 rounded-lg divide-y divide-gray-100">
+                    {filteredAvailable.map((emp) => (
+                      <div
+                        key={emp.id}
+                        onClick={() => setSelectedExisting(emp)}
+                        data-testid="pos-assign-candidate"
+                        className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${
+                          selectedExisting?.id === emp.id
+                            ? 'bg-indigo-50 border-l-4 border-l-indigo-500'
+                            : 'hover:bg-gray-50 border-l-4 border-l-transparent'
+                        }`}
+                      >
+                        <div className={`w-9 h-9 ${emp.color || 'bg-gray-500'} rounded-full flex items-center justify-center text-white font-semibold text-xs shrink-0`}>
+                          {emp.avatar}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-medium text-gray-900 truncate">{emp.name}</div>
+                          <div className="text-xs text-gray-500 truncate">
+                            {emp.role} {emp.department && `• ${emp.department}`}
+                          </div>
+                        </div>
+                        {selectedExisting?.id === emp.id && (
+                          <svg className="w-5 h-5 text-indigo-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
+
+              {selectedExisting && (
+                <div className="bg-indigo-50 rounded-lg p-3 border border-indigo-200">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-9 h-9 ${selectedExisting.color || 'bg-gray-500'} rounded-full flex items-center justify-center text-white font-semibold text-xs shrink-0`}>
+                      {selectedExisting.avatar}
+                    </div>
+                    <div className="text-sm text-indigo-800">
+                      <span className="font-semibold">{selectedExisting.name}</span>
+                      <span className="text-indigo-600"> — {selectedExisting.role}</span>
+                      {selectedExisting.department && (
+                        <span className="text-indigo-500"> • {selectedExisting.department}</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* CREATE NEW or EDIT mode — show the form */}
+          {(editingEmployee || addMode === 'create') && (
+            <>
           {/* Personal Information */}
           <div>
             <h4 className="text-lg font-medium text-gray-900 mb-4">Personal Information</h4>
@@ -530,7 +689,7 @@ const PosEmployeeList = ({ employees = [], posId, onAdd, onUpdate, onRemove, onS
                 {formErrors.role && <p className="mt-1 text-sm text-red-600">{formErrors.role}</p>}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Department *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Point of Sale Department *</label>
                 <input
                   type="text"
                   name="department"
@@ -540,7 +699,7 @@ const PosEmployeeList = ({ employees = [], posId, onAdd, onUpdate, onRemove, onS
                   className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors ${
                     formErrors.department ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-indigo-500'
                   }`}
-                  placeholder="Enter department"
+                  placeholder="Enter point of sale department"
                   list="pos-emp-depts"
                 />
                 <datalist id="pos-emp-depts">
@@ -622,6 +781,8 @@ const PosEmployeeList = ({ employees = [], posId, onAdd, onUpdate, onRemove, onS
           </div>
 
           <div className="text-xs text-gray-500">* Required fields</div>
+            </>
+          )}
         </div>
       </Modal>
 

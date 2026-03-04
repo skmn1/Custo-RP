@@ -20,6 +20,7 @@ const PosDetailPage = () => {
     deletePos,
     fetchManagers,
     addEmployee,
+    assignEmployee,
     updateEmployee,
     removeEmployee,
     swapEmployee,
@@ -223,6 +224,7 @@ const PosDetailPage = () => {
           employees={pos.employees || []}
           posId={pos.id}
           onAdd={addEmployee}
+          onAssign={assignEmployee}
           onUpdate={updateEmployee}
           onRemove={removeEmployee}
           onSwap={swapEmployee}

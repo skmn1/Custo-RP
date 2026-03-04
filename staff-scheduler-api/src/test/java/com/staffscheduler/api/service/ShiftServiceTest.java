@@ -47,7 +47,7 @@ class ShiftServiceTest {
                 .duration(8.0)
                 .type("Morning")
                 .color("bg-blue-100 border-blue-300 text-blue-800")
-                .department("ICU")
+                .department("Sales")
                 .build();
     }
 
@@ -90,7 +90,7 @@ class ShiftServiceTest {
                 .startTime("09:00")
                 .endTime("17:00")
                 .type("Day")
-                .department("ICU")
+                .department("Sales")
                 .build();
 
         ShiftDto result = service.create(dto);

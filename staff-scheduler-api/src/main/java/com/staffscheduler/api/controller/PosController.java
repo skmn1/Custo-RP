@@ -160,6 +160,23 @@ public class PosController {
         return ResponseEntity.status(HttpStatus.CREATED).body(posService.addEmployee(posId, dto));
     }
 
+    @PutMapping("/{posId}/employees/{empId}/assign")
+    @Operation(summary = "Assign existing employee to a PoS",
+            description = "Assigns an existing employee to the specified PoS location by updating their posId.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Employee assigned to PoS",
+                    content = @Content(schema = @Schema(implementation = EmployeeDto.class))),
+            @ApiResponse(responseCode = "404", description = "PoS or employee not found",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    public ResponseEntity<EmployeeDto> assignEmployee(
+            @Parameter(description = "PoS ID", example = "1", required = true)
+            @PathVariable Long posId,
+            @Parameter(description = "Employee ID", example = "emp-1", required = true)
+            @PathVariable String empId) {
+        return ResponseEntity.ok(posService.assignEmployee(posId, empId));
+    }
+
     @PutMapping("/{posId}/employees/{empId}")
     @Operation(summary = "Update employee in a PoS",
             description = "Updates the details of an employee within the context of a PoS location.")
