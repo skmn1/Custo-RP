@@ -25,19 +25,19 @@ class EmployeeRepositoryTest {
         repository.save(Employee.builder()
                 .id("emp1").name("Sarah Johnson").role("Sales Associate")
                 .avatar("SJ").color("bg-blue-500").email("sarah@company.com")
-                .maxHours(40).department("Sales").posId(1L).isManager(false)
+                .maxHours(40).posId(1L).isManager(false)
                 .build());
 
         repository.save(Employee.builder()
                 .id("emp2").name("Michael Chen").role("Store Manager")
                 .avatar("MC").color("bg-green-500").email("michael@company.com")
-                .maxHours(50).department("Warehouse").posId(1L).isManager(true)
+                .maxHours(50).posId(1L).isManager(true)
                 .build());
 
         repository.save(Employee.builder()
                 .id("emp3").name("Emily Davis").role("Cashier")
                 .avatar("ED").color("bg-purple-500").email("emily@company.com")
-                .maxHours(40).department("Sales").posId(2L).isManager(false)
+                .maxHours(40).posId(2L).isManager(false)
                 .build());
     }
 
@@ -48,10 +48,10 @@ class EmployeeRepositoryTest {
     }
 
     @Test
-    void findByDepartment_shouldReturnFiltered() {
-        List<Employee> salesEmployees = repository.findByDepartment("Sales");
-        assertThat(salesEmployees).hasSize(2);
-        assertThat(salesEmployees).allMatch(e -> e.getDepartment().equals("Sales"));
+    void findByPosId_shouldReturnOnlyThatLocation() {
+        List<Employee> atPos2 = repository.findByPosId(2L);
+        assertThat(atPos2).hasSize(1);
+        assertThat(atPos2.get(0).getName()).isEqualTo("Emily Davis");
     }
 
     @Test
@@ -69,21 +69,21 @@ class EmployeeRepositoryTest {
 
     @Test
     void findFiltered_shouldSearchByName() {
-        List<Employee> result = repository.findFiltered("sarah", null, null);
+        List<Employee> result = repository.findFiltered("sarah", null);
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getName()).isEqualTo("Sarah Johnson");
     }
 
     @Test
-    void findFiltered_shouldFilterByDepartmentAndRole() {
-        List<Employee> result = repository.findFiltered(null, "Sales", "Cashier");
+    void findFiltered_shouldFilterByRole() {
+        List<Employee> result = repository.findFiltered(null, "Cashier");
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getName()).isEqualTo("Emily Davis");
     }
 
     @Test
     void findFiltered_shouldReturnAll_whenNoFilters() {
-        List<Employee> result = repository.findFiltered(null, null, null);
+        List<Employee> result = repository.findFiltered(null, null);
         assertThat(result).hasSize(3);
     }
 

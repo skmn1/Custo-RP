@@ -40,7 +40,6 @@ class EmployeeServiceTest {
                 .color("bg-blue-500")
                 .email("sarah.johnson@company.com")
                 .maxHours(40)
-                .department("Sales")
                 .posId(1L)
                 .isManager(false)
                 .build();
@@ -71,12 +70,12 @@ class EmployeeServiceTest {
                 .id("emp2").name("Michael Chen").role("Store Manager")
                 .avatar("MC").color("bg-green-500")
                 .email("michael.chen@company.com").maxHours(50)
-                .department("Warehouse").posId(1L).isManager(false)
+                .posId(1L).isManager(false)
                 .build();
 
-        when(repository.findFiltered(null, null, null)).thenReturn(List.of(sampleEmployee, emp2));
+        when(repository.findFiltered(null, null)).thenReturn(List.of(sampleEmployee, emp2));
 
-        List<EmployeeDto> result = service.findAll(null, null, null, "name", "asc");
+        List<EmployeeDto> result = service.findAll(null, null, "name", "asc");
 
         assertThat(result).hasSize(2);
         assertThat(result.get(0).getName()).isEqualTo("Michael Chen");
@@ -93,7 +92,6 @@ class EmployeeServiceTest {
                 .role("Cashier")
                 .email("test@company.com")
                 .maxHours(40)
-                .department("Sales")
                 .build();
 
         EmployeeDto result = service.create(dto);
@@ -114,7 +112,6 @@ class EmployeeServiceTest {
                 .role("Cashier")
                 .email("sarah.johnson@company.com")
                 .maxHours(40)
-                .department("Sales")
                 .build();
 
         assertThatThrownBy(() -> service.create(dto))

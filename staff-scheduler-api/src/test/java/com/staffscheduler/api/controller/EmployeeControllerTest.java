@@ -38,9 +38,9 @@ class EmployeeControllerTest {
         EmployeeDto emp = EmployeeDto.builder()
                 .id("emp1").name("Sarah Johnson").role("Sales Associate")
                 .avatar("SJ").color("bg-blue-500").email("sarah@company.com")
-                .maxHours(40).department("Sales").build();
+                .maxHours(40).build();
 
-        when(service.findAll(any(), any(), any(), any(), any())).thenReturn(List.of(emp));
+        when(service.findAll(any(), any(), any(), any())).thenReturn(List.of(emp));
 
         mockMvc.perform(get("/api/employees"))
                 .andExpect(status().isOk())
@@ -75,12 +75,12 @@ class EmployeeControllerTest {
     void createEmployee_shouldReturn201() throws Exception {
         EmployeeDto input = EmployeeDto.builder()
                 .name("Test User").role("Cashier").email("test@company.com")
-                .maxHours(40).department("Sales").build();
+                .maxHours(40).build();
 
         EmployeeDto created = EmployeeDto.builder()
                 .id("emp123").name("Test User").role("Cashier").avatar("TU")
                 .color("bg-blue-500").email("test@company.com")
-                .maxHours(40).department("Sales").build();
+                .maxHours(40).build();
 
         when(service.create(any(EmployeeDto.class))).thenReturn(created);
 
@@ -113,10 +113,10 @@ class EmployeeControllerTest {
     }
 
     @Test
-    void getDepartments_shouldReturnList() throws Exception {
-        when(service.getDepartments()).thenReturn(List.of("Sales", "Warehouse", "Production"));
+    void getRoles_shouldReturnList() throws Exception {
+        when(service.getRoles()).thenReturn(List.of("Cashier", "Sales Associate", "Store Manager"));
 
-        mockMvc.perform(get("/api/employees/departments"))
+        mockMvc.perform(get("/api/employees/roles"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(3)));
     }
