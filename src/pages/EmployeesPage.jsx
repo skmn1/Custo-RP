@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useEmployees } from '../hooks/useEmployees';
+import { usePos } from '../hooks/usePos';
 import EmployeeModal from '../components/employees/EmployeeModal';
 import EmployeeFilters from '../components/employees/EmployeeFilters';
 import EmployeeStats from '../components/employees/EmployeeStats';
@@ -28,6 +29,12 @@ const EmployeesPage = () => {
     sortOrder,
     setSortOrder,
   } = useEmployees();
+
+  const { posList, fetchPosList } = usePos();
+
+  useEffect(() => {
+    fetchPosList().catch(() => {});
+  }, [fetchPosList]);
 
   const [viewMode, setViewMode] = useState('list'); // 'list', 'grid', 'cards'
   const [showModal, setShowModal] = useState(false);
@@ -203,6 +210,7 @@ const EmployeesPage = () => {
         employee={editingEmployee}
         departments={departments}
         roles={roles}
+        posList={posList}
       />
     </div>
   );

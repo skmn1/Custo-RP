@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import Modal from '../ui/Modal';
+import ComboBox from '../ui/ComboBox';
 
-const EmployeeModal = ({ isOpen, onClose, onSave, employee, departments, roles }) => {
+const EmployeeModal = ({ isOpen, onClose, onSave, employee, departments, roles, posList = [] }) => {
   const [formData, setFormData] = useState({
     name: '',
     role: '',
     email: '',
     department: '',
     maxHours: 40,
+    posId: '',
   });
   
   const [errors, setErrors] = useState({});
@@ -20,6 +22,7 @@ const EmployeeModal = ({ isOpen, onClose, onSave, employee, departments, roles }
         email: employee.email || '',
         department: employee.department || '',
         maxHours: employee.maxHours || 40,
+        posId: employee.posId ?? '',
       });
     } else {
       setFormData({
@@ -28,6 +31,7 @@ const EmployeeModal = ({ isOpen, onClose, onSave, employee, departments, roles }
         email: '',
         department: '',
         maxHours: 40,
+        posId: '',
       });
     }
     setErrors({});
@@ -152,30 +156,14 @@ const EmployeeModal = ({ isOpen, onClose, onSave, employee, departments, roles }
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Role *
               </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  name="role"
-                  value={formData.role}
-                  onChange={handleChange}
-                  className={`w-full pl-3 pr-8 py-2 border rounded-md appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors ${
-                    errors.role ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-indigo-500'
-                  }`}
-                  placeholder="Enter role"
-                  list="roles"
-                  style={{ backgroundImage: 'none' }}
-                />
-                <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                  <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </div>
-                <datalist id="roles">
-                  {roles.map(role => (
-                    <option key={role} value={role} />
-                  ))}
-                </datalist>
-              </div>
+              <ComboBox
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
+                options={roles}
+                placeholder="Select or type a role"
+                error={!!errors.role}
+              />
               {errors.role && <p className="mt-1 text-sm text-red-600">{errors.role}</p>}
             </div>
 
@@ -183,33 +171,48 @@ const EmployeeModal = ({ isOpen, onClose, onSave, employee, departments, roles }
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Department *
               </label>
+              <ComboBox
+                name="department"
+                value={formData.department}
+                onChange={handleChange}
+                options={departments}
+                placeholder="Select or type a department"
+                error={!!errors.department}
+              />
+              {errors.department && <p className="mt-1 text-sm text-red-600">{errors.department}</p>}
+            </div>
+          </div>
+
+          {/* PoS assignment — full width */}
+          {posList.length > 0 && (
+            <div className="mt-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Point of Sale Location
+              </label>
               <div className="relative">
-                <input
-                  type="text"
-                  name="department"
-                  value={formData.department}
+                <select
+                  name="posId"
+                  value={formData.posId}
                   onChange={handleChange}
-                  className={`w-full pl-3 pr-8 py-2 border rounded-md appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors ${
-                    errors.department ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-indigo-500'
-                  }`}
-                  placeholder="Enter department"
-                  list="departments"
+                  className="w-full pl-3 pr-8 py-2 border border-gray-300 rounded-md appearance-none text-sm bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                   style={{ backgroundImage: 'none' }}
-                />
-                <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                >
+                  <option value="">— Not assigned —</option>
+                  {posList.map((pos) => (
+                    <option key={pos.id} value={pos.id}>
+                      {pos.name}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center pr-2.5 pointer-events-none">
                   <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                   </svg>
                 </div>
-                <datalist id="departments">
-                  {departments.map(dept => (
-                    <option key={dept} value={dept} />
-                  ))}
-                </datalist>
               </div>
-              {errors.department && <p className="mt-1 text-sm text-red-600">{errors.department}</p>}
+              <p className="mt-1 text-xs text-gray-500">Assign this employee to a PoS location</p>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Schedule Information */}
