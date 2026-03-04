@@ -123,6 +123,7 @@ public class EmployeeService {
         if (dto.getRole() != null) entity.setRole(dto.getRole());
         if (dto.getEmail() != null) entity.setEmail(dto.getEmail());
         if (dto.getMaxHours() != null) entity.setMaxHours(dto.getMaxHours());
+        if (dto.getDepartment() != null) entity.setDepartment(dto.getDepartment());
         if (dto.getPosId() != null) entity.setPosId(dto.getPosId());
         if (dto.getIsManager() != null) entity.setIsManager(dto.getIsManager());
         if (dto.getColor() != null) entity.setColor(dto.getColor());
@@ -137,6 +138,7 @@ public class EmployeeService {
                 .color(e.getColor())
                 .email(e.getEmail())
                 .maxHours(e.getMaxHours())
+                .department(e.getDepartment())
                 .posId(e.getPosId())
                 .isManager(e.getIsManager())
                 .build();

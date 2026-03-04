@@ -39,6 +39,9 @@ public class Employee {
     @Column(nullable = false)
     private Integer maxHours;
 
+    @Column(length = 100)
+    private String department;
+
     @Column(name = "pos_id")
     private Long posId;
 
