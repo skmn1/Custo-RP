@@ -1,5 +1,7 @@
 import { useState, useCallback } from 'react';
 import { posApi } from '../api/posApi';
+import { initialPosData } from '../data/pos';
+import { initialEmployees } from '../data/employees';
 
 /**
  * usePos — manages PoS data fetching and mutations,
@@ -41,8 +43,13 @@ export const usePos = () => {
       setPosList(data);
       return data;
     } catch (err) {
-      setError(err.message || 'Failed to fetch PoS locations');
-      throw err;
+      console.warn('Backend unavailable, using local PoS data:', err.message);
+      const fallback = includeInactive
+        ? initialPosData
+        : initialPosData.filter((p) => p.isActive);
+      setPosList(fallback);
+      setError(null); // suppress — fallback is silent
+      return fallback;
     } finally {
       setIsLoading(false);
     }
@@ -56,8 +63,17 @@ export const usePos = () => {
       setSelectedPos(data);
       return data;
     } catch (err) {
-      setError(err.message || 'Failed to fetch PoS detail');
-      throw err;
+      console.warn('Backend unavailable, using local PoS detail:', err.message);
+      const fallback = initialPosData.find((p) => p.id === Number(id)) || null;
+      if (fallback) {
+        const posEmployees = initialEmployees.filter((e) => e.posId === fallback.id);
+        const detail = { ...fallback, employees: posEmployees };
+        setSelectedPos(detail);
+        setError(null);
+        return detail;
+      }
+      setError('PoS not found');
+      return null;
     } finally {
       setIsLoading(false);
     }
@@ -125,8 +141,10 @@ export const usePos = () => {
       setManagers(data);
       return data;
     } catch (err) {
-      setError(err.message || 'Failed to fetch managers');
-      throw err;
+      console.warn('Backend unavailable, using local manager data:', err.message);
+      const fallback = initialEmployees.filter((e) => e.isManager);
+      setManagers(fallback);
+      return fallback;
     }
   }, []);
 
