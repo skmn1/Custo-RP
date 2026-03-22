@@ -18,7 +18,8 @@ INSERT INTO point_of_sale (id, name, address, type, phone, manager_id, manager_n
  true, '2026-02-05T12:00:00Z', NULL),
 (5, 'Riverside Butcher', '654 River Ln, Riverside', 'BUTCHER', '(555) 567-8901', 'emp7', 'Jane Smith',
  '{"monday":{"open":"07:00","close":"18:00","closed":false},"tuesday":{"open":"07:00","close":"18:00","closed":false},"wednesday":{"open":"07:00","close":"18:00","closed":false},"thursday":{"open":"07:00","close":"18:00","closed":false},"friday":{"open":"07:00","close":"18:00","closed":false},"saturday":{"open":"08:00","close":"14:00","closed":false},"sunday":{"open":null,"close":null,"closed":true}}',
- false, '2026-01-10T10:00:00Z', '2026-02-15T09:00:00Z');
+ false, '2026-01-10T10:00:00Z', '2026-02-15T09:00:00Z')
+ON CONFLICT DO NOTHING;
 
 -- ══════════════════════════════════════════════════════
 -- Employees (from src/data/employees.js with new fields)
@@ -35,7 +36,8 @@ INSERT INTO employees (id, name, role, avatar, color, email, phone, max_hours, d
 ('emp9',  'Alice Brown',     'Store Manager',     'AB', 'bg-amber-500',  'alice.brown@company.com',      '(555) 111-0009', 45, 'Management',     24.00, 'active', '2024-02-01', 3, true,  '2026-01-15T10:00:00', '2026-02-20T14:30:00'),
 ('emp10', 'Robert Taylor',   'Cashier',           'RT', 'bg-cyan-500',   'robert.taylor@company.com',    '(555) 111-0010', 35, 'Sales',          14.50, 'active', '2025-09-01', 4, false, '2026-01-15T10:00:00', '2026-02-20T14:30:00'),
 ('emp11', 'Maria Garcia',    'Assistant Manager', 'MG', 'bg-violet-500', 'maria.garcia@company.com',     '(555) 111-0011', 40, 'Management',     21.00, 'active', '2024-11-15', 4, true,  '2026-01-15T10:00:00', '2026-02-20T14:30:00'),
-('emp12', 'Thomas Wright',   'Butcher',           'TW', 'bg-red-500',    'thomas.wright@company.com',    '(555) 111-0012', 40, 'Production',     18.50, 'active', '2025-08-20', 1, false, '2026-01-15T10:00:00', '2026-02-20T14:30:00');
+('emp12', 'Thomas Wright',   'Butcher',           'TW', 'bg-red-500',    'thomas.wright@company.com',    '(555) 111-0012', 40, 'Production',     18.50, 'active', '2025-08-20', 1, false, '2026-01-15T10:00:00', '2026-02-20T14:30:00')
+ON CONFLICT DO NOTHING;
 
 -- ══════════════════════════════════════════════════════
 -- Shifts (from src/data/shifts.js — week of 2026-03-02, Monday)
@@ -53,7 +55,8 @@ INSERT INTO shifts (id, employee_id, date, day_index, start_time, end_time, dura
 ('shift9',  'emp4', '2026-03-05', 3, '07:00', '15:00', 8,  'Day',     'bg-orange-100 border-orange-300 text-orange-800','Production',     'Deli prep',      '2026-02-28T09:00:00', '2026-02-28T09:00:00'),
 ('shift10', 'emp5', '2026-03-02', 0, '09:00', '17:00', 8,  'Admin',   'bg-pink-100 border-pink-300 text-pink-800',      'Administration', 'Regular shift',  '2026-02-28T09:00:00', '2026-02-28T09:00:00'),
 ('shift11', 'emp5', '2026-03-04', 2, '09:00', '17:00', 8,  'Admin',   'bg-pink-100 border-pink-300 text-pink-800',      'Administration', 'Regular shift',  '2026-02-28T09:00:00', '2026-02-28T09:00:00'),
-('shift12', 'emp6', '2026-03-03', 1, '10:00', '18:00', 8,  'Day',     'bg-indigo-100 border-indigo-300 text-indigo-800','Kitchen',        'Prep cooking',   '2026-02-28T09:00:00', '2026-02-28T09:00:00');
+('shift12', 'emp6', '2026-03-03', 1, '10:00', '18:00', 8,  'Day',     'bg-indigo-100 border-indigo-300 text-indigo-800','Kitchen',        'Prep cooking',   '2026-02-28T09:00:00', '2026-02-28T09:00:00')
+ON CONFLICT DO NOTHING;
 
 -- Reset the auto-increment for POS after explicit ID inserts
-ALTER TABLE point_of_sale ALTER COLUMN id RESTART WITH 6;
+SELECT setval(pg_get_serial_sequence('point_of_sale', 'id'), 5);
