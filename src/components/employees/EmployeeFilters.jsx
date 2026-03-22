@@ -3,15 +3,15 @@ import React from 'react';
 const EmployeeFilters = ({
   searchTerm,
   setSearchTerm,
-  filterDepartment,
-  setFilterDepartment,
+  filterPos,
+  setFilterPos,
   filterRole,
   setFilterRole,
   sortBy,
   setSortBy,
   sortOrder,
   setSortOrder,
-  departments,
+  posList,
   roles,
 }) => {
   const handleSortChange = (field) => {
@@ -25,13 +25,13 @@ const EmployeeFilters = ({
 
   const clearFilters = () => {
     setSearchTerm('');
-    setFilterDepartment('');
+    setFilterPos('');
     setFilterRole('');
     setSortBy('name');
     setSortOrder('asc');
   };
 
-  const hasActiveFilters = searchTerm || filterDepartment || filterRole || sortBy !== 'name' || sortOrder !== 'asc';
+  const hasActiveFilters = searchTerm || filterPos || filterRole || sortBy !== 'name' || sortOrder !== 'asc';
 
   return (
     <div className="flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4 lg:items-end">
@@ -56,19 +56,19 @@ const EmployeeFilters = ({
         </div>
       </div>
 
-      {/* Department Filter */}
+      {/* PoS Location Filter */}
       <div className="min-w-0 flex-shrink-0">
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Department
+          PoS Location
         </label>
         <select
-          value={filterDepartment}
-          onChange={(e) => setFilterDepartment(e.target.value)}
+          value={filterPos}
+          onChange={(e) => setFilterPos(e.target.value)}
           className="block w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
         >
-          <option value="">All Departments</option>
-          {departments.map(dept => (
-            <option key={dept} value={dept}>{dept}</option>
+          <option value="">All Locations</option>
+          {(posList || []).map(pos => (
+            <option key={pos.id} value={String(pos.id)}>{pos.name}</option>
           ))}
         </select>
       </div>
@@ -103,7 +103,6 @@ const EmployeeFilters = ({
           >
             <option value="name">Name</option>
             <option value="role">Role</option>
-            <option value="department">Department</option>
             <option value="maxHours">Max Hours</option>
           </select>
           <button

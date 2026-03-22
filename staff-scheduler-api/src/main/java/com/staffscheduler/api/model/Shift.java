@@ -48,7 +48,10 @@ public class Shift {
     @Column(length = 50)
     private String type = "Regular";
 
-    @Column(length = 100)
+    @Column(length = 80)
+    private String color;
+
+    @Column(length = 50)
     private String department;
 
     @Column(columnDefinition = "TEXT")
@@ -64,9 +67,7 @@ public class Shift {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
-        if (type == null) {
-            type = "Regular";
-        }
+        if (type == null) type = "Regular";
         computeDerivedFields();
     }
 

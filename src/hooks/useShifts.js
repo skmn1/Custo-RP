@@ -1,48 +1,34 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { shiftsApi } from '../api/shiftsApi';
 import { initialShifts } from '../data/shifts';
 import { SHIFT_TYPES } from '../constants/scheduler';
 import { generateShiftId, calculateShiftDuration } from '../utils/shiftUtils';
 
 export const useShifts = () => {
-  const [shifts, setShifts] = useState(initialShifts);
+  const [shifts, setShifts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const addShift = useCallback((employeeId, day, customShiftData = null) => {
-    let newShift;
-    
-    if (customShiftData) {
-      // Use provided shift data from AddShiftModal
-      newShift = {
-        id: generateShiftId(),
-        employeeId,
-        day,
-        startTime: customShiftData.startTime,
-        endTime: customShiftData.endTime,
-        duration: customShiftData.duration,
-        type: customShiftData.type,
-        department: customShiftData.department,
-        color: getShiftColor(customShiftData.type),
-      };
-    } else {
-      // Use random shift type for quick add
-      const randomShiftType = SHIFT_TYPES[Math.floor(Math.random() * SHIFT_TYPES.length)];
-      const duration = calculateShiftDuration(randomShiftType.start, randomShiftType.end);
-      
-      newShift = {
-        id: generateShiftId(),
-        employeeId,
-        day,
-        startTime: randomShiftType.start,
-        endTime: randomShiftType.end,
-        duration,
-        type: randomShiftType.type,
-        color: randomShiftType.color,
-        department: 'General',
-      };
+  // ── Fetch shifts from backend (falls back to static data) ──
+
+  const fetchShifts = useCallback(async (filters = {}) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const data = await shiftsApi.list(filters);
+      setShifts(data);
+    } catch (err) {
+      console.warn('Backend unavailable, using local data:', err.message);
+      setShifts(initialShifts);
+      setError(null);
+    } finally {
+      setIsLoading(false);
     }
-
-    setShifts(prevShifts => [...prevShifts, newShift]);
-    return newShift;
   }, []);
+
+  useEffect(() => {
+    fetchShifts();
+  }, [fetchShifts]);
 
   // Helper function to get color based on shift type
   const getShiftColor = (shiftType) => {
@@ -56,35 +42,100 @@ export const useShifts = () => {
     return colorMap[shiftType] || 'bg-blue-100 border-blue-300 text-blue-800';
   };
 
-  const deleteShift = useCallback((shiftId) => {
-    setShifts(prevShifts => prevShifts.filter(shift => shift.id !== shiftId));
+  const addShift = useCallback(async (employeeId, day, customShiftData = null) => {
+    let payload;
+
+    if (customShiftData) {
+      payload = {
+        employeeId,
+        day,
+        startTime: customShiftData.startTime,
+        endTime: customShiftData.endTime,
+        duration: customShiftData.duration,
+        type: customShiftData.type,
+        department: customShiftData.department,
+        color: getShiftColor(customShiftData.type),
+      };
+    } else {
+      const randomShiftType = SHIFT_TYPES[Math.floor(Math.random() * SHIFT_TYPES.length)];
+      const duration = calculateShiftDuration(randomShiftType.start, randomShiftType.end);
+      payload = {
+        employeeId,
+        day,
+        startTime: randomShiftType.start,
+        endTime: randomShiftType.end,
+        duration,
+        type: randomShiftType.type,
+        color: randomShiftType.color,
+        department: 'General',
+      };
+    }
+
+    try {
+      const created = await shiftsApi.create(payload);
+      setShifts(prev => [...prev, created]);
+      return created;
+    } catch (err) {
+      // Fallback to local-only if backend is down
+      const localShift = { id: generateShiftId(), ...payload };
+      setShifts(prev => [...prev, localShift]);
+      return localShift;
+    }
   }, []);
 
-  const updateShift = useCallback((shiftId, updates) => {
-    setShifts(prevShifts => 
-      prevShifts.map(shift => 
-        shift.id === shiftId 
-          ? { ...shift, ...updates }
-          : shift
-      )
-    );
+  const deleteShift = useCallback(async (shiftId) => {
+    // Optimistic removal
+    setShifts(prev => prev.filter(s => s.id !== shiftId));
+    try {
+      await shiftsApi.delete(shiftId);
+    } catch (err) {
+      console.warn('Failed to delete shift on server:', err.message);
+    }
   }, []);
 
-  const moveShift = useCallback((shiftId, newEmployeeId, newDay) => {
-    setShifts(prevShifts => 
-      prevShifts.map(shift => 
-        shift.id === shiftId 
-          ? { ...shift, employeeId: newEmployeeId, day: newDay }
-          : shift
-      )
+  const updateShift = useCallback(async (shiftId, updates) => {
+    // Optimistic update
+    setShifts(prev =>
+      prev.map(s => (s.id === shiftId ? { ...s, ...updates } : s)),
     );
+    try {
+      const updated = await shiftsApi.update(shiftId, updates);
+      setShifts(prev =>
+        prev.map(s => (s.id === shiftId ? updated : s)),
+      );
+    } catch (err) {
+      console.warn('Failed to update shift on server:', err.message);
+    }
+  }, []);
+
+  const moveShift = useCallback(async (shiftId, newEmployeeId, newDay) => {
+    // Optimistic update for drag-and-drop responsiveness
+    setShifts(prev =>
+      prev.map(s =>
+        s.id === shiftId ? { ...s, employeeId: newEmployeeId, day: newDay } : s,
+      ),
+    );
+    try {
+      const moved = await shiftsApi.move(shiftId, {
+        employeeId: newEmployeeId,
+        day: newDay,
+      });
+      setShifts(prev =>
+        prev.map(s => (s.id === shiftId ? moved : s)),
+      );
+    } catch (err) {
+      console.warn('Failed to move shift on server:', err.message);
+    }
   }, []);
 
   return {
     shifts,
+    isLoading,
+    error,
     addShift,
     deleteShift,
     updateShift,
     moveShift,
+    refetch: fetchShifts,
   };
 };

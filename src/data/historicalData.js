@@ -19,43 +19,47 @@ export const generateHistoricalShifts = () => {
   
   // All employees from employees.js
   const employees = [
-    { id: 'emp1', role: 'Doctor', department: 'ICU' },
-    { id: 'emp2', role: 'Senior Nurse', department: 'Emergency' },
-    { id: 'emp3', role: 'Nurse', department: 'Pediatrics' },
-    { id: 'emp4', role: 'Technician', department: 'Radiology' },
+    { id: 'emp1', role: 'Sales Associate', department: 'Sales' },
+    { id: 'emp2', role: 'Stock Clerk', department: 'Warehouse' },
+    { id: 'emp3', role: 'Cashier', department: 'Sales' },
+    { id: 'emp4', role: 'Deli Clerk', department: 'Production' },
     { id: 'emp5', role: 'Administrator', department: 'Administration' },
-    { id: 'emp6', role: 'Doctor', department: 'Surgery' },
-    { id: 'emp7', role: 'Nurse', department: 'ICU' },
-    { id: 'emp8', role: 'Technician', department: 'Laboratory' },
-    { id: 'emp9', role: 'Senior Nurse', department: 'Emergency' },
-    { id: 'emp10', role: 'Radiologist', department: 'Radiology' },
+    { id: 'emp6', role: 'Cook', department: 'Kitchen' },
+    { id: 'emp7', role: 'Cashier', department: 'Sales' },
+    { id: 'emp8', role: 'Stock Clerk', department: 'Warehouse' },
+    { id: 'emp9', role: 'Sales Associate', department: 'Sales' },
+    { id: 'emp10', role: 'Butcher', department: 'Production' },
   ];
 
   // Shift patterns by role
   const shiftPatterns = {
-    'Doctor': [
-      { startTime: '07:00', endTime: '19:00', duration: 12, type: 'Day', frequency: 3 }, // 3 days a week
-      { startTime: '19:00', endTime: '07:00', duration: 12, type: 'Night', frequency: 1 }, // 1 night shift
+    'Sales Associate': [
+      { startTime: '07:00', endTime: '19:00', duration: 12, type: 'Day', frequency: 3 },
+      { startTime: '19:00', endTime: '07:00', duration: 12, type: 'Night', frequency: 1 },
     ],
-    'Senior Nurse': [
+    'Stock Clerk': [
       { startTime: '06:00', endTime: '18:00', duration: 12, type: 'Day', frequency: 3 },
       { startTime: '18:00', endTime: '06:00', duration: 12, type: 'Night', frequency: 2 },
     ],
-    'Nurse': [
+    'Cashier': [
       { startTime: '06:00', endTime: '14:00', duration: 8, type: 'Morning', frequency: 3 },
       { startTime: '14:00', endTime: '22:00', duration: 8, type: 'Evening', frequency: 2 },
       { startTime: '22:00', endTime: '06:00', duration: 8, type: 'Night', frequency: 1 },
     ],
-    'Technician': [
+    'Deli Clerk': [
       { startTime: '08:00', endTime: '16:00', duration: 8, type: 'Day', frequency: 5 },
       { startTime: '16:00', endTime: '00:00', duration: 8, type: 'Evening', frequency: 1 },
     ],
     'Administrator': [
       { startTime: '09:00', endTime: '17:00', duration: 8, type: 'Office', frequency: 5 },
     ],
-    'Radiologist': [
+    'Cook': [
       { startTime: '08:00', endTime: '18:00', duration: 10, type: 'Day', frequency: 4 },
       { startTime: '18:00', endTime: '22:00', duration: 4, type: 'Evening', frequency: 2 },
+    ],
+    'Butcher': [
+      { startTime: '06:00', endTime: '14:00', duration: 8, type: 'Morning', frequency: 5 },
+      { startTime: '14:00', endTime: '20:00', duration: 6, type: 'Evening', frequency: 1 },
     ],
   };
 
@@ -194,33 +198,33 @@ export const historicalPayPeriods = [
 
 // Employee performance metrics for the period
 export const historicalEmployeeMetrics = {
-  'emp1': { // Doctor
+  'emp1': { // Sales Associate
     mayHours: 164.5,
     juneHours: 168.0,
     overtimeHours: 24.5,
-    avgHourlyRate: 85.00,
-    totalGrossPay: 28372.50,
+    avgHourlyRate: 18.00,
+    totalGrossPay: 5985.00,
   },
-  'emp2': { // Senior Nurse
+  'emp2': { // Stock Clerk
     mayHours: 172.0,
     juneHours: 176.5,
     overtimeHours: 32.5,
-    avgHourlyRate: 35.00,
-    totalGrossPay: 12197.50,
+    avgHourlyRate: 17.00,
+    totalGrossPay: 5924.50,
   },
-  'emp3': { // Nurse
+  'emp3': { // Cashier
     mayHours: 158.0,
     juneHours: 162.5,
     overtimeHours: 20.5,
-    avgHourlyRate: 28.00,
-    totalGrossPay: 8974.00,
+    avgHourlyRate: 16.00,
+    totalGrossPay: 5128.00,
   },
-  'emp4': { // Technician
+  'emp4': { // Deli Clerk
     mayHours: 160.0,
     juneHours: 160.0,
     overtimeHours: 0.0,
-    avgHourlyRate: 22.00,
-    totalGrossPay: 7040.00,
+    avgHourlyRate: 18.00,
+    totalGrossPay: 5760.00,
   },
   'emp5': { // Administrator
     mayHours: 160.0,
@@ -229,46 +233,46 @@ export const historicalEmployeeMetrics = {
     avgHourlyRate: 25.00,
     totalGrossPay: 8000.00,
   },
-  'emp6': { // Doctor
+  'emp6': { // Cook
     mayHours: 156.0,
     juneHours: 164.0,
     overtimeHours: 20.0,
-    avgHourlyRate: 85.00,
-    totalGrossPay: 27200.00,
+    avgHourlyRate: 22.00,
+    totalGrossPay: 7040.00,
   },
-  'emp7': { // Nurse
+  'emp7': { // Cashier
     mayHours: 168.5,
     juneHours: 172.0,
     overtimeHours: 28.5,
-    avgHourlyRate: 28.00,
-    totalGrossPay: 9534.00,
+    avgHourlyRate: 16.00,
+    totalGrossPay: 5448.00,
   },
-  'emp8': { // Technician
+  'emp8': { // Stock Clerk
     mayHours: 152.0,
     juneHours: 156.0,
     overtimeHours: 8.0,
-    avgHourlyRate: 22.00,
-    totalGrossPay: 6776.00,
+    avgHourlyRate: 17.00,
+    totalGrossPay: 5236.00,
   },
-  'emp9': { // Senior Nurse
+  'emp9': { // Sales Associate
     mayHours: 176.0,
     juneHours: 180.0,
     overtimeHours: 36.0,
-    avgHourlyRate: 35.00,
-    totalGrossPay: 12460.00,
+    avgHourlyRate: 18.00,
+    totalGrossPay: 6408.00,
   },
-  'emp10': { // Radiologist
+  'emp10': { // Butcher
     mayHours: 148.0,
     juneHours: 152.0,
     overtimeHours: 12.0,
-    avgHourlyRate: 75.00,
-    totalGrossPay: 22500.00,
+    avgHourlyRate: 25.00,
+    totalGrossPay: 7500.00,
   },
 };
 
 // Department cost centers for tracking
 export const departmentCostCenters = {
-  'ICU': {
+  'Sales': {
     budgetedHours: 2000,
     actualHours: 2156,
     budgetedCost: 120000,
@@ -276,7 +280,7 @@ export const departmentCostCenters = {
     variance: 14875,
     variancePercentage: 12.4,
   },
-  'Emergency': {
+  'Warehouse': {
     budgetedHours: 1800,
     actualHours: 1923,
     budgetedCost: 95000,
@@ -284,7 +288,7 @@ export const departmentCostCenters = {
     variance: 7340,
     variancePercentage: 7.7,
   },
-  'Surgery': {
+  'Production': {
     budgetedHours: 1200,
     actualHours: 1189,
     budgetedCost: 85000,
@@ -292,7 +296,7 @@ export const departmentCostCenters = {
     variance: -1433,
     variancePercentage: -1.7,
   },
-  'Pediatrics': {
+  'Kitchen': {
     budgetedHours: 1000,
     actualHours: 1045,
     budgetedCost: 45000,
@@ -300,7 +304,7 @@ export const departmentCostCenters = {
     variance: 2230,
     variancePercentage: 5.0,
   },
-  'Radiology': {
+  'Front of House': {
     budgetedHours: 800,
     actualHours: 856,
     budgetedCost: 65000,
@@ -308,7 +312,7 @@ export const departmentCostCenters = {
     variance: 3945,
     variancePercentage: 6.1,
   },
-  'Laboratory': {
+  'Management': {
     budgetedHours: 600,
     actualHours: 612,
     budgetedCost: 25000,

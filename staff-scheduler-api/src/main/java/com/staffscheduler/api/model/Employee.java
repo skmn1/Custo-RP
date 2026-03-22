@@ -27,6 +27,16 @@ public class Employee {
     @Column(nullable = false, length = 100)
     private String name;
 
+    @NotBlank(message = "Role is required")
+    @Column(nullable = false, length = 50)
+    private String role;
+
+    @Column(length = 10)
+    private String avatar;
+
+    @Column(length = 30)
+    private String color;
+
     @NotBlank(message = "Email is required")
     @Email(message = "Email must be valid")
     @Column(nullable = false, unique = true, length = 255)
@@ -35,9 +45,11 @@ public class Employee {
     @Column(length = 20)
     private String phone;
 
-    @NotBlank(message = "Role is required")
-    @Column(nullable = false, length = 50)
-    private String role;
+    @NotNull(message = "Max hours is required")
+    @Min(value = 1, message = "Max hours must be at least 1")
+    @Max(value = 168, message = "Max hours cannot exceed 168")
+    @Column(nullable = false)
+    private Integer maxHours;
 
     @Column(length = 100)
     private String department;
@@ -47,20 +59,8 @@ public class Employee {
     @Column(name = "hourly_rate", precision = 6, scale = 2)
     private BigDecimal hourlyRate = BigDecimal.ZERO;
 
-    @NotNull(message = "Max hours is required")
-    @Min(value = 1, message = "Max hours must be at least 1")
-    @Max(value = 168, message = "Max hours cannot exceed 168")
-    @Column(nullable = false)
-    private Integer maxHours;
-
     @Column(length = 20)
-    private String status = "active"; // active, inactive
-
-    @Column(length = 5)
-    private String avatar;
-
-    @Column(length = 50)
-    private String color;
+    private String status = "active";
 
     @Column(name = "hire_date")
     private LocalDate hireDate;
@@ -81,12 +81,8 @@ public class Employee {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
-        if (status == null) {
-            status = "active";
-        }
-        if (isManager == null) {
-            isManager = false;
-        }
+        if (status == null) status = "active";
+        if (isManager == null) isManager = false;
     }
 
     @PreUpdate

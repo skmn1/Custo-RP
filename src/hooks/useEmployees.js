@@ -1,151 +1,123 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
+import { employeesApi } from '../api/employeesApi';
 import { initialEmployees } from '../data/employees';
 
-const generateEmployeeId = () => {
-  return `emp${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-};
-
-const generateAvatar = (name) => {
-  const names = name.split(' ');
-  return names.map(n => n.charAt(0)).join('').toUpperCase();
-};
-
-const getRandomColor = () => {
-  const colors = [
-    'bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-orange-500',
-    'bg-pink-500', 'bg-indigo-500', 'bg-red-500', 'bg-yellow-500',
-    'bg-teal-500', 'bg-cyan-500'
-  ];
-  return colors[Math.floor(Math.random() * colors.length)];
-};
-
 export const useEmployees = () => {
-  const [employees, setEmployees] = useState(initialEmployees);
+  const [employees, setEmployees] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterDepartment, setFilterDepartment] = useState('');
+  const [filterPos, setFilterPos] = useState('');
   const [filterRole, setFilterRole] = useState('');
   const [sortBy, setSortBy] = useState('name');
   const [sortOrder, setSortOrder] = useState('asc');
 
-  // CRUD Operations
-  const addEmployee = useCallback((employeeData) => {
-    const newEmployee = {
-      id: generateEmployeeId(),
-      avatar: generateAvatar(employeeData.name),
-      color: getRandomColor(),
-      ...employeeData,
-    };
-    setEmployees(prev => [...prev, newEmployee]);
-    return newEmployee;
+  // ── Fetch employees from backend (falls back to static data) ──
+
+  const fetchEmployees = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const data = await employeesApi.list({
+        search: searchTerm || undefined,
+        posId: filterPos || undefined,
+        role: filterRole || undefined,
+        sort: sortBy,
+        order: sortOrder,
+      });
+      setEmployees(data);
+    } catch (err) {
+      console.warn('Backend unavailable, using local data:', err.message);
+      setEmployees(initialEmployees);
+      setError(null); // suppress — fallback is silent
+    } finally {
+      setIsLoading(false);
+    }
+  }, [searchTerm, filterPos, filterRole, sortBy, sortOrder]);
+
+  useEffect(() => {
+    fetchEmployees();
+  }, [fetchEmployees]);
+
+  // ── CRUD Operations ──
+
+  const addEmployee = useCallback(async (employeeData) => {
+    try {
+      const created = await employeesApi.create(employeeData);
+      setEmployees(prev => [...prev, created]);
+      return created;
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    }
   }, []);
 
-  const updateEmployee = useCallback((employeeId, updates) => {
-    setEmployees(prev => 
-      prev.map(emp => 
-        emp.id === employeeId 
-          ? { 
-              ...emp, 
-              ...updates,
-              avatar: updates.name ? generateAvatar(updates.name) : emp.avatar
-            }
-          : emp
-      )
-    );
-  }, []);
-
-  const deleteEmployee = useCallback((employeeId) => {
-    setEmployees(prev => prev.filter(emp => emp.id !== employeeId));
-  }, []);
-
-  const getEmployee = useCallback((employeeId) => {
-    return employees.find(emp => emp.id === employeeId);
-  }, [employees]);
-
-  // Filtering and searching
-  const filteredEmployees = useMemo(() => {
-    let filtered = employees;
-
-    // Search filter
-    if (searchTerm) {
-      filtered = filtered.filter(emp => 
-        emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        emp.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        emp.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        emp.department.toLowerCase().includes(searchTerm.toLowerCase())
+  const updateEmployee = useCallback(async (employeeId, updates) => {
+    try {
+      const updated = await employeesApi.update(employeeId, updates);
+      setEmployees(prev =>
+        prev.map(emp => (emp.id === employeeId ? updated : emp))
       );
+      return updated;
+    } catch (err) {
+      setError(err.message);
+      throw err;
     }
+  }, []);
 
-    // Department filter
-    if (filterDepartment) {
-      filtered = filtered.filter(emp => emp.department === filterDepartment);
+  const deleteEmployee = useCallback(async (employeeId) => {
+    try {
+      await employeesApi.delete(employeeId);
+      setEmployees(prev => prev.filter(emp => emp.id !== employeeId));
+    } catch (err) {
+      setError(err.message);
+      throw err;
     }
+  }, []);
 
-    // Role filter
-    if (filterRole) {
-      filtered = filtered.filter(emp => emp.role === filterRole);
-    }
+  const getEmployee = useCallback(
+    (employeeId) => employees.find(emp => emp.id === employeeId),
+    [employees],
+  );
 
-    // Sorting
-    filtered.sort((a, b) => {
-      let aValue = a[sortBy];
-      let bValue = b[sortBy];
+  // ── Derived data (computed client-side from fetched list) ──
 
-      if (typeof aValue === 'string') {
-        aValue = aValue.toLowerCase();
-        bValue = bValue.toLowerCase();
-      }
+  const roles = useMemo(
+    () => [...new Set(employees.map(emp => emp.role))].filter(Boolean).sort(),
+    [employees],
+  );
 
-      if (sortOrder === 'asc') {
-        return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-      } else {
-        return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
-      }
-    });
-
-    return filtered;
-  }, [employees, searchTerm, filterDepartment, filterRole, sortBy, sortOrder]);
-
-  // Get unique departments and roles for filters
-  const departments = useMemo(() => {
-    return [...new Set(employees.map(emp => emp.department))].sort();
-  }, [employees]);
-
-  const roles = useMemo(() => {
-    return [...new Set(employees.map(emp => emp.role))].sort();
-  }, [employees]);
-
-  // Statistics
-  const stats = useMemo(() => {
-    return {
-      totalEmployees: employees.length,
-      totalDepartments: departments.length,
-      averageMaxHours: employees.reduce((sum, emp) => sum + emp.maxHours, 0) / employees.length,
-      departmentCounts: departments.reduce((acc, dept) => {
-        acc[dept] = employees.filter(emp => emp.department === dept).length;
-        return acc;
-      }, {}),
-    };
-  }, [employees, departments]);
+  const stats = useMemo(() => ({
+    totalEmployees: employees.length,
+    totalPosLocations: new Set(employees.map(e => e.posId).filter(Boolean)).size,
+    totalRoles: new Set(employees.map(e => e.role).filter(Boolean)).size,
+    averageMaxHours:
+      employees.length > 0
+        ? employees.reduce((sum, emp) => sum + (emp.maxHours || 0), 0) / employees.length
+        : 0,
+  }), [employees]);
 
   return {
     // Data
-    employees: filteredEmployees,
+    employees,          // already filtered/sorted from API
     allEmployees: employees,
-    departments,
     roles,
     stats,
-    
+    isLoading,
+    error,
+
     // CRUD operations
     addEmployee,
     updateEmployee,
     deleteEmployee,
     getEmployee,
-    
+    refetch: fetchEmployees,
+
     // Filtering and searching
     searchTerm,
     setSearchTerm,
-    filterDepartment,
-    setFilterDepartment,
+    filterPos,
+    setFilterPos,
     filterRole,
     setFilterRole,
     sortBy,

@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useEmployees } from '../hooks/useEmployees';
+import { usePos } from '../hooks/usePos';
 import EmployeeModal from '../components/employees/EmployeeModal';
 import EmployeeFilters from '../components/employees/EmployeeFilters';
 import EmployeeStats from '../components/employees/EmployeeStats';
@@ -11,7 +12,6 @@ import Button from '../components/ui/Button';
 const EmployeesPage = () => {
   const {
     employees,
-    departments,
     roles,
     stats,
     addEmployee,
@@ -19,8 +19,8 @@ const EmployeesPage = () => {
     deleteEmployee,
     searchTerm,
     setSearchTerm,
-    filterDepartment,
-    setFilterDepartment,
+    filterPos,
+    setFilterPos,
     filterRole,
     setFilterRole,
     sortBy,
@@ -28,6 +28,12 @@ const EmployeesPage = () => {
     sortOrder,
     setSortOrder,
   } = useEmployees();
+
+  const { posList, fetchPosList } = usePos();
+
+  useEffect(() => {
+    fetchPosList().catch(() => {});
+  }, [fetchPosList]);
 
   const [viewMode, setViewMode] = useState('list'); // 'list', 'grid', 'cards'
   const [showModal, setShowModal] = useState(false);
@@ -69,6 +75,7 @@ const EmployeesPage = () => {
       employees,
       onEdit: handleEditEmployee,
       onDelete: handleDeleteEmployee,
+      posList,
     };
 
     switch (viewMode) {
@@ -90,7 +97,7 @@ const EmployeesPage = () => {
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Employee Management</h1>
               <p className="text-sm text-gray-600 mt-1">
-                Manage your team • {employees.length} employees • {departments.length} departments
+                Manage your team • {employees.length} employees
               </p>
             </div>
             <div className="flex items-center space-x-3">
@@ -117,15 +124,15 @@ const EmployeesPage = () => {
               <EmployeeFilters
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
-                filterDepartment={filterDepartment}
-                setFilterDepartment={setFilterDepartment}
+                filterPos={filterPos}
+                setFilterPos={setFilterPos}
                 filterRole={filterRole}
                 setFilterRole={setFilterRole}
                 sortBy={sortBy}
                 setSortBy={setSortBy}
                 sortOrder={sortOrder}
                 setSortOrder={setSortOrder}
-                departments={departments}
+                posList={posList}
                 roles={roles}
               />
 
@@ -181,11 +188,11 @@ const EmployeesPage = () => {
               </svg>
               <h3 className="text-lg font-medium text-gray-900 mb-1">No employees found</h3>
               <p className="text-gray-500 mb-4">
-                {searchTerm || filterDepartment || filterRole
+                {searchTerm || filterPos || filterRole
                   ? 'Try adjusting your search or filters.'
                   : 'Get started by adding your first employee.'}
               </p>
-              {!searchTerm && !filterDepartment && !filterRole && (
+              {!searchTerm && !filterPos && !filterRole && (
                 <Button onClick={handleAddEmployee}>Add Employee</Button>
               )}
             </div>
@@ -201,8 +208,8 @@ const EmployeesPage = () => {
         onClose={handleCloseModal}
         onSave={handleSaveEmployee}
         employee={editingEmployee}
-        departments={departments}
         roles={roles}
+        posList={posList}
       />
     </div>
   );

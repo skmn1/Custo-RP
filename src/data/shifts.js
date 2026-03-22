@@ -8,7 +8,7 @@ export const initialShifts = [
     duration: 8,
     type: 'Morning',
     color: 'bg-blue-100 border-blue-300 text-blue-800',
-    department: 'ICU',
+    department: 'Sales',
   },
   {
     id: 'shift2',
@@ -19,7 +19,7 @@ export const initialShifts = [
     duration: 8,
     type: 'Morning',
     color: 'bg-blue-100 border-blue-300 text-blue-800',
-    department: 'ICU',
+    department: 'Sales',
   },
   {
     id: 'shift3',
@@ -30,7 +30,7 @@ export const initialShifts = [
     duration: 8,
     type: 'Evening',
     color: 'bg-blue-200 border-blue-400 text-blue-900',
-    department: 'ICU',
+    department: 'Sales',
   },
   {
     id: 'shift4',
@@ -41,7 +41,7 @@ export const initialShifts = [
     duration: 10,
     type: 'Day',
     color: 'bg-green-100 border-green-300 text-green-800',
-    department: 'Emergency',
+    department: 'Warehouse',
   },
   {
     id: 'shift5',
@@ -52,7 +52,7 @@ export const initialShifts = [
     duration: 10,
     type: 'Day',
     color: 'bg-green-100 border-green-300 text-green-800',
-    department: 'Emergency',
+    department: 'Warehouse',
   },
   {
     id: 'shift6',
@@ -63,7 +63,7 @@ export const initialShifts = [
     duration: 8,
     type: 'Night',
     color: 'bg-purple-100 border-purple-300 text-purple-800',
-    department: 'General',
+    department: 'Sales',
   },
   {
     id: 'shift7',
@@ -74,7 +74,7 @@ export const initialShifts = [
     duration: 8,
     type: 'Evening',
     color: 'bg-purple-200 border-purple-400 text-purple-900',
-    department: 'General',
+    department: 'Sales',
   },
   {
     id: 'shift8',
@@ -85,7 +85,7 @@ export const initialShifts = [
     duration: 8,
     type: 'Day',
     color: 'bg-orange-100 border-orange-300 text-orange-800',
-    department: 'Lab',
+    department: 'Production',
   },
   {
     id: 'shift9',
@@ -96,7 +96,7 @@ export const initialShifts = [
     duration: 8,
     type: 'Day',
     color: 'bg-orange-100 border-orange-300 text-orange-800',
-    department: 'Lab',
+    department: 'Production',
   },
   {
     id: 'shift10',
@@ -129,6 +129,6 @@ export const initialShifts = [
     duration: 8,
     type: 'Day',
     color: 'bg-indigo-100 border-indigo-300 text-indigo-800',
-    department: 'Radiology',
+    department: 'Kitchen',
   },
 ];

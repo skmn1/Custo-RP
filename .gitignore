@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Spring Boot backend
+staff-scheduler-api/target/
+staff-scheduler-api/.mvn/
+staff-scheduler-api/*.iml
+staff-scheduler-api/.idea/

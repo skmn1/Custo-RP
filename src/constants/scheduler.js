@@ -59,14 +59,11 @@ export const EMPLOYEE_COLORS = [
 ];
 
 export const DEPARTMENTS = [
-  'ICU',
-  'Emergency',
-  'General',
-  'Lab',
+  'Sales',
+  'Warehouse',
+  'Production',
+  'Kitchen',
   'Administration',
-  'Radiology',
-  'Surgery',
-  'Pediatrics',
-  'Cardiology',
-  'Neurology',
+  'Front of House',
+  'Management',
 ];

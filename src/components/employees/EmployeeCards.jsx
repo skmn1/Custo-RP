@@ -1,6 +1,6 @@
 import React from 'react';
 
-const EmployeeCards = ({ employees, onEdit, onDelete }) => {
+const EmployeeCards = ({ employees, onEdit, onDelete, posList = [] }) => {
   return (
     <div className="p-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -21,8 +21,8 @@ const EmployeeCards = ({ employees, onEdit, onDelete }) => {
                   <p className="text-gray-600 mb-2">
                     {employee.role}
                   </p>
-                  <span className="inline-flex px-3 py-1 text-sm font-semibold rounded-full bg-blue-100 text-blue-800">
-                    {employee.department}
+                  <span className="inline-flex px-3 py-1 text-sm font-semibold rounded-full bg-indigo-100 text-indigo-800">
+                    {posList.find(p => p.id === employee.posId)?.name ?? '—'}
                   </span>
                 </div>
               </div>
