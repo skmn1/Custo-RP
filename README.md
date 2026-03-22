@@ -90,6 +90,8 @@ The application follows a modular architecture with clear separation of concerns
 ### Prerequisites
 - Node.js (v16 or higher)
 - npm or yarn package manager
+- PostgreSQL 15+ (for data persistence)
+- Java 17+ (for Spring Boot backend)
 
 ### Installation
 
@@ -99,19 +101,102 @@ git clone <repository-url>
 cd scheduler
 ```
 
-2. Install dependencies:
+2. Set up PostgreSQL database (one-time setup):
+```bash
+# Run the automated setup script
+chmod +x setup-postgresql.sh
+./setup-postgresql.sh
+
+# This will create the database user and database automatically
+```
+
+3. Install frontend dependencies:
 ```bash
 npm install
 ```
 
-3. Start the development server:
+4. Start the Spring Boot backend (in a new terminal):
 ```bash
-npm run dev
+cd staff-scheduler-api
+mvn spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=dev"
+
+# Backend will:
+# - Create/update database tables automatically
+# - Seed initial data
+# - Start on http://localhost:8080
 ```
 
-4. Open your browser and navigate to `http://localhost:5173`
+5. Start the frontend development server (in another terminal):
+```bash
+npm run dev
 
-## 🎯 Usage
+# Frontend will start on http://localhost:5173
+```
+
+6. Open your browser and navigate to `http://localhost:5173`
+
+### Database Setup Details
+
+For detailed database setup, configuration, and troubleshooting, see [DATABASE_PERSISTENCE_README.md](./DATABASE_PERSISTENCE_README.md).
+
+## 📦 Backend / Database Architecture
+
+### Overview
+Staff Scheduler Pro uses a modern three-tier architecture with persistent data storage:
+
+```
+React Frontend (Port 5173)
+        ↓ REST API
+Spring Boot Backend (Port 8080)
+        ↓ JPA/Hibernate
+PostgreSQL Database (Port 5432)
+```
+
+### Key Features
+- ✅ **Data Persistence**: All data persists to PostgreSQL database
+- ✅ **Automatic Schema Management**: JPA/Hibernate handles database schema creation and updates
+- ✅ **Connection Pooling**: HikariCP optimizes database connections for performance
+- ✅ **Referential Integrity**: Foreign key constraints and cascading deletes ensure data consistency
+- ✅ **Multi-Environment Support**: Dev, Test, and Production profiles with appropriate configurations
+
+### Database Documentation
+
+Comprehensive guides are available in the [docs/](./docs/) folder:
+
+| Document | Purpose |
+|----------|---------|
+| [DATABASE_PERSISTENCE_README.md](./DATABASE_PERSISTENCE_README.md) | Overview and quick-start guide |
+| [docs/POSTGRESQL_SETUP.md](./docs/POSTGRESQL_SETUP.md) | PostgreSQL installation and configuration |
+| [docs/DATABASE_MIGRATION_GUIDE.md](./docs/DATABASE_MIGRATION_GUIDE.md) | Data migration procedures and rollback strategies |
+| [docs/DATA_MODEL_GUIDE.md](./docs/DATA_MODEL_GUIDE.md) | Frontend-to-database data mapping and API contracts |
+| [docs/PERFORMANCE_GUIDELINES.md](./docs/PERFORMANCE_GUIDELINES.md) | Query optimization and index strategy |
+
+### Environment Configuration
+
+The backend supports three environment profiles:
+
+**Development** (default)
+```yaml
+spring.profiles.active: dev
+spring.datasource.url: jdbc:postgresql://localhost:5432/staff_scheduler
+spring.jpa.hibernate.ddl-auto: update  # Auto-create and update schema
+```
+
+**Production**
+```yaml
+spring.profiles.active: prod
+spring.datasource.url: ${DATABASE_URL}
+spring.jpa.hibernate.ddl-auto: validate  # Prevent accidental schema changes
+```
+
+### Backend Technologies
+- **Spring Boot 3.x** - Java web framework
+- **Spring Data JPA** - Object-Relational Mapping
+- **PostgreSQL** - Relational database
+- **HikariCP** - Connection pooling
+- **Maven** - Build tool
+
+
 
 ### Dashboard
 - Overview of the scheduling system
@@ -187,7 +272,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## 🚀 Future Enhancements
 
-- Backend integration for data persistence
+- ✅ **Backend integration for data persistence** (PostgreSQL with Spring Data JPA - Complete)
 - User authentication and authorization
 - Email notifications for schedule changes
 - Export schedules to PDF/Excel

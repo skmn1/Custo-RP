@@ -1,0 +1,7 @@
+com/staffscheduler/api/service/ShiftServiceTest.class
+com/staffscheduler/api/service/EmployeeServiceTest.class
+com/staffscheduler/api/util/PayrollCalculatorTest.class
+com/staffscheduler/api/controller/EmployeeControllerTest.class
+com/staffscheduler/api/repository/EmployeeRepositoryTest.class
+com/staffscheduler/api/controller/ShiftControllerTest.class
+com/staffscheduler/api/StaffSchedulerApiApplicationTests.class
