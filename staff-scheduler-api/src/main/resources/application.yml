@@ -98,6 +98,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+    defer-datasource-initialization: true
     show-sql: false
     properties:
       hibernate:
@@ -107,6 +108,9 @@ spring:
   h2:
     console:
       enabled: false
+  sql:
+    init:
+      mode: always
 
 ---
 # PostgreSQL for production

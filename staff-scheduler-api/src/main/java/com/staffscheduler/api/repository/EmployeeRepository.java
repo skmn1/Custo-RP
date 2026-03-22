@@ -25,9 +25,9 @@ public interface EmployeeRepository extends JpaRepository<Employee, String> {
     List<Employee> findByPosIdIsNullOrPosIdNot(Long posId);
 
     @Query("SELECT e FROM Employee e WHERE " +
-           "(:search IS NULL OR LOWER(e.name) LIKE LOWER(CONCAT('%', :search, '%')) " +
-           "   OR LOWER(e.email) LIKE LOWER(CONCAT('%', :search, '%')) " +
-           "   OR LOWER(e.role) LIKE LOWER(CONCAT('%', :search, '%'))) " +
+           "(:search IS NULL OR LOWER(e.name) LIKE LOWER(CONCAT('%', CAST(:search AS string), '%')) " +
+           "   OR LOWER(e.email) LIKE LOWER(CONCAT('%', CAST(:search AS string), '%')) " +
+           "   OR LOWER(e.role) LIKE LOWER(CONCAT('%', CAST(:search AS string), '%'))) " +
            "AND (:role IS NULL OR e.role = :role)")
     List<Employee> findFiltered(
             @Param("search") String search,

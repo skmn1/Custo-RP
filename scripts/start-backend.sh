@@ -37,14 +37,10 @@ if [[ -n "$EXISTING_PID" ]]; then
   sleep 2
 fi
 
-# ── Parse optional profile ──
-PROFILE="${1:-}"
-PROFILE_FLAG=""
-if [[ -n "$PROFILE" ]]; then
-  PROFILE_FLAG="-Dspring-boot.run.profiles=$PROFILE"
-  echo "🔧  Using Spring profile: $PROFILE"
-fi
+# ── Parse profile (default: dev) ──
+PROFILE="${1:-dev}"
+echo "🔧  Using Spring profile: $PROFILE"
 
 echo "🚀  Starting Staff Scheduler API (port 8080)..."
 cd "$API_DIR"
-exec mvn spring-boot:run $PROFILE_FLAG -q
+exec mvn spring-boot:run -Dspring-boot.run.profiles="$PROFILE" -q

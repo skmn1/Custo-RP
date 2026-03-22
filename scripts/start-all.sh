@@ -30,9 +30,10 @@ cleanup() {
 }
 trap cleanup EXIT INT TERM
 
-# ── Start backend ──
-echo -e "${GREEN}[1/2]${NC} Starting backend API (Spring Boot)..."
-"$SCRIPT_DIR/start-backend.sh" "${1:-}" &
+# ── Resolve Spring profile (default: dev) ──
+PROFILE="${1:-dev}"
+echo -e "${GREEN}[1/2]${NC} Starting backend API (Spring Boot — profile: ${CYAN}${PROFILE}${NC})..."
+"$SCRIPT_DIR/start-backend.sh" "$PROFILE" &
 BACKEND_PID=$!
 
 # ── Wait for backend to be ready ──
@@ -58,10 +59,16 @@ FRONTEND_PID=$!
 
 echo ""
 echo -e "${GREEN}═══════════════════════════════════════════════${NC}"
-echo -e "  Frontend : ${CYAN}http://localhost:5173${NC}"
-echo -e "  Backend  : ${CYAN}http://localhost:8080${NC}"
-echo -e "  Swagger  : ${CYAN}http://localhost:8080/swagger-ui.html${NC}"
-echo -e "  H2 Console: ${CYAN}http://localhost:8080/h2-console${NC}"
+echo -e "  Frontend  : ${CYAN}http://localhost:5173${NC}"
+echo -e "  Backend   : ${CYAN}http://localhost:8080${NC}"
+echo -e "  Swagger   : ${CYAN}http://localhost:8080/swagger-ui.html${NC}"
+echo -e "  Profile   : ${CYAN}${PROFILE}${NC}"
+if [[ "$PROFILE" == "dev" || "$PROFILE" == "prod" ]]; then
+  echo -e "  Database  : ${CYAN}PostgreSQL (staff_scheduler)${NC}"
+else
+  echo -e "  Database  : ${CYAN}H2 in-memory${NC}"
+  echo -e "  H2 Console: ${CYAN}http://localhost:8080/h2-console${NC}"
+fi
 echo -e "${GREEN}═══════════════════════════════════════════════${NC}"
 echo ""
 echo "Press Ctrl+C to stop all services."
