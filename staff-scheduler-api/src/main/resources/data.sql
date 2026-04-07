@@ -60,3 +60,14 @@ ON CONFLICT DO NOTHING;
 
 -- Reset the auto-increment for POS after explicit ID inserts
 SELECT setval(pg_get_serial_sequence('point_of_sale', 'id'), 5);
+
+-- ══════════════════════════════════════════════════════
+-- Users (authentication seed data)
+-- Passwords: Admin@123, Manager@123, Employee@123, Viewer@123
+-- ══════════════════════════════════════════════════════
+INSERT INTO users (id, email, password_hash, first_name, last_name, role, is_active, employee_id, created_at, updated_at) VALUES
+('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'admin@staffscheduler.com',    '$2b$12$cy3eWzkf/hLfSt3mV1zwKOaPs9YPGrpWf/Wd1y5JVEhG87N0qn5LG', 'System',  'Admin',   'admin',    true, NULL,   NOW(), NOW()),
+('b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22', 'manager@staffscheduler.com',  '$2b$12$HpgVI3BNYxGjXbxXEP71N.vo/htl13rBqPRff5M8pXTFPpDoSN9Py', 'Jane',    'Smith',   'manager',  true, 'emp7', NOW(), NOW()),
+('c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a33', 'employee@staffscheduler.com', '$2b$12$6pb0EUl.JzsyeIMJtxnjNeBiR74daytthc31gH3zqVYbk8jAroHKq', 'Sarah',   'Johnson', 'employee', true, 'emp1', NOW(), NOW()),
+('d0eebc99-9c0b-4ef8-bb6d-6bb9bd380a44', 'viewer@staffscheduler.com',   '$2b$12$aC4oZhRL3o18HJkorip6QOuvRlMx2MvG8jX9oWSl1KQwlxVWlyGbO', 'Robert',  'Taylor',  'viewer',   true, 'emp10', NOW(), NOW())
+ON CONFLICT DO NOTHING;

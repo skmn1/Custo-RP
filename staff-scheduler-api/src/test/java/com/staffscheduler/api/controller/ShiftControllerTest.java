@@ -4,9 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.staffscheduler.api.dto.ShiftDto;
 import com.staffscheduler.api.dto.ShiftMoveDto;
 import com.staffscheduler.api.exception.ResourceNotFoundException;
+import com.staffscheduler.api.security.JwtService;
 import com.staffscheduler.api.service.ShiftService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -24,6 +26,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ShiftController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class ShiftControllerTest {
 
     @Autowired
@@ -34,6 +37,9 @@ class ShiftControllerTest {
 
     @MockBean
     private ShiftService service;
+
+    @MockBean
+    private JwtService jwtService;
 
     @Test
     void listShifts_shouldReturnOk() throws Exception {
