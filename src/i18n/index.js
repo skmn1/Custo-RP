@@ -24,6 +24,7 @@ export const NAMESPACES = [
   'mobile',
   'pos',
   'validation',
+  'settings',
 ];
 
 i18n

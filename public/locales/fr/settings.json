@@ -1,0 +1,95 @@
+{
+  "title": "Paramètres",
+  "category": {
+    "business": "Entreprise",
+    "scheduling": "Planification",
+    "display": "Affichage",
+    "notifications": "Notifications",
+    "privacy": "Confidentialité",
+    "account": "Mon compte"
+  },
+  "business": {
+    "companyName": "Nom de l'entreprise",
+    "timezone": "Fuseau horaire par défaut",
+    "workWeekStart": "Début de la semaine de travail",
+    "overtimeThreshold": "Seuil des heures supplémentaires (heures hebdomadaires)",
+    "overtimeMultiplier": "Multiplicateur heures supplémentaires",
+    "doubleTimeThreshold": "Seuil des heures au double tarif",
+    "doubleTimeMultiplier": "Multiplicateur heures au double tarif",
+    "payPeriodType": "Type de période de paie",
+    "payPeriodType_weekly": "Hebdomadaire",
+    "payPeriodType_biweekly": "Bihebdomadaire",
+    "payPeriodType_semiMonthly": "Deux fois par mois",
+    "payPeriodType_monthly": "Mensuel",
+    "defaultShiftDuration": "Durée par défaut d'un quart (heures)",
+    "maxShiftDuration": "Durée maximale d'un quart (heures)",
+    "minHoursBetweenShifts": "Heures minimales entre les quarts",
+    "ptoAccrualRate": "Taux d'accumulation des congés (jours/mois)",
+    "annualPtoCap": "Plafond annuel de congés (jours)"
+  },
+  "scheduling": {
+    "allowShiftOverlap": "Permettre le chevauchement de quarts",
+    "allowShiftOverlap_desc": "Si les employés peuvent avoir des quarts qui se chevauchent",
+    "autoAssignColors": "Attribution automatique des couleurs",
+    "autoAssignColors_desc": "Attribuer automatiquement les couleurs de département aux quarts",
+    "showShiftCosts": "Afficher les coûts des quarts",
+    "showShiftCosts_desc": "Afficher les coûts estimés sur les quarts",
+    "defaultView": "Vue par défaut",
+    "defaultView_day": "Jour",
+    "defaultView_week": "Semaine",
+    "defaultView_month": "Mois",
+    "enableDragAndDrop": "Activer le glisser-déposer",
+    "enableDragAndDrop_desc": "Permettre la gestion des quarts par glisser-déposer",
+    "requireShiftConfirmation": "Exiger la confirmation des quarts",
+    "requireShiftConfirmation_desc": "Les employés doivent confirmer les quarts assignés"
+  },
+  "display": {
+    "theme": "Thème",
+    "theme_light": "Clair",
+    "theme_dark": "Sombre",
+    "theme_system": "Par défaut du système",
+    "language": "Langue",
+    "dateFormat": "Format de date",
+    "timeFormat": "Format d'heure",
+    "timeFormat_12h": "12 heures (AM/PM)",
+    "timeFormat_24h": "24 heures",
+    "currency": "Devise",
+    "rowsPerPage": "Lignes par page",
+    "compactMode": "Mode compact",
+    "compactMode_desc": "Réduire l'espacement pour les vues de données denses",
+    "sidebarCollapsed": "Barre latérale réduite",
+    "sidebarCollapsed_desc": "Commencer avec la barre latérale réduite"
+  },
+  "notifications": {
+    "emailEnabled": "Notifications par e-mail",
+    "shiftReminders": "Rappels de quart",
+    "schedulePublishedAlerts": "Alertes de publication du planning",
+    "swapRequests": "Alertes de demandes d'échange",
+    "timeOffApprovals": "Alertes d'approbation de congé",
+    "reviewAlerts": "Alertes d'évaluation",
+    "reminderHours": "Heures de rappel avant le quart"
+  },
+  "actions": {
+    "resetSection": "Réinitialiser les valeurs par défaut",
+    "saveChanges": "Enregistrer les modifications",
+    "saving": "Enregistrement...",
+    "saved": "Paramètres enregistrés",
+    "resetConfirm": "Êtes-vous sûr de vouloir réinitialiser cette section aux valeurs par défaut ?"
+  },
+  "unsavedChanges": {
+    "title": "Modifications non enregistrées",
+    "message": "Vous avez des modifications non enregistrées. Voulez-vous enregistrer avant de quitter ?",
+    "save": "Enregistrer et quitter",
+    "discard": "Ignorer les modifications",
+    "cancel": "Annuler"
+  },
+  "weekDays": {
+    "monday": "Lundi",
+    "tuesday": "Mardi",
+    "wednesday": "Mercredi",
+    "thursday": "Jeudi",
+    "friday": "Vendredi",
+    "saturday": "Samedi",
+    "sunday": "Dimanche"
+  }
+}

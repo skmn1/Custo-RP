@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './hooks/useAuth';
+import { SettingsProvider } from './hooks/useSettings';
 import AuthGuard from './components/ui/AuthGuard';
 import RoleGuard from './components/ui/RoleGuard';
 import Navbar from './components/Navbar';
@@ -11,6 +12,7 @@ import PayrollPage from './pages/PayrollPage';
 import PosListPage from './pages/PosListPage';
 import PosDetailPage from './pages/PosDetailPage';
 import UserManagementPage from './pages/UserManagementPage';
+import SettingsPage from './pages/SettingsPage';
 import AccessDeniedPage from './pages/AccessDeniedPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -29,6 +31,7 @@ const App = () => {
   return (
     <BrowserRouter>
       <AuthProvider>
+        <SettingsProvider>
         <Routes>
           {/* Public routes */}
           <Route path="/login" element={<DevLoginPage />} />
@@ -44,8 +47,10 @@ const App = () => {
           <Route path="/pos" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><PosListPage /></RoleGuard></ProtectedLayout>} />
           <Route path="/pos/:id" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><PosDetailPage /></RoleGuard></ProtectedLayout>} />
           <Route path="/admin/users" element={<ProtectedLayout><RoleGuard roles={['admin']}><UserManagementPage /></RoleGuard></ProtectedLayout>} />
+          <Route path="/settings" element={<ProtectedLayout><SettingsPage /></ProtectedLayout>} />
           <Route path="/access-denied" element={<ProtectedLayout><AccessDeniedPage /></ProtectedLayout>} />
         </Routes>
+        </SettingsProvider>
       </AuthProvider>
     </BrowserRouter>
   );

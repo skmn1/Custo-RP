@@ -1,12 +1,22 @@
 import { format, startOfWeek, addDays } from 'date-fns';
 
 /**
- * Generate week days array starting from Monday
+ * Map day name to date-fns weekStartsOn index (0=Sun, 1=Mon, ... 6=Sat)
+ */
+const WEEK_START_MAP = {
+  sunday: 0, monday: 1, tuesday: 2, wednesday: 3,
+  thursday: 4, friday: 5, saturday: 6,
+};
+
+/**
+ * Generate week days array starting from the configured day
  * @param {Date} currentWeek - Current week date
+ * @param {string} [weekStartDay='monday'] - Day name the week starts on
  * @returns {Array} Array of Date objects for the week
  */
-export const generateWeekDays = (currentWeek) => {
-  const weekStart = startOfWeek(currentWeek, { weekStartsOn: 1 }); // Monday start
+export const generateWeekDays = (currentWeek, weekStartDay = 'monday') => {
+  const weekStartsOn = WEEK_START_MAP[weekStartDay] ?? 1;
+  const weekStart = startOfWeek(currentWeek, { weekStartsOn });
   return Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
 };
 

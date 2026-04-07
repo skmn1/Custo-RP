@@ -71,3 +71,38 @@ INSERT INTO users (id, email, password_hash, first_name, last_name, role, is_act
 ('c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a33', 'employee@staffscheduler.com', '$2b$12$6pb0EUl.JzsyeIMJtxnjNeBiR74daytthc31gH3zqVYbk8jAroHKq', 'Sarah',   'Johnson', 'employee', true, 'emp1', NOW(), NOW()),
 ('d0eebc99-9c0b-4ef8-bb6d-6bb9bd380a44', 'viewer@staffscheduler.com',   '$2b$12$aC4oZhRL3o18HJkorip6QOuvRlMx2MvG8jX9oWSl1KQwlxVWlyGbO', 'Robert',  'Taylor',  'viewer',   true, 'emp10', NOW(), NOW())
 ON CONFLICT DO NOTHING;
+
+-- ═══════════════════════════════════════════════════════════════════
+-- Application Settings (global defaults)
+-- ═══════════════════════════════════════════════════════════════════
+INSERT INTO app_settings (id, category, setting_key, setting_value, value_type, updated_at) VALUES
+-- Business settings
+(gen_random_uuid(), 'business', 'companyName',           'Staff Scheduler Pro', 'string',  NOW()),
+(gen_random_uuid(), 'business', 'timezone',              'America/New_York',    'string',  NOW()),
+(gen_random_uuid(), 'business', 'workWeekStart',         'monday',             'string',  NOW()),
+(gen_random_uuid(), 'business', 'overtimeThreshold',     '40',                 'number',  NOW()),
+(gen_random_uuid(), 'business', 'overtimeMultiplier',    '1.5',                'number',  NOW()),
+(gen_random_uuid(), 'business', 'doubleTimeThreshold',   '60',                 'number',  NOW()),
+(gen_random_uuid(), 'business', 'doubleTimeMultiplier',  '2.0',                'number',  NOW()),
+(gen_random_uuid(), 'business', 'payPeriodType',         'biweekly',           'string',  NOW()),
+(gen_random_uuid(), 'business', 'defaultShiftDuration',  '8',                  'number',  NOW()),
+(gen_random_uuid(), 'business', 'maxShiftDuration',      '12',                 'number',  NOW()),
+(gen_random_uuid(), 'business', 'minHoursBetweenShifts', '8',                  'number',  NOW()),
+(gen_random_uuid(), 'business', 'ptoAccrualRate',        '1.25',               'number',  NOW()),
+(gen_random_uuid(), 'business', 'annualPtoCap',          '20',                 'number',  NOW()),
+-- Scheduling settings
+(gen_random_uuid(), 'scheduling', 'allowShiftOverlap',          'false', 'boolean', NOW()),
+(gen_random_uuid(), 'scheduling', 'autoAssignColors',           'true',  'boolean', NOW()),
+(gen_random_uuid(), 'scheduling', 'showShiftCosts',             'true',  'boolean', NOW()),
+(gen_random_uuid(), 'scheduling', 'defaultView',                'week',  'string',  NOW()),
+(gen_random_uuid(), 'scheduling', 'enableDragAndDrop',          'true',  'boolean', NOW()),
+(gen_random_uuid(), 'scheduling', 'requireShiftConfirmation',   'false', 'boolean', NOW()),
+-- Notification settings
+(gen_random_uuid(), 'notifications', 'emailEnabled',             'true',  'boolean', NOW()),
+(gen_random_uuid(), 'notifications', 'shiftReminders',           'true',  'boolean', NOW()),
+(gen_random_uuid(), 'notifications', 'schedulePublishedAlerts',  'true',  'boolean', NOW()),
+(gen_random_uuid(), 'notifications', 'swapRequests',             'true',  'boolean', NOW()),
+(gen_random_uuid(), 'notifications', 'timeOffApprovals',         'true',  'boolean', NOW()),
+(gen_random_uuid(), 'notifications', 'reviewAlerts',             'true',  'boolean', NOW()),
+(gen_random_uuid(), 'notifications', 'reminderHours',            '24',    'number',  NOW())
+ON CONFLICT DO NOTHING;

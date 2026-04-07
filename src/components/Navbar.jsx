@@ -12,7 +12,7 @@ const ROLE_NAV_PERMISSIONS = {
   payroll:   ['admin', 'manager', 'employee'],
   shifts:    ['admin', 'manager'],
   reports:   ['admin', 'manager'],
-  settings:  ['admin'],
+  settings:  ['admin', 'manager', 'employee', 'viewer'],
   dashboard: ['admin', 'manager', 'employee', 'viewer'],
   users:     ['admin'],
 };
@@ -83,6 +83,7 @@ const Navbar = () => {
   const currentView = (() => {
     const path = location.pathname;
     if (path.startsWith('/admin/users')) return 'users';
+    if (path.startsWith('/settings')) return 'settings';
     if (path.startsWith('/pos')) return 'pos';
     if (path.startsWith('/dashboard')) return 'dashboard';
     if (path.startsWith('/scheduler')) return 'scheduler';
@@ -98,6 +99,7 @@ const Navbar = () => {
       employees: '/employees',
       payroll: '/payroll',
       pos: '/pos',
+      settings: '/settings',
       users: '/admin/users',
     };
     navigate(routes[viewId] || '/scheduler');

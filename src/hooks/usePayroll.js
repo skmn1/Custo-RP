@@ -2,8 +2,15 @@ import { useState, useMemo, useCallback } from 'react';
 import { format, startOfWeek, endOfWeek, addWeeks, subWeeks, eachDayOfInterval, isWithinInterval } from 'date-fns';
 import { payrollConfig, getShiftType, calculateOvertimeHours, calculateDoubleTimeHours, historicalPayrollData } from '../data/payroll';
 import { mayPayrollRecords, junePayrollRecords, ytdSummary } from '../data/payrollRecords';
+import { useSettings } from './useSettings';
 
 export const usePayroll = (employees, shifts) => {
+  const { settings } = useSettings();
+  const overtimeThreshold = settings?.business?.overtimeThreshold ?? 40;
+  const doubleTimeThreshold = settings?.business?.doubleTimeThreshold ?? 60;
+  const overtimeMultiplier = settings?.business?.overtimeMultiplier ?? 1.5;
+  const doubleTimeMultiplier = settings?.business?.doubleTimeMultiplier ?? 2.0;
+
   const [selectedPayPeriod, setSelectedPayPeriod] = useState(() => {
     const now = new Date();
     return {
@@ -56,8 +63,8 @@ export const usePayroll = (employees, shifts) => {
     const totalHours = shiftsInPeriod.reduce((sum, shift) => sum + shift.duration, 0);
     
     // Calculate overtime
-    const overtimeHours = calculateOvertimeHours(totalHours);
-    const doubleTimeHours = calculateDoubleTimeHours(totalHours);
+    const overtimeHours = calculateOvertimeHours(totalHours, overtimeThreshold);
+    const doubleTimeHours = calculateDoubleTimeHours(totalHours, doubleTimeThreshold);
     const regularHours = totalHours - overtimeHours;
 
     totalRegularHours = regularHours;
@@ -66,8 +73,8 @@ export const usePayroll = (employees, shifts) => {
 
     // Calculate base pay
     grossPay += regularHours * baseRate;
-    grossPay += totalOvertimeHours * baseRate * payrollConfig.overtimeMultipliers.standard;
-    grossPay += doubleTimeHours * baseRate * payrollConfig.overtimeMultipliers.double;
+    grossPay += totalOvertimeHours * baseRate * overtimeMultiplier;
+    grossPay += doubleTimeHours * baseRate * doubleTimeMultiplier;
 
     // Calculate shift differentials
     shiftsInPeriod.forEach(shift => {
@@ -114,13 +121,13 @@ export const usePayroll = (employees, shifts) => {
       },
       rates: {
         base: baseRate,
-        overtime: baseRate * payrollConfig.overtimeMultipliers.standard,
-        doubleTime: baseRate * payrollConfig.overtimeMultipliers.double,
+        overtime: baseRate * overtimeMultiplier,
+        doubleTime: baseRate * doubleTimeMultiplier,
       },
       pay: {
         regularPay: regularHours * baseRate,
-        overtimePay: totalOvertimeHours * baseRate * payrollConfig.overtimeMultipliers.standard,
-        doubleTimePay: doubleTimeHours * baseRate * payrollConfig.overtimeMultipliers.double,
+        overtimePay: totalOvertimeHours * baseRate * overtimeMultiplier,
+        doubleTimePay: doubleTimeHours * baseRate * doubleTimeMultiplier,
         shiftDifferentials: totalShiftDifferentials,
         grossPay,
         netPay,

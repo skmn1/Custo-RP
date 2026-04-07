@@ -19,6 +19,7 @@ import { useWeekNavigation } from '../../hooks/useWeekNavigation';
 import { useDragAndDrop } from '../../hooks/useDragAndDrop';
 import { generateWeekDays, getWeekNumber } from '../../utils/dateUtils';
 import { useLocaleDateFns } from '../../utils/formatLocale';
+import { useSettings } from '../../hooks/useSettings';
 
 import Button from '../ui/Button';
 import PermissionGate from '../ui/PermissionGate';
@@ -31,6 +32,7 @@ import AddShiftModal from './AddShiftModal';
 const StaffScheduler = () => {
   const { t } = useTranslation(['scheduler', 'common']);
   const { formatDate } = useLocaleDateFns();
+  const { settings } = useSettings();
   const { employees: fetchedEmployees, isLoading: employeesLoading } = useEmployees();
   const employees = fetchedEmployees.length > 0 ? fetchedEmployees : initialEmployees;
   const [showAddShiftModal, setShowAddShiftModal] = useState(false);
@@ -39,7 +41,7 @@ const StaffScheduler = () => {
   const { currentWeek, navigateWeek, goToCurrentWeek } = useWeekNavigation();
   const { sensors, activeShift, dragOverDropZone, handleDragStart, handleDragOver, handleDragEnd } = useDragAndDrop(shifts, moveShift);
 
-  const weekDays = generateWeekDays(currentWeek);
+  const weekDays = generateWeekDays(currentWeek, settings?.business?.workWeekStart);
   const weekStart = weekDays[0];
 
   // Custom collision detection for better drop zone targeting

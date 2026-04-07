@@ -1,0 +1,95 @@
+{
+  "title": "Settings",
+  "category": {
+    "business": "Business",
+    "scheduling": "Scheduling",
+    "display": "Display",
+    "notifications": "Notifications",
+    "privacy": "Privacy",
+    "account": "My Account"
+  },
+  "business": {
+    "companyName": "Company Name",
+    "timezone": "Default Timezone",
+    "workWeekStart": "Work Week Start",
+    "overtimeThreshold": "Overtime Threshold (Weekly Hours)",
+    "overtimeMultiplier": "Overtime Pay Multiplier",
+    "doubleTimeThreshold": "Double-Time Threshold",
+    "doubleTimeMultiplier": "Double-Time Pay Multiplier",
+    "payPeriodType": "Pay Period Type",
+    "payPeriodType_weekly": "Weekly",
+    "payPeriodType_biweekly": "Bi-weekly",
+    "payPeriodType_semiMonthly": "Semi-monthly",
+    "payPeriodType_monthly": "Monthly",
+    "defaultShiftDuration": "Default Shift Duration (hours)",
+    "maxShiftDuration": "Maximum Shift Duration (hours)",
+    "minHoursBetweenShifts": "Minimum Hours Between Shifts",
+    "ptoAccrualRate": "PTO Accrual Rate (days/month)",
+    "annualPtoCap": "Annual PTO Cap (days)"
+  },
+  "scheduling": {
+    "allowShiftOverlap": "Allow Shift Overlap",
+    "allowShiftOverlap_desc": "Whether employees can have overlapping shifts",
+    "autoAssignColors": "Auto-Assign Colors",
+    "autoAssignColors_desc": "Automatically assign department colors to shifts",
+    "showShiftCosts": "Show Shift Costs",
+    "showShiftCosts_desc": "Display estimated costs on shifts",
+    "defaultView": "Default View",
+    "defaultView_day": "Day",
+    "defaultView_week": "Week",
+    "defaultView_month": "Month",
+    "enableDragAndDrop": "Enable Drag & Drop",
+    "enableDragAndDrop_desc": "Allow drag-and-drop shift management",
+    "requireShiftConfirmation": "Require Shift Confirmation",
+    "requireShiftConfirmation_desc": "Employees must confirm assigned shifts"
+  },
+  "display": {
+    "theme": "Theme",
+    "theme_light": "Light",
+    "theme_dark": "Dark",
+    "theme_system": "System Default",
+    "language": "Language",
+    "dateFormat": "Date Format",
+    "timeFormat": "Time Format",
+    "timeFormat_12h": "12-hour (AM/PM)",
+    "timeFormat_24h": "24-hour",
+    "currency": "Currency",
+    "rowsPerPage": "Rows Per Page",
+    "compactMode": "Compact Mode",
+    "compactMode_desc": "Reduce spacing for dense data views",
+    "sidebarCollapsed": "Sidebar Collapsed",
+    "sidebarCollapsed_desc": "Start with sidebar collapsed"
+  },
+  "notifications": {
+    "emailEnabled": "Email Notifications",
+    "shiftReminders": "Shift Reminders",
+    "schedulePublishedAlerts": "Schedule Published Alerts",
+    "swapRequests": "Swap Request Alerts",
+    "timeOffApprovals": "Time-Off Approval Alerts",
+    "reviewAlerts": "Review Alerts",
+    "reminderHours": "Reminder Hours Before Shift"
+  },
+  "actions": {
+    "resetSection": "Reset to Defaults",
+    "saveChanges": "Save Changes",
+    "saving": "Saving...",
+    "saved": "Settings saved",
+    "resetConfirm": "Are you sure you want to reset this section to defaults?"
+  },
+  "unsavedChanges": {
+    "title": "Unsaved Changes",
+    "message": "You have unsaved changes. Do you want to save before leaving?",
+    "save": "Save & Leave",
+    "discard": "Discard Changes",
+    "cancel": "Cancel"
+  },
+  "weekDays": {
+    "monday": "Monday",
+    "tuesday": "Tuesday",
+    "wednesday": "Wednesday",
+    "thursday": "Thursday",
+    "friday": "Friday",
+    "saturday": "Saturday",
+    "sunday": "Sunday"
+  }
+}
