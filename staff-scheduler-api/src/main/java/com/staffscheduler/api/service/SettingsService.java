@@ -98,7 +98,7 @@ public class SettingsService {
             dto("feature.recurringTemplates", "true", "boolean"),
             dto("feature.reports", "true", "boolean"),
             dto("feature.performanceReviews", "true", "boolean"),
-            dto("feature.stock", "false", "boolean"),
+            dto("feature.stock", "true", "boolean"),
             dto("feature.invoices", "false", "boolean"),
             dto("feature.employeeMobileApp", "true", "boolean")
         ));
@@ -158,10 +158,11 @@ public class SettingsService {
         NavItemDto.builder().routeKey("employees").displayOrder(2).visibleAdmin(true).visibleManager(true).visibleEmployee(true).systemLocked(false).build(),
         NavItemDto.builder().routeKey("payroll").displayOrder(3).visibleAdmin(true).visibleManager(true).visibleEmployee(true).systemLocked(false).build(),
         NavItemDto.builder().routeKey("pos").displayOrder(4).visibleAdmin(true).visibleManager(true).visibleEmployee(false).systemLocked(false).build(),
-        NavItemDto.builder().routeKey("shifts").displayOrder(5).visibleAdmin(true).visibleManager(true).visibleEmployee(false).systemLocked(false).build(),
-        NavItemDto.builder().routeKey("reports").displayOrder(6).visibleAdmin(true).visibleManager(true).visibleEmployee(false).systemLocked(false).build(),
-        NavItemDto.builder().routeKey("settings").displayOrder(7).visibleAdmin(true).visibleManager(true).visibleEmployee(false).systemLocked(true).build(),
-        NavItemDto.builder().routeKey("users").displayOrder(8).visibleAdmin(true).visibleManager(false).visibleEmployee(false).systemLocked(false).build()
+        NavItemDto.builder().routeKey("stock").displayOrder(5).visibleAdmin(true).visibleManager(true).visibleEmployee(false).systemLocked(false).build(),
+        NavItemDto.builder().routeKey("shifts").displayOrder(6).visibleAdmin(true).visibleManager(true).visibleEmployee(false).systemLocked(false).build(),
+        NavItemDto.builder().routeKey("reports").displayOrder(7).visibleAdmin(true).visibleManager(true).visibleEmployee(false).systemLocked(false).build(),
+        NavItemDto.builder().routeKey("settings").displayOrder(8).visibleAdmin(true).visibleManager(true).visibleEmployee(false).systemLocked(true).build(),
+        NavItemDto.builder().routeKey("users").displayOrder(9).visibleAdmin(true).visibleManager(false).visibleEmployee(false).systemLocked(false).build()
     );
 
     // ── App Settings ────────────────────────────────────────────────────

@@ -138,7 +138,7 @@ INSERT INTO app_settings (id, category, setting_key, setting_value, value_type, 
 (gen_random_uuid(), 'featureFlags', 'feature.recurringTemplates',  'true',  'boolean', NOW()),
 (gen_random_uuid(), 'featureFlags', 'feature.reports',             'true',  'boolean', NOW()),
 (gen_random_uuid(), 'featureFlags', 'feature.performanceReviews',  'true',  'boolean', NOW()),
-(gen_random_uuid(), 'featureFlags', 'feature.stock',               'false', 'boolean', NOW()),
+(gen_random_uuid(), 'featureFlags', 'feature.stock',               'true',  'boolean', NOW()),
 (gen_random_uuid(), 'featureFlags', 'feature.invoices',            'false', 'boolean', NOW()),
 (gen_random_uuid(), 'featureFlags', 'feature.employeeMobileApp',   'true',  'boolean', NOW()),
 -- Security settings
@@ -172,11 +172,18 @@ INSERT INTO nav_items (id, route_key, display_order, visible_admin, visible_mana
 (gen_random_uuid(), 'employees',  2, true, true,  true,  false, NOW()),
 (gen_random_uuid(), 'payroll',    3, true, true,  true,  false, NOW()),
 (gen_random_uuid(), 'pos',        4, true, true,  false, false, NOW()),
-(gen_random_uuid(), 'shifts',     5, true, true,  false, false, NOW()),
-(gen_random_uuid(), 'reports',    6, true, true,  false, false, NOW()),
-(gen_random_uuid(), 'settings',   7, true, true,  false, true,  NOW()),
-(gen_random_uuid(), 'users',      8, true, false, false, false, NOW())
+(gen_random_uuid(), 'stock',      5, true, true,  false, false, NOW()),
+(gen_random_uuid(), 'shifts',     6, true, true,  false, false, NOW()),
+(gen_random_uuid(), 'reports',    7, true, true,  false, false, NOW()),
+(gen_random_uuid(), 'settings',   8, true, true,  false, true,  NOW()),
+(gen_random_uuid(), 'users',      9, true, false, false, false, NOW())
 ON CONFLICT DO NOTHING;
+
+-- ── Fix existing installations (ON CONFLICT DO NOTHING skips updates) ──
+UPDATE app_settings SET setting_value = 'true' WHERE category = 'featureFlags' AND setting_key = 'feature.stock';
+INSERT INTO nav_items (id, route_key, display_order, visible_admin, visible_manager, visible_employee, system_locked, updated_at)
+VALUES (gen_random_uuid(), 'stock', 5, true, true, false, false, NOW())
+ON CONFLICT (route_key) DO NOTHING;
 
 -- ═══════════════════════════════════════════════════════════════════
 -- Departments
