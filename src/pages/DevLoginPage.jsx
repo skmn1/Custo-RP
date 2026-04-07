@@ -136,7 +136,7 @@ const DevLoginPage = () => {
       await login(e, pwd);
       navigate('/scheduler', { replace: true });
     } catch (err) {
-      if (err.status === 403) {
+      if (err.status === 403 && err.code === 'FORBIDDEN') {
         setError(t('auth:login.error.deactivated'));
       } else {
         setError(t('auth:login.error.invalid'));
@@ -158,7 +158,7 @@ const DevLoginPage = () => {
       await login(account.email, account.password);
       navigate('/scheduler', { replace: true });
     } catch (err) {
-      if (err.status === 403) {
+      if (err.status === 403 && err.code === 'FORBIDDEN') {
         setError(t('auth:login.error.deactivated'));
       } else {
         setError(t('auth:login.error.invalid'));
