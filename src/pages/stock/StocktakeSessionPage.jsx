@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useStock } from '../../hooks/useStock';
+import StockSubNav from '../../components/stock/StockSubNav';
 
 const StocktakeSessionPage = () => {
   const { t, i18n } = useTranslation(['stock', 'common']);
@@ -42,6 +43,7 @@ const StocktakeSessionPage = () => {
 
   return (
     <div className="space-y-6">
+      <StockSubNav />
       <div className="flex items-center justify-between">
         <div>
           <button onClick={() => navigate('/stock/stocktakes')} className="text-sm text-indigo-600 hover:text-indigo-900 mb-1">

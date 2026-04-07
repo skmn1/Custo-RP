@@ -6,6 +6,7 @@ import {
   PieChart, Pie, Cell, Legend,
 } from 'recharts';
 import { useStock } from '../../hooks/useStock';
+import StockSubNav from '../../components/stock/StockSubNav';
 
 const COLORS = ['#6366f1', '#f59e0b', '#10b981', '#ef4444', '#3b82f6', '#8b5cf6', '#ec4899', '#14b8a6'];
 
@@ -21,6 +22,7 @@ const StockDashboardPage = () => {
 
   return (
     <div className="space-y-6">
+      <StockSubNav />
       <div>
         <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
         <p className="text-sm text-gray-500">{t('subtitle')}</p>

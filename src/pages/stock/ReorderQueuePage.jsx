@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useStock } from '../../hooks/useStock';
+import StockSubNav from '../../components/stock/StockSubNav';
 
 const ReorderQueuePage = () => {
   const { t, i18n } = useTranslation(['stock', 'common']);
@@ -13,6 +14,7 @@ const ReorderQueuePage = () => {
 
   return (
     <div className="space-y-6">
+      <StockSubNav />
       <div>
         <h1 className="text-2xl font-bold text-gray-900">{t('reorder.title')}</h1>
         <p className="text-sm text-gray-500">{t('reorder.subtitle')}</p>

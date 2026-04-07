@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useStock } from '../../hooks/useStock';
+import StockSubNav from '../../components/stock/StockSubNav';
 
 const STATUS_COLORS = {
   draft: 'bg-gray-100 text-gray-800',
@@ -56,6 +57,7 @@ const PurchaseOrderDetailPage = () => {
 
   return (
     <div className="space-y-6">
+      <StockSubNav />
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

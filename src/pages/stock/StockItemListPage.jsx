@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useStock } from '../../hooks/useStock';
 import Button from '../../components/ui/Button';
+import StockSubNav from '../../components/stock/StockSubNav';
 
 const StockItemListPage = () => {
   const { t } = useTranslation(['stock', 'common']);
@@ -54,6 +55,7 @@ const StockItemListPage = () => {
 
   return (
     <div className="space-y-6">
+      <StockSubNav />
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{t('items.title')}</h1>

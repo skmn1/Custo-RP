@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useStock } from '../../hooks/useStock';
+import StockSubNav from '../../components/stock/StockSubNav';
 
 const emptyLine = { itemId: '', description: '', qtyOrdered: '', unitCost: '' };
 
@@ -90,6 +91,7 @@ const PurchaseOrderFormPage = () => {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
+      <StockSubNav />
       <h1 className="text-2xl font-bold text-gray-900">
         {isEdit ? t('purchaseOrders.form.editTitle') : t('purchaseOrders.form.addTitle')}
       </h1>
