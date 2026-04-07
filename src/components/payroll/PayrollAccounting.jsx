@@ -129,7 +129,7 @@ const PayrollAccounting = ({ payrollData }) => {
       <div className="bg-white border border-gray-200 rounded-lg p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
           <span className="text-xl">📚</span>
-          Journal Entries
+          {t('payroll:accounting.journalEntries')}
         </h3>
         
         <div className="overflow-x-auto">

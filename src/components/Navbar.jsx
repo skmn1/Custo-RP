@@ -214,7 +214,6 @@ const Navbar = () => {
 
           {/* User Profile & Actions */}
           <div className="hidden md:flex items-center space-x-2">
-            <LanguageSwitcher className="mr-2" />
             <div className="relative" ref={userMenuRef}>
               <button
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
@@ -239,6 +238,15 @@ const Navbar = () => {
                     <p className="text-xs text-gray-500 truncate">{user?.email}</p>
                     <span className="inline-block mt-1 px-2 py-0.5 text-xs font-medium bg-indigo-50 text-indigo-700 rounded-full">{user?.role ? t(`common:role.${user.role}`) : ''}</span>
                   </div>
+                  <button
+                    onClick={() => { setIsUserMenuOpen(false); navigate('/settings'); }}
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors flex items-center"
+                  >
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    {t('common:nav.settings')}
+                  </button>
                   <button
                     onClick={handleLogout}
                     className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center"
@@ -309,10 +317,6 @@ const Navbar = () => {
               )}
             </button>
           ))}
-          <div className="pt-3 px-3 flex items-center justify-between">
-            <span className="text-sm text-gray-500">{t('common:nav.language')}</span>
-            <LanguageSwitcher />
-          </div>
         </div>
       </div>
     </nav>
