@@ -13,7 +13,7 @@ CYAN='\033[0;36m'
 NC='\033[0m' # No Colour
 
 echo -e "${CYAN}╔══════════════════════════════════════════════╗${NC}"
-echo -e "${CYAN}║     Staff Scheduler Pro  —  Full Stack      ║${NC}"
+echo -e "${CYAN}║     Staff Scheduler Pro  —  Full Stack       ║${NC}"
 echo -e "${CYAN}╚══════════════════════════════════════════════╝${NC}"
 echo ""
 
@@ -39,7 +39,7 @@ BACKEND_PID=$!
 # ── Wait for backend to be ready ──
 echo -n "      Waiting for backend on :8080 "
 for i in $(seq 1 60); do
-  if curl -sf http://localhost:8080/v3/api-docs >/dev/null 2>&1; then
+  if curl -sf http://localhost:8080/api-docs >/dev/null 2>&1; then
     echo -e " ${GREEN}✔${NC}"
     break
   fi
@@ -47,7 +47,7 @@ for i in $(seq 1 60); do
   sleep 2
 done
 
-if ! curl -sf http://localhost:8080/v3/api-docs >/dev/null 2>&1; then
+if ! curl -sf http://localhost:8080/api-docs >/dev/null 2>&1; then
   echo -e " ${RED}✖  Backend did not start within 120s${NC}"
   exit 1
 fi
@@ -63,12 +63,7 @@ echo -e "  Frontend  : ${CYAN}http://localhost:5173${NC}"
 echo -e "  Backend   : ${CYAN}http://localhost:8080${NC}"
 echo -e "  Swagger   : ${CYAN}http://localhost:8080/swagger-ui.html${NC}"
 echo -e "  Profile   : ${CYAN}${PROFILE}${NC}"
-if [[ "$PROFILE" == "dev" || "$PROFILE" == "prod" ]]; then
-  echo -e "  Database  : ${CYAN}PostgreSQL (staff_scheduler)${NC}"
-else
-  echo -e "  Database  : ${CYAN}H2 in-memory${NC}"
-  echo -e "  H2 Console: ${CYAN}http://localhost:8080/h2-console${NC}"
-fi
+echo -e "  Database  : ${CYAN}PostgreSQL (staff_scheduler)${NC}"
 echo -e "${GREEN}═══════════════════════════════════════════════${NC}"
 echo ""
 echo "Press Ctrl+C to stop all services."

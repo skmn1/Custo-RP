@@ -60,34 +60,6 @@ springdoc:
     tags-sorter: alpha
 
 ---
-# H2 in-memory database for testing
-spring:
-  config:
-    activate:
-      on-profile: test
-  datasource:
-    url: jdbc:h2:mem:staffscheduler;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
-  jpa:
-    hibernate:
-      ddl-auto: create-drop
-    show-sql: false
-    properties:
-      hibernate:
-        format_sql: true
-    defer-datasource-initialization: true
-  sql:
-    init:
-      # data.sql uses PostgreSQL syntax; H2 test profile does not need seed data
-      mode: never
-
----
 # PostgreSQL for development
 spring:
   config:
