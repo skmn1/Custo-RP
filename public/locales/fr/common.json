@@ -45,6 +45,7 @@
     "shifts": "Modèles de quart",
     "reports": "Rapports",
     "settings": "Paramètres",
+    "userManagement": "Gestion des utilisateurs",
     "language": "Langue",
     "switchToFrench": "Passer en français",
     "switchToEnglish": "Passer en anglais",
@@ -85,14 +86,27 @@
     "endTime": "Heure de fin",
     "date": "Date"
   },
+  "role": {
+    "admin": "Administrateur",
+    "manager": "Responsable",
+    "employee": "Employé",
+    "viewer": "Lecteur"
+  },
+  "accessDenied": {
+    "title": "Accès refusé",
+    "message": "Vous n'avez pas la permission d'accéder à cette page.",
+    "contact": "Si vous pensez qu'il s'agit d'une erreur, veuillez contacter votre administrateur.",
+    "goHome": "Aller au tableau de bord"
+  },
   "errors": {
     "generic": "Une erreur inattendue est survenue",
     "loadFailed": "Échec du chargement des données",
-    "saveFailed": "Échec de l’enregistrement",
+    "saveFailed": "Échec de l'enregistrement",
     "deleteFailed": "Échec de la suppression",
     "networkError": "Erreur réseau",
     "notFound": "Introuvable",
-    "required": "Ce champ est obligatoire"
+    "required": "Ce champ est obligatoire",
+    "forbidden": "Vous n'avez pas la permission d'effectuer cette action"
   },
   "dashboard": {
     "welcome": "Bienvenue dans Staff Scheduler",

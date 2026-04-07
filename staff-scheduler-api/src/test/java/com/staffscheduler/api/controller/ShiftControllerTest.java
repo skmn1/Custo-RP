@@ -5,6 +5,7 @@ import com.staffscheduler.api.dto.ShiftDto;
 import com.staffscheduler.api.dto.ShiftMoveDto;
 import com.staffscheduler.api.exception.ResourceNotFoundException;
 import com.staffscheduler.api.security.JwtService;
+import com.staffscheduler.api.service.EmployeeService;
 import com.staffscheduler.api.service.ShiftService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,9 @@ class ShiftControllerTest {
 
     @MockBean
     private ShiftService service;
+
+    @MockBean
+    private EmployeeService employeeService;
 
     @MockBean
     private JwtService jwtService;

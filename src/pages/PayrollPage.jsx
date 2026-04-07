@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useEmployees } from '../hooks/useEmployees';
 import { useShifts } from '../hooks/useShifts';
 import { usePayroll } from '../hooks/usePayroll';
+import { useAuth } from '../hooks/useAuth';
 import PayrollDashboard from '../components/payroll/PayrollDashboard';
 import PayrollEmployeeList from '../components/payroll/PayrollEmployeeList';
 import PayrollStatistics from '../components/payroll/PayrollStatistics';
@@ -15,14 +16,17 @@ const PayrollPage = () => {
   const { employees } = useEmployees();
   const { shifts } = useShifts();
   const payrollData = usePayroll(employees, shifts);
+  const { can } = useAuth();
 
-  const tabs = [
+  const allTabs = [
     { id: 'dashboard', label: t('payroll:tabs.dashboard'), icon: '📊' },
     { id: 'employees', label: t('payroll:tabs.employees'), icon: '👥' },
-    { id: 'statistics', label: t('payroll:tabs.statistics'), icon: '📈' },
-    { id: 'accounting', label: t('payroll:tabs.accounting'), icon: '💰' },
-    { id: 'export', label: t('payroll:tabs.export'), icon: '📄' },
+    { id: 'statistics', label: t('payroll:tabs.statistics'), icon: '📈', permission: 'payroll:view-all' },
+    { id: 'accounting', label: t('payroll:tabs.accounting'), icon: '💰', permission: 'payroll:view-all' },
+    { id: 'export', label: t('payroll:tabs.export'), icon: '📄', permission: 'payroll:export' },
   ];
+
+  const tabs = allTabs.filter((tab) => !tab.permission || can(tab.permission));
 
   const renderContent = () => {
     switch (activeTab) {

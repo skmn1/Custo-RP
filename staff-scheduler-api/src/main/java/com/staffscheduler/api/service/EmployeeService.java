@@ -5,6 +5,7 @@ import com.staffscheduler.api.exception.DuplicateResourceException;
 import com.staffscheduler.api.exception.ResourceNotFoundException;
 import com.staffscheduler.api.model.Employee;
 import com.staffscheduler.api.repository.EmployeeRepository;
+import com.staffscheduler.api.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 public class EmployeeService {
 
     private final EmployeeRepository repository;
+    private final UserRepository userRepository;
 
     private static final String[] COLORS = {
         "bg-blue-500", "bg-green-500", "bg-purple-500", "bg-orange-500",
@@ -63,6 +65,12 @@ public class EmployeeService {
                 .map(Employee::getRole)
                 .distinct().sorted()
                 .collect(Collectors.toList());
+    }
+
+    public String getEmployeeIdByUserId(UUID userId) {
+        return userRepository.findById(userId)
+                .map(u -> u.getEmployeeId())
+                .orElse(null);
     }
 
     // ── Mutations ──

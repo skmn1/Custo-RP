@@ -21,6 +21,7 @@ import { generateWeekDays, getWeekNumber } from '../../utils/dateUtils';
 import { useLocaleDateFns } from '../../utils/formatLocale';
 
 import Button from '../ui/Button';
+import PermissionGate from '../ui/PermissionGate';
 import CalendarHeader from './CalendarHeader';
 import EmployeeRow from './EmployeeRow';
 import DraggableShift from './DraggableShift';
@@ -94,17 +95,19 @@ const StaffScheduler = () => {
                 </svg>
                 <span>{t('scheduler:today')}</span>
               </Button>
-              <Button 
-                onClick={() => setShowAddShiftModal(true)}
-                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center space-x-2"
-                data-testid="add-shift-button"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                <span className="font-semibold">{t('scheduler:addShift')}</span>
-                <div className="w-2 h-2 bg-white rounded-full opacity-75"></div>
-              </Button>
+              <PermissionGate permission="schedule:create">
+                <Button 
+                  onClick={() => setShowAddShiftModal(true)}
+                  className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center space-x-2"
+                  data-testid="add-shift-button"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  <span className="font-semibold">{t('scheduler:addShift')}</span>
+                  <div className="w-2 h-2 bg-white rounded-full opacity-75"></div>
+                </Button>
+              </PermissionGate>
             </div>
           </div>
         </div>

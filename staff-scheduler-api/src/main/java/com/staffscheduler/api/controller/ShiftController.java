@@ -3,6 +3,7 @@ package com.staffscheduler.api.controller;
 import com.staffscheduler.api.dto.ErrorResponse;
 import com.staffscheduler.api.dto.ShiftDto;
 import com.staffscheduler.api.dto.ShiftMoveDto;
+import com.staffscheduler.api.service.EmployeeService;
 import com.staffscheduler.api.service.ShiftService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -17,10 +18,13 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/shifts")
@@ -29,15 +33,17 @@ import java.util.Map;
 public class ShiftController {
 
     private final ShiftService service;
+    private final EmployeeService employeeService;
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'VIEWER', 'EMPLOYEE')")
     @Operation(
             summary = "List shifts",
-            description = "Returns shifts with optional filters. Use `startDate`/`endDate` for date-range queries "
-                    + "(ISO 8601 format: YYYY-MM-DD). Additional filters for employee, department, and shift type.")
+            description = "Returns shifts with optional filters. Employee role sees only own shifts.")
     @ApiResponse(responseCode = "200", description = "Shift list",
             content = @Content(array = @ArraySchema(schema = @Schema(implementation = ShiftDto.class))))
     public ResponseEntity<List<ShiftDto>> list(
+            Authentication authentication,
             @Parameter(description = "Start of date range (inclusive)", example = "2025-06-09")
             @RequestParam(required = false) String startDate,
             @Parameter(description = "End of date range (inclusive)", example = "2025-06-15")
@@ -48,10 +54,16 @@ public class ShiftController {
             @RequestParam(required = false) String department,
             @Parameter(description = "Filter by shift type", schema = @Schema(allowableValues = {"morning", "afternoon", "evening", "night", "full"}))
             @RequestParam(required = false) String type) {
+        // Employee role: force filter to own shifts
+        if (hasRole(authentication, "ROLE_EMPLOYEE")) {
+            String ownId = getEmployeeId(authentication);
+            employeeId = ownId;
+        }
         return ResponseEntity.ok(service.findAll(startDate, endDate, employeeId, department, type));
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'VIEWER', 'EMPLOYEE')")
     @Operation(summary = "Get shift by ID", description = "Returns a single shift by its unique identifier.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Shift found",
@@ -60,15 +72,18 @@ public class ShiftController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<ShiftDto> getById(
+            Authentication authentication,
             @Parameter(description = "Shift ID", example = "shift-1", required = true)
             @PathVariable String id) {
-        return ResponseEntity.ok(service.findById(id));
+        ShiftDto shift = service.findById(id);
+        enforceOwnShift(authentication, shift);
+        return ResponseEntity.ok(shift);
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     @Operation(summary = "Create shift",
-            description = "Creates a new shift. Duration is calculated automatically from start/end times. "
-                    + "Color is mapped from employee department. Provide either `date` (ISO) or `day` (0=Mon..6=Sun).")
+            description = "Creates a new shift. Duration is calculated automatically from start/end times.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Shift created",
                     content = @Content(schema = @Schema(implementation = ShiftDto.class))),
@@ -80,6 +95,7 @@ public class ShiftController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     @Operation(summary = "Update shift", description = "Replaces shift details. Duration is recalculated automatically.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Shift updated",
@@ -94,11 +110,8 @@ public class ShiftController {
     }
 
     @PatchMapping("/{id}/move")
-    @Operation(
-            summary = "Move shift (drag-and-drop)",
-            description = "Partially updates a shift's `employeeId` and/or `date`/`day`. "
-                    + "Designed for drag-and-drop operations on the scheduler calendar. "
-                    + "Only the supplied fields are updated; others remain unchanged.")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @Operation(summary = "Move shift (drag-and-drop)")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Shift moved",
                     content = @Content(schema = @Schema(implementation = ShiftDto.class))),
@@ -112,6 +125,7 @@ public class ShiftController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     @Operation(summary = "Delete shift", description = "Permanently removes a shift from the schedule.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Shift deleted",
@@ -125,5 +139,27 @@ public class ShiftController {
             @PathVariable String id) {
         service.delete(id);
         return ResponseEntity.ok(Map.of("message", "Shift deleted successfully"));
+    }
+
+    // ── Helpers for resource-level access control ──
+
+    private void enforceOwnShift(Authentication auth, ShiftDto shift) {
+        if (hasRole(auth, "ROLE_EMPLOYEE")) {
+            String ownId = getEmployeeId(auth);
+            if (ownId == null || !ownId.equals(shift.getEmployeeId())) {
+                throw new SecurityException("Access denied: you can only view your own shifts");
+            }
+        }
+    }
+
+    private boolean hasRole(Authentication auth, String role) {
+        if (auth == null) return false;
+        return auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals(role));
+    }
+
+    private String getEmployeeId(Authentication auth) {
+        UUID userId = UUID.fromString(auth.getName());
+        return employeeService.getEmployeeIdByUserId(userId);
     }
 }

@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { loginApi, registerApi, logoutApi, refreshTokenApi, getMeApi } from '../api/authApi';
+import { hasPermission, hasAnyPermission } from '../constants/permissions';
 
 const AuthContext = createContext(null);
 
@@ -129,6 +130,19 @@ export function AuthProvider({ children }) {
     setUser(null);
   }, [clearTokens]);
 
+  const can = useCallback((permission) => {
+    return user ? hasPermission(user.role, permission) : false;
+  }, [user]);
+
+  const canAny = useCallback((...permissions) => {
+    return user ? hasAnyPermission(user.role, ...permissions) : false;
+  }, [user]);
+
+  const isAdmin = useMemo(() => user?.role === 'admin', [user]);
+  const isManager = useMemo(() => user?.role === 'manager', [user]);
+  const isEmployee = useMemo(() => user?.role === 'employee', [user]);
+  const isViewer = useMemo(() => user?.role === 'viewer', [user]);
+
   const value = {
     user,
     loading,
@@ -136,6 +150,12 @@ export function AuthProvider({ children }) {
     login,
     register,
     logout,
+    can,
+    canAny,
+    isAdmin,
+    isManager,
+    isEmployee,
+    isViewer,
   };
 
   return (

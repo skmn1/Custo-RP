@@ -205,6 +205,7 @@ public class AuthService {
                 .lastName(user.getLastName())
                 .role(user.getRole())
                 .isActive(user.getIsActive())
+                .employeeId(user.getEmployeeId())
                 .build();
     }
 

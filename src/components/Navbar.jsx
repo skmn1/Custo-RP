@@ -5,6 +5,18 @@ import Button from './ui/Button';
 import useLocale from '../hooks/useLocale';
 import { useAuth } from '../hooks/useAuth';
 
+const ROLE_NAV_PERMISSIONS = {
+  pos:       ['admin', 'manager'],
+  scheduler: ['admin', 'manager', 'employee', 'viewer'],
+  employees: ['admin', 'manager', 'employee', 'viewer'],
+  payroll:   ['admin', 'manager', 'employee'],
+  shifts:    ['admin', 'manager'],
+  reports:   ['admin', 'manager'],
+  settings:  ['admin'],
+  dashboard: ['admin', 'manager', 'employee', 'viewer'],
+  users:     ['admin'],
+};
+
 const LanguageSwitcher = ({ className = '' }) => {
   const { t } = useTranslation(['common']);
   const { language, setLocale } = useLocale();
@@ -70,6 +82,7 @@ const Navbar = () => {
   // Derive the active view from the current URL pathname
   const currentView = (() => {
     const path = location.pathname;
+    if (path.startsWith('/admin/users')) return 'users';
     if (path.startsWith('/pos')) return 'pos';
     if (path.startsWith('/dashboard')) return 'dashboard';
     if (path.startsWith('/scheduler')) return 'scheduler';
@@ -85,6 +98,7 @@ const Navbar = () => {
       employees: '/employees',
       payroll: '/payroll',
       pos: '/pos',
+      users: '/admin/users',
     };
     navigate(routes[viewId] || '/scheduler');
   };
@@ -97,8 +111,14 @@ const Navbar = () => {
     { id: 'shifts', labelKey: 'common:nav.shifts', icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z', badge: null },
     { id: 'reports', labelKey: 'common:nav.reports', icon: 'M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', badge: '3' },
     { id: 'settings', labelKey: 'common:nav.settings', icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z', badge: null },
+    { id: 'users', labelKey: 'common:nav.userManagement', icon: 'M5.121 17.804A9 9 0 0112 15a9 9 0 016.879 2.804M15 11a3 3 0 11-6 0 3 3 0 016 0z', badge: null },
     { id: 'dashboard', labelKey: 'common:nav.dashboard', icon: 'M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z', badge: null },
   ];
+
+  const userRole = user?.role;
+  const visibleNavItems = navItems.filter(
+    (item) => ROLE_NAV_PERMISSIONS[item.id]?.includes(userRole)
+  );
 
   return (
     <nav className="bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100">
@@ -118,7 +138,7 @@ const Navbar = () => {
 
             {/* Desktop Navigation */}
             <div className="hidden md:ml-8 md:flex md:space-x-1">
-              {navItems.map((item) => (
+              {visibleNavItems.map((item) => (
                 <button
                   key={item.id}
                   data-nav-item={item.id}
@@ -168,7 +188,7 @@ const Navbar = () => {
                   <div className="px-4 py-3 border-b border-gray-100">
                     <p className="text-sm font-medium text-gray-900">{user?.firstName} {user?.lastName}</p>
                     <p className="text-xs text-gray-500 truncate">{user?.email}</p>
-                    <span className="inline-block mt-1 px-2 py-0.5 text-xs font-medium bg-indigo-50 text-indigo-700 rounded-full capitalize">{user?.role}</span>
+                    <span className="inline-block mt-1 px-2 py-0.5 text-xs font-medium bg-indigo-50 text-indigo-700 rounded-full">{user?.role ? t(`common:role.${user.role}`) : ''}</span>
                   </div>
                   <button
                     onClick={handleLogout}
@@ -215,7 +235,7 @@ const Navbar = () => {
       {/* Mobile menu */}
       <div className={`${isMobileMenuOpen ? 'block' : 'hidden'} md:hidden bg-white border-t border-gray-100`}>
         <div className="px-2 pt-2 pb-3 space-y-1">
-          {navItems.map((item) => (
+          {visibleNavItems.map((item) => (
             <button
               key={item.id}
               data-nav-item={item.id}
