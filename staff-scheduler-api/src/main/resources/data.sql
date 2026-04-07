@@ -229,26 +229,3 @@ INSERT INTO suppliers (id, name, contact_person, email, phone, address, currency
 (gen_random_uuid(), 'Metro Supply Co',     'Pierre Tremblay', 'pierre@metro.ca', '450-555-0303', '500 Boul. Laurier, Québec',       'CAD', 'Net 15', 2,  true, 'Local produce and dairy',         NOW()),
 (gen_random_uuid(), 'CleanPro Supplies',   'Julie Martin', 'julie@cleanpro.ca',  '613-555-0404', '75 Industrial Pkwy, Ottawa',      'CAD', 'Net 45', 7,  true, 'Cleaning and packaging supplies', NOW())
 ON CONFLICT DO NOTHING;
-
--- ═══════════════════════════════════════════════════════════════════
--- Immutability trigger for stock_movements
--- ═══════════════════════════════════════════════════════════════════
-CREATE OR REPLACE FUNCTION prevent_movement_update()
-RETURNS TRIGGER AS $$
-BEGIN
-    RAISE EXCEPTION 'stock_movements rows are immutable – DELETE or UPDATE not allowed';
-    RETURN NULL;
-END;
-$$ LANGUAGE plpgsql;
-
-DO $$
-BEGIN
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_trigger WHERE tgname = 'trg_movements_immutable'
-    ) THEN
-        CREATE TRIGGER trg_movements_immutable
-        BEFORE UPDATE OR DELETE ON stock_movements
-        FOR EACH ROW EXECUTE FUNCTION prevent_movement_update();
-    END IF;
-END;
-$$;
