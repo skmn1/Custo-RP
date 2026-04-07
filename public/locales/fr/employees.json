@@ -1,0 +1,94 @@
+{
+  "title": "Gestion des employés",
+  "subtitle": "Gérez votre équipe",
+  "subtitleStats": "Gérez votre équipe • {{count}} employés",
+  "addEmployee": "Ajouter un employé",
+  "addNewEmployee": "Ajouter un nouvel employé",
+  "editEmployee": "Modifier l’employé",
+  "updateEmployee": "Mettre à jour l’employé",
+  "noEmployeesFound": "Aucun employé trouvé",
+  "tryAdjustingFilters": "Essayez d’ajuster votre recherche ou vos filtres.",
+  "getStartedAdding": "Commencez par ajouter votre premier employé.",
+  "confirmDelete": "Voulez-vous vraiment supprimer cet employé ?",
+  "sections": {
+    "personalInfo": "Informations personnelles",
+    "workInfo": "Informations professionnelles",
+    "scheduleInfo": "Informations de planning"
+  },
+  "fields": {
+    "fullName": "Nom complet",
+    "fullNameRequired": "Nom complet *",
+    "name": "Nom",
+    "email": "Adresse e-mail",
+    "emailRequired": "Adresse e-mail *",
+    "role": "Rôle",
+    "roleRequired": "Rôle *",
+    "pos": "Point de vente",
+    "posRequired": "Point de vente *",
+    "maxHours": "Heures maximum par semaine",
+    "maxHoursRequired": "Heures maximum par semaine *",
+    "contact": "Contact",
+    "employee": "Employé",
+    "employeeId": "Identifiant employé"
+  },
+  "placeholders": {
+    "fullName": "Saisir le nom complet",
+    "email": "Saisir l’adresse e-mail",
+    "role": "Sélectionner ou saisir un rôle",
+    "search": "Rechercher des employés…",
+    "notAssigned": "— Non attribué —"
+  },
+  "validation": {
+    "nameRequired": "Le nom est obligatoire",
+    "emailRequired": "L’e-mail est obligatoire",
+    "emailInvalid": "Veuillez saisir une adresse e-mail valide",
+    "roleRequired": "Le rôle est obligatoire",
+    "maxHoursRange": "Les heures maximum doivent être comprises entre 1 et 80"
+  },
+  "hints": {
+    "hoursRange": "Heures comprises entre 1 et 80",
+    "autoFilled": "Pré-rempli depuis le point de vente",
+    "requiredFields": "* Champs obligatoires"
+  },
+  "preview": "Aperçu",
+  "employeeName": "Nom de l’employé",
+  "hoursPerWeek": "{{value}} h / semaine",
+  "filters": {
+    "search": "Rechercher",
+    "posLocation": "Point de vente",
+    "allLocations": "Tous les points de vente",
+    "role": "Rôle",
+    "allRoles": "Tous les rôles",
+    "sortBy": "Trier par",
+    "sortName": "Nom",
+    "sortRole": "Rôle",
+    "sortMaxHours": "Heures max",
+    "sortAscending": "Tri croissant",
+    "sortDescending": "Tri décroissant",
+    "clearAll": "Tout effacer"
+  },
+  "view": {
+    "list": "Liste",
+    "grid": "Grille",
+    "cards": "Cartes"
+  },
+  "table": {
+    "employee": "Employé",
+    "role": "Rôle",
+    "pos": "Point de vente",
+    "maxHours": "Heures max",
+    "contact": "Contact",
+    "actions": "Actions",
+    "id": "ID : {{id}}"
+  },
+  "actions": {
+    "edit": "Modifier l’employé",
+    "delete": "Supprimer l’employé"
+  },
+  "stats": {
+    "totalEmployees": "Total des employés",
+    "posLocations": "Points de vente",
+    "averageMaxHours": "Heures max moyennes",
+    "uniqueRoles": "Rôles uniques"
+  }
+}

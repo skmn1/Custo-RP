@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import Button from '../ui/Button';
 import PayrollDetailsModal from './PayrollDetailsModal';
 
 const PayrollEmployeeList = ({ payrollData, employees }) => {
+  const { t } = useTranslation(['payroll']);
   const { employeePayrolls } = payrollData;
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [sortField, setSortField] = useState('grossPay');
@@ -47,14 +49,14 @@ const PayrollEmployeeList = ({ payrollData, employees }) => {
     <div className="p-6">
       {/* Header */}
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">Employee Payroll Breakdown</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('payroll:employeeList.title')}</h2>
         
         {/* Filters */}
         <div className="flex flex-wrap gap-4 items-center">
           <div className="flex-1 min-w-64">
             <input
               type="text"
-              placeholder="Search employees..."
+              placeholder={t('payroll:employeeList.searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -66,7 +68,7 @@ const PayrollEmployeeList = ({ payrollData, employees }) => {
             onChange={(e) => setDepartmentFilter(e.target.value)}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
-            <option value="all">All Departments</option>
+            <option value="all">{t('payroll:employeeList.allDepartments')}</option>
             {departments.map(dept => (
               <option key={dept} value={dept}>{dept}</option>
             ))}
@@ -80,14 +82,14 @@ const PayrollEmployeeList = ({ payrollData, employees }) => {
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Employee
+                {t('payroll:table.employee')}
               </th>
               <th 
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                 onClick={() => handleSort('grossPay')}
               >
                 <div className="flex items-center gap-1">
-                  Gross Pay {getSortIcon('grossPay')}
+                  {t('payroll:table.grossPay')} {getSortIcon('grossPay')}
                 </div>
               </th>
               <th 
@@ -95,7 +97,7 @@ const PayrollEmployeeList = ({ payrollData, employees }) => {
                 onClick={() => handleSort('netPay')}
               >
                 <div className="flex items-center gap-1">
-                  Net Pay {getSortIcon('netPay')}
+                  {t('payroll:table.netPay')} {getSortIcon('netPay')}
                 </div>
               </th>
               <th 
@@ -103,7 +105,7 @@ const PayrollEmployeeList = ({ payrollData, employees }) => {
                 onClick={() => handleSort('totalHours')}
               >
                 <div className="flex items-center gap-1">
-                  Hours {getSortIcon('totalHours')}
+                  {t('payroll:table.hours')} {getSortIcon('totalHours')}
                 </div>
               </th>
               <th 
@@ -111,7 +113,7 @@ const PayrollEmployeeList = ({ payrollData, employees }) => {
                 onClick={() => handleSort('overtimeHours')}
               >
                 <div className="flex items-center gap-1">
-                  Overtime {getSortIcon('overtimeHours')}
+                  {t('payroll:table.overtime')} {getSortIcon('overtimeHours')}
                 </div>
               </th>
               <th 
@@ -119,11 +121,11 @@ const PayrollEmployeeList = ({ payrollData, employees }) => {
                 onClick={() => handleSort('hourlyRate')}
               >
                 <div className="flex items-center gap-1">
-                  Rate {getSortIcon('hourlyRate')}
+                  {t('payroll:table.rate')} {getSortIcon('hourlyRate')}
                 </div>
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
+                {t('payroll:table.actions')}
               </th>
             </tr>
           </thead>
@@ -169,7 +171,7 @@ const PayrollEmployeeList = ({ payrollData, employees }) => {
                     variant="outline"
                     size="sm"
                   >
-                    View Details
+                    {t('payroll:employeeList.viewDetails')}
                   </Button>
                 </td>
               </tr>
@@ -182,16 +184,16 @@ const PayrollEmployeeList = ({ payrollData, employees }) => {
       <div className="mt-6 bg-gray-50 rounded-lg p-4">
         <div className="flex justify-between items-center text-sm">
           <span className="text-gray-600">
-            Showing {filteredEmployees.length} of {employeePayrolls.length} employees
+            {t('payroll:employeeList.showing', { shown: filteredEmployees.length, total: employeePayrolls.length })}
           </span>
           <div className="flex gap-6">
             <span className="text-gray-600">
-              Total Gross: <span className="font-semibold text-gray-900">
+              {t('payroll:employeeList.totalGross')}: <span className="font-semibold text-gray-900">
                 ${filteredEmployees.reduce((sum, emp) => sum + emp.grossPay, 0).toFixed(2)}
               </span>
             </span>
             <span className="text-gray-600">
-              Total Hours: <span className="font-semibold text-gray-900">
+              {t('payroll:employeeList.totalHours')}: <span className="font-semibold text-gray-900">
                 {filteredEmployees.reduce((sum, emp) => sum + emp.totalHours, 0).toFixed(1)}h
               </span>
             </span>

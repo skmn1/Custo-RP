@@ -1,6 +1,8 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const StatCard = ({ title, value, subtitle, icon, color = 'blue', change, description }) => {
+  const { t } = useTranslation(['common']);
   const colorClasses = {
     blue: 'bg-blue-500',
     green: 'bg-green-500',
@@ -48,7 +50,7 @@ const StatCard = ({ title, value, subtitle, icon, color = 'blue', change, descri
             {change !== undefined && change !== 0 && (
               <dd className={`text-xs mt-1 flex items-center gap-1 ${getChangeColor(change)}`}>
                 <span>{getChangeIcon(change)}</span>
-                <span>{Math.abs(change).toFixed(1)}% from last period</span>
+                <span>{t('common:stats.changeFromLastPeriod', { change: Math.abs(change).toFixed(1) })}</span>
               </dd>
             )}
           </dl>

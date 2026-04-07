@@ -1,14 +1,18 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import PosCard from '../components/pos/PosCard';
 import PosListView from '../components/pos/PosListView';
 import PosGridView from '../components/pos/PosGridView';
 import PosModal from '../components/pos/PosModal';
 import Button from '../components/ui/Button';
 import { usePos } from '../hooks/usePos';
-import { POS_TYPES, POS_TYPE_LABELS } from '../constants/pos';
+import { POS_TYPES } from '../constants/pos';
+
+const TYPE_KEY_MAP = { BUTCHER: 'butcher', GROCERY: 'grocery', FAST_FOOD: 'fastFood', MIXED: 'mixed' };
 
 const PosListPage = () => {
+  const { t } = useTranslation(['pos', 'common']);
   const navigate = useNavigate();
   const {
     posList,
@@ -131,10 +135,10 @@ const PosListPage = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">
-            Point of Sale Locations
+            {t('pos:list.title')}
           </h1>
           <p className="mt-1 text-sm text-gray-500">
-            Manage all your retail locations
+            {t('pos:list.subtitle')}
           </p>
         </div>
         <Button
@@ -146,7 +150,7 @@ const PosListPage = () => {
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
           </svg>
-          <span>New PoS</span>
+          <span>{t('pos:list.btnNew')}</span>
         </Button>
       </div>
 
@@ -160,7 +164,7 @@ const PosListPage = () => {
                 <input
                   data-testid="pos-search-input"
                   type="text"
-                  placeholder="Search by name or address..."
+                  placeholder={t('pos:list.searchPlaceholder')}
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -172,10 +176,10 @@ const PosListPage = () => {
                 onChange={(e) => setTypeFilter(e.target.value)}
                 className="rounded-lg border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
-                <option value="">All Types</option>
-                {POS_TYPES.map((t) => (
-                  <option key={t} value={t}>
-                    {POS_TYPE_LABELS[t]}
+                <option value="">{t('pos:list.allTypes')}</option>
+                {POS_TYPES.map((tp) => (
+                  <option key={tp} value={tp}>
+                    {t(`pos:type.${TYPE_KEY_MAP[tp] || tp.toLowerCase()}`)}
                   </option>
                 ))}
               </select>
@@ -187,7 +191,7 @@ const PosListPage = () => {
                   onChange={(e) => setShowInactive(e.target.checked)}
                   className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                 />
-                Show inactive
+                {t('pos:list.showInactive')}
               </label>
             </div>
 
@@ -201,7 +205,7 @@ const PosListPage = () => {
                     ? 'bg-white text-gray-900 shadow-sm'
                     : 'text-gray-600 hover:text-gray-900'
                 }`}
-                title="List view"
+                title={t('pos:list.viewList')}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
@@ -215,7 +219,7 @@ const PosListPage = () => {
                     ? 'bg-white text-gray-900 shadow-sm'
                     : 'text-gray-600 hover:text-gray-900'
                 }`}
-                title="Grid view"
+                title={t('pos:list.viewGrid')}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
@@ -229,7 +233,7 @@ const PosListPage = () => {
                     ? 'bg-white text-gray-900 shadow-sm'
                     : 'text-gray-600 hover:text-gray-900'
                 }`}
-                title="Cards view"
+                title={t('pos:list.viewCards')}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
@@ -264,12 +268,12 @@ const PosListPage = () => {
         >
           <div className="text-5xl mb-4">🏪</div>
           <h3 className="text-lg font-medium text-gray-900 mb-1">
-            No PoS locations found
+            {t('pos:list.empty.title')}
           </h3>
           <p className="text-sm text-gray-500">
             {search || typeFilter
-              ? 'Try adjusting your search or filter criteria.'
-              : 'Get started by creating your first Point of Sale location.'}
+              ? t('pos:list.empty.tryAdjust')
+              : t('pos:list.empty.getStarted')}
           </p>
           {!search && !typeFilter && (
             <Button
@@ -280,7 +284,7 @@ const PosListPage = () => {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
-              <span>Create PoS</span>
+              <span>{t('pos:list.empty.create')}</span>
             </Button>
           )}
         </div>
@@ -348,12 +352,12 @@ const PosListPage = () => {
                 </svg>
               </div>
               <h3 className="text-lg font-semibold text-gray-900 text-center mb-2">
-                Delete PoS Location
+                {t('pos:delete.title')}
               </h3>
               <p className="text-sm text-gray-600 text-center">
-                Are you sure you want to delete{' '}
-                <span className="font-semibold">{deleteConfirm.name}</span>?
-                This will deactivate the location.
+                {t('pos:delete.confirmPrefix')}{' '}
+                <span className="font-semibold">{deleteConfirm.name}</span>
+                {t('pos:delete.confirmSuffix')}
               </p>
             </div>
             <div className="bg-gray-50 px-6 py-4 flex justify-end gap-3">
@@ -363,7 +367,7 @@ const PosListPage = () => {
                 onClick={() => setDeleteConfirm(null)}
                 data-testid="pos-delete-cancel-btn"
               >
-                Cancel
+                {t('common:actions.cancel')}
               </Button>
               <Button
                 variant="danger"
@@ -371,7 +375,7 @@ const PosListPage = () => {
                 onClick={handleDeleteConfirm}
                 data-testid="pos-delete-confirm-btn"
               >
-                Delete
+                {t('common:actions.delete')}
               </Button>
             </div>
           </div>

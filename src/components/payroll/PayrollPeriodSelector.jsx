@@ -1,9 +1,12 @@
 import React from 'react';
-import { format } from 'date-fns';
+import { useTranslation } from 'react-i18next';
+import { useLocaleDateFns } from '../../utils/formatLocale';
 import Button from '../ui/Button';
 import { mayPayrollRecords, junePayrollRecords } from '../../data/payrollRecords';
 
 const PayrollPeriodSelector = ({ selectedPayPeriod, onPeriodChange, onNavigate }) => {
+  const { t } = useTranslation(['payroll']);
+  const { formatDate } = useLocaleDateFns();
   const handlePrevPeriod = () => {
     onNavigate('prev');
   };
@@ -24,11 +27,11 @@ const PayrollPeriodSelector = ({ selectedPayPeriod, onPeriodChange, onNavigate }
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between bg-white border border-gray-200 rounded-lg p-4">
         <div className="flex items-center gap-4">
-          <h2 className="text-lg font-semibold text-gray-900">Pay Period</h2>
+          <h2 className="text-lg font-semibold text-gray-900">{t('payroll:period.title')}</h2>
           <div className="flex items-center gap-2 text-gray-600">
             <span className="text-xl">📅</span>
             <span className="font-medium">
-              {format(selectedPayPeriod.start, 'MMM dd')} - {format(selectedPayPeriod.end, 'MMM dd, yyyy')}
+              {formatDate(selectedPayPeriod.start, 'MMM dd')} - {formatDate(selectedPayPeriod.end, 'MMM dd, yyyy')}
             </span>
           </div>
         </div>
@@ -41,7 +44,7 @@ const PayrollPeriodSelector = ({ selectedPayPeriod, onPeriodChange, onNavigate }
             className="flex items-center gap-1"
           >
             <span>←</span>
-            Previous
+            {t('payroll:period.previous')}
           </Button>
           
           <Button
@@ -49,7 +52,7 @@ const PayrollPeriodSelector = ({ selectedPayPeriod, onPeriodChange, onNavigate }
             variant="outline"
             size="sm"
           >
-            Current
+            {t('payroll:period.current')}
           </Button>
           
           <Button
@@ -58,7 +61,7 @@ const PayrollPeriodSelector = ({ selectedPayPeriod, onPeriodChange, onNavigate }
             size="sm"
             className="flex items-center gap-1"
           >
-            Next
+            {t('payroll:period.next')}
             <span>→</span>
           </Button>
         </div>
@@ -66,7 +69,7 @@ const PayrollPeriodSelector = ({ selectedPayPeriod, onPeriodChange, onNavigate }
 
       {/* Quick Historical Period Selection */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <h3 className="text-sm font-medium text-blue-900 mb-3">📊 View Historical Data (with mock payroll records)</h3>
+        <h3 className="text-sm font-medium text-blue-900 mb-3">📊 {t('payroll:period.historicalTitle')}</h3>
         <div className="flex gap-2">
           <Button
             onClick={() => handleHistoricalPeriod(mayPayrollRecords.payPeriod)}
@@ -74,7 +77,7 @@ const PayrollPeriodSelector = ({ selectedPayPeriod, onPeriodChange, onNavigate }
             size="sm"
             className="text-blue-700 border-blue-300 hover:bg-blue-100"
           >
-            May 2025
+            {t('payroll:period.may2025')}
           </Button>
           <Button
             onClick={() => handleHistoricalPeriod(junePayrollRecords.payPeriod)}
@@ -82,11 +85,11 @@ const PayrollPeriodSelector = ({ selectedPayPeriod, onPeriodChange, onNavigate }
             size="sm"
             className="text-blue-700 border-blue-300 hover:bg-blue-100"
           >
-            June 2025
+            {t('payroll:period.june2025')}
           </Button>
         </div>
         <p className="text-xs text-blue-600 mt-2">
-          These periods contain comprehensive mock payroll data for testing all features
+          {t('payroll:period.historicalDesc')}
         </p>
       </div>
     </div>

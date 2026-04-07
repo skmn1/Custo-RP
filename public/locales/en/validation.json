@@ -1,0 +1,19 @@
+{
+  "required": "This field is required",
+  "email.format": "Please enter a valid email address",
+  "email.unique": "This email is already in use",
+  "password.minLength": "Password must be at least {{min}} characters",
+  "password.strength": "Must contain uppercase, lowercase, number, and special character",
+  "password.mismatch": "Passwords do not match",
+  "name.minLength": "Must be at least {{min}} characters",
+  "name.maxLength": "Must be no more than {{max}} characters",
+  "phone.format": "Please enter a valid phone number",
+  "hours.range": "Must be between {{min}} and {{max}}",
+  "rate.range": "Must be between {{min}} and {{max}}",
+  "rate.format": "Must be a valid number with up to 2 decimal places",
+  "time.endAfterStart": "End time must be after start time",
+  "date.futureRequired": "Date must be today or in the future",
+  "date.endAfterStart": "End date must be on or after start date",
+  "openingHours.closeAfterOpen": "Closing time must be after opening time",
+  "openingHours.allDaysRequired": "Opening hours are required for all 7 days"
+}

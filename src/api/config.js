@@ -8,6 +8,8 @@
  * the full backend origin.
  */
 
+import i18n from '../i18n';
+
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
 /**
@@ -20,8 +22,12 @@ export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 export async function apiFetch(path, options = {}) {
   const url = `${API_BASE_URL}${path}`;
 
+  const lang = (i18n && i18n.language) ? i18n.language : 'fr';
+  const acceptLanguage = lang.startsWith('fr') ? 'fr-FR,fr;q=0.9,en;q=0.8' : 'en-US,en;q=0.9,fr;q=0.8';
+
   const headers = {
     ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+    'Accept-Language': acceptLanguage,
     ...options.headers,
   };
 

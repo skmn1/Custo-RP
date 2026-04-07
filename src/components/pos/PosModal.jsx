@@ -1,14 +1,16 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import Modal from '../ui/Modal';
 import {
   POS_TYPES,
-  POS_TYPE_LABELS,
   DAYS_OF_WEEK,
-  DAY_LABELS,
   DEFAULT_OPENING_HOURS,
 } from '../../constants/pos';
 
+const TYPE_KEY_MAP = { BUTCHER: 'butcher', GROCERY: 'grocery', FAST_FOOD: 'fastFood', MIXED: 'mixed' };
+
 const PosModal = ({ isOpen, onClose, onSubmit, initialData = null, mode = 'create', managers = [] }) => {
+  const { t } = useTranslation(['pos']);
   const isEdit = mode === 'edit';
 
   const emptyForm = {
@@ -91,27 +93,27 @@ const PosModal = ({ isOpen, onClose, onSubmit, initialData = null, mode = 'creat
   // --- Validation ---
   const errors = useMemo(() => {
     const errs = {};
-    if (!form.name.trim()) errs.name = 'Name is required';
-    else if (form.name.length > 100) errs.name = 'Name must be 100 characters or less';
+    if (!form.name.trim()) errs.name = t('pos:modal.err.nameRequired');
+    else if (form.name.length > 100) errs.name = t('pos:modal.err.nameMax');
 
-    if (!form.address.trim()) errs.address = 'Address is required';
-    else if (form.address.length > 255) errs.address = 'Address must be 255 characters or less';
+    if (!form.address.trim()) errs.address = t('pos:modal.err.addressRequired');
+    else if (form.address.length > 255) errs.address = t('pos:modal.err.addressMax');
 
-    if (!form.type) errs.type = 'Type is required';
+    if (!form.type) errs.type = t('pos:modal.err.typeRequired');
 
     // Opening hours validation
     const hoursErrors = {};
     DAYS_OF_WEEK.forEach((day) => {
       const hours = form.openingHours[day];
       if (!hours) {
-        hoursErrors[day] = 'Hours required';
+        hoursErrors[day] = t('pos:modal.err.hoursRequired');
         return;
       }
       if (!hours.closed) {
-        if (!hours.open) hoursErrors[day] = 'Open time required';
-        else if (!hours.close) hoursErrors[day] = 'Close time required';
+        if (!hours.open) hoursErrors[day] = t('pos:modal.err.openRequired');
+        else if (!hours.close) hoursErrors[day] = t('pos:modal.err.closeRequired');
         else if (hours.close !== '00:00' && hours.open >= hours.close) {
-          hoursErrors[day] = 'Close time must be after open time';
+          hoursErrors[day] = t('pos:modal.err.closeAfterOpen');
         }
       }
     });
@@ -151,7 +153,7 @@ const PosModal = ({ isOpen, onClose, onSubmit, initialData = null, mode = 'creat
       });
       onClose();
     } catch (err) {
-      setServerError(err.message || 'An error occurred while saving');
+      setServerError(err.message || t('pos:modal.serverError'));
     } finally {
       setSubmitting(false);
     }
@@ -161,10 +163,10 @@ const PosModal = ({ isOpen, onClose, onSubmit, initialData = null, mode = 'creat
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEdit ? 'Edit PoS Location' : 'Create New PoS Location'}
+      title={isEdit ? t('pos:modal.editTitle') : t('pos:modal.createTitle')}
       size="2xl"
       showValidate
-      validateText={submitting ? 'Saving...' : isEdit ? 'Save Changes' : 'Create PoS'}
+      validateText={submitting ? t('pos:modal.saving') : isEdit ? t('pos:modal.save') : t('pos:modal.create')}
       validateDisabled={!isValid || submitting}
       onValidate={handleSubmit}
     >
@@ -182,7 +184,7 @@ const PosModal = ({ isOpen, onClose, onSubmit, initialData = null, mode = 'creat
         {/* Name */}
         <div>
           <label htmlFor="pos-name" className="block text-sm font-medium text-gray-700 mb-1">
-            Name <span className="text-red-500">*</span>
+            {t('pos:form.name')} <span className="text-red-500">*</span>
           </label>
           <input
             id="pos-name"
@@ -192,7 +194,7 @@ const PosModal = ({ isOpen, onClose, onSubmit, initialData = null, mode = 'creat
             value={form.name}
             onChange={(e) => handleFieldChange('name', e.target.value)}
             onBlur={() => handleBlur('name')}
-            placeholder="e.g. Downtown Butcher Shop"
+            placeholder={t('pos:modal.namePlaceholder')}
             className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
               touched.name && errors.name ? 'border-red-300 bg-red-50' : 'border-gray-300'
             }`}
@@ -207,7 +209,7 @@ const PosModal = ({ isOpen, onClose, onSubmit, initialData = null, mode = 'creat
         {/* Address */}
         <div>
           <label htmlFor="pos-address" className="block text-sm font-medium text-gray-700 mb-1">
-            Address <span className="text-red-500">*</span>
+            {t('pos:form.address')} <span className="text-red-500">*</span>
           </label>
           <input
             id="pos-address"
@@ -217,7 +219,7 @@ const PosModal = ({ isOpen, onClose, onSubmit, initialData = null, mode = 'creat
             value={form.address}
             onChange={(e) => handleFieldChange('address', e.target.value)}
             onBlur={() => handleBlur('address')}
-            placeholder="e.g. 123 Main St, Downtown"
+            placeholder={t('pos:modal.addressPlaceholder')}
             className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
               touched.address && errors.address ? 'border-red-300 bg-red-50' : 'border-gray-300'
             }`}
@@ -232,7 +234,7 @@ const PosModal = ({ isOpen, onClose, onSubmit, initialData = null, mode = 'creat
         {/* Type */}
         <div>
           <label htmlFor="pos-type" className="block text-sm font-medium text-gray-700 mb-1">
-            Type <span className="text-red-500">*</span>
+            {t('pos:form.type')} <span className="text-red-500">*</span>
           </label>
           <select
             id="pos-type"
@@ -244,10 +246,10 @@ const PosModal = ({ isOpen, onClose, onSubmit, initialData = null, mode = 'creat
               touched.type && errors.type ? 'border-red-300 bg-red-50' : 'border-gray-300'
             }`}
           >
-            <option value="">Select type...</option>
-            {POS_TYPES.map((t) => (
-              <option key={t} value={t}>
-                {POS_TYPE_LABELS[t]}
+            <option value="">{t('pos:modal.selectType')}</option>
+            {POS_TYPES.map((tp) => (
+              <option key={tp} value={tp}>
+                {t(`pos:type.${TYPE_KEY_MAP[tp]}`)}
               </option>
             ))}
           </select>
@@ -261,7 +263,7 @@ const PosModal = ({ isOpen, onClose, onSubmit, initialData = null, mode = 'creat
         {/* Phone */}
         <div>
           <label htmlFor="pos-phone" className="block text-sm font-medium text-gray-700 mb-1">
-            Phone
+            {t('pos:form.phone')}
           </label>
           <input
             id="pos-phone"
@@ -270,7 +272,7 @@ const PosModal = ({ isOpen, onClose, onSubmit, initialData = null, mode = 'creat
             value={form.phone}
             onChange={(e) => handleFieldChange('phone', e.target.value)}
             onBlur={() => handleBlur('phone')}
-            placeholder="e.g. (555) 123-4567"
+            placeholder={t('pos:modal.phonePlaceholder')}
             className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
         </div>
@@ -278,7 +280,7 @@ const PosModal = ({ isOpen, onClose, onSubmit, initialData = null, mode = 'creat
         {/* Manager (dropdown from employees with manager status) */}
         <div>
           <label htmlFor="pos-manager" className="block text-sm font-medium text-gray-700 mb-1">
-            Manager
+            {t('pos:form.manager')}
           </label>
           <select
             id="pos-manager"
@@ -293,7 +295,7 @@ const PosModal = ({ isOpen, onClose, onSubmit, initialData = null, mode = 'creat
             onBlur={() => handleBlur('managerId')}
             className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
-            <option value="">— Select a manager —</option>
+            <option value="">{t('pos:modal.selectManager')}</option>
             {managers.map((m) => (
               <option key={m.id} value={m.id}>
                 {m.name} — {m.role}
@@ -302,7 +304,7 @@ const PosModal = ({ isOpen, onClose, onSubmit, initialData = null, mode = 'creat
           </select>
           {managers.length === 0 && (
             <p className="mt-1 text-xs text-gray-500">
-              No managers available. Add an employee with manager status first.
+              {t('pos:modal.noManagers')}
             </p>
           )}
         </div>
@@ -310,15 +312,15 @@ const PosModal = ({ isOpen, onClose, onSubmit, initialData = null, mode = 'creat
         {/* Opening Hours */}
         <div>
           <h4 className="text-sm font-medium text-gray-700 mb-3">
-            Opening Hours <span className="text-red-500">*</span>
+            {t('pos:form.openingHours')} <span className="text-red-500">*</span>
           </h4>
           <div className="border border-gray-200 rounded-lg overflow-hidden">
             {/* Table header */}
             <div className="grid grid-cols-[1fr_1fr_1fr_auto] gap-2 bg-gray-50 px-4 py-2 text-xs font-semibold text-gray-600 uppercase tracking-wide">
-              <span>Day</span>
-              <span>Open</span>
-              <span>Close</span>
-              <span className="text-center">Closed</span>
+              <span>{t('pos:modal.day')}</span>
+              <span>{t('pos:modal.openLabel')}</span>
+              <span>{t('pos:modal.closeLabel')}</span>
+              <span className="text-center">{t('pos:modal.closedLabel')}</span>
             </div>
             {/* Day rows */}
             {DAYS_OF_WEEK.map((day) => {
@@ -334,7 +336,7 @@ const PosModal = ({ isOpen, onClose, onSubmit, initialData = null, mode = 'creat
                   }`}
                 >
                   <span className="text-sm font-medium text-gray-700">
-                    {DAY_LABELS[day]}
+                    {t(`pos:days.${day}`)}
                   </span>
                   <input
                     data-testid={`opening-hours-${day}-open`}

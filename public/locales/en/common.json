@@ -1,0 +1,110 @@
+{
+  "app": {
+    "name": "Scheduler Pro",
+    "tagline": "Manage your team's schedules with ease",
+    "loading": "Loading…",
+    "welcome": "Welcome to Staff Scheduler"
+  },
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "create": "Create",
+    "update": "Update",
+    "close": "Close",
+    "confirm": "Confirm",
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "import": "Import",
+    "refresh": "Refresh",
+    "reset": "Reset",
+    "apply": "Apply",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "view": "View",
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK",
+    "select": "Select",
+    "clear": "Clear",
+    "submit": "Submit"
+  },
+  "btn": {
+    "close": "Close"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "scheduler": "Scheduler",
+    "employees": "Employees",
+    "payroll": "Payroll",
+    "pos": "PoS",
+    "shifts": "Shift Templates",
+    "reports": "Reports",
+    "settings": "Settings",
+    "language": "Language",
+    "switchToFrench": "Switch to French",
+    "switchToEnglish": "Switch to English",
+    "notifications": "Notifications",
+    "profile": "Profile"
+  },
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive",
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "loading": "Loading",
+    "error": "Error",
+    "success": "Success",
+    "noData": "No data",
+    "empty": "Nothing to display"
+  },
+  "time": {
+    "hours": "hours",
+    "hours_one": "{{count}} hour",
+    "hours_other": "{{count}} hours",
+    "minutes": "minutes",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "tomorrow": "Tomorrow",
+    "thisWeek": "This week",
+    "lastWeek": "Last week",
+    "nextWeek": "Next week",
+    "thisMonth": "This month",
+    "week": "Week",
+    "month": "Month",
+    "year": "Year",
+    "day": "Day",
+    "from": "From",
+    "to": "To",
+    "startTime": "Start time",
+    "endTime": "End time",
+    "date": "Date"
+  },
+  "errors": {
+    "generic": "An unexpected error occurred",
+    "loadFailed": "Failed to load data",
+    "saveFailed": "Failed to save",
+    "deleteFailed": "Failed to delete",
+    "networkError": "Network error",
+    "notFound": "Not found",
+    "required": "This field is required"
+  },
+  "dashboard": {
+    "welcome": "Welcome to Staff Scheduler",
+    "subtitle": "Manage your team's schedules with ease using our drag-and-drop interface",
+    "weeklyView": "Weekly View",
+    "weeklyViewDesc": "Visual weekly calendar with drag-and-drop shift management",
+    "staffManagement": "Staff Management",
+    "staffManagementDesc": "Complete employee profiles with roles and total hours tracking",
+    "analytics": "Analytics",
+    "analyticsDesc": "Real-time statistics and schedule optimization insights"
+  },
+  "stats": {
+    "changeFromLastPeriod": "{{change}}% from last period"
+  }
+}

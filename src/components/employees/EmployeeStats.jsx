@@ -1,11 +1,13 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import StatCard from '../ui/StatCard';
 
 const EmployeeStats = ({ stats }) => {
+  const { t } = useTranslation(['employees']);
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
       <StatCard
-        title="Total Employees"
+        title={t('employees:stats.totalEmployees')}
         value={stats.totalEmployees}
         icon={
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -16,7 +18,7 @@ const EmployeeStats = ({ stats }) => {
       />
       
       <StatCard
-        title="PoS Locations"
+        title={t('employees:stats.posLocations')}
         value={stats.totalPosLocations}
         icon={
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -28,7 +30,7 @@ const EmployeeStats = ({ stats }) => {
       />
       
       <StatCard
-        title="Avg. Max Hours"
+        title={t('employees:stats.averageMaxHours')}
         value={`${stats.averageMaxHours.toFixed(1)}h`}
         icon={
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -39,7 +41,7 @@ const EmployeeStats = ({ stats }) => {
       />
       
       <StatCard
-        title="Unique Roles"
+        title={t('employees:stats.uniqueRoles')}
         value={stats.totalRoles}
         icon={
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

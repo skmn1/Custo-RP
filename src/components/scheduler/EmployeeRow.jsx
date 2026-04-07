@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useDroppable } from '@dnd-kit/core';
 import { isToday } from 'date-fns';
 import DraggableShift from './DraggableShift';
 import { getShiftsForEmployeeAndDay, isEmployeeOvertime, getEmployeeTotalHours } from '../../utils/shiftUtils';
 
 const DroppableDay = ({ children, employeeId, dayIndex, isTodayCheck, dragOverDropZone, onAddShift, hasShifts, dayShifts, onDeleteShift, onUpdateShift, employee }) => {
+  const { t } = useTranslation(['scheduler']);
   const [isHovered, setIsHovered] = useState(false);
   const droppableId = `${employeeId}-${dayIndex}`;
   const { setNodeRef, isOver } = useDroppable({
@@ -41,7 +43,7 @@ const DroppableDay = ({ children, employeeId, dayIndex, isTodayCheck, dragOverDr
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
             </svg>
-            <span>No shifts scheduled</span>
+            <span>{t('scheduler:noShifts')}</span>
           </div>
         </div>
       )}
@@ -65,7 +67,7 @@ const DroppableDay = ({ children, employeeId, dayIndex, isTodayCheck, dragOverDr
       {isHighlighted && (
         <div className="absolute inset-0 bg-indigo-200 bg-opacity-30 rounded-md border-2 border-dashed border-indigo-400 pointer-events-none flex items-center justify-center">
           <div className="bg-white bg-opacity-90 rounded-lg px-3 py-2 text-sm font-medium text-indigo-700 shadow-sm">
-            Drop shift here
+            {t('scheduler:dropShiftHere')}
           </div>
         </div>
       )}
@@ -77,7 +79,7 @@ const DroppableDay = ({ children, employeeId, dayIndex, isTodayCheck, dragOverDr
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
             </svg>
-            <span>Click to create shift</span>
+            <span>{t('scheduler:clickToCreateShift')}</span>
           </div>
         </div>
       )}
@@ -86,6 +88,7 @@ const DroppableDay = ({ children, employeeId, dayIndex, isTodayCheck, dragOverDr
 };
 
 const EmployeeRow = ({ employee, shifts, weekDays, onDeleteShift, onAddShift, onUpdateShift, dragOverDropZone }) => {
+  const { t } = useTranslation(['scheduler']);
   const employeeShifts = shifts.filter(shift => shift.employeeId === employee.id);
   const totalHours = getEmployeeTotalHours(shifts, employee.id);
   const isOvertime = isEmployeeOvertime(shifts, employee.id, employee.maxHours);
@@ -110,12 +113,12 @@ const EmployeeRow = ({ employee, shifts, weekDays, onDeleteShift, onAddShift, on
                 </div>
                 {isOvertime && (
                   <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                    OT
+                    {t('scheduler:overtimeBadge')}
                   </span>
                 )}
               </div>
               <div className="text-xs text-gray-500 mt-1 truncate">
-                {employeeShifts.length} shift{employeeShifts.length !== 1 ? 's' : ''}
+                {t('scheduler:shiftCount', { count: employeeShifts.length })}
               </div>
             </div>
           </div>

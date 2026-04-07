@@ -1,11 +1,50 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import Button from './ui/Button';
+import useLocale from '../hooks/useLocale';
+
+const LanguageSwitcher = ({ className = '' }) => {
+  const { t } = useTranslation(['common']);
+  const { language, setLocale } = useLocale();
+  const isFr = language === 'fr';
+  return (
+    <div
+      className={`inline-flex items-center rounded-full border border-gray-200 bg-gray-50 p-0.5 ${className}`}
+      role="group"
+      aria-label={t('common:nav.language')}
+    >
+      <button
+        type="button"
+        onClick={() => setLocale('fr')}
+        aria-pressed={isFr}
+        aria-label={t('common:nav.switchToFrench')}
+        className={`px-2.5 py-1 text-xs font-semibold rounded-full transition-colors ${
+          isFr ? 'bg-indigo-600 text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'
+        }`}
+      >
+        FR
+      </button>
+      <button
+        type="button"
+        onClick={() => setLocale('en')}
+        aria-pressed={!isFr}
+        aria-label={t('common:nav.switchToEnglish')}
+        className={`px-2.5 py-1 text-xs font-semibold rounded-full transition-colors ${
+          !isFr ? 'bg-indigo-600 text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'
+        }`}
+      >
+        EN
+      </button>
+    </div>
+  );
+};
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const { t } = useTranslation(['common']);
 
   // Derive the active view from the current URL pathname
   const currentView = (() => {
@@ -30,54 +69,14 @@ const Navbar = () => {
   };
 
   const navItems = [
-    { 
-      id: 'pos', 
-      label: 'PoS', 
-      icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4',
-      badge: null
-    },
-    { 
-      id: 'scheduler', 
-      label: 'Scheduler', 
-      icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z',
-      badge: null
-    },
-    { 
-      id: 'employees', 
-      label: 'Employees', 
-      icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z',
-      badge: null
-    },
-    { 
-      id: 'payroll', 
-      label: 'Payroll', 
-      icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
-      badge: null
-    },
-    { 
-      id: 'shifts', 
-      label: 'Shift Templates', 
-      icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
-      badge: null
-    },
-    { 
-      id: 'reports', 
-      label: 'Reports', 
-      icon: 'M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
-      badge: '3'
-    },
-    { 
-      id: 'settings', 
-      label: 'Settings', 
-      icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z',
-      badge: null
-    },
-    { 
-      id: 'dashboard', 
-      label: 'Dashboard', 
-      icon: 'M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z',
-      badge: null
-    }
+    { id: 'pos', labelKey: 'common:nav.pos', icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4', badge: null },
+    { id: 'scheduler', labelKey: 'common:nav.scheduler', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z', badge: null },
+    { id: 'employees', labelKey: 'common:nav.employees', icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z', badge: null },
+    { id: 'payroll', labelKey: 'common:nav.payroll', icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z', badge: null },
+    { id: 'shifts', labelKey: 'common:nav.shifts', icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z', badge: null },
+    { id: 'reports', labelKey: 'common:nav.reports', icon: 'M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', badge: '3' },
+    { id: 'settings', labelKey: 'common:nav.settings', icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z', badge: null },
+    { id: 'dashboard', labelKey: 'common:nav.dashboard', icon: 'M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z', badge: null },
   ];
 
   return (
@@ -92,10 +91,10 @@ const Navbar = () => {
                 </svg>
               </div>
               <span className="ml-3 text-xl font-semibold text-gray-900">
-                Scheduler Pro
+                {t('common:app.name')}
               </span>
             </div>
-            
+
             {/* Desktop Navigation */}
             <div className="hidden md:ml-8 md:flex md:space-x-1">
               {navItems.map((item) => (
@@ -112,7 +111,7 @@ const Navbar = () => {
                   <svg className="w-4 h-4 mr-2 transition-transform duration-200 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={item.icon} />
                   </svg>
-                  {item.label}
+                  {t(item.labelKey)}
                   {item.badge && (
                     <span className="ml-2 inline-flex items-center justify-center px-2 py-0.5 text-xs font-medium text-white bg-red-500 rounded-full">
                       {item.badge}
@@ -125,13 +124,20 @@ const Navbar = () => {
 
           {/* User Profile & Actions */}
           <div className="hidden md:flex items-center space-x-2">
-            <button className="text-gray-500 hover:text-gray-700 p-2 rounded-lg hover:bg-gray-50 transition-all duration-200">
+            <LanguageSwitcher className="mr-2" />
+            <button
+              aria-label={t('common:nav.notifications')}
+              className="text-gray-500 hover:text-gray-700 p-2 rounded-lg hover:bg-gray-50 transition-all duration-200"
+            >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-5 5c-3 0-5-2-5-5M19 4H5a2 2 0 00-2 2v10a2 2 0 002 2h4m9-2V6a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2" />
               </svg>
             </button>
             <div className="relative">
-              <button className="text-gray-500 hover:text-gray-700 p-2 rounded-lg hover:bg-gray-50 transition-all duration-200">
+              <button
+                aria-label={t('common:nav.profile')}
+                className="text-gray-500 hover:text-gray-700 p-2 rounded-lg hover:bg-gray-50 transition-all duration-200"
+              >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
@@ -188,7 +194,7 @@ const Navbar = () => {
               <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={item.icon} />
               </svg>
-              {item.label}
+              {t(item.labelKey)}
               {item.badge && (
                 <span className="ml-auto inline-flex items-center justify-center px-2 py-0.5 text-xs font-medium text-white bg-red-500 rounded-full">
                   {item.badge}
@@ -196,6 +202,10 @@ const Navbar = () => {
               )}
             </button>
           ))}
+          <div className="pt-3 px-3 flex items-center justify-between">
+            <span className="text-sm text-gray-500">{t('common:nav.language')}</span>
+            <LanguageSwitcher />
+          </div>
         </div>
       </div>
     </nav>

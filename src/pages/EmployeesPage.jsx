@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useEmployees } from '../hooks/useEmployees';
 import { usePos } from '../hooks/usePos';
 import EmployeeModal from '../components/employees/EmployeeModal';
@@ -10,6 +11,7 @@ import EmployeeCards from '../components/employees/EmployeeCards';
 import Button from '../components/ui/Button';
 
 const EmployeesPage = () => {
+  const { t } = useTranslation(['employees', 'common']);
   const {
     employees,
     roles,
@@ -50,7 +52,7 @@ const EmployeesPage = () => {
   };
 
   const handleDeleteEmployee = (employeeId) => {
-    if (window.confirm('Are you sure you want to delete this employee?')) {
+    if (window.confirm(t('employees:confirmDelete'))) {
       deleteEmployee(employeeId);
     }
   };
@@ -95,9 +97,9 @@ const EmployeesPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-6 space-y-4 sm:space-y-0">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Employee Management</h1>
+              <h1 className="text-3xl font-bold text-gray-900">{t('employees:title')}</h1>
               <p className="text-sm text-gray-600 mt-1">
-                Manage your team • {employees.length} employees
+                {t('employees:subtitleStats', { count: employees.length })}
               </p>
             </div>
             <div className="flex items-center space-x-3">
@@ -105,7 +107,7 @@ const EmployeesPage = () => {
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
-                <span>Add Employee</span>
+                <span>{t('employees:addEmployee')}</span>
               </Button>
             </div>
           </div>
@@ -186,14 +188,14 @@ const EmployeesPage = () => {
               <svg className="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
               </svg>
-              <h3 className="text-lg font-medium text-gray-900 mb-1">No employees found</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-1">{t('employees:noEmployeesFound')}</h3>
               <p className="text-gray-500 mb-4">
                 {searchTerm || filterPos || filterRole
-                  ? 'Try adjusting your search or filters.'
-                  : 'Get started by adding your first employee.'}
+                  ? t('employees:tryAdjustingFilters')
+                  : t('employees:getStartedAdding')}
               </p>
               {!searchTerm && !filterPos && !filterRole && (
-                <Button onClick={handleAddEmployee}>Add Employee</Button>
+                <Button onClick={handleAddEmployee}>{t('employees:addEmployee')}</Button>
               )}
             </div>
           ) : (

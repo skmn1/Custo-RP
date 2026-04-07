@@ -1,8 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
 const TimePickerDropdown = ({ startTime, endTime, onTimeChange, onClose }) => {
+  const { t } = useTranslation(['scheduler']);
   const [currentStartTime, setCurrentStartTime] = useState(startTime);
   const [currentEndTime, setCurrentEndTime] = useState(endTime);
   const dropdownRef = useRef(null);
@@ -44,13 +46,13 @@ const TimePickerDropdown = ({ startTime, endTime, onTimeChange, onClose }) => {
       <div className="space-y-4">
         {/* Header */}
         <div className="text-sm font-semibold text-gray-800 text-center border-b border-gray-100 pb-2">
-          Edit Shift Time
+          {t('scheduler:editShiftTime')}
         </div>
         
         {/* Time Selection Grid */}
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Start Time</label>
+            <label className="block text-sm font-medium text-gray-700">{t('scheduler:startTime')}</label>
             <select
               value={currentStartTime}
               onChange={(e) => {
@@ -72,7 +74,7 @@ const TimePickerDropdown = ({ startTime, endTime, onTimeChange, onClose }) => {
             </select>
           </div>
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">End Time</label>
+            <label className="block text-sm font-medium text-gray-700">{t('scheduler:endTime')}</label>
             <select
               value={currentEndTime}
               onChange={(e) => setCurrentEndTime(e.target.value)}
@@ -87,9 +89,9 @@ const TimePickerDropdown = ({ startTime, endTime, onTimeChange, onClose }) => {
         
         {/* Duration Display */}
         <div className="bg-gray-50 rounded-md p-3 text-center">
-          <div className="text-xs font-medium text-gray-600 mb-1">Total Duration</div>
+          <div className="text-xs font-medium text-gray-600 mb-1">{t('scheduler:totalDuration')}</div>
           <div className="text-lg font-semibold text-indigo-600">
-            {calculateDuration(currentStartTime, currentEndTime).toFixed(1)} hours
+            {t('scheduler:durationHours', { value: calculateDuration(currentStartTime, currentEndTime).toFixed(1) })}
           </div>
         </div>
         
@@ -99,7 +101,7 @@ const TimePickerDropdown = ({ startTime, endTime, onTimeChange, onClose }) => {
             onClick={handleValidate}
             className="px-6 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors"
           >
-            Validate
+            {t('scheduler:validate')}
           </button>
         </div>
       </div>
@@ -191,7 +193,7 @@ const DraggableShift = ({ shift, employee, isDragOverlay = false, onUpdateShift,
               setIsEditingTime(true);
             }
           }}
-          title="Click to edit time"
+          title={t('scheduler:clickToEditTime')}
         >
           {shift.startTime} - {shift.endTime}
           <svg className="w-3 h-3 inline ml-1 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -234,7 +236,7 @@ const DraggableShift = ({ shift, employee, isDragOverlay = false, onUpdateShift,
             onDeleteShift(shift.id);
           }}
           className="absolute top-1 right-1 w-5 h-5 bg-white border border-gray-300 text-gray-600 rounded-full text-xs opacity-0 group-hover:opacity-100 transition-all duration-200 hover:border-red-400 hover:text-red-600 hover:bg-red-50 flex items-center justify-center shadow-sm hover:shadow-md z-10"
-          title="Delete shift"
+          title={t('scheduler:deleteShift')}
         >
           <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
             <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />

@@ -15,15 +15,20 @@
     "cy:open": "cypress open",
     "cy:run": "cypress run",
     "cy:dev": "start-server-and-test dev http://localhost:5173 cy:open",
-    "cy:ci": "start-server-and-test dev http://localhost:5173 cy:run"
+    "cy:ci": "start-server-and-test dev http://localhost:5173 cy:run",
+    "i18n:check": "node scripts/check-translations.js"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "date-fns": "^4.1.0",
+    "i18next": "^26.0.3",
+    "i18next-browser-languagedetector": "^8.2.1",
+    "i18next-http-backend": "^3.0.4",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-i18next": "^17.0.2",
     "react-router-dom": "^7.13.1"
   },
   "devDependencies": {

@@ -1,0 +1,19 @@
+{
+  "required": "Ce champ est obligatoire",
+  "email.format": "Veuillez saisir une adresse e-mail valide",
+  "email.unique": "Cette adresse e-mail est déjà utilisée",
+  "password.minLength": "Le mot de passe doit contenir au moins {{min}} caractères",
+  "password.strength": "Doit contenir une majuscule, une minuscule, un chiffre et un caractère spécial",
+  "password.mismatch": "Les mots de passe ne correspondent pas",
+  "name.minLength": "Doit contenir au moins {{min}} caractères",
+  "name.maxLength": "Ne doit pas dépasser {{max}} caractères",
+  "phone.format": "Veuillez saisir un numéro de téléphone valide",
+  "hours.range": "Doit être entre {{min}} et {{max}}",
+  "rate.range": "Doit être entre {{min}} et {{max}}",
+  "rate.format": "Doit être un nombre valide avec 2 décimales maximum",
+  "time.endAfterStart": "L'heure de fin doit être postérieure à l'heure de début",
+  "date.futureRequired": "La date doit être aujourd'hui ou dans le futur",
+  "date.endAfterStart": "La date de fin doit être égale ou postérieure à la date de début",
+  "openingHours.closeAfterOpen": "L'heure de fermeture doit être postérieure à l'heure d'ouverture",
+  "openingHours.allDaysRequired": "Les horaires d'ouverture sont requis pour les 7 jours"
+}

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Modal from '../ui/Modal';
 import Button from '../ui/Button';
 import EmployeeModal from '../employees/EmployeeModal';
@@ -41,14 +42,19 @@ const SwapIcon = ({ className = 'w-4 h-4' }) => (
   </svg>
 );
 
-const ManagerBadge = () => (
-  <span className="inline-flex px-2.5 py-0.5 text-xs font-semibold rounded-full bg-amber-100 text-amber-800 border border-amber-200">
-    Manager
-  </span>
-);
+const ManagerBadge = () => {
+  const { t } = useTranslation(['pos']);
+  return (
+    <span className="inline-flex px-2.5 py-0.5 text-xs font-semibold rounded-full bg-amber-100 text-amber-800 border border-amber-200">
+      {t('pos:form.manager')}
+    </span>
+  );
+};
 
 // ── Cards View ──
-const EmpCardsView = ({ employees, onEdit, onRemove, onSwap }) => (
+const EmpCardsView = ({ employees, onEdit, onRemove, onSwap }) => {
+  const { t } = useTranslation(['pos']);
+  return (
   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
     {employees.map((emp) => (
       <div
@@ -70,13 +76,13 @@ const EmpCardsView = ({ employees, onEdit, onRemove, onSwap }) => (
             </div>
           </div>
           <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button onClick={() => onSwap(emp)} className="text-emerald-600 hover:text-emerald-800 p-2 rounded-full hover:bg-emerald-50 transition-colors" title="Replace employee" data-testid="pos-employee-swap-btn">
+            <button onClick={() => onSwap(emp)} className="text-emerald-600 hover:text-emerald-800 p-2 rounded-full hover:bg-emerald-50 transition-colors" title={t('pos:btn.edit')} data-testid="pos-employee-swap-btn">
               <SwapIcon className="w-4.5 h-4.5" />
             </button>
-            <button onClick={() => onEdit(emp)} className="text-indigo-600 hover:text-indigo-800 p-2 rounded-full hover:bg-indigo-50 transition-colors" title="Edit employee" data-testid="pos-employee-edit-btn">
+            <button onClick={() => onEdit(emp)} className="text-indigo-600 hover:text-indigo-800 p-2 rounded-full hover:bg-indigo-50 transition-colors" title={t('pos:btn.edit')} data-testid="pos-employee-edit-btn">
               <EditIcon className="w-4.5 h-4.5" />
             </button>
-            <button onClick={() => onRemove(emp)} className="text-red-600 hover:text-red-800 p-2 rounded-full hover:bg-red-50 transition-colors" title="Remove employee" data-testid="pos-employee-remove-btn">
+            <button onClick={() => onRemove(emp)} className="text-red-600 hover:text-red-800 p-2 rounded-full hover:bg-red-50 transition-colors" title={t('pos:btn.delete')} data-testid="pos-employee-remove-btn">
               <DeleteIcon className="w-4.5 h-4.5" />
             </button>
           </div>
@@ -84,11 +90,11 @@ const EmpCardsView = ({ employees, onEdit, onRemove, onSwap }) => (
         <div className="mt-4 pt-4 border-t border-gray-200">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <dt className="text-xs font-medium text-gray-500">Max Hours</dt>
-              <dd className="mt-0.5 text-sm font-semibold text-gray-900">{emp.maxHours}h/week</dd>
+              <dt className="text-xs font-medium text-gray-500">{t('pos:emp.maxHours')}</dt>
+              <dd className="mt-0.5 text-sm font-semibold text-gray-900">{emp.maxHours}{t('pos:emp.perWeek')}</dd>
             </div>
             <div>
-              <dt className="text-xs font-medium text-gray-500">Email</dt>
+              <dt className="text-xs font-medium text-gray-500">{t('pos:emp.emailLabel')}</dt>
               <dd className="mt-0.5 text-sm text-gray-900 truncate" title={emp.email}>
                 <a href={`mailto:${emp.email}`} className="text-indigo-600 hover:text-indigo-800 transition-colors">{emp.email}</a>
               </dd>
@@ -98,10 +104,13 @@ const EmpCardsView = ({ employees, onEdit, onRemove, onSwap }) => (
       </div>
     ))}
   </div>
-);
+  );
+};
 
 // ── Grid View ──
-const EmpGridView = ({ employees, onEdit, onRemove, onSwap }) => (
+const EmpGridView = ({ employees, onEdit, onRemove, onSwap }) => {
+  const { t } = useTranslation(['pos']);
+  return (
   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
     {employees.map((emp) => (
       <div
@@ -114,13 +123,13 @@ const EmpGridView = ({ employees, onEdit, onRemove, onSwap }) => (
             {emp.avatar}
           </div>
           <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button onClick={() => onSwap(emp)} className="text-emerald-600 hover:text-emerald-800 p-1 rounded-full hover:bg-emerald-50 transition-colors" title="Replace" data-testid="pos-employee-swap-btn">
+            <button onClick={() => onSwap(emp)} className="text-emerald-600 hover:text-emerald-800 p-1 rounded-full hover:bg-emerald-50 transition-colors" title={t('pos:btn.edit')} data-testid="pos-employee-swap-btn">
               <SwapIcon />
             </button>
-            <button onClick={() => onEdit(emp)} className="text-indigo-600 hover:text-indigo-800 p-1 rounded-full hover:bg-indigo-50 transition-colors" title="Edit" data-testid="pos-employee-edit-btn">
+            <button onClick={() => onEdit(emp)} className="text-indigo-600 hover:text-indigo-800 p-1 rounded-full hover:bg-indigo-50 transition-colors" title={t('pos:btn.edit')} data-testid="pos-employee-edit-btn">
               <EditIcon />
             </button>
-            <button onClick={() => onRemove(emp)} className="text-red-600 hover:text-red-800 p-1 rounded-full hover:bg-red-50 transition-colors" title="Remove" data-testid="pos-employee-remove-btn">
+            <button onClick={() => onRemove(emp)} className="text-red-600 hover:text-red-800 p-1 rounded-full hover:bg-red-50 transition-colors" title={t('pos:btn.delete')} data-testid="pos-employee-remove-btn">
               <DeleteIcon />
             </button>
           </div>
@@ -135,8 +144,8 @@ const EmpGridView = ({ employees, onEdit, onRemove, onSwap }) => (
           )}
           <div className="space-y-1.5 text-sm">
             <div className="flex justify-between">
-              <span className="text-gray-500">Max Hours:</span>
-              <span className="font-medium">{emp.maxHours}h/week</span>
+              <span className="text-gray-500">{t('pos:emp.maxHours')}:</span>
+              <span className="font-medium">{emp.maxHours}{t('pos:emp.perWeek')}</span>
             </div>
             <div className="text-xs text-gray-400 truncate" title={emp.email}>{emp.email}</div>
           </div>
@@ -144,18 +153,21 @@ const EmpGridView = ({ employees, onEdit, onRemove, onSwap }) => (
       </div>
     ))}
   </div>
-);
+  );
+};
 
 // ── List View ──
-const EmpListView = ({ employees, onEdit, onRemove, onSwap }) => (
+const EmpListView = ({ employees, onEdit, onRemove, onSwap }) => {
+  const { t } = useTranslation(['pos']);
+  return (
   <div className="overflow-x-auto">
     <table className="min-w-full divide-y divide-gray-200">
       <thead className="bg-gray-50">
         <tr>
-          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee</th>
-          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Max Hours</th>
-          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('pos:emp.employee')}</th>
+          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('pos:emp.role')}</th>
+          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('pos:emp.maxHours')}</th>
+          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('pos:emp.contact')}</th>
           <th className="relative px-6 py-3"><span className="sr-only">Actions</span></th>
         </tr>
       </thead>
@@ -174,19 +186,19 @@ const EmpListView = ({ employees, onEdit, onRemove, onSwap }) => (
               </div>
             </td>
             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{emp.role}</td>
-            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{emp.maxHours}h/week</td>
+            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{emp.maxHours}{t('pos:emp.perWeek')}</td>
             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 truncate max-w-[160px]">
               <a href={`mailto:${emp.email}`} className="text-indigo-600 hover:text-indigo-800">{emp.email}</a>
             </td>
             <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
               <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button onClick={() => onSwap(emp)} className="text-emerald-600 hover:text-emerald-800 p-1 rounded-full hover:bg-emerald-50 transition-colors" title="Replace" data-testid="pos-employee-swap-btn">
+                <button onClick={() => onSwap(emp)} className="text-emerald-600 hover:text-emerald-800 p-1 rounded-full hover:bg-emerald-50 transition-colors" title={t('pos:btn.edit')} data-testid="pos-employee-swap-btn">
                   <SwapIcon />
                 </button>
-                <button onClick={() => onEdit(emp)} className="text-indigo-600 hover:text-indigo-800 p-1 rounded-full hover:bg-indigo-50 transition-colors" title="Edit" data-testid="pos-employee-edit-btn">
+                <button onClick={() => onEdit(emp)} className="text-indigo-600 hover:text-indigo-800 p-1 rounded-full hover:bg-indigo-50 transition-colors" title={t('pos:btn.edit')} data-testid="pos-employee-edit-btn">
                   <EditIcon />
                 </button>
-                <button onClick={() => onRemove(emp)} className="text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-50 transition-colors" title="Remove" data-testid="pos-employee-remove-btn">
+                <button onClick={() => onRemove(emp)} className="text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-50 transition-colors" title={t('pos:btn.delete')} data-testid="pos-employee-remove-btn">
                   <DeleteIcon />
                 </button>
               </div>
@@ -196,7 +208,8 @@ const EmpListView = ({ employees, onEdit, onRemove, onSwap }) => (
       </tbody>
     </table>
   </div>
-);
+  );
+};
 
 // ── Main Component ──
 const PosEmployeeList = ({
@@ -210,6 +223,7 @@ const PosEmployeeList = ({
   onSwap,
   onFetchAvailableEmployees,
 }) => {
+  const { t } = useTranslation(['pos']);
   const [search, setSearch]     = useState('');
   const [viewMode, setViewMode] = useState('cards');
   const [deleteConfirm, setDeleteConfirm] = useState(null);
@@ -367,9 +381,9 @@ const PosEmployeeList = ({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900">Employees</h2>
+          <h2 className="text-lg font-semibold text-gray-900">{t('pos:emp.title')}</h2>
           <p className="text-sm text-gray-500 mt-0.5">
-            {employees.length} employee{employees.length !== 1 ? 's' : ''} assigned to this location
+            {t('pos:emp.assignedCount', { count: employees.length })}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -378,7 +392,7 @@ const PosEmployeeList = ({
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
-              Assign Existing
+              {t('pos:emp.assignExisting')}
             </span>
           </Button>
           <Button variant="primary" size="sm" onClick={openCreate} data-testid="pos-add-employee-btn">
@@ -386,7 +400,7 @@ const PosEmployeeList = ({
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
-              New Employee
+              {t('pos:emp.newEmployee')}
             </span>
           </Button>
         </div>
@@ -406,8 +420,7 @@ const PosEmployeeList = ({
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search employees..."
-              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg text-sm bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder={t('pos:emp.searchPlaceholder')}
             />
           </div>
           <div className="flex items-center space-x-2 bg-gray-100 rounded-lg p-1" data-testid="pos-emp-view-toggle">
@@ -424,9 +437,9 @@ const PosEmployeeList = ({
           <svg className="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
           </svg>
-          <h3 className="text-sm font-medium text-gray-900 mb-1">No employees found</h3>
+          <h3 className="text-sm font-medium text-gray-900 mb-1">{t('pos:emp.noEmployeesTitle')}</h3>
           <p className="text-xs text-gray-500">
-            {search ? 'Try a different search term.' : 'Add employees to this PoS location.'}
+            {search ? t('pos:emp.noEmployeesSearch') : t('pos:emp.noEmployeesEmpty')}
           </p>
         </div>
       ) : (
@@ -437,16 +450,16 @@ const PosEmployeeList = ({
       <Modal
         isOpen={assignOpen}
         onClose={() => setAssignOpen(false)}
-        title="Assign Existing Employee"
+        title={t('pos:emp.assignTitle')}
         size="lg"
         showValidate
         onValidate={handleAssignConfirm}
-        validateText="Assign Employee"
+        validateText={t('pos:emp.btnAssign')}
         validateDisabled={!selectedExisting}
       >
         <div className="space-y-4">
           <p className="text-sm text-gray-600">
-            Select an existing employee to assign to this Point of Sale location.
+            {t('pos:emp.assignDesc')}
           </p>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -458,7 +471,7 @@ const PosEmployeeList = ({
               type="text"
               value={availableSearch}
               onChange={(e) => setAvailableSearch(e.target.value)}
-              placeholder="Search by name or role..."
+              placeholder={t('pos:emp.assignSearchPlaceholder')}
               className="block w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               data-testid="pos-assign-search"
             />
@@ -477,7 +490,7 @@ const PosEmployeeList = ({
               : availableEmployees;
             return filteredAvailable.length === 0 ? (
               <div className="text-center py-8 text-sm text-gray-500">
-                {availableSearch ? 'No matching employees found.' : 'No available employees to assign.'}
+                {availableSearch ? t('pos:emp.noMatchingEmployees') : t('pos:emp.noAvailableEmployees')}
               </div>
             ) : (
               <div className="max-h-64 overflow-y-auto border border-gray-200 rounded-lg divide-y divide-gray-100">
@@ -540,16 +553,16 @@ const PosEmployeeList = ({
       <Modal
         isOpen={!!swapTarget}
         onClose={closeSwapModal}
-        title={swapTarget ? `Replace ${swapTarget.name}` : 'Replace Employee'}
+        title={swapTarget ? t('pos:emp.swapTitle', { name: swapTarget.name }) : t('pos:emp.swapTitleDefault')}
         size="lg"
         showValidate
         onValidate={handleSwapConfirm}
-        validateText="Swap Employees"
+        validateText={t('pos:emp.btnSwap')}
         validateDisabled={!selectedSwap}
       >
         <div className="space-y-4">
           <p className="text-sm text-gray-600">
-            Select an employee to swap with{' '}
+            {t('pos:emp.swapDesc')}{' '}
             <span className="font-semibold">{swapTarget?.name}</span>.
           </p>
           <div className="relative">
@@ -562,7 +575,7 @@ const PosEmployeeList = ({
               type="text"
               value={swapSearch}
               onChange={(e) => setSwapSearch(e.target.value)}
-              placeholder="Search by name or role..."
+              placeholder={t('pos:emp.assignSearchPlaceholder')}
               className="block w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               data-testid="pos-swap-search"
             />
@@ -573,7 +586,7 @@ const PosEmployeeList = ({
             </div>
           ) : filteredSwapCandidates.length === 0 ? (
             <div className="text-center py-8 text-sm text-gray-500">
-              {swapSearch ? 'No matching employees found.' : 'No available employees to swap.'}
+              {swapSearch ? t('pos:emp.noMatchingEmployees') : t('pos:emp.noSwapCandidates')}
             </div>
           ) : (
             <div className="max-h-64 overflow-y-auto border border-gray-200 rounded-lg divide-y divide-gray-100">
@@ -629,18 +642,18 @@ const PosEmployeeList = ({
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 text-center mb-2">Remove Employee</h3>
+              <h3 className="text-lg font-semibold text-gray-900 text-center mb-2">{t('pos:emp.removeTitle')}</h3>
               <p className="text-sm text-gray-600 text-center">
-                Are you sure you want to remove{' '}
-                <span className="font-semibold">{deleteConfirm.name}</span> from this location?
+                {t('pos:emp.removeConfirm')}{' '}
+                <span className="font-semibold">{deleteConfirm.name}</span> {t('pos:emp.removeFromLocation')}
               </p>
             </div>
             <div className="bg-gray-50 px-6 py-4 flex justify-end gap-3">
               <Button variant="secondary" size="sm" onClick={() => setDeleteConfirm(null)} data-testid="pos-emp-delete-cancel">
-                Cancel
+                {t('pos:emp.btnCancel')}
               </Button>
               <Button variant="danger" size="sm" onClick={handleRemoveConfirm} data-testid="pos-emp-delete-confirm">
-                Remove
+                {t('pos:emp.btnRemove')}
               </Button>
             </div>
           </div>

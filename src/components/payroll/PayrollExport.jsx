@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
+import { useLocaleDateFns } from '../../utils/formatLocale';
 import Button from '../ui/Button';
 
 const PayrollExport = ({ payrollData, employees }) => {
+  const { t } = useTranslation(['payroll']);
+  const { formatDate } = useLocaleDateFns();
   const [exportFormat, setExportFormat] = useState('csv');
   const [exportType, setExportType] = useState('summary');
   const [isExporting, setIsExporting] = useState(false);
@@ -10,19 +14,19 @@ const PayrollExport = ({ payrollData, employees }) => {
   const { selectedPayPeriod, employeePayrolls, payrollStats } = payrollData;
 
   const exportOptions = [
-    { id: 'summary', label: 'Payroll Summary', description: 'High-level payroll overview' },
-    { id: 'detailed', label: 'Detailed Payroll', description: 'Complete employee breakdown' },
-    { id: 'accounting', label: 'Accounting Journal', description: 'Journal entries for accounting' },
-    { id: 'paystubs', label: 'Pay Stubs', description: 'Individual employee pay stubs' },
-    { id: 'taxes', label: 'Tax Report', description: 'Tax withholding and liability report' },
-    { id: 'timesheets', label: 'Timesheets', description: 'Employee time and attendance' }
+    { id: 'summary', label: t('payroll:export.options.summary'), description: t('payroll:export.options.summaryDesc') },
+    { id: 'detailed', label: t('payroll:export.options.detailed'), description: t('payroll:export.options.detailedDesc') },
+    { id: 'accounting', label: t('payroll:export.options.accounting'), description: t('payroll:export.options.accountingDesc') },
+    { id: 'paystubs', label: t('payroll:export.options.paystubs'), description: t('payroll:export.options.paystubsDesc') },
+    { id: 'taxes', label: t('payroll:export.options.taxes'), description: t('payroll:export.options.taxesDesc') },
+    { id: 'timesheets', label: t('payroll:export.options.timesheets'), description: t('payroll:export.options.timesheetsDesc') }
   ];
 
   const formatOptions = [
-    { id: 'csv', label: 'CSV', description: 'Comma-separated values' },
-    { id: 'excel', label: 'Excel', description: 'Microsoft Excel format' },
-    { id: 'pdf', label: 'PDF', description: 'Portable document format' },
-    { id: 'json', label: 'JSON', description: 'JavaScript object notation' }
+    { id: 'csv', label: t('payroll:export.formats.csv'), description: t('payroll:export.formats.csvDesc') },
+    { id: 'excel', label: t('payroll:export.formats.excel'), description: t('payroll:export.formats.excelDesc') },
+    { id: 'pdf', label: t('payroll:export.formats.pdf'), description: t('payroll:export.formats.pdfDesc') },
+    { id: 'json', label: t('payroll:export.formats.json'), description: t('payroll:export.formats.jsonDesc') }
   ];
 
   const handleExport = async () => {
@@ -71,7 +75,7 @@ const PayrollExport = ({ payrollData, employees }) => {
       
     } catch (error) {
       console.error('Export failed:', error);
-      alert('Export failed. Please try again.');
+      alert(t('payroll:export.exportFailed'));
     } finally {
       setIsExporting(false);
     }
@@ -266,8 +270,8 @@ const PayrollExport = ({ payrollData, employees }) => {
     <div className="p-6 space-y-8">
       {/* Header */}
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Export & Reports</h2>
-        <p className="text-gray-600">Generate and download payroll reports in various formats</p>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('payroll:export.title')}</h2>
+        <p className="text-gray-600">{t('payroll:export.subtitle')}</p>
       </div>
 
       {/* Export Configuration */}
@@ -276,7 +280,7 @@ const PayrollExport = ({ payrollData, employees }) => {
         <div className="bg-white border border-gray-200 rounded-lg p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <span className="text-xl">📋</span>
-            Report Type
+            {t('payroll:export.reportType')}
           </h3>
           <div className="space-y-3">
             {exportOptions.map((option) => (
@@ -302,7 +306,7 @@ const PayrollExport = ({ payrollData, employees }) => {
         <div className="bg-white border border-gray-200 rounded-lg p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <span className="text-xl">📄</span>
-            Export Format
+            {t('payroll:export.exportFormat')}
           </h3>
           <div className="space-y-3">
             {formatOptions.map((format) => (
@@ -329,26 +333,26 @@ const PayrollExport = ({ payrollData, employees }) => {
       <div className="bg-white border border-gray-200 rounded-lg p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
           <span className="text-xl">👀</span>
-          Export Preview
+          {t('payroll:export.preview')}
         </h3>
         <div className="bg-gray-50 rounded-lg p-4 mb-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
             <div>
-              <span className="text-gray-600">Report Type:</span>
+              <span className="text-gray-600">{t('payroll:export.previewType')}</span>
               <div className="font-medium">{exportOptions.find(opt => opt.id === exportType)?.label}</div>
             </div>
             <div>
-              <span className="text-gray-600">Format:</span>
+              <span className="text-gray-600">{t('payroll:export.previewFormat')}</span>
               <div className="font-medium">{formatOptions.find(fmt => fmt.id === exportFormat)?.label}</div>
             </div>
             <div>
-              <span className="text-gray-600">Pay Period:</span>
+              <span className="text-gray-600">{t('payroll:export.previewPeriod')}</span>
               <div className="font-medium">
-                {format(selectedPayPeriod.start, 'MMM dd')} - {format(selectedPayPeriod.end, 'MMM dd, yyyy')}
+                {formatDate(selectedPayPeriod.start, 'MMM dd')} - {formatDate(selectedPayPeriod.end, 'MMM dd, yyyy')}
               </div>
             </div>
             <div>
-              <span className="text-gray-600">Employees:</span>
+              <span className="text-gray-600">{t('payroll:export.previewEmployees')}</span>
               <div className="font-medium">{employeePayrolls.length}</div>
             </div>
           </div>
@@ -362,12 +366,12 @@ const PayrollExport = ({ payrollData, employees }) => {
           {isExporting ? (
             <div className="flex items-center gap-2">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-              Generating Export...
+              {t('payroll:export.generating')}
             </div>
           ) : (
             <div className="flex items-center gap-2">
               <span>📥</span>
-              Generate & Download Report
+              {t('payroll:export.generate')}
             </div>
           )}
         </Button>
@@ -377,7 +381,7 @@ const PayrollExport = ({ payrollData, employees }) => {
       <div className="bg-white border border-gray-200 rounded-lg p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
           <span className="text-xl">⚡</span>
-          Quick Reports
+          {t('payroll:export.quickReports')}
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <Button
@@ -390,8 +394,8 @@ const PayrollExport = ({ payrollData, employees }) => {
             className="flex items-center gap-2 h-auto py-4"
           >
             <div className="text-left">
-              <div className="font-medium">Executive Summary</div>
-              <div className="text-sm text-gray-600">PDF overview for management</div>
+              <div className="font-medium">{t('payroll:export.executiveSummary')}</div>
+              <div className="text-sm text-gray-600">{t('payroll:export.executiveSummaryDesc')}</div>
             </div>
           </Button>
 
@@ -405,8 +409,8 @@ const PayrollExport = ({ payrollData, employees }) => {
             className="flex items-center gap-2 h-auto py-4"
           >
             <div className="text-left">
-              <div className="font-medium">HR Spreadsheet</div>
-              <div className="text-sm text-gray-600">Detailed Excel for HR</div>
+              <div className="font-medium">{t('payroll:export.hrSpreadsheet')}</div>
+              <div className="text-sm text-gray-600">{t('payroll:export.hrSpreadsheetDesc')}</div>
             </div>
           </Button>
 
@@ -420,8 +424,8 @@ const PayrollExport = ({ payrollData, employees }) => {
             className="flex items-center gap-2 h-auto py-4"
           >
             <div className="text-left">
-              <div className="font-medium">Accounting CSV</div>
-              <div className="text-sm text-gray-600">Journal entries for accounting</div>
+              <div className="font-medium">{t('payroll:export.accountingCsv')}</div>
+              <div className="text-sm text-gray-600">{t('payroll:export.accountingCsvDesc')}</div>
             </div>
           </Button>
         </div>
@@ -431,20 +435,20 @@ const PayrollExport = ({ payrollData, employees }) => {
       <div className="bg-white border border-gray-200 rounded-lg p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
           <span className="text-xl">📊</span>
-          Report Analytics
+          {t('payroll:export.reportAnalytics')}
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="text-center p-4 bg-blue-50 rounded-lg">
             <div className="text-2xl font-bold text-blue-600">{employeePayrolls.length}</div>
-            <div className="text-sm text-gray-600">Employees in this report</div>
+            <div className="text-sm text-gray-600">{t('payroll:export.employeesInReport')}</div>
           </div>
           <div className="text-center p-4 bg-green-50 rounded-lg">
             <div className="text-2xl font-bold text-green-600">${payrollStats.totalGrossPay.toFixed(0)}</div>
-            <div className="text-sm text-gray-600">Total gross pay</div>
+            <div className="text-sm text-gray-600">{t('payroll:export.totalGrossPay')}</div>
           </div>
           <div className="text-center p-4 bg-purple-50 rounded-lg">
             <div className="text-2xl font-bold text-purple-600">{payrollStats.totalHours.toFixed(0)}</div>
-            <div className="text-sm text-gray-600">Total hours worked</div>
+            <div className="text-sm text-gray-600">{t('payroll:export.totalHoursWorked')}</div>
           </div>
         </div>
       </div>

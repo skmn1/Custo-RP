@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   DndContext,
   DragOverlay,
@@ -16,7 +17,8 @@ import { useEmployees } from '../../hooks/useEmployees';
 import { useShifts } from '../../hooks/useShifts';
 import { useWeekNavigation } from '../../hooks/useWeekNavigation';
 import { useDragAndDrop } from '../../hooks/useDragAndDrop';
-import { generateWeekDays, formatWeekRange, getWeekNumber } from '../../utils/dateUtils';
+import { generateWeekDays, getWeekNumber } from '../../utils/dateUtils';
+import { useLocaleDateFns } from '../../utils/formatLocale';
 
 import Button from '../ui/Button';
 import CalendarHeader from './CalendarHeader';
@@ -26,6 +28,8 @@ import StatisticsPanel from './StatisticsPanel';
 import AddShiftModal from './AddShiftModal';
 
 const StaffScheduler = () => {
+  const { t } = useTranslation(['scheduler', 'common']);
+  const { formatDate } = useLocaleDateFns();
   const { employees: fetchedEmployees, isLoading: employeesLoading } = useEmployees();
   const employees = fetchedEmployees.length > 0 ? fetchedEmployees : initialEmployees;
   const [showAddShiftModal, setShowAddShiftModal] = useState(false);
@@ -73,9 +77,9 @@ const StaffScheduler = () => {
         <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-4 space-y-4 sm:space-y-0">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Staff Scheduler</h1>
+              <h1 className="text-2xl font-bold text-gray-900">{t('scheduler:title')}</h1>
               <p className="text-sm text-gray-600 mt-1">
-                Manage staff schedules with drag and drop • {employees.length} employees • {shifts.length} shifts
+                {t('scheduler:subtitleStats', { employees: employees.length, shifts: shifts.length })}
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-3">
@@ -88,7 +92,7 @@ const StaffScheduler = () => {
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-                <span>Today</span>
+                <span>{t('scheduler:today')}</span>
               </Button>
               <Button 
                 onClick={() => setShowAddShiftModal(true)}
@@ -98,7 +102,7 @@ const StaffScheduler = () => {
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
-                <span className="font-semibold">Add Shift</span>
+                <span className="font-semibold">{t('scheduler:addShift')}</span>
                 <div className="w-2 h-2 bg-white rounded-full opacity-75"></div>
               </Button>
             </div>
@@ -118,15 +122,15 @@ const StaffScheduler = () => {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
               </svg>
-              <span className="text-sm hidden sm:inline">Previous</span>
+              <span className="text-sm hidden sm:inline">{t('scheduler:previous')}</span>
             </Button>
             
             <div className="text-center">
               <h2 className="text-lg font-semibold text-gray-900">
-                {formatWeekRange(weekStart)}
+                {formatDate(weekStart, 'MMMM d')} - {formatDate(weekDays[6], 'MMMM d, yyyy')}
               </h2>
               <p className="text-sm text-gray-600 mt-1">
-                Week {getWeekNumber(weekStart)}
+                {t('scheduler:week', { number: getWeekNumber(weekStart) })}
               </p>
             </div>
             
@@ -135,7 +139,7 @@ const StaffScheduler = () => {
               onClick={() => navigateWeek(1)}
               className="flex items-center space-x-1"
             >
-              <span className="text-sm hidden sm:inline">Next</span>
+              <span className="text-sm hidden sm:inline">{t('scheduler:next')}</span>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
               </svg>

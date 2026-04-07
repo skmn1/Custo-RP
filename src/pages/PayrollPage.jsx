@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useEmployees } from '../hooks/useEmployees';
 import { useShifts } from '../hooks/useShifts';
 import { usePayroll } from '../hooks/usePayroll';
@@ -9,17 +10,18 @@ import PayrollAccounting from '../components/payroll/PayrollAccounting';
 import PayrollExport from '../components/payroll/PayrollExport';
 
 const PayrollPage = () => {
+  const { t } = useTranslation(['payroll']);
   const [activeTab, setActiveTab] = useState('dashboard');
   const { employees } = useEmployees();
   const { shifts } = useShifts();
   const payrollData = usePayroll(employees, shifts);
 
   const tabs = [
-    { id: 'dashboard', label: 'Dashboard', icon: '📊' },
-    { id: 'employees', label: 'Employee Payroll', icon: '👥' },
-    { id: 'statistics', label: 'Statistics', icon: '📈' },
-    { id: 'accounting', label: 'Accounting', icon: '💰' },
-    { id: 'export', label: 'Export & Reports', icon: '📄' },
+    { id: 'dashboard', label: t('payroll:tabs.dashboard'), icon: '📊' },
+    { id: 'employees', label: t('payroll:tabs.employees'), icon: '👥' },
+    { id: 'statistics', label: t('payroll:tabs.statistics'), icon: '📈' },
+    { id: 'accounting', label: t('payroll:tabs.accounting'), icon: '💰' },
+    { id: 'export', label: t('payroll:tabs.export'), icon: '📄' },
   ];
 
   const renderContent = () => {
@@ -44,9 +46,9 @@ const PayrollPage = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Payroll Management</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">{t('payroll:title')}</h1>
           <p className="text-gray-600">
-            Manage employee payroll, calculate wages, and generate reports
+            {t('payroll:subtitle')}
           </p>
         </div>
 

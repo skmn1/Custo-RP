@@ -1,0 +1,94 @@
+{
+  "title": "Employee Management",
+  "subtitle": "Manage your team",
+  "subtitleStats": "Manage your team • {{count}} employees",
+  "addEmployee": "Add Employee",
+  "addNewEmployee": "Add New Employee",
+  "editEmployee": "Edit Employee",
+  "updateEmployee": "Update Employee",
+  "noEmployeesFound": "No employees found",
+  "tryAdjustingFilters": "Try adjusting your search or filters.",
+  "getStartedAdding": "Get started by adding your first employee.",
+  "confirmDelete": "Are you sure you want to delete this employee?",
+  "sections": {
+    "personalInfo": "Personal Information",
+    "workInfo": "Work Information",
+    "scheduleInfo": "Schedule Information"
+  },
+  "fields": {
+    "fullName": "Full Name",
+    "fullNameRequired": "Full Name *",
+    "name": "Name",
+    "email": "Email Address",
+    "emailRequired": "Email Address *",
+    "role": "Role",
+    "roleRequired": "Role *",
+    "pos": "Point of Sale",
+    "posRequired": "Point of Sale *",
+    "maxHours": "Maximum Hours per Week",
+    "maxHoursRequired": "Maximum Hours per Week *",
+    "contact": "Contact",
+    "employee": "Employee",
+    "employeeId": "Employee ID"
+  },
+  "placeholders": {
+    "fullName": "Enter full name",
+    "email": "Enter email address",
+    "role": "Select or type a role",
+    "search": "Search employees…",
+    "notAssigned": "— Not assigned —"
+  },
+  "validation": {
+    "nameRequired": "Name is required",
+    "emailRequired": "Email is required",
+    "emailInvalid": "Please enter a valid email address",
+    "roleRequired": "Role is required",
+    "maxHoursRange": "Max hours must be between 1 and 80"
+  },
+  "hints": {
+    "hoursRange": "Hours between 1 and 80",
+    "autoFilled": "Auto-filled from the PoS location",
+    "requiredFields": "* Required fields"
+  },
+  "preview": "Preview",
+  "employeeName": "Employee Name",
+  "hoursPerWeek": "{{value}}h/week",
+  "filters": {
+    "search": "Search",
+    "posLocation": "PoS Location",
+    "allLocations": "All Locations",
+    "role": "Role",
+    "allRoles": "All Roles",
+    "sortBy": "Sort By",
+    "sortName": "Name",
+    "sortRole": "Role",
+    "sortMaxHours": "Max Hours",
+    "sortAscending": "Sort Ascending",
+    "sortDescending": "Sort Descending",
+    "clearAll": "Clear All"
+  },
+  "view": {
+    "list": "List",
+    "grid": "Grid",
+    "cards": "Cards"
+  },
+  "table": {
+    "employee": "Employee",
+    "role": "Role",
+    "pos": "Point of Sale",
+    "maxHours": "Max Hours",
+    "contact": "Contact",
+    "actions": "Actions",
+    "id": "ID: {{id}}"
+  },
+  "actions": {
+    "edit": "Edit employee",
+    "delete": "Delete employee"
+  },
+  "stats": {
+    "totalEmployees": "Total Employees",
+    "posLocations": "PoS Locations",
+    "averageMaxHours": "Avg. Max Hours",
+    "uniqueRoles": "Unique Roles"
+  }
+}

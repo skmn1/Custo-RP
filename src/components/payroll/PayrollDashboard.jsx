@@ -1,9 +1,12 @@
 import React from 'react';
-import { format } from 'date-fns';
+import { useTranslation } from 'react-i18next';
+import { useLocaleDateFns } from '../../utils/formatLocale';
 import StatCard from '../ui/StatCard';
 import PayrollPeriodSelector from './PayrollPeriodSelector';
 
 const PayrollDashboard = ({ payrollData }) => {
+  const { t } = useTranslation(['payroll']);
+  const { formatDate } = useLocaleDateFns();
   const {
     payrollSummary,
     selectedPayPeriod,
@@ -16,42 +19,42 @@ const PayrollDashboard = ({ payrollData }) => {
 
   const quickStats = [
     {
-      title: 'Total Gross Pay',
+      title: t('payroll:stats.totalGrossPay'),
       value: `$${payrollSummary.totalGrossPay.toFixed(2)}`,
       icon: '💰',
       color: 'green',
       change: payrollSummary.grossPayChange || 0,
     },
     {
-      title: 'Total Net Pay',
+      title: t('payroll:stats.totalNetPay'),
       value: `$${payrollSummary.totalNetPay.toFixed(2)}`,
       icon: '💵',
       color: 'blue',
       change: payrollSummary.netPayChange || 0,
     },
     {
-      title: 'Total Hours',
+      title: t('payroll:stats.totalHours'),
       value: payrollSummary.totalHours.toFixed(1),
       icon: '⏰',
       color: 'purple',
       change: payrollSummary.hoursChange || 0,
     },
     {
-      title: 'Overtime Hours',
+      title: t('payroll:stats.overtimeHours'),
       value: payrollSummary.totalOvertimeHours.toFixed(1),
       icon: '⚡',
       color: 'orange',
       change: payrollSummary.overtimeChange || 0,
     },
     {
-      title: 'Total Employees',
+      title: t('payroll:stats.totalEmployees'),
       value: payrollSummary.totalEmployees,
       icon: '👥',
       color: 'indigo',
       change: 0,
     },
     {
-      title: 'Avg. Hourly Rate',
+      title: t('payroll:stats.averageHourlyRate'),
       value: `$${payrollSummary.avgHourlyRate.toFixed(2)}`,
       icon: '📊',
       color: 'pink',
@@ -90,7 +93,7 @@ const PayrollDashboard = ({ payrollData }) => {
         <div className="bg-white border border-gray-200 rounded-lg p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <span className="text-xl">🏆</span>
-            Top Earners This Period
+            {t('payroll:topEarners')}
           </h3>
           <div className="space-y-3">
             {topEarners.slice(0, 5).map((employee, index) => (
@@ -117,14 +120,14 @@ const PayrollDashboard = ({ payrollData }) => {
         <div className="bg-white border border-gray-200 rounded-lg p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <span className="text-xl">🏢</span>
-            Payroll by Department
+            {t('payroll:byDepartment')}
           </h3>
           <div className="space-y-3">
             {Object.entries(departmentPayroll).map(([department, data]) => (
               <div key={department} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <div>
                   <div className="font-medium text-gray-900">{department}</div>
-                  <div className="text-sm text-gray-500">{data.employeeCount} employees</div>
+                  <div className="text-sm text-gray-500">{t('payroll:departmentEmployees', { count: data.employeeCount })}</div>
                 </div>
                 <div className="text-right">
                   <div className="font-semibold text-gray-900">${data.totalPay.toFixed(2)}</div>
@@ -141,26 +144,26 @@ const PayrollDashboard = ({ payrollData }) => {
         <div className="bg-white border border-gray-200 rounded-lg p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <span className="text-xl">📅</span>
-            Recent Pay Periods
+            {t('payroll:recentPayPeriods')}
           </h3>
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Period
+                    {t('payroll:table.period')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Gross Pay
+                    {t('payroll:table.grossPay')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Net Pay
+                    {t('payroll:table.netPay')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Hours
+                    {t('payroll:table.hours')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Employees
+                    {t('payroll:table.employees')}
                   </th>
                 </tr>
               </thead>
@@ -168,7 +171,7 @@ const PayrollDashboard = ({ payrollData }) => {
                 {recentPayPeriods.slice(0, 5).map((period, index) => (
                   <tr key={index} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {format(period.start, 'MMM dd')} - {format(period.end, 'MMM dd, yyyy')}
+                      {formatDate(period.start, 'MMM dd')} - {formatDate(period.end, 'MMM dd, yyyy')}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       ${period.grossPay.toFixed(2)}

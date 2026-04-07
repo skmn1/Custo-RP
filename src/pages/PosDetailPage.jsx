@@ -1,13 +1,18 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import PosDashboard from '../components/pos/PosDashboard';
 import PosEmployeeList from '../components/pos/PosEmployeeList';
 import PosModal from '../components/pos/PosModal';
 import Button from '../components/ui/Button';
 import { usePos } from '../hooks/usePos';
-import { POS_TYPE_LABELS, POS_TYPE_COLORS, DAYS_OF_WEEK, DAY_LABELS } from '../constants/pos';
+import { POS_TYPE_COLORS, DAYS_OF_WEEK } from '../constants/pos';
+
+const TYPE_KEY_MAP = { BUTCHER: 'butcher', GROCERY: 'grocery', FAST_FOOD: 'fastFood', MIXED: 'mixed' };
+const DAY_KEY_MAP = { MONDAY: 'monday', TUESDAY: 'tuesday', WEDNESDAY: 'wednesday', THURSDAY: 'thursday', FRIDAY: 'friday', SATURDAY: 'saturday', SUNDAY: 'sunday' };
 
 const PosDetailPage = () => {
+  const { t } = useTranslation(['pos', 'common']);
   const { id } = useParams();
   const navigate = useNavigate();
   const {
@@ -94,13 +99,13 @@ const PosDetailPage = () => {
         <div data-testid="pos-not-found" className="text-center py-16">
           <div className="text-5xl mb-4">🔍</div>
           <h3 className="text-lg font-medium text-gray-900 mb-1">
-            PoS Location Not Found
+            {t('pos:detail.notFound')}
           </h3>
           <p className="text-sm text-gray-500 mb-4">
-            {error || 'The requested location could not be found.'}
+            {error || t('pos:detail.notFoundDesc')}
           </p>
           <Button variant="primary" onClick={() => navigate('/pos')}>
-            ← Back to PoS List
+            ← {t('pos:detail.back')}
           </Button>
         </div>
       </div>
@@ -132,14 +137,14 @@ const PosDetailPage = () => {
               d="M15 19l-7-7 7-7"
             />
           </svg>
-          Back to PoS List
+          {t('pos:detail.back')}
         </button>
         <div className="flex items-center gap-2">
           <button
             onClick={handleEdit}
             data-testid="pos-detail-edit-btn"
             className="text-indigo-600 hover:text-indigo-800 p-2 rounded-full hover:bg-indigo-50 transition-colors"
-            title="Edit"
+            title={t('pos:btn.edit')}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -149,7 +154,7 @@ const PosDetailPage = () => {
             onClick={() => setDeleteConfirm(true)}
             data-testid="pos-detail-delete-btn"
             className="text-red-600 hover:text-red-800 p-2 rounded-full hover:bg-red-50 transition-colors"
-            title="Delete"
+            title={t('pos:btn.delete')}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -167,7 +172,7 @@ const PosDetailPage = () => {
           data-testid="pos-detail-type-badge"
           className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${typeColor.bg} ${typeColor.text} ${typeColor.border} border`}
         >
-          {POS_TYPE_LABELS[pos.type] || pos.type}
+          {t(`pos:type.${TYPE_KEY_MAP[pos.type] || pos.type.toLowerCase()}`)}
         </span>
         <span className="inline-flex items-center gap-1.5 text-xs font-medium">
           <span
@@ -175,7 +180,7 @@ const PosDetailPage = () => {
               pos.isActive ? 'bg-green-400' : 'bg-gray-400'
             }`}
           />
-          {pos.isActive ? 'Active' : 'Inactive'}
+          {pos.isActive ? t('pos:status.active') : t('pos:status.inactive')}
         </span>
       </div>
 
@@ -184,12 +189,12 @@ const PosDetailPage = () => {
 
       {/* Info section */}
       <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Location Information</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('pos:detail.locationInfo')}</h2>
         <div className="space-y-3">
           <div className="flex items-start gap-3">
             <span className="text-lg shrink-0">📍</span>
             <div>
-              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Address</p>
+              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{t('pos:detail.address')}</p>
               <p data-testid="pos-detail-address" className="text-sm text-gray-900">
                 {pos.address}
               </p>
@@ -199,7 +204,7 @@ const PosDetailPage = () => {
             <div className="flex items-start gap-3">
               <span className="text-lg shrink-0">📞</span>
               <div>
-                <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Phone</p>
+                <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{t('pos:detail.phone')}</p>
                 <p data-testid="pos-detail-phone" className="text-sm text-gray-900">
                   {pos.phone}
                 </p>
@@ -209,9 +214,9 @@ const PosDetailPage = () => {
           <div className="flex items-start gap-3">
             <span className="text-lg shrink-0">👤</span>
             <div>
-              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Manager</p>
+              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{t('pos:detail.manager')}</p>
               <p data-testid="pos-detail-manager" className="text-sm text-gray-900">
-                {pos.managerName || 'Unassigned'}
+                {pos.managerName || t('pos:detail.unassigned')}
               </p>
             </div>
           </div>
@@ -235,7 +240,7 @@ const PosDetailPage = () => {
 
       {/* Opening Hours */}
       <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Opening Hours</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('pos:detail.openingHours')}</h2>
         <div data-testid="pos-detail-hours" className="divide-y divide-gray-100">
           {DAYS_OF_WEEK.map((day) => {
             const hours = pos.openingHours?.[day];
@@ -246,10 +251,10 @@ const PosDetailPage = () => {
                 className="flex items-center justify-between py-3"
               >
                 <span className="text-sm font-medium text-gray-700 w-28">
-                  {DAY_LABELS[day]}
+                  {t(`pos:days.${DAY_KEY_MAP[day] || day.toLowerCase()}`)}
                 </span>
                 {hours?.closed ? (
-                  <span className="text-sm text-gray-400 italic">Closed</span>
+                  <span className="text-sm text-gray-400 italic">{t('pos:form.closed')}</span>
                 ) : (
                   <span className="text-sm text-gray-900">
                     {hours?.open || '—'} – {hours?.close || '—'}
@@ -295,12 +300,12 @@ const PosDetailPage = () => {
                 </svg>
               </div>
               <h3 className="text-lg font-semibold text-gray-900 text-center mb-2">
-                Delete PoS Location
+                {t('pos:delete.title')}
               </h3>
               <p className="text-sm text-gray-600 text-center">
-                Are you sure you want to delete{' '}
-                <span className="font-semibold">{pos.name}</span>?
-                This will deactivate the location.
+                {t('pos:delete.confirmPrefix')}{' '}
+                <span className="font-semibold">{pos.name}</span>
+                {t('pos:delete.confirmSuffix')}
               </p>
             </div>
             <div className="bg-gray-50 px-6 py-4 flex justify-end gap-3">
@@ -310,7 +315,7 @@ const PosDetailPage = () => {
                 onClick={() => setDeleteConfirm(false)}
                 data-testid="pos-delete-cancel-btn"
               >
-                Cancel
+                {t('common:actions.cancel')}
               </Button>
               <Button
                 variant="danger"
@@ -318,7 +323,7 @@ const PosDetailPage = () => {
                 onClick={handleDelete}
                 data-testid="pos-delete-confirm-btn"
               >
-                Delete
+                {t('common:actions.delete')}
               </Button>
             </div>
           </div>

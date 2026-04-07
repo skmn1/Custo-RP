@@ -1,6 +1,9 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
-const Modal = ({ isOpen, onClose, title, children, size = 'md', onValidate, validateText = 'Validate', showValidate = false, validateDisabled = false }) => {
+const Modal = ({ isOpen, onClose, title, children, size = 'md', onValidate, validateText, showValidate = false, validateDisabled = false }) => {
+  const { t } = useTranslation(['common']);
+  const resolvedValidateText = validateText ?? t('common:actions.submit');
   if (!isOpen) return null;
 
   const sizes = {
@@ -19,6 +22,7 @@ const Modal = ({ isOpen, onClose, title, children, size = 'md', onValidate, vali
             <h3 className="text-lg font-semibold text-white">{title}</h3>
             <button
               onClick={onClose}
+              aria-label={t('common:btn.close')}
               className="text-white hover:text-gray-200 transition-colors p-1 rounded-full hover:bg-white hover:bg-opacity-20"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -39,7 +43,7 @@ const Modal = ({ isOpen, onClose, title, children, size = 'md', onValidate, vali
               data-testid="modal-cancel-button"
               className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors"
             >
-              Cancel
+              {t('common:actions.cancel')}
             </button>
             <button
               onClick={onValidate}
@@ -51,7 +55,7 @@ const Modal = ({ isOpen, onClose, title, children, size = 'md', onValidate, vali
                   : 'bg-indigo-600 hover:bg-indigo-700'
               }`}
             >
-              {validateText}
+              {resolvedValidateText}
             </button>
           </div>
         )}

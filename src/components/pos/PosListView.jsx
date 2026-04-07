@@ -1,29 +1,33 @@
 import React from 'react';
-import { POS_TYPE_LABELS, POS_TYPE_COLORS } from '../../constants/pos';
+import { useTranslation } from 'react-i18next';
+import { POS_TYPE_COLORS } from '../../constants/pos';
+
+const TYPE_KEY_MAP = { BUTCHER: 'butcher', GROCERY: 'grocery', FAST_FOOD: 'fastFood', MIXED: 'mixed' };
 
 const PosListView = ({ posList, onView, onEdit, onDelete }) => {
+  const { t } = useTranslation(['pos']);
   return (
     <div className="overflow-hidden">
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Location
+              {t('pos:table.location')}
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Type
+              {t('pos:table.type')}
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Address
+              {t('pos:table.address')}
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Manager
+              {t('pos:table.manager')}
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Phone
+              {t('pos:table.phone')}
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Status
+              {t('pos:table.status')}
             </th>
             <th className="relative px-6 py-3">
               <span className="sr-only">Actions</span>
@@ -52,7 +56,7 @@ const PosListView = ({ posList, onView, onEdit, onDelete }) => {
                     data-testid="pos-type-badge"
                     className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${typeColor.bg} ${typeColor.text} ${typeColor.border} border`}
                   >
-                    {POS_TYPE_LABELS[pos.type] || pos.type}
+                    {t(`pos:type.${TYPE_KEY_MAP[pos.type]}`) || pos.type}
                   </span>
                 </td>
                 <td className="px-6 py-4">
@@ -62,7 +66,7 @@ const PosListView = ({ posList, onView, onEdit, onDelete }) => {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-900" data-testid="pos-manager">
-                    {pos.managerName || <span className="text-gray-400 italic">Unassigned</span>}
+                    {pos.managerName || <span className="text-gray-400 italic">{t('pos:detail.unassigned')}</span>}
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
@@ -74,14 +78,14 @@ const PosListView = ({ posList, onView, onEdit, onDelete }) => {
                       className={`w-2.5 h-2.5 rounded-full ${pos.isActive ? 'bg-green-400' : 'bg-gray-400'}`}
                     />
                     <span className="text-sm text-gray-700">
-                      {pos.isActive ? 'Active' : 'Inactive'}
+                      {pos.isActive ? t('pos:status.active') : t('pos:status.inactive')}
                     </span>
                     {!pos.isActive && (
                       <span
                         data-testid="pos-inactive-badge"
                         className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200 ml-1"
                       >
-                        Inactive
+                        {t('pos:status.inactive')}
                       </span>
                     )}
                   </span>
@@ -91,8 +95,7 @@ const PosListView = ({ posList, onView, onEdit, onDelete }) => {
                     <button
                       onClick={() => onView(pos)}
                       className="text-indigo-600 hover:text-indigo-900 p-1 rounded-full hover:bg-indigo-50 transition-colors"
-                      title="View"
-                      data-testid="pos-view-btn"
+                      title={t('pos:btn.view')}
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -102,8 +105,7 @@ const PosListView = ({ posList, onView, onEdit, onDelete }) => {
                     <button
                       onClick={() => onEdit(pos)}
                       className="text-indigo-600 hover:text-indigo-900 p-1 rounded-full hover:bg-indigo-50 transition-colors"
-                      title="Edit"
-                      data-testid="pos-edit-btn"
+                      title={t('pos:btn.edit')}
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -112,8 +114,7 @@ const PosListView = ({ posList, onView, onEdit, onDelete }) => {
                     <button
                       onClick={() => onDelete(pos)}
                       className="text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-50 transition-colors"
-                      title="Delete"
-                      data-testid="pos-delete-btn"
+                      title={t('pos:btn.delete')}
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />

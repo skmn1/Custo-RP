@@ -1,7 +1,9 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import StatCard from '../ui/StatCard';
 
 const StatisticsPanel = ({ employees, shifts }) => {
+  const { t } = useTranslation(['scheduler']);
   const totalHours = shifts.reduce((sum, shift) => sum + shift.duration, 0);
   const averageHoursPerEmployee = employees.length > 0 ? (totalHours / employees.length).toFixed(1) : 0;
   const overtimeEmployees = employees.filter(emp => {
@@ -13,9 +15,9 @@ const StatisticsPanel = ({ employees, shifts }) => {
 
   const statsData = [
     {
-      title: 'Total Staff',
+      title: t('scheduler:stats.totalStaff'),
       value: employees.length,
-      subtitle: 'Active employees',
+      subtitle: t('scheduler:stats.activeEmployees'),
       color: 'blue',
       icon: (
         <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -24,9 +26,9 @@ const StatisticsPanel = ({ employees, shifts }) => {
       ),
     },
     {
-      title: 'Total Shifts',
+      title: t('scheduler:stats.totalShifts'),
       value: shifts.length,
-      subtitle: 'This week',
+      subtitle: t('scheduler:stats.thisWeek'),
       color: 'green',
       icon: (
         <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -35,9 +37,9 @@ const StatisticsPanel = ({ employees, shifts }) => {
       ),
     },
     {
-      title: 'Total Hours',
+      title: t('scheduler:stats.totalHours'),
       value: `${totalHours}h`,
-      subtitle: `${averageHoursPerEmployee}h avg/employee`,
+      subtitle: t('scheduler:stats.averagePerEmployee', { value: averageHoursPerEmployee }),
       color: 'purple',
       icon: (
         <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -46,9 +48,9 @@ const StatisticsPanel = ({ employees, shifts }) => {
       ),
     },
     {
-      title: 'Overtime',
+      title: t('scheduler:stats.overtime'),
       value: overtimeEmployees,
-      subtitle: overtimeEmployees > 0 ? 'employees over limit' : 'all within limits',
+      subtitle: overtimeEmployees > 0 ? t('scheduler:stats.employeesOverLimit') : t('scheduler:stats.allWithinLimits'),
       color: overtimeEmployees > 0 ? 'red' : 'green',
       icon: (
         <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">

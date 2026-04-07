@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import Modal from '../ui/Modal';
 import ComboBox from '../ui/ComboBox';
 
@@ -21,6 +22,7 @@ const EmployeeModal = ({
   posList = [],
   lockedPosId = null,
 }) => {
+  const { t } = useTranslation(['employees', 'validation']);
   const initialForm = (emp) => ({
     name:     emp?.name     || '',
     role:     emp?.role     || '',
@@ -40,13 +42,13 @@ const EmployeeModal = ({
 
   const validate = () => {
     const e = {};
-    if (!formData.name.trim())  e.name  = 'Name is required';
-    if (!formData.email.trim()) e.email = 'Email is required';
+    if (!formData.name.trim())  e.name  = t('employees:validation.nameRequired');
+    if (!formData.email.trim()) e.email = t('employees:validation.emailRequired');
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
-      e.email = 'Please enter a valid email address';
-    if (!formData.role.trim())  e.role  = 'Role is required';
+      e.email = t('employees:validation.emailInvalid');
+    if (!formData.role.trim())  e.role  = t('employees:validation.roleRequired');
     if (!formData.maxHours || formData.maxHours < 1 || formData.maxHours > 80)
-      e.maxHours = 'Max hours must be between 1 and 80';
+      e.maxHours = t('employees:validation.maxHoursRange');
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -78,20 +80,20 @@ const EmployeeModal = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={employee ? 'Edit Employee' : 'Add New Employee'}
+      title={employee ? t('employees:editEmployee') : t('employees:addNewEmployee')}
       size="lg"
       showValidate
       onValidate={handleSubmit}
-      validateText={employee ? 'Update Employee' : 'Add Employee'}
+      validateText={employee ? t('employees:updateEmployee') : t('employees:addEmployee')}
       validateDisabled={!isFormValid()}
     >
       <div className="space-y-6">
         {/* Personal Information */}
         <div>
-          <h4 className="text-lg font-medium text-gray-900 mb-4">Personal Information</h4>
+          <h4 className="text-lg font-medium text-gray-900 mb-4">{t('employees:sections.personalInfo')}</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">{t('employees:fields.fullNameRequired')}</label>
               <input
                 type="text"
                 name="name"
@@ -101,13 +103,13 @@ const EmployeeModal = ({
                 className={`w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors ${
                   errors.name ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 focus:border-indigo-500'
                 }`}
-                placeholder="Enter full name"
+                placeholder={t('employees:placeholders.fullName')}
               />
               {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">{t('employees:fields.emailRequired')}</label>
               <input
                 type="email"
                 name="email"
@@ -116,7 +118,7 @@ const EmployeeModal = ({
                 className={`w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors ${
                   errors.email ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 focus:border-indigo-500'
                 }`}
-                placeholder="Enter email address"
+                placeholder={t('employees:placeholders.email')}
               />
               {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
             </div>
@@ -125,17 +127,17 @@ const EmployeeModal = ({
 
         {/* Work Information */}
         <div>
-          <h4 className="text-lg font-medium text-gray-900 mb-4">Work Information</h4>
+          <h4 className="text-lg font-medium text-gray-900 mb-4">{t('employees:sections.workInfo')}</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Role */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Role *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">{t('employees:fields.roleRequired')}</label>
               <ComboBox
                 name="role"
                 value={formData.role}
                 onChange={handleChange}
                 options={roles}
-                placeholder="Select or type a role"
+                placeholder={t('employees:placeholders.role')}
                 error={!!errors.role}
               />
               {errors.role && <p className="mt-1 text-sm text-red-600">{errors.role}</p>}
@@ -144,7 +146,7 @@ const EmployeeModal = ({
             {/* Point of Sale */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Point of Sale{lockedPosId != null ? ' *' : ''}
+                {lockedPosId != null ? t('employees:fields.posRequired') : t('employees:fields.pos')}
               </label>
               <div className="relative">
                 <select
@@ -159,7 +161,7 @@ const EmployeeModal = ({
                   }`}
                   style={{ backgroundImage: 'none' }}
                 >
-                  {lockedPosId == null && <option value="">— Not assigned —</option>}
+                  {lockedPosId == null && <option value="">{t('employees:placeholders.notAssigned')}</option>}
                   {posList.map((pos) => (
                     <option key={pos.id} value={pos.id}>{pos.name}</option>
                   ))}
@@ -177,7 +179,7 @@ const EmployeeModal = ({
                 </div>
               </div>
               {lockedPosId != null && (
-                <p className="mt-1 text-xs text-indigo-500">Auto-filled from the PoS location</p>
+                <p className="mt-1 text-xs text-indigo-500">{t('employees:hints.autoFilled')}</p>
               )}
             </div>
           </div>
@@ -185,10 +187,10 @@ const EmployeeModal = ({
 
         {/* Schedule Information */}
         <div>
-          <h4 className="text-lg font-medium text-gray-900 mb-4">Schedule Information</h4>
+          <h4 className="text-lg font-medium text-gray-900 mb-4">{t('employees:sections.scheduleInfo')}</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Maximum Hours per Week *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">{t('employees:fields.maxHoursRequired')}</label>
               <input
                 type="number"
                 name="maxHours"
@@ -202,12 +204,12 @@ const EmployeeModal = ({
                 placeholder="40"
               />
               {errors.maxHours && <p className="mt-1 text-sm text-red-600">{errors.maxHours}</p>}
-              <p className="mt-1 text-xs text-gray-500">Hours between 1 and 80</p>
+              <p className="mt-1 text-xs text-gray-500">{t('employees:hints.hoursRange')}</p>
             </div>
 
             <div className="flex items-end">
               <div className="bg-gray-50 rounded-lg p-4 w-full">
-                <div className="text-sm font-medium text-gray-700 mb-2">Preview</div>
+                <div className="text-sm font-medium text-gray-700 mb-2">{t('employees:preview')}</div>
                 <div className="flex items-center space-x-3">
                   <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
                     {formData.name
@@ -216,10 +218,10 @@ const EmployeeModal = ({
                   </div>
                   <div>
                     <div className="text-sm font-semibold text-gray-900">
-                      {formData.name || 'Employee Name'}
+                      {formData.name || t('employees:employeeName')}
                     </div>
                     <div className="text-xs text-gray-600">
-                      {formData.role || 'Role'}{posName ? ` · ${posName}` : ''}
+                      {formData.role || t('employees:fields.role')}{posName ? ` · ${posName}` : ''}
                     </div>
                   </div>
                 </div>
@@ -228,7 +230,7 @@ const EmployeeModal = ({
           </div>
         </div>
 
-        <div className="text-xs text-gray-500">* Required fields</div>
+        <div className="text-xs text-gray-500">{t('employees:hints.requiredFields')}</div>
       </div>
     </Modal>
   );
