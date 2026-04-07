@@ -14,6 +14,7 @@ import UserManagementPage from './pages/UserManagementPage';
 import AccessDeniedPage from './pages/AccessDeniedPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import DevLoginPage from './pages/DevLoginPage';
 
 const ProtectedLayout = ({ children }) => (
   <AuthGuard>
@@ -30,7 +31,8 @@ const App = () => {
       <AuthProvider>
         <Routes>
           {/* Public routes */}
-          <Route path="/login" element={<LoginPage />} />
+          <Route path="/login" element={<DevLoginPage />} />
+          <Route path="/login/classic" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
 
           {/* Protected routes */}
