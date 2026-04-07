@@ -17,13 +17,13 @@ const StockDashboardPage = () => {
   useEffect(() => { fetchKpi(); }, [fetchKpi]);
 
   if (isLoading && !kpi) return <div className="text-center py-12 text-gray-500">{t('common:loading')}</div>;
-  if (!kpi) return <div className="text-center py-12 text-gray-500">{t('kpi.noData')}</div>;
+  if (!kpi) return <div className="text-center py-12 text-gray-500">{t('common:noResults')}</div>;
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">{t('kpi.title')}</h1>
-        <p className="text-sm text-gray-500">{t('kpi.subtitle')}</p>
+        <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
+        <p className="text-sm text-gray-500">{t('subtitle')}</p>
       </div>
 
       {/* KPI summary cards */}
@@ -41,24 +41,24 @@ const StockDashboardPage = () => {
           <p className="text-2xl font-bold text-yellow-600">{kpi.lowStockItems || 0}</p>
         </div>
         <div className="bg-white rounded-lg shadow p-4">
-          <p className="text-sm text-gray-500">{t('kpi.avgDaysStockout')}</p>
+          <p className="text-sm text-gray-500">{t('kpi.avgDaysToStockout')}</p>
           <p className="text-2xl font-bold">{kpi.avgDaysToStockout != null ? Math.round(kpi.avgDaysToStockout) : '—'}</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Weekly movement trend */}
-        {kpi.weeklyTrend && kpi.weeklyTrend.length > 0 && (
+        {kpi.movementTrend && kpi.movementTrend.length > 0 && (
           <div className="bg-white rounded-lg shadow p-4">
-            <h3 className="font-semibold mb-4">{t('kpi.weeklyTrend')}</h3>
+            <h3 className="font-semibold mb-4">{t('kpi.movementTrend')}</h3>
             <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={kpi.weeklyTrend}>
+              <BarChart data={kpi.movementTrend}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="weekLabel" tick={{ fontSize: 11 }} />
+                <XAxis dataKey="week" tick={{ fontSize: 11 }} />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="received" fill="#10b981" name={t('kpi.received')} />
-                <Bar dataKey="consumed" fill="#ef4444" name={t('kpi.consumed')} />
+                <Bar dataKey="qtyIn" fill="#10b981" name={t('kpi.qtyIn')} />
+                <Bar dataKey="qtyOut" fill="#ef4444" name={t('kpi.qtyOut')} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -93,7 +93,7 @@ const StockDashboardPage = () => {
                 <XAxis type="number" />
                 <YAxis dataKey="itemName" type="category" width={120} tick={{ fontSize: 11 }} />
                 <Tooltip />
-                <Bar dataKey="totalConsumed" fill="#6366f1" name={t('kpi.consumed')} />
+                <Bar dataKey="totalConsumed" fill="#6366f1" name={t('kpi.topConsumed')} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -119,7 +119,7 @@ const StockDashboardPage = () => {
             </div>
             <button onClick={() => navigate('/stock/reorder-queue')}
               className="mt-3 text-sm text-indigo-600 hover:text-indigo-900">
-              {t('kpi.viewReorderQueue')} →
+              {t('reorder.title')} →
             </button>
           </div>
         )}

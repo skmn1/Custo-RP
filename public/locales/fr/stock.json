@@ -235,8 +235,8 @@
   "kpi.topConsumed": "Plus consommés (30j)",
   "kpi.valueByCategory": "Valeur par catégorie",
   "kpi.lowStockAlerts": "Alertes de stock bas",
-  "kpi.qtyIn": "Entrées",
-  "kpi.qtyOut": "Sorties",
+  "kpi.qtyIn": "Reçus",
+  "kpi.qtyOut": "Consommés",
 
   "barcode.title": "Scanner le code-barres",
   "barcode.scanning": "Scan en cours...",

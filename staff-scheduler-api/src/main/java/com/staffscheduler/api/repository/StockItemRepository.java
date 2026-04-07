@@ -23,13 +23,14 @@ public interface StockItemRepository extends JpaRepository<StockItem, UUID> {
 
     List<StockItem> findByIsActiveTrueOrderByNameEnAsc();
 
-    @Query("SELECT i FROM StockItem i WHERE i.isActive = true " +
-           "AND (:categoryId IS NULL OR i.categoryId = :categoryId) " +
-           "AND (:locationId IS NULL OR i.locationId = :locationId) " +
-           "AND (:search IS NULL OR LOWER(i.nameEn) LIKE LOWER(CONCAT('%', CAST(:search AS string), '%')) " +
-           "   OR LOWER(i.nameFr) LIKE LOWER(CONCAT('%', CAST(:search AS string), '%')) " +
-           "   OR LOWER(i.sku) LIKE LOWER(CONCAT('%', CAST(:search AS string), '%'))) " +
-           "ORDER BY i.nameEn ASC")
+    @Query(value = "SELECT * FROM stock_items WHERE is_active = true " +
+           "AND (CAST(:categoryId AS uuid) IS NULL OR category_id = CAST(:categoryId AS uuid)) " +
+           "AND (CAST(:locationId AS uuid) IS NULL OR location_id = CAST(:locationId AS uuid)) " +
+           "AND (CAST(:search AS text) IS NULL " +
+           "     OR LOWER(name_en) LIKE LOWER('%' || CAST(:search AS text) || '%') " +
+           "     OR LOWER(name_fr) LIKE LOWER('%' || CAST(:search AS text) || '%') " +
+           "     OR LOWER(sku)     LIKE LOWER('%' || CAST(:search AS text) || '%')) " +
+           "ORDER BY name_en ASC", nativeQuery = true)
     List<StockItem> findFiltered(
             @Param("search") String search,
             @Param("categoryId") UUID categoryId,

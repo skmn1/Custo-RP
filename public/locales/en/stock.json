@@ -235,8 +235,8 @@
   "kpi.topConsumed": "Top Consumed (30d)",
   "kpi.valueByCategory": "Value by Category",
   "kpi.lowStockAlerts": "Low Stock Alerts",
-  "kpi.qtyIn": "In",
-  "kpi.qtyOut": "Out",
+  "kpi.qtyIn": "Received",
+  "kpi.qtyOut": "Consumed",
 
   "barcode.title": "Scan Barcode",
   "barcode.scanning": "Scanning...",
