@@ -66,7 +66,7 @@ const SettingNumber = ({ label, value, onChange, min, max, step = 1, disabled })
     <label className="block text-sm font-medium text-gray-900 mb-1">{label}</label>
     <input
       type="number"
-      value={value}
+      value={value ?? ''}
       onChange={(e) => onChange(Number(e.target.value))}
       min={min} max={max} step={step}
       disabled={disabled}
@@ -197,6 +197,172 @@ const CATEGORY_ICONS = {
   dataPrivacy: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
   departments: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4',
   shiftTypes: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
+};
+
+// ── Departments Inline CRUD ─────────────────────────────────────────
+
+const DepartmentsEditor = ({ departments, createDepartment, updateDepartment, deleteDepartment, t }) => {
+  const [editingId, setEditingId] = useState(null);
+  const [draftRow, setDraftRow] = useState({ nameEn: '', nameFr: '', color: '#3B82F6', active: true });
+
+  const handleAdd = async () => {
+    if (!draftRow.nameEn.trim()) return;
+    await createDepartment(draftRow);
+    setDraftRow({ nameEn: '', nameFr: '', color: '#3B82F6', active: true });
+  };
+
+  const handleSave = async (id) => {
+    await updateDepartment(id, draftRow);
+    setEditingId(null);
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm(t('settings:departments.confirmDelete'))) return;
+    await deleteDepartment(id);
+  };
+
+  return (
+    <div>
+      <p className="text-sm text-gray-500 mb-4">{t('settings:departments.description')}</p>
+      <table className="w-full text-left text-sm">
+        <thead>
+          <tr className="border-b border-gray-200 text-xs font-semibold text-gray-500 uppercase">
+            <th className="py-2 px-2">{t('settings:departments.nameEn')}</th>
+            <th className="py-2 px-2">{t('settings:departments.nameFr')}</th>
+            <th className="py-2 px-2 w-16">{t('settings:departments.color')}</th>
+            <th className="py-2 px-2 w-16">{t('settings:departments.active')}</th>
+            <th className="py-2 px-2 w-24"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {departments.map((dept) => (
+            <tr key={dept.id} className="border-b border-gray-100">
+              {editingId === dept.id ? (
+                <>
+                  <td className="py-2 px-2"><input type="text" value={draftRow.nameEn} onChange={(e) => setDraftRow((d) => ({ ...d, nameEn: e.target.value }))} className="w-full border border-gray-300 rounded px-2 py-1 text-sm" /></td>
+                  <td className="py-2 px-2"><input type="text" value={draftRow.nameFr} onChange={(e) => setDraftRow((d) => ({ ...d, nameFr: e.target.value }))} className="w-full border border-gray-300 rounded px-2 py-1 text-sm" /></td>
+                  <td className="py-2 px-2"><input type="color" value={draftRow.color} onChange={(e) => setDraftRow((d) => ({ ...d, color: e.target.value }))} className="w-8 h-8 rounded cursor-pointer" /></td>
+                  <td className="py-2 px-2"><input type="checkbox" checked={draftRow.active} onChange={(e) => setDraftRow((d) => ({ ...d, active: e.target.checked }))} className="rounded border-gray-300" /></td>
+                  <td className="py-2 px-2 space-x-1">
+                    <button onClick={() => handleSave(dept.id)} className="text-indigo-600 hover:text-indigo-800 text-xs font-medium">{t('settings:actions.save')}</button>
+                    <button onClick={() => setEditingId(null)} className="text-gray-500 hover:text-gray-700 text-xs font-medium">{t('settings:actions.cancel')}</button>
+                  </td>
+                </>
+              ) : (
+                <>
+                  <td className="py-2 px-2 text-gray-900">{dept.nameEn}</td>
+                  <td className="py-2 px-2 text-gray-600">{dept.nameFr}</td>
+                  <td className="py-2 px-2"><span className="inline-block w-6 h-6 rounded" style={{ backgroundColor: dept.color }} /></td>
+                  <td className="py-2 px-2">{dept.active ? '✓' : '–'}</td>
+                  <td className="py-2 px-2 space-x-1">
+                    <button onClick={() => { setEditingId(dept.id); setDraftRow({ nameEn: dept.nameEn, nameFr: dept.nameFr, color: dept.color, active: dept.active }); }} className="text-indigo-600 hover:text-indigo-800 text-xs font-medium">{t('settings:actions.edit')}</button>
+                    <button onClick={() => handleDelete(dept.id)} className="text-red-600 hover:text-red-800 text-xs font-medium">{t('settings:actions.delete')}</button>
+                  </td>
+                </>
+              )}
+            </tr>
+          ))}
+          {/* New row */}
+          <tr className="border-b border-gray-100 bg-gray-50">
+            <td className="py-2 px-2"><input type="text" value={draftRow.nameEn} onChange={(e) => setDraftRow((d) => ({ ...d, nameEn: e.target.value }))} placeholder="English name" className="w-full border border-gray-300 rounded px-2 py-1 text-sm" /></td>
+            <td className="py-2 px-2"><input type="text" value={draftRow.nameFr} onChange={(e) => setDraftRow((d) => ({ ...d, nameFr: e.target.value }))} placeholder="Nom français" className="w-full border border-gray-300 rounded px-2 py-1 text-sm" /></td>
+            <td className="py-2 px-2"><input type="color" value={draftRow.color} onChange={(e) => setDraftRow((d) => ({ ...d, color: e.target.value }))} className="w-8 h-8 rounded cursor-pointer" /></td>
+            <td className="py-2 px-2"><input type="checkbox" checked={draftRow.active} onChange={(e) => setDraftRow((d) => ({ ...d, active: e.target.checked }))} className="rounded border-gray-300" /></td>
+            <td className="py-2 px-2">
+              <button onClick={handleAdd} disabled={!draftRow.nameEn.trim()} className="text-sm font-medium text-indigo-600 hover:text-indigo-800 disabled:opacity-40">{t('settings:departments.add')}</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+// ── Shift Types Inline CRUD ─────────────────────────────────────────
+
+const ShiftTypesEditor = ({ shiftTypes, createShiftType, updateShiftType, deleteShiftType, t }) => {
+  const [editingId, setEditingId] = useState(null);
+  const [draftRow, setDraftRow] = useState({ nameEn: '', nameFr: '', defaultStart: '09:00', durationHours: 8, color: '#3B82F6', active: true });
+
+  const handleAdd = async () => {
+    if (!draftRow.nameEn.trim()) return;
+    await createShiftType(draftRow);
+    setDraftRow({ nameEn: '', nameFr: '', defaultStart: '09:00', durationHours: 8, color: '#3B82F6', active: true });
+  };
+
+  const handleSave = async (id) => {
+    await updateShiftType(id, draftRow);
+    setEditingId(null);
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm(t('settings:shiftTypes.confirmDelete'))) return;
+    await deleteShiftType(id);
+  };
+
+  return (
+    <div>
+      <p className="text-sm text-gray-500 mb-4">{t('settings:shiftTypes.description')}</p>
+      <table className="w-full text-left text-sm">
+        <thead>
+          <tr className="border-b border-gray-200 text-xs font-semibold text-gray-500 uppercase">
+            <th className="py-2 px-2">{t('settings:shiftTypes.nameEn')}</th>
+            <th className="py-2 px-2">{t('settings:shiftTypes.nameFr')}</th>
+            <th className="py-2 px-2 w-24">{t('settings:shiftTypes.defaultStart')}</th>
+            <th className="py-2 px-2 w-20">{t('settings:shiftTypes.duration')}</th>
+            <th className="py-2 px-2 w-16">{t('settings:shiftTypes.color')}</th>
+            <th className="py-2 px-2 w-16">{t('settings:shiftTypes.active')}</th>
+            <th className="py-2 px-2 w-24"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {shiftTypes.map((st) => (
+            <tr key={st.id} className="border-b border-gray-100">
+              {editingId === st.id ? (
+                <>
+                  <td className="py-2 px-2"><input type="text" value={draftRow.nameEn} onChange={(e) => setDraftRow((d) => ({ ...d, nameEn: e.target.value }))} className="w-full border border-gray-300 rounded px-2 py-1 text-sm" /></td>
+                  <td className="py-2 px-2"><input type="text" value={draftRow.nameFr} onChange={(e) => setDraftRow((d) => ({ ...d, nameFr: e.target.value }))} className="w-full border border-gray-300 rounded px-2 py-1 text-sm" /></td>
+                  <td className="py-2 px-2"><input type="time" value={draftRow.defaultStart} onChange={(e) => setDraftRow((d) => ({ ...d, defaultStart: e.target.value }))} className="border border-gray-300 rounded px-2 py-1 text-sm" /></td>
+                  <td className="py-2 px-2"><input type="number" value={draftRow.durationHours} onChange={(e) => setDraftRow((d) => ({ ...d, durationHours: Number(e.target.value) }))} min={0.5} max={24} step={0.5} className="w-16 border border-gray-300 rounded px-2 py-1 text-sm" /></td>
+                  <td className="py-2 px-2"><input type="color" value={draftRow.color} onChange={(e) => setDraftRow((d) => ({ ...d, color: e.target.value }))} className="w-8 h-8 rounded cursor-pointer" /></td>
+                  <td className="py-2 px-2"><input type="checkbox" checked={draftRow.active} onChange={(e) => setDraftRow((d) => ({ ...d, active: e.target.checked }))} className="rounded border-gray-300" /></td>
+                  <td className="py-2 px-2 space-x-1">
+                    <button onClick={() => handleSave(st.id)} className="text-indigo-600 hover:text-indigo-800 text-xs font-medium">{t('settings:actions.save')}</button>
+                    <button onClick={() => setEditingId(null)} className="text-gray-500 hover:text-gray-700 text-xs font-medium">{t('settings:actions.cancel')}</button>
+                  </td>
+                </>
+              ) : (
+                <>
+                  <td className="py-2 px-2 text-gray-900">{st.nameEn}</td>
+                  <td className="py-2 px-2 text-gray-600">{st.nameFr}</td>
+                  <td className="py-2 px-2 text-gray-600">{st.defaultStart}</td>
+                  <td className="py-2 px-2 text-gray-600">{st.durationHours}h</td>
+                  <td className="py-2 px-2"><span className="inline-block w-6 h-6 rounded" style={{ backgroundColor: st.color }} /></td>
+                  <td className="py-2 px-2">{st.active ? '✓' : '–'}</td>
+                  <td className="py-2 px-2 space-x-1">
+                    <button onClick={() => { setEditingId(st.id); setDraftRow({ nameEn: st.nameEn, nameFr: st.nameFr, defaultStart: st.defaultStart, durationHours: st.durationHours, color: st.color, active: st.active }); }} className="text-indigo-600 hover:text-indigo-800 text-xs font-medium">{t('settings:actions.edit')}</button>
+                    <button onClick={() => handleDelete(st.id)} className="text-red-600 hover:text-red-800 text-xs font-medium">{t('settings:actions.delete')}</button>
+                  </td>
+                </>
+              )}
+            </tr>
+          ))}
+          {/* New row */}
+          <tr className="border-b border-gray-100 bg-gray-50">
+            <td className="py-2 px-2"><input type="text" value={draftRow.nameEn} onChange={(e) => setDraftRow((d) => ({ ...d, nameEn: e.target.value }))} placeholder="English name" className="w-full border border-gray-300 rounded px-2 py-1 text-sm" /></td>
+            <td className="py-2 px-2"><input type="text" value={draftRow.nameFr} onChange={(e) => setDraftRow((d) => ({ ...d, nameFr: e.target.value }))} placeholder="Nom français" className="w-full border border-gray-300 rounded px-2 py-1 text-sm" /></td>
+            <td className="py-2 px-2"><input type="time" value={draftRow.defaultStart} onChange={(e) => setDraftRow((d) => ({ ...d, defaultStart: e.target.value }))} className="border border-gray-300 rounded px-2 py-1 text-sm" /></td>
+            <td className="py-2 px-2"><input type="number" value={draftRow.durationHours} onChange={(e) => setDraftRow((d) => ({ ...d, durationHours: Number(e.target.value) }))} min={0.5} max={24} step={0.5} className="w-16 border border-gray-300 rounded px-2 py-1 text-sm" /></td>
+            <td className="py-2 px-2"><input type="color" value={draftRow.color} onChange={(e) => setDraftRow((d) => ({ ...d, color: e.target.value }))} className="w-8 h-8 rounded cursor-pointer" /></td>
+            <td className="py-2 px-2"><input type="checkbox" checked={draftRow.active} onChange={(e) => setDraftRow((d) => ({ ...d, active: e.target.checked }))} className="rounded border-gray-300" /></td>
+            <td className="py-2 px-2">
+              <button onClick={handleAdd} disabled={!draftRow.nameEn.trim()} className="text-sm font-medium text-indigo-600 hover:text-indigo-800 disabled:opacity-40">{t('settings:shiftTypes.add')}</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  );
 };
 
 // ── Main Page Component ────────────────────────────────────────────
@@ -769,167 +935,25 @@ const SettingsPage = () => {
     </div>
   );
 
-  const renderDepartments = () => {
-    const [editingId, setEditingId] = useState(null);
-    const [draftRow, setDraftRow] = useState({ nameEn: '', nameFr: '', color: '#3B82F6', active: true });
+  const renderDepartments = () => (
+    <DepartmentsEditor
+      departments={savedDepartments}
+      createDepartment={createDepartment}
+      updateDepartment={updateDepartment}
+      deleteDepartment={deleteDepartment}
+      t={t}
+    />
+  );
 
-    const handleAdd = async () => {
-      if (!draftRow.nameEn.trim()) return;
-      await createDepartment(draftRow);
-      setDraftRow({ nameEn: '', nameFr: '', color: '#3B82F6', active: true });
-    };
-
-    const handleSave = async (id) => {
-      await updateDepartment(id, draftRow);
-      setEditingId(null);
-    };
-
-    const handleDelete = async (id) => {
-      if (!window.confirm(t('settings:departments.confirmDelete'))) return;
-      await deleteDepartment(id);
-    };
-
-    return (
-      <div>
-        <p className="text-sm text-gray-500 mb-4">{t('settings:departments.description')}</p>
-        <table className="w-full text-left text-sm">
-          <thead>
-            <tr className="border-b border-gray-200 text-xs font-semibold text-gray-500 uppercase">
-              <th className="py-2 px-2">{t('settings:departments.nameEn')}</th>
-              <th className="py-2 px-2">{t('settings:departments.nameFr')}</th>
-              <th className="py-2 px-2 w-16">{t('settings:departments.color')}</th>
-              <th className="py-2 px-2 w-16">{t('settings:departments.active')}</th>
-              <th className="py-2 px-2 w-24"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {savedDepartments.map((dept) => (
-              <tr key={dept.id} className="border-b border-gray-100">
-                {editingId === dept.id ? (
-                  <>
-                    <td className="py-2 px-2"><input type="text" value={draftRow.nameEn} onChange={(e) => setDraftRow((d) => ({ ...d, nameEn: e.target.value }))} className="w-full border border-gray-300 rounded px-2 py-1 text-sm" /></td>
-                    <td className="py-2 px-2"><input type="text" value={draftRow.nameFr} onChange={(e) => setDraftRow((d) => ({ ...d, nameFr: e.target.value }))} className="w-full border border-gray-300 rounded px-2 py-1 text-sm" /></td>
-                    <td className="py-2 px-2"><input type="color" value={draftRow.color} onChange={(e) => setDraftRow((d) => ({ ...d, color: e.target.value }))} className="w-8 h-8 rounded cursor-pointer" /></td>
-                    <td className="py-2 px-2"><input type="checkbox" checked={draftRow.active} onChange={(e) => setDraftRow((d) => ({ ...d, active: e.target.checked }))} className="rounded border-gray-300" /></td>
-                    <td className="py-2 px-2 space-x-1">
-                      <button onClick={() => handleSave(dept.id)} className="text-indigo-600 hover:text-indigo-800 text-xs font-medium">{t('settings:actions.save')}</button>
-                      <button onClick={() => setEditingId(null)} className="text-gray-500 hover:text-gray-700 text-xs font-medium">{t('settings:actions.cancel')}</button>
-                    </td>
-                  </>
-                ) : (
-                  <>
-                    <td className="py-2 px-2 text-gray-900">{dept.nameEn}</td>
-                    <td className="py-2 px-2 text-gray-600">{dept.nameFr}</td>
-                    <td className="py-2 px-2"><span className="inline-block w-6 h-6 rounded" style={{ backgroundColor: dept.color }} /></td>
-                    <td className="py-2 px-2">{dept.active ? '✓' : '–'}</td>
-                    <td className="py-2 px-2 space-x-1">
-                      <button onClick={() => { setEditingId(dept.id); setDraftRow({ nameEn: dept.nameEn, nameFr: dept.nameFr, color: dept.color, active: dept.active }); }} className="text-indigo-600 hover:text-indigo-800 text-xs font-medium">{t('settings:actions.edit')}</button>
-                      <button onClick={() => handleDelete(dept.id)} className="text-red-600 hover:text-red-800 text-xs font-medium">{t('settings:actions.delete')}</button>
-                    </td>
-                  </>
-                )}
-              </tr>
-            ))}
-            {/* New row */}
-            <tr className="border-b border-gray-100 bg-gray-50">
-              <td className="py-2 px-2"><input type="text" value={draftRow.nameEn} onChange={(e) => setDraftRow((d) => ({ ...d, nameEn: e.target.value }))} placeholder="English name" className="w-full border border-gray-300 rounded px-2 py-1 text-sm" /></td>
-              <td className="py-2 px-2"><input type="text" value={draftRow.nameFr} onChange={(e) => setDraftRow((d) => ({ ...d, nameFr: e.target.value }))} placeholder="Nom français" className="w-full border border-gray-300 rounded px-2 py-1 text-sm" /></td>
-              <td className="py-2 px-2"><input type="color" value={draftRow.color} onChange={(e) => setDraftRow((d) => ({ ...d, color: e.target.value }))} className="w-8 h-8 rounded cursor-pointer" /></td>
-              <td className="py-2 px-2"><input type="checkbox" checked={draftRow.active} onChange={(e) => setDraftRow((d) => ({ ...d, active: e.target.checked }))} className="rounded border-gray-300" /></td>
-              <td className="py-2 px-2">
-                <button onClick={handleAdd} disabled={!draftRow.nameEn.trim()} className="text-sm font-medium text-indigo-600 hover:text-indigo-800 disabled:opacity-40">{t('settings:departments.add')}</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    );
-  };
-
-  const renderShiftTypes = () => {
-    const [editingId, setEditingId] = useState(null);
-    const [draftRow, setDraftRow] = useState({ nameEn: '', nameFr: '', defaultStart: '09:00', durationHours: 8, color: '#3B82F6', active: true });
-
-    const handleAdd = async () => {
-      if (!draftRow.nameEn.trim()) return;
-      await createShiftType(draftRow);
-      setDraftRow({ nameEn: '', nameFr: '', defaultStart: '09:00', durationHours: 8, color: '#3B82F6', active: true });
-    };
-
-    const handleSave = async (id) => {
-      await updateShiftType(id, draftRow);
-      setEditingId(null);
-    };
-
-    const handleDelete = async (id) => {
-      if (!window.confirm(t('settings:shiftTypes.confirmDelete'))) return;
-      await deleteShiftType(id);
-    };
-
-    return (
-      <div>
-        <p className="text-sm text-gray-500 mb-4">{t('settings:shiftTypes.description')}</p>
-        <table className="w-full text-left text-sm">
-          <thead>
-            <tr className="border-b border-gray-200 text-xs font-semibold text-gray-500 uppercase">
-              <th className="py-2 px-2">{t('settings:shiftTypes.nameEn')}</th>
-              <th className="py-2 px-2">{t('settings:shiftTypes.nameFr')}</th>
-              <th className="py-2 px-2 w-24">{t('settings:shiftTypes.defaultStart')}</th>
-              <th className="py-2 px-2 w-20">{t('settings:shiftTypes.duration')}</th>
-              <th className="py-2 px-2 w-16">{t('settings:shiftTypes.color')}</th>
-              <th className="py-2 px-2 w-16">{t('settings:shiftTypes.active')}</th>
-              <th className="py-2 px-2 w-24"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {savedShiftTypes.map((st) => (
-              <tr key={st.id} className="border-b border-gray-100">
-                {editingId === st.id ? (
-                  <>
-                    <td className="py-2 px-2"><input type="text" value={draftRow.nameEn} onChange={(e) => setDraftRow((d) => ({ ...d, nameEn: e.target.value }))} className="w-full border border-gray-300 rounded px-2 py-1 text-sm" /></td>
-                    <td className="py-2 px-2"><input type="text" value={draftRow.nameFr} onChange={(e) => setDraftRow((d) => ({ ...d, nameFr: e.target.value }))} className="w-full border border-gray-300 rounded px-2 py-1 text-sm" /></td>
-                    <td className="py-2 px-2"><input type="time" value={draftRow.defaultStart} onChange={(e) => setDraftRow((d) => ({ ...d, defaultStart: e.target.value }))} className="border border-gray-300 rounded px-2 py-1 text-sm" /></td>
-                    <td className="py-2 px-2"><input type="number" value={draftRow.durationHours} onChange={(e) => setDraftRow((d) => ({ ...d, durationHours: Number(e.target.value) }))} min={0.5} max={24} step={0.5} className="w-16 border border-gray-300 rounded px-2 py-1 text-sm" /></td>
-                    <td className="py-2 px-2"><input type="color" value={draftRow.color} onChange={(e) => setDraftRow((d) => ({ ...d, color: e.target.value }))} className="w-8 h-8 rounded cursor-pointer" /></td>
-                    <td className="py-2 px-2"><input type="checkbox" checked={draftRow.active} onChange={(e) => setDraftRow((d) => ({ ...d, active: e.target.checked }))} className="rounded border-gray-300" /></td>
-                    <td className="py-2 px-2 space-x-1">
-                      <button onClick={() => handleSave(st.id)} className="text-indigo-600 hover:text-indigo-800 text-xs font-medium">{t('settings:actions.save')}</button>
-                      <button onClick={() => setEditingId(null)} className="text-gray-500 hover:text-gray-700 text-xs font-medium">{t('settings:actions.cancel')}</button>
-                    </td>
-                  </>
-                ) : (
-                  <>
-                    <td className="py-2 px-2 text-gray-900">{st.nameEn}</td>
-                    <td className="py-2 px-2 text-gray-600">{st.nameFr}</td>
-                    <td className="py-2 px-2 text-gray-600">{st.defaultStart}</td>
-                    <td className="py-2 px-2 text-gray-600">{st.durationHours}h</td>
-                    <td className="py-2 px-2"><span className="inline-block w-6 h-6 rounded" style={{ backgroundColor: st.color }} /></td>
-                    <td className="py-2 px-2">{st.active ? '✓' : '–'}</td>
-                    <td className="py-2 px-2 space-x-1">
-                      <button onClick={() => { setEditingId(st.id); setDraftRow({ nameEn: st.nameEn, nameFr: st.nameFr, defaultStart: st.defaultStart, durationHours: st.durationHours, color: st.color, active: st.active }); }} className="text-indigo-600 hover:text-indigo-800 text-xs font-medium">{t('settings:actions.edit')}</button>
-                      <button onClick={() => handleDelete(st.id)} className="text-red-600 hover:text-red-800 text-xs font-medium">{t('settings:actions.delete')}</button>
-                    </td>
-                  </>
-                )}
-              </tr>
-            ))}
-            {/* New row */}
-            <tr className="border-b border-gray-100 bg-gray-50">
-              <td className="py-2 px-2"><input type="text" value={draftRow.nameEn} onChange={(e) => setDraftRow((d) => ({ ...d, nameEn: e.target.value }))} placeholder="English name" className="w-full border border-gray-300 rounded px-2 py-1 text-sm" /></td>
-              <td className="py-2 px-2"><input type="text" value={draftRow.nameFr} onChange={(e) => setDraftRow((d) => ({ ...d, nameFr: e.target.value }))} placeholder="Nom français" className="w-full border border-gray-300 rounded px-2 py-1 text-sm" /></td>
-              <td className="py-2 px-2"><input type="time" value={draftRow.defaultStart} onChange={(e) => setDraftRow((d) => ({ ...d, defaultStart: e.target.value }))} className="border border-gray-300 rounded px-2 py-1 text-sm" /></td>
-              <td className="py-2 px-2"><input type="number" value={draftRow.durationHours} onChange={(e) => setDraftRow((d) => ({ ...d, durationHours: Number(e.target.value) }))} min={0.5} max={24} step={0.5} className="w-16 border border-gray-300 rounded px-2 py-1 text-sm" /></td>
-              <td className="py-2 px-2"><input type="color" value={draftRow.color} onChange={(e) => setDraftRow((d) => ({ ...d, color: e.target.value }))} className="w-8 h-8 rounded cursor-pointer" /></td>
-              <td className="py-2 px-2"><input type="checkbox" checked={draftRow.active} onChange={(e) => setDraftRow((d) => ({ ...d, active: e.target.checked }))} className="rounded border-gray-300" /></td>
-              <td className="py-2 px-2">
-                <button onClick={handleAdd} disabled={!draftRow.nameEn.trim()} className="text-sm font-medium text-indigo-600 hover:text-indigo-800 disabled:opacity-40">{t('settings:shiftTypes.add')}</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    );
-  };
+  const renderShiftTypes = () => (
+    <ShiftTypesEditor
+      shiftTypes={savedShiftTypes}
+      createShiftType={createShiftType}
+      updateShiftType={updateShiftType}
+      deleteShiftType={deleteShiftType}
+      t={t}
+    />
+  );
 
   const renderContent = () => {
     switch (activeCategory) {
