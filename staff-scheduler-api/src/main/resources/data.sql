@@ -199,3 +199,56 @@ INSERT INTO shift_types (id, name_en, name_fr, default_start, duration_hours, co
 (gen_random_uuid(), 'Evening Shift', 'Quart du soir',   '14:00', 8.00, '#F97316', true, NOW(), NOW()),
 (gen_random_uuid(), 'Night Shift',   'Quart de nuit',   '22:00', 8.00, '#6366F1', true, NOW(), NOW())
 ON CONFLICT DO NOTHING;
+
+-- ═══════════════════════════════════════════════════════════════════
+-- Stock Locations
+-- ═══════════════════════════════════════════════════════════════════
+INSERT INTO stock_locations (id, name, description, is_active, sort_order) VALUES
+(gen_random_uuid(), 'Main warehouse',     'Central storage facility',           true, 1),
+(gen_random_uuid(), 'Walk-in cooler',     'Refrigerated storage',              true, 2),
+(gen_random_uuid(), 'Dry store',          'Ambient temperature storage',       true, 3),
+(gen_random_uuid(), 'Front-of-house bar', 'Bar area stock',                    true, 4)
+ON CONFLICT DO NOTHING;
+
+-- ═══════════════════════════════════════════════════════════════════
+-- Stock Categories (3-level hierarchy)
+-- ═══════════════════════════════════════════════════════════════════
+INSERT INTO stock_categories (id, name_en, name_fr, parent_id, sort_order, is_active, created_at, updated_at) VALUES
+(gen_random_uuid(), 'Food',        'Nourriture',     NULL, 1, true, NOW(), NOW()),
+(gen_random_uuid(), 'Beverages',   'Boissons',       NULL, 2, true, NOW(), NOW()),
+(gen_random_uuid(), 'Supplies',    'Fournitures',    NULL, 3, true, NOW(), NOW()),
+(gen_random_uuid(), 'Packaging',   'Emballage',      NULL, 4, true, NOW(), NOW())
+ON CONFLICT DO NOTHING;
+
+-- ═══════════════════════════════════════════════════════════════════
+-- Suppliers
+-- ═══════════════════════════════════════════════════════════════════
+INSERT INTO suppliers (id, name, contact_person, email, phone, address, currency, payment_terms, lead_time_days, is_active, notes, created_at) VALUES
+(gen_random_uuid(), 'Sysco Canada',       'Marc Dupont',  'marc@sysco.ca',      '514-555-0101', '1000 Rue Industrielle, Montréal', 'CAD', 'Net 30', 3,  true, 'Primary food distributor',        NOW()),
+(gen_random_uuid(), 'Gordon Food Service', 'Sarah Lee',    'sarah@gfs.ca',       '416-555-0202', '200 Commerce Dr, Toronto',        'CAD', 'Net 30', 5,  true, 'Secondary food supplier',         NOW()),
+(gen_random_uuid(), 'Metro Supply Co',     'Pierre Tremblay', 'pierre@metro.ca', '450-555-0303', '500 Boul. Laurier, Québec',       'CAD', 'Net 15', 2,  true, 'Local produce and dairy',         NOW()),
+(gen_random_uuid(), 'CleanPro Supplies',   'Julie Martin', 'julie@cleanpro.ca',  '613-555-0404', '75 Industrial Pkwy, Ottawa',      'CAD', 'Net 45', 7,  true, 'Cleaning and packaging supplies', NOW())
+ON CONFLICT DO NOTHING;
+
+-- ═══════════════════════════════════════════════════════════════════
+-- Immutability trigger for stock_movements
+-- ═══════════════════════════════════════════════════════════════════
+CREATE OR REPLACE FUNCTION prevent_movement_update()
+RETURNS TRIGGER AS $$
+BEGIN
+    RAISE EXCEPTION 'stock_movements rows are immutable – DELETE or UPDATE not allowed';
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_trigger WHERE tgname = 'trg_movements_immutable'
+    ) THEN
+        CREATE TRIGGER trg_movements_immutable
+        BEFORE UPDATE OR DELETE ON stock_movements
+        FOR EACH ROW EXECUTE FUNCTION prevent_movement_update();
+    END IF;
+END;
+$$;

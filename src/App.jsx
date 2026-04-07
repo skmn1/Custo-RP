@@ -18,6 +18,21 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DevLoginPage from './pages/DevLoginPage';
 import AccessibilityEffects from './components/AccessibilityEffects';
+import StockDashboardPage from './pages/stock/StockDashboardPage';
+import StockItemListPage from './pages/stock/StockItemListPage';
+import StockItemDetailPage from './pages/stock/StockItemDetailPage';
+import StockItemFormPage from './pages/stock/StockItemFormPage';
+import StockMovementPage from './pages/stock/StockMovementPage';
+import StockCategoryPage from './pages/stock/StockCategoryPage';
+import StockLocationPage from './pages/stock/StockLocationPage';
+import SupplierListPage from './pages/stock/SupplierListPage';
+import SupplierFormPage from './pages/stock/SupplierFormPage';
+import PurchaseOrderListPage from './pages/stock/PurchaseOrderListPage';
+import PurchaseOrderDetailPage from './pages/stock/PurchaseOrderDetailPage';
+import PurchaseOrderFormPage from './pages/stock/PurchaseOrderFormPage';
+import StocktakeListPage from './pages/stock/StocktakeListPage';
+import StocktakeSessionPage from './pages/stock/StocktakeSessionPage';
+import ReorderQueuePage from './pages/stock/ReorderQueuePage';
 
 const ProtectedLayout = ({ children }) => (
   <AuthGuard>
@@ -51,6 +66,26 @@ const App = () => {
           <Route path="/admin/users" element={<ProtectedLayout><RoleGuard roles={['admin']}><UserManagementPage /></RoleGuard></ProtectedLayout>} />
           <Route path="/settings" element={<ProtectedLayout><SettingsPage /></ProtectedLayout>} />
           <Route path="/access-denied" element={<ProtectedLayout><AccessDeniedPage /></ProtectedLayout>} />
+
+          {/* Stock management routes */}
+          <Route path="/stock" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><StockDashboardPage /></RoleGuard></ProtectedLayout>} />
+          <Route path="/stock/items" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><StockItemListPage /></RoleGuard></ProtectedLayout>} />
+          <Route path="/stock/items/new" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><StockItemFormPage /></RoleGuard></ProtectedLayout>} />
+          <Route path="/stock/items/:id" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><StockItemDetailPage /></RoleGuard></ProtectedLayout>} />
+          <Route path="/stock/items/:id/edit" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><StockItemFormPage /></RoleGuard></ProtectedLayout>} />
+          <Route path="/stock/movements" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><StockMovementPage /></RoleGuard></ProtectedLayout>} />
+          <Route path="/stock/categories" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><StockCategoryPage /></RoleGuard></ProtectedLayout>} />
+          <Route path="/stock/locations" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><StockLocationPage /></RoleGuard></ProtectedLayout>} />
+          <Route path="/stock/suppliers" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><SupplierListPage /></RoleGuard></ProtectedLayout>} />
+          <Route path="/stock/suppliers/new" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><SupplierFormPage /></RoleGuard></ProtectedLayout>} />
+          <Route path="/stock/suppliers/:id/edit" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><SupplierFormPage /></RoleGuard></ProtectedLayout>} />
+          <Route path="/stock/purchase-orders" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><PurchaseOrderListPage /></RoleGuard></ProtectedLayout>} />
+          <Route path="/stock/purchase-orders/new" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><PurchaseOrderFormPage /></RoleGuard></ProtectedLayout>} />
+          <Route path="/stock/purchase-orders/:id" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><PurchaseOrderDetailPage /></RoleGuard></ProtectedLayout>} />
+          <Route path="/stock/purchase-orders/:id/edit" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><PurchaseOrderFormPage /></RoleGuard></ProtectedLayout>} />
+          <Route path="/stock/stocktakes" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><StocktakeListPage /></RoleGuard></ProtectedLayout>} />
+          <Route path="/stock/stocktakes/:id" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><StocktakeSessionPage /></RoleGuard></ProtectedLayout>} />
+          <Route path="/stock/reorder-queue" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><ReorderQueuePage /></RoleGuard></ProtectedLayout>} />
         </Routes>
         </SettingsProvider>
       </AuthProvider>
