@@ -39,7 +39,7 @@ BACKEND_PID=$!
 # ── Wait for backend to be ready ──
 echo -n "      Waiting for backend on :8080 "
 for i in $(seq 1 60); do
-  if curl -sf http://localhost:8080/api/employees >/dev/null 2>&1; then
+  if curl -sf http://localhost:8080/v3/api-docs >/dev/null 2>&1; then
     echo -e " ${GREEN}✔${NC}"
     break
   fi
@@ -47,7 +47,7 @@ for i in $(seq 1 60); do
   sleep 2
 done
 
-if ! curl -sf http://localhost:8080/api/employees >/dev/null 2>&1; then
+if ! curl -sf http://localhost:8080/v3/api-docs >/dev/null 2>&1; then
   echo -e " ${RED}✖  Backend did not start within 120s${NC}"
   exit 1
 fi

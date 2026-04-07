@@ -16,7 +16,6 @@ public class RefreshToken {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(columnDefinition = "uuid")
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -35,7 +34,7 @@ public class RefreshToken {
     @Column(name = "revoked_at")
     private LocalDateTime revokedAt;
 
-    @Column(name = "replaced_by", columnDefinition = "uuid")
+    @Column(name = "replaced_by")
     private UUID replacedBy;
 
     @PrePersist
