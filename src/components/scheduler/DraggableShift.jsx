@@ -110,6 +110,7 @@ const TimePickerDropdown = ({ startTime, endTime, onTimeChange, onClose }) => {
 };
 
 const DraggableShift = ({ shift, employee, isDragOverlay = false, onUpdateShift, onDeleteShift }) => {
+  const { t } = useTranslation(['scheduler']);
   const [isEditingTime, setIsEditingTime] = useState(false);
   
   const {
