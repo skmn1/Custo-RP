@@ -73,36 +73,129 @@ INSERT INTO users (id, email, password_hash, first_name, last_name, role, is_act
 ON CONFLICT DO NOTHING;
 
 -- ═══════════════════════════════════════════════════════════════════
--- Application Settings (global defaults)
+-- Application Settings (comprehensive defaults)
 -- ═══════════════════════════════════════════════════════════════════
 INSERT INTO app_settings (id, category, setting_key, setting_value, value_type, updated_at) VALUES
--- Business settings
-(gen_random_uuid(), 'business', 'companyName',           'Staff Scheduler Pro', 'string',  NOW()),
-(gen_random_uuid(), 'business', 'timezone',              'America/New_York',    'string',  NOW()),
-(gen_random_uuid(), 'business', 'workWeekStart',         'monday',             'string',  NOW()),
-(gen_random_uuid(), 'business', 'overtimeThreshold',     '40',                 'number',  NOW()),
-(gen_random_uuid(), 'business', 'overtimeMultiplier',    '1.5',                'number',  NOW()),
-(gen_random_uuid(), 'business', 'doubleTimeThreshold',   '60',                 'number',  NOW()),
-(gen_random_uuid(), 'business', 'doubleTimeMultiplier',  '2.0',                'number',  NOW()),
-(gen_random_uuid(), 'business', 'payPeriodType',         'biweekly',           'string',  NOW()),
-(gen_random_uuid(), 'business', 'defaultShiftDuration',  '8',                  'number',  NOW()),
-(gen_random_uuid(), 'business', 'maxShiftDuration',      '12',                 'number',  NOW()),
-(gen_random_uuid(), 'business', 'minHoursBetweenShifts', '8',                  'number',  NOW()),
-(gen_random_uuid(), 'business', 'ptoAccrualRate',        '1.25',               'number',  NOW()),
-(gen_random_uuid(), 'business', 'annualPtoCap',          '20',                 'number',  NOW()),
+-- General settings
+(gen_random_uuid(), 'general', 'companyName',       'Staff Scheduler Pro', 'string',  NOW()),
+(gen_random_uuid(), 'general', 'timezone',          'America/New_York',    'string',  NOW()),
+(gen_random_uuid(), 'general', 'workWeekStart',     'monday',             'string',  NOW()),
+(gen_random_uuid(), 'general', 'dateFormat',        'MM/dd/yyyy',         'string',  NOW()),
+(gen_random_uuid(), 'general', 'timeFormat',        '12h',                'string',  NOW()),
+(gen_random_uuid(), 'general', 'currency',          'USD',                'string',  NOW()),
+(gen_random_uuid(), 'general', 'fiscalYearStart',   'January',            'string',  NOW()),
 -- Scheduling settings
-(gen_random_uuid(), 'scheduling', 'allowShiftOverlap',          'false', 'boolean', NOW()),
-(gen_random_uuid(), 'scheduling', 'autoAssignColors',           'true',  'boolean', NOW()),
-(gen_random_uuid(), 'scheduling', 'showShiftCosts',             'true',  'boolean', NOW()),
-(gen_random_uuid(), 'scheduling', 'defaultView',                'week',  'string',  NOW()),
-(gen_random_uuid(), 'scheduling', 'enableDragAndDrop',          'true',  'boolean', NOW()),
-(gen_random_uuid(), 'scheduling', 'requireShiftConfirmation',   'false', 'boolean', NOW()),
+(gen_random_uuid(), 'scheduling', 'defaultShiftDuration',  '8',     'number',  NOW()),
+(gen_random_uuid(), 'scheduling', 'maxShiftDuration',      '12',    'number',  NOW()),
+(gen_random_uuid(), 'scheduling', 'minHoursBetweenShifts', '8',     'number',  NOW()),
+(gen_random_uuid(), 'scheduling', 'allowOverlap',          'false', 'boolean', NOW()),
+(gen_random_uuid(), 'scheduling', 'autoAssignColors',      'true',  'boolean', NOW()),
+(gen_random_uuid(), 'scheduling', 'showCostOnCards',       'true',  'boolean', NOW()),
+(gen_random_uuid(), 'scheduling', 'defaultView',           'week',  'string',  NOW()),
+(gen_random_uuid(), 'scheduling', 'enableDragDrop',        'true',  'boolean', NOW()),
+(gen_random_uuid(), 'scheduling', 'requireConfirmation',   'false', 'boolean', NOW()),
+(gen_random_uuid(), 'scheduling', 'maxShiftsPerWeek',      '0',     'number',  NOW()),
+-- Payroll settings
+(gen_random_uuid(), 'payroll', 'payPeriodType',          'biweekly', 'string',  NOW()),
+(gen_random_uuid(), 'payroll', 'payPeriodRefDate',       '',          'string',  NOW()),
+(gen_random_uuid(), 'payroll', 'overtimeThreshold',      '40',        'number',  NOW()),
+(gen_random_uuid(), 'payroll', 'overtimeMultiplier',     '1.5',       'number',  NOW()),
+(gen_random_uuid(), 'payroll', 'dailyOvertimeThreshold', '0',         'number',  NOW()),
+(gen_random_uuid(), 'payroll', 'doubleTimeThreshold',    '0',         'number',  NOW()),
+(gen_random_uuid(), 'payroll', 'doubleTimeMultiplier',   '2.0',       'number',  NOW()),
+(gen_random_uuid(), 'payroll', 'holidayMultiplier',      '1.5',       'number',  NOW()),
+(gen_random_uuid(), 'payroll', 'defaultHourlyRate',      '15.00',     'number',  NOW()),
+(gen_random_uuid(), 'payroll', 'minWageEnforcement',     'true',      'boolean', NOW()),
+-- Time Off settings
+(gen_random_uuid(), 'timeOff', 'accrualRate',        '1.25', 'number',  NOW()),
+(gen_random_uuid(), 'timeOff', 'annualCap',          '20',   'number',  NOW()),
+(gen_random_uuid(), 'timeOff', 'carryoverLimit',     '5',    'number',  NOW()),
+(gen_random_uuid(), 'timeOff', 'minAdvanceNotice',   '7',    'number',  NOW()),
+(gen_random_uuid(), 'timeOff', 'maxConsecutiveDays', '0',    'number',  NOW()),
+(gen_random_uuid(), 'timeOff', 'autoApprove',        'false','boolean', NOW()),
+(gen_random_uuid(), 'timeOff', 'blackoutDates',      '[]',   'json',    NOW()),
+-- Swap settings
+(gen_random_uuid(), 'swaps', 'allowEmployeeInitiated', 'true',  'boolean', NOW()),
+(gen_random_uuid(), 'swaps', 'requireManagerApproval', 'true',  'boolean', NOW()),
+(gen_random_uuid(), 'swaps', 'requestWindowHours',     '48',    'number',  NOW()),
+(gen_random_uuid(), 'swaps', 'allowCrossDepartment',   'false', 'boolean', NOW()),
+(gen_random_uuid(), 'swaps', 'autoApproveEligible',    'false', 'boolean', NOW()),
 -- Notification settings
-(gen_random_uuid(), 'notifications', 'emailEnabled',             'true',  'boolean', NOW()),
-(gen_random_uuid(), 'notifications', 'shiftReminders',           'true',  'boolean', NOW()),
-(gen_random_uuid(), 'notifications', 'schedulePublishedAlerts',  'true',  'boolean', NOW()),
-(gen_random_uuid(), 'notifications', 'swapRequests',             'true',  'boolean', NOW()),
-(gen_random_uuid(), 'notifications', 'timeOffApprovals',         'true',  'boolean', NOW()),
-(gen_random_uuid(), 'notifications', 'reviewAlerts',             'true',  'boolean', NOW()),
-(gen_random_uuid(), 'notifications', 'reminderHours',            '24',    'number',  NOW())
+(gen_random_uuid(), 'notifications', 'emailEnabled',         'true',    'boolean', NOW()),
+(gen_random_uuid(), 'notifications', 'pushEnabled',          'true',    'boolean', NOW()),
+(gen_random_uuid(), 'notifications', 'shiftAssignment',      'true',    'boolean', NOW()),
+(gen_random_uuid(), 'notifications', 'schedulePublished',    'true',    'boolean', NOW()),
+(gen_random_uuid(), 'notifications', 'swapRequests',         'true',    'boolean', NOW()),
+(gen_random_uuid(), 'notifications', 'timeOffDecision',      'true',    'boolean', NOW()),
+(gen_random_uuid(), 'notifications', 'performanceReviews',   'true',    'boolean', NOW()),
+(gen_random_uuid(), 'notifications', 'reminderLeadTime',     '24h',     'string',  NOW()),
+(gen_random_uuid(), 'notifications', 'digestFrequency',      'instant', 'string',  NOW()),
+-- Feature Flags
+(gen_random_uuid(), 'featureFlags', 'feature.shifts',              'true',  'boolean', NOW()),
+(gen_random_uuid(), 'featureFlags', 'feature.payroll',             'true',  'boolean', NOW()),
+(gen_random_uuid(), 'featureFlags', 'feature.timeOff',             'true',  'boolean', NOW()),
+(gen_random_uuid(), 'featureFlags', 'feature.shiftSwaps',          'true',  'boolean', NOW()),
+(gen_random_uuid(), 'featureFlags', 'feature.recurringTemplates',  'true',  'boolean', NOW()),
+(gen_random_uuid(), 'featureFlags', 'feature.reports',             'true',  'boolean', NOW()),
+(gen_random_uuid(), 'featureFlags', 'feature.performanceReviews',  'true',  'boolean', NOW()),
+(gen_random_uuid(), 'featureFlags', 'feature.stock',               'false', 'boolean', NOW()),
+(gen_random_uuid(), 'featureFlags', 'feature.invoices',            'false', 'boolean', NOW()),
+(gen_random_uuid(), 'featureFlags', 'feature.employeeMobileApp',   'true',  'boolean', NOW()),
+-- Security settings
+(gen_random_uuid(), 'security', 'passwordMinLength',  '8',     'number',  NOW()),
+(gen_random_uuid(), 'security', 'requireUppercase',   'true',  'boolean', NOW()),
+(gen_random_uuid(), 'security', 'requireNumber',      'true',  'boolean', NOW()),
+(gen_random_uuid(), 'security', 'requireSpecialChar', 'false', 'boolean', NOW()),
+(gen_random_uuid(), 'security', 'passwordExpiry',     '0',     'number',  NOW()),
+(gen_random_uuid(), 'security', 'maxFailedAttempts',  '5',     'number',  NOW()),
+(gen_random_uuid(), 'security', 'lockoutDuration',    '15',    'number',  NOW()),
+(gen_random_uuid(), 'security', 'sessionTimeout',     '60',    'number',  NOW()),
+(gen_random_uuid(), 'security', 'jwtAccessTtl',       '15',    'number',  NOW()),
+(gen_random_uuid(), 'security', 'jwtRefreshTtl',      '7',     'number',  NOW()),
+(gen_random_uuid(), 'security', 'require2faAdmins',   'false', 'boolean', NOW()),
+(gen_random_uuid(), 'security', 'allowedIpRanges',    '',      'string',  NOW()),
+-- Data Privacy settings
+(gen_random_uuid(), 'dataPrivacy', 'auditLogRetention',          '365',   'number',  NOW()),
+(gen_random_uuid(), 'dataPrivacy', 'scheduleHistoryRetention',   '730',   'number',  NOW()),
+(gen_random_uuid(), 'dataPrivacy', 'gdprErasure',                'true',  'boolean', NOW()),
+(gen_random_uuid(), 'dataPrivacy', 'exportFormat',               'CSV',   'string',  NOW()),
+(gen_random_uuid(), 'dataPrivacy', 'anonymousAnalytics',         'false', 'boolean', NOW()),
+(gen_random_uuid(), 'dataPrivacy', 'cookieConsentBanner',        'true',  'boolean', NOW())
+ON CONFLICT DO NOTHING;
+
+-- ═══════════════════════════════════════════════════════════════════
+-- Navigation Items (default ordering)
+-- ═══════════════════════════════════════════════════════════════════
+INSERT INTO nav_items (id, route_key, display_order, visible_admin, visible_manager, visible_employee, system_locked, updated_at) VALUES
+(gen_random_uuid(), 'dashboard',  0, true, true,  true,  false, NOW()),
+(gen_random_uuid(), 'scheduler',  1, true, true,  true,  false, NOW()),
+(gen_random_uuid(), 'employees',  2, true, true,  true,  false, NOW()),
+(gen_random_uuid(), 'payroll',    3, true, true,  true,  false, NOW()),
+(gen_random_uuid(), 'pos',        4, true, true,  false, false, NOW()),
+(gen_random_uuid(), 'shifts',     5, true, true,  false, false, NOW()),
+(gen_random_uuid(), 'reports',    6, true, true,  false, false, NOW()),
+(gen_random_uuid(), 'settings',   7, true, true,  false, true,  NOW()),
+(gen_random_uuid(), 'users',      8, true, false, false, false, NOW())
+ON CONFLICT DO NOTHING;
+
+-- ═══════════════════════════════════════════════════════════════════
+-- Departments
+-- ═══════════════════════════════════════════════════════════════════
+INSERT INTO departments (id, name_en, name_fr, color, active, created_at, updated_at) VALUES
+(gen_random_uuid(), 'Sales',          'Ventes',         '#3B82F6', true, NOW(), NOW()),
+(gen_random_uuid(), 'Warehouse',      'Entrepôt',       '#22C55E', true, NOW(), NOW()),
+(gen_random_uuid(), 'Production',     'Production',     '#F97316', true, NOW(), NOW()),
+(gen_random_uuid(), 'Administration', 'Administration', '#EC4899', true, NOW(), NOW()),
+(gen_random_uuid(), 'Kitchen',        'Cuisine',        '#6366F1', true, NOW(), NOW()),
+(gen_random_uuid(), 'Management',     'Gestion',        '#F43F5E', true, NOW(), NOW())
+ON CONFLICT DO NOTHING;
+
+-- ═══════════════════════════════════════════════════════════════════
+-- Shift Types
+-- ═══════════════════════════════════════════════════════════════════
+INSERT INTO shift_types (id, name_en, name_fr, default_start, duration_hours, color, active, created_at, updated_at) VALUES
+(gen_random_uuid(), 'Morning Shift', 'Quart du matin',  '06:00', 8.00, '#3B82F6', true, NOW(), NOW()),
+(gen_random_uuid(), 'Day Shift',     'Quart de jour',   '08:00', 9.00, '#22C55E', true, NOW(), NOW()),
+(gen_random_uuid(), 'Evening Shift', 'Quart du soir',   '14:00', 8.00, '#F97316', true, NOW(), NOW()),
+(gen_random_uuid(), 'Night Shift',   'Quart de nuit',   '22:00', 8.00, '#6366F1', true, NOW(), NOW())
 ON CONFLICT DO NOTHING;

@@ -2,6 +2,7 @@ package com.staffscheduler.api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.staffscheduler.api.dto.AppSettingDto;
+import com.staffscheduler.api.dto.NavItemDto;
 import com.staffscheduler.api.dto.UserPreferenceDto;
 import com.staffscheduler.api.security.JwtService;
 import com.staffscheduler.api.service.SettingsService;
@@ -153,5 +154,57 @@ class SettingsControllerTest {
         mockMvc.perform(post("/api/user/preferences/reset"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].value").value("light"));
+    }
+
+    // ── Feature Flags ───────────────────────────────────────────────────
+
+    @Test
+    void getFeatureFlags_shouldReturnBooleanMap() throws Exception {
+        when(settingsService.getFeatureFlags()).thenReturn(Map.of(
+                "feature.shifts", true,
+                "feature.stock", false));
+
+        mockMvc.perform(get("/api/settings/feature-flags"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.['feature.shifts']").value(true))
+                .andExpect(jsonPath("$.['feature.stock']").value(false));
+    }
+
+    // ── Navigation ──────────────────────────────────────────────────────
+
+    @Test
+    void getNavItems_shouldReturnOrderedList() throws Exception {
+        NavItemDto nav = NavItemDto.builder()
+                .routeKey("dashboard").displayOrder(0)
+                .visibleAdmin(true).visibleManager(true).visibleEmployee(true).systemLocked(false)
+                .build();
+
+        when(settingsService.getNavItems()).thenReturn(List.of(nav));
+
+        mockMvc.perform(get("/api/settings/navigation"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].routeKey").value("dashboard"));
+    }
+
+    @Test
+    void saveNavItems_shouldReturnUpdatedList() throws Exception {
+        NavItemDto input = NavItemDto.builder()
+                .routeKey("dashboard").displayOrder(1)
+                .visibleAdmin(true).visibleManager(true).visibleEmployee(false).systemLocked(false)
+                .build();
+        NavItemDto result = NavItemDto.builder()
+                .routeKey("dashboard").displayOrder(1)
+                .visibleAdmin(true).visibleManager(true).visibleEmployee(false).systemLocked(false)
+                .build();
+
+        when(settingsService.saveNavItems(any())).thenReturn(List.of(result));
+
+        mockMvc.perform(post("/api/settings/navigation")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(List.of(input))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].displayOrder").value(1))
+                .andExpect(jsonPath("$[0].visibleEmployee").value(false));
     }
 }

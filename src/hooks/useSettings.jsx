@@ -7,37 +7,101 @@ const SettingsContext = createContext(null);
 // ── Default values (used before API responds or as fallback) ────────
 
 const APP_DEFAULTS = {
-  business: {
+  general: {
     companyName: 'Staff Scheduler Pro',
     timezone: 'America/New_York',
     workWeekStart: 'monday',
-    overtimeThreshold: 40,
-    overtimeMultiplier: 1.5,
-    doubleTimeThreshold: 60,
-    doubleTimeMultiplier: 2.0,
-    payPeriodType: 'biweekly',
+    dateFormat: 'yyyy-MM-dd',
+    timeFormat: '24h',
+    currency: 'CAD',
+    fiscalYearStart: '1',
+  },
+  scheduling: {
+    defaultView: 'week',
     defaultShiftDuration: 8,
     maxShiftDuration: 12,
     minHoursBetweenShifts: 8,
+    allowOverlap: false,
+    autoAssignColors: true,
+    showCostOnCards: true,
+    enableDragDrop: true,
+    requireConfirmation: false,
+    maxShiftsPerDay: 3,
+  },
+  payroll: {
+    payPeriodType: 'biweekly',
+    payDayOfWeek: 'friday',
+    payDayOfMonth: 15,
+    overtimeThreshold: 40,
+    overtimeMultiplier: 1.5,
+    dailyOvertimeThreshold: 0,
+    doubleTimeThreshold: 60,
+    doubleTimeMultiplier: 2.0,
+    autoApproveTimesheets: false,
+    roundClockEntries: 0,
+    showGrossPay: true,
+  },
+  timeOff: {
     ptoAccrualRate: 1.25,
     annualPtoCap: 20,
+    requireApproval: true,
+    maxConsecutiveDays: 15,
+    blackoutDatesEnabled: false,
+    minNoticeDays: 7,
+    carryOverLimit: 5,
   },
-  scheduling: {
-    allowShiftOverlap: false,
-    autoAssignColors: true,
-    showShiftCosts: true,
-    defaultView: 'week',
-    enableDragAndDrop: true,
-    requireShiftConfirmation: false,
+  swaps: {
+    swapRequireApproval: true,
+    swapWindowHours: 24,
+    maxSwapsPerMonth: 4,
+    allowCrossDepartment: false,
+    notifyManager: true,
   },
   notifications: {
     emailEnabled: true,
-    shiftReminders: true,
-    schedulePublishedAlerts: true,
+    shiftAssignment: true,
+    schedulePublished: true,
     swapRequests: true,
-    timeOffApprovals: true,
-    reviewAlerts: true,
-    reminderHours: 24,
+    timeOffDecision: true,
+    performanceReviews: true,
+    reminderLeadTime: 24,
+    digestFrequency: 'none',
+    quietHoursStart: '22:00',
+    quietHoursEnd: '07:00',
+  },
+  featureFlags: {
+    enablePayroll: true,
+    enableTimeOff: true,
+    enableShiftSwaps: true,
+    enableReports: true,
+    enableDashboard: true,
+    enablePOS: true,
+    enableNotifications: true,
+    enableMobile: false,
+    enableAuditLog: false,
+    enableBetaFeatures: false,
+  },
+  security: {
+    sessionTimeoutMinutes: 30,
+    maxLoginAttempts: 5,
+    lockoutDurationMinutes: 15,
+    passwordMinLength: 8,
+    passwordRequireUppercase: true,
+    passwordRequireNumbers: true,
+    passwordRequireSpecial: false,
+    passwordExpiryDays: 0,
+    twoFactorEnabled: false,
+    ipWhitelistEnabled: false,
+    auditLogRetentionDays: 365,
+    forcePasswordChangeOnFirstLogin: true,
+  },
+  dataPrivacy: {
+    dataRetentionDays: 730,
+    anonymizeAfterTermination: true,
+    exportFormat: 'csv',
+    allowSelfDataExport: true,
+    cookieConsentRequired: false,
+    privacyPolicyUrl: '',
   },
 };
 
@@ -48,23 +112,52 @@ const PREF_DEFAULTS = {
   rowsPerPage: 10,
   compactMode: false,
   sidebarCollapsed: false,
+  animateTransitions: true,
+  reducedMotion: false,
+  fontSize: 'medium',
+  highContrast: false,
+  focusRingAlwaysVisible: false,
+  myShiftAssignment: true,
+  mySchedulePublished: true,
+  mySwapRequests: true,
+  myTimeOffDecision: true,
+  myPerformanceReviews: true,
 };
 
 // ── Type coercion helpers ───────────────────────────────────────────
 
 const NUMBER_KEYS = new Set([
   'overtimeThreshold', 'overtimeMultiplier', 'doubleTimeThreshold',
-  'doubleTimeMultiplier', 'defaultShiftDuration', 'maxShiftDuration',
-  'minHoursBetweenShifts', 'ptoAccrualRate', 'annualPtoCap',
-  'reminderHours', 'rowsPerPage',
+  'doubleTimeMultiplier', 'dailyOvertimeThreshold',
+  'defaultShiftDuration', 'maxShiftDuration', 'minHoursBetweenShifts',
+  'maxShiftsPerDay',
+  'ptoAccrualRate', 'annualPtoCap', 'maxConsecutiveDays', 'minNoticeDays', 'carryOverLimit',
+  'swapWindowHours', 'maxSwapsPerMonth',
+  'reminderLeadTime', 'rowsPerPage',
+  'payDayOfMonth', 'roundClockEntries',
+  'sessionTimeoutMinutes', 'maxLoginAttempts', 'lockoutDurationMinutes',
+  'passwordMinLength', 'passwordExpiryDays', 'auditLogRetentionDays',
+  'dataRetentionDays', 'fiscalYearStart',
 ]);
 
 const BOOLEAN_KEYS = new Set([
-  'allowShiftOverlap', 'autoAssignColors', 'showShiftCosts',
-  'enableDragAndDrop', 'requireShiftConfirmation',
-  'emailEnabled', 'shiftReminders', 'schedulePublishedAlerts',
-  'swapRequests', 'timeOffApprovals', 'reviewAlerts',
-  'compactMode', 'sidebarCollapsed',
+  'allowOverlap', 'autoAssignColors', 'showCostOnCards',
+  'enableDragDrop', 'requireConfirmation',
+  'autoApproveTimesheets', 'showGrossPay',
+  'requireApproval', 'blackoutDatesEnabled',
+  'swapRequireApproval', 'allowCrossDepartment', 'notifyManager',
+  'emailEnabled', 'shiftAssignment', 'schedulePublished',
+  'swapRequests', 'timeOffDecision', 'performanceReviews',
+  'enablePayroll', 'enableTimeOff', 'enableShiftSwaps',
+  'enableReports', 'enableDashboard', 'enablePOS',
+  'enableNotifications', 'enableMobile', 'enableAuditLog', 'enableBetaFeatures',
+  'passwordRequireUppercase', 'passwordRequireNumbers', 'passwordRequireSpecial',
+  'twoFactorEnabled', 'ipWhitelistEnabled', 'forcePasswordChangeOnFirstLogin',
+  'anonymizeAfterTermination', 'allowSelfDataExport', 'cookieConsentRequired',
+  'compactMode', 'sidebarCollapsed', 'animateTransitions',
+  'reducedMotion', 'highContrast', 'focusRingAlwaysVisible',
+  'myShiftAssignment', 'mySchedulePublished', 'mySwapRequests',
+  'myTimeOffDecision', 'myPerformanceReviews',
 ]);
 
 function coerce(key, value) {
@@ -80,9 +173,7 @@ function coerce(key, value) {
 function apiListToMap(list) {
   const map = {};
   if (!Array.isArray(list)) return map;
-  list.forEach(({ key, value }) => {
-    map[key] = coerce(key, value);
-  });
+  list.forEach(({ key, value }) => { map[key] = coerce(key, value); });
   return map;
 }
 
@@ -94,6 +185,12 @@ function groupedApiToState(grouped) {
   return state;
 }
 
+// All backend categories
+const ALL_CATEGORIES = [
+  'general', 'scheduling', 'payroll', 'timeOff', 'swaps',
+  'notifications', 'featureFlags', 'security', 'dataPrivacy',
+];
+
 // ── Provider ────────────────────────────────────────────────────────
 
 export function SettingsProvider({ children }) {
@@ -101,6 +198,10 @@ export function SettingsProvider({ children }) {
 
   const [appSettings, setAppSettings] = useState(APP_DEFAULTS);
   const [preferences, setPreferences] = useState(PREF_DEFAULTS);
+  const [navItems, setNavItems] = useState([]);
+  const [featureFlags, setFeatureFlags] = useState(APP_DEFAULTS.featureFlags);
+  const [departments, setDepartments] = useState([]);
+  const [shiftTypes, setShiftTypes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -116,28 +217,37 @@ export function SettingsProvider({ children }) {
       setIsLoading(true);
       setError(null);
       try {
-        const [settingsData, prefsData] = await Promise.all([
+        const promises = [
           isAdmin ? settingsApi.getAll() : settingsApi.getPublic(),
           settingsApi.getPreferences(),
-        ]);
+          settingsApi.getFeatureFlags(),
+          settingsApi.getNavItems(),
+        ];
+        if (isAdmin) {
+          promises.push(settingsApi.getDepartments(), settingsApi.getShiftTypes());
+        }
 
+        const results = await Promise.all(promises);
         if (cancelled) return;
 
+        const [settingsData, prefsData, flagsData, navData] = results;
+
         if (isAdmin && settingsData) {
+          const fromApi = groupedApiToState(settingsData);
           setAppSettings((prev) => {
-            const fromApi = groupedApiToState(settingsData);
-            return {
-              business: { ...prev.business, ...fromApi.business },
-              scheduling: { ...prev.scheduling, ...fromApi.scheduling },
-              notifications: { ...prev.notifications, ...fromApi.notifications },
-            };
+            const merged = { ...prev };
+            ALL_CATEGORIES.forEach((cat) => {
+              if (fromApi[cat]) {
+                merged[cat] = { ...prev[cat], ...fromApi[cat] };
+              }
+            });
+            return merged;
           });
         } else if (settingsData) {
-          // Public settings — flat list
           const pubMap = apiListToMap(settingsData);
           setAppSettings((prev) => ({
             ...prev,
-            business: { ...prev.business, ...pubMap },
+            general: { ...prev.general, ...pubMap },
           }));
         }
 
@@ -145,6 +255,11 @@ export function SettingsProvider({ children }) {
           const prefMap = apiListToMap(prefsData);
           setPreferences((prev) => ({ ...prev, ...prefMap }));
         }
+
+        if (flagsData) setFeatureFlags(flagsData);
+        if (navData) setNavItems(navData);
+        if (isAdmin && results[4]) setDepartments(results[4]);
+        if (isAdmin && results[5]) setShiftTypes(results[5]);
       } catch (err) {
         if (!cancelled) {
           console.warn('Failed to load settings, using defaults:', err.message);
@@ -174,6 +289,12 @@ export function SettingsProvider({ children }) {
         ...prev,
         [category]: { ...prev[category], ...updated },
       }));
+      // If featureFlags category was updated, also update the separate flags state
+      if (category === 'featureFlags') {
+        const flags = {};
+        Object.entries(updated).forEach(([k, v]) => { flags[k] = Boolean(v); });
+        setFeatureFlags((prev) => ({ ...prev, ...flags }));
+      }
       return result;
     } catch (err) {
       setError(err.message);
@@ -199,8 +320,7 @@ export function SettingsProvider({ children }) {
   const updatePreferences = useCallback(async (updates) => {
     try {
       const payload = Object.entries(updates).map(([key, value]) => ({
-        key,
-        value: String(value),
+        key, value: String(value),
       }));
       const result = await settingsApi.updatePreferences(payload);
       const updated = apiListToMap(result);
@@ -224,6 +344,57 @@ export function SettingsProvider({ children }) {
     }
   }, []);
 
+  // ── Nav Items ─────────────────────────────────────────────────────
+
+  const saveNavItems = useCallback(async (items) => {
+    try {
+      const result = await settingsApi.saveNavItems(items);
+      setNavItems(result);
+      return result;
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    }
+  }, []);
+
+  // ── Departments CRUD ──────────────────────────────────────────────
+
+  const createDepartment = useCallback(async (dept) => {
+    const result = await settingsApi.createDepartment(dept);
+    setDepartments((prev) => [...prev, result]);
+    return result;
+  }, []);
+
+  const updateDepartment = useCallback(async (id, dept) => {
+    const result = await settingsApi.updateDepartment(id, dept);
+    setDepartments((prev) => prev.map((d) => (d.id === id ? result : d)));
+    return result;
+  }, []);
+
+  const deleteDepartment = useCallback(async (id) => {
+    await settingsApi.deleteDepartment(id);
+    setDepartments((prev) => prev.filter((d) => d.id !== id));
+  }, []);
+
+  // ── Shift Types CRUD ──────────────────────────────────────────────
+
+  const createShiftType = useCallback(async (st) => {
+    const result = await settingsApi.createShiftType(st);
+    setShiftTypes((prev) => [...prev, result]);
+    return result;
+  }, []);
+
+  const updateShiftType = useCallback(async (id, st) => {
+    const result = await settingsApi.updateShiftType(id, st);
+    setShiftTypes((prev) => prev.map((s) => (s.id === id ? result : s)));
+    return result;
+  }, []);
+
+  const deleteShiftType = useCallback(async (id) => {
+    await settingsApi.deleteShiftType(id);
+    setShiftTypes((prev) => prev.filter((s) => s.id !== id));
+  }, []);
+
   // ── Convenience accessors ─────────────────────────────────────────
 
   const settings = useMemo(() => ({
@@ -235,14 +406,27 @@ export function SettingsProvider({ children }) {
     settings,
     appSettings,
     preferences,
+    navItems,
+    featureFlags,
+    departments,
+    shiftTypes,
     isLoading,
     error,
     updateAppSettings,
     resetAppSettings,
     updatePreferences,
     resetPreferences,
-  }), [settings, appSettings, preferences, isLoading, error,
-    updateAppSettings, resetAppSettings, updatePreferences, resetPreferences]);
+    saveNavItems,
+    createDepartment,
+    updateDepartment,
+    deleteDepartment,
+    createShiftType,
+    updateShiftType,
+    deleteShiftType,
+  }), [settings, appSettings, preferences, navItems, featureFlags, departments, shiftTypes,
+    isLoading, error, updateAppSettings, resetAppSettings, updatePreferences, resetPreferences,
+    saveNavItems, createDepartment, updateDepartment, deleteDepartment,
+    createShiftType, updateShiftType, deleteShiftType]);
 
   return (
     <SettingsContext.Provider value={value}>
@@ -254,20 +438,28 @@ export function SettingsProvider({ children }) {
 export function useSettings() {
   const ctx = useContext(SettingsContext);
   if (!ctx) {
-    // Fallback when used outside provider (shouldn't happen but safety)
     return {
       settings: { ...APP_DEFAULTS, display: PREF_DEFAULTS },
       appSettings: APP_DEFAULTS,
       preferences: PREF_DEFAULTS,
+      navItems: [],
+      featureFlags: APP_DEFAULTS.featureFlags,
+      departments: [],
+      shiftTypes: [],
       isLoading: false,
       error: null,
       updateAppSettings: async () => {},
       resetAppSettings: async () => {},
       updatePreferences: async () => {},
       resetPreferences: async () => {},
+      saveNavItems: async () => {},
+      createDepartment: async () => {},
+      updateDepartment: async () => {},
+      deleteDepartment: async () => {},
+      createShiftType: async () => {},
+      updateShiftType: async () => {},
+      deleteShiftType: async () => {},
     };
   }
   return ctx;
 }
-
-export default useSettings;

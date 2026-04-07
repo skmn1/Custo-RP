@@ -17,6 +17,7 @@ import AccessDeniedPage from './pages/AccessDeniedPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DevLoginPage from './pages/DevLoginPage';
+import AccessibilityEffects from './components/AccessibilityEffects';
 
 const ProtectedLayout = ({ children }) => (
   <AuthGuard>
@@ -32,6 +33,7 @@ const App = () => {
     <BrowserRouter>
       <AuthProvider>
         <SettingsProvider>
+        <AccessibilityEffects />
         <Routes>
           {/* Public routes */}
           <Route path="/login" element={<DevLoginPage />} />

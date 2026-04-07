@@ -41,7 +41,7 @@ const StaffScheduler = () => {
   const { currentWeek, navigateWeek, goToCurrentWeek } = useWeekNavigation();
   const { sensors, activeShift, dragOverDropZone, handleDragStart, handleDragOver, handleDragEnd } = useDragAndDrop(shifts, moveShift);
 
-  const weekDays = generateWeekDays(currentWeek, settings?.business?.workWeekStart);
+  const weekDays = generateWeekDays(currentWeek, settings?.general?.workWeekStart);
   const weekStart = weekDays[0];
 
   // Custom collision detection for better drop zone targeting

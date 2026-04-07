@@ -1,6 +1,7 @@
 package com.staffscheduler.api.controller;
 
 import com.staffscheduler.api.dto.AppSettingDto;
+import com.staffscheduler.api.dto.NavItemDto;
 import com.staffscheduler.api.dto.UserPreferenceDto;
 import com.staffscheduler.api.service.SettingsService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,7 +19,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
-@Tag(name = "Settings", description = "Application settings and user preferences")
+@Tag(name = "Settings", description = "Application settings, navigation, feature flags, and user preferences")
 public class SettingsController {
 
     private final SettingsService settingsService;
@@ -27,21 +28,33 @@ public class SettingsController {
 
     @GetMapping("/settings")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Get all application settings", description = "Returns all settings grouped by category (Admin only)")
+    @Operation(summary = "Get all application settings grouped by category")
     public ResponseEntity<Map<String, List<AppSettingDto>>> getAllSettings() {
         return ResponseEntity.ok(settingsService.getAllSettings());
     }
 
+    @GetMapping("/settings/public")
+    @Operation(summary = "Get public settings (no auth required for timezone, dateFormat, currency)")
+    public ResponseEntity<List<AppSettingDto>> getPublicSettings() {
+        return ResponseEntity.ok(settingsService.getPublicSettings());
+    }
+
+    @GetMapping("/settings/feature-flags")
+    @Operation(summary = "Get active feature flag map")
+    public ResponseEntity<Map<String, Boolean>> getFeatureFlags() {
+        return ResponseEntity.ok(settingsService.getFeatureFlags());
+    }
+
     @GetMapping("/settings/{category}")
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
-    @Operation(summary = "Get settings by category", description = "Returns settings for a specific category")
+    @Operation(summary = "Get settings by category")
     public ResponseEntity<List<AppSettingDto>> getSettingsByCategory(@PathVariable String category) {
         return ResponseEntity.ok(settingsService.getSettingsByCategory(category));
     }
 
     @PutMapping("/settings/{category}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Update settings for a category", description = "Updates one or more settings in a category (Admin only)")
+    @Operation(summary = "Update settings for a category (Admin only)")
     public ResponseEntity<List<AppSettingDto>> updateCategory(
             @PathVariable String category,
             @RequestBody List<AppSettingDto> settings,
@@ -52,28 +65,37 @@ public class SettingsController {
 
     @PostMapping("/settings/{category}/reset")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Reset category to defaults", description = "Resets all settings in a category to their default values (Admin only)")
+    @Operation(summary = "Reset category to defaults (Admin only)")
     public ResponseEntity<List<AppSettingDto>> resetCategory(@PathVariable String category) {
         return ResponseEntity.ok(settingsService.resetCategory(category));
     }
 
-    @GetMapping("/settings/public")
-    @Operation(summary = "Get public settings", description = "Returns non-sensitive settings visible to all authenticated users")
-    public ResponseEntity<List<AppSettingDto>> getPublicSettings() {
-        return ResponseEntity.ok(settingsService.getPublicSettings());
+    // ── Navigation ──────────────────────────────────────────────────────
+
+    @GetMapping("/settings/navigation")
+    @Operation(summary = "Get current nav item configuration")
+    public ResponseEntity<List<NavItemDto>> getNavItems() {
+        return ResponseEntity.ok(settingsService.getNavItems());
+    }
+
+    @PostMapping("/settings/navigation")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Save nav item order and visibility (Admin only)")
+    public ResponseEntity<List<NavItemDto>> saveNavItems(@RequestBody List<NavItemDto> items) {
+        return ResponseEntity.ok(settingsService.saveNavItems(items));
     }
 
     // ── User Preferences ────────────────────────────────────────────────
 
     @GetMapping("/user/preferences")
-    @Operation(summary = "Get current user's preferences", description = "Returns all preferences for the authenticated user")
+    @Operation(summary = "Get current user's preferences")
     public ResponseEntity<List<UserPreferenceDto>> getUserPreferences(Authentication authentication) {
         UUID userId = getUserId(authentication);
         return ResponseEntity.ok(settingsService.getUserPreferences(userId));
     }
 
     @PutMapping("/user/preferences")
-    @Operation(summary = "Update current user's preferences", description = "Updates one or more preferences for the authenticated user")
+    @Operation(summary = "Update current user's preferences")
     public ResponseEntity<List<UserPreferenceDto>> updateUserPreferences(
             @RequestBody List<UserPreferenceDto> preferences,
             Authentication authentication) {
@@ -82,7 +104,7 @@ public class SettingsController {
     }
 
     @PostMapping("/user/preferences/reset")
-    @Operation(summary = "Reset user preferences to defaults", description = "Resets all preferences to their default values")
+    @Operation(summary = "Reset user preferences to defaults")
     public ResponseEntity<List<UserPreferenceDto>> resetUserPreferences(Authentication authentication) {
         UUID userId = getUserId(authentication);
         return ResponseEntity.ok(settingsService.resetUserPreferences(userId));

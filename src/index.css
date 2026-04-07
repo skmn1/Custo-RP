@@ -91,3 +91,25 @@ h1 {
     background-color: #f9f9f9;
   }
 }
+
+/* ── Accessibility effects ─────────────────────────────────────── */
+
+/* Reduced motion */
+html.reduce-motion *,
+html.reduce-motion *::before,
+html.reduce-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+}
+
+/* High contrast */
+html.high-contrast {
+  filter: contrast(1.25);
+}
+
+/* Focus ring always visible */
+html.focus-visible-always *:focus {
+  outline: 2px solid #4f46e5 !important;
+  outline-offset: 2px !important;
+}

@@ -1,10 +1,12 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Button from './ui/Button';
 import useLocale from '../hooks/useLocale';
 import { useAuth } from '../hooks/useAuth';
+import { useSettings } from '../hooks/useSettings';
 
+// Fallback role permissions when navItems haven't loaded from API yet
 const ROLE_NAV_PERMISSIONS = {
   pos:       ['admin', 'manager'],
   scheduler: ['admin', 'manager', 'employee', 'viewer'],
@@ -60,7 +62,8 @@ const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { t } = useTranslation(['common', 'auth']);
-  const { user, logout } = useAuth();
+  const { user, logout, isAdmin, isManager } = useAuth();
+  const { navItems: dbNavItems, featureFlags } = useSettings();
 
   // Close user menu on outside click
   useEffect(() => {
@@ -105,22 +108,66 @@ const Navbar = () => {
     navigate(routes[viewId] || '/scheduler');
   };
 
-  const navItems = [
-    { id: 'pos', labelKey: 'common:nav.pos', icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4', badge: null },
-    { id: 'scheduler', labelKey: 'common:nav.scheduler', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z', badge: null },
-    { id: 'employees', labelKey: 'common:nav.employees', icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z', badge: null },
-    { id: 'payroll', labelKey: 'common:nav.payroll', icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z', badge: null },
-    { id: 'shifts', labelKey: 'common:nav.shifts', icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z', badge: null },
-    { id: 'reports', labelKey: 'common:nav.reports', icon: 'M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', badge: '3' },
-    { id: 'settings', labelKey: 'common:nav.settings', icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z', badge: null },
-    { id: 'users', labelKey: 'common:nav.userManagement', icon: 'M5.121 17.804A9 9 0 0112 15a9 9 0 016.879 2.804M15 11a3 3 0 11-6 0 3 3 0 016 0z', badge: null },
-    { id: 'dashboard', labelKey: 'common:nav.dashboard', icon: 'M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z', badge: null },
-  ];
+  // Icon map for nav items (backend doesn't store icons)
+  const NAV_ICONS = {
+    pos: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4',
+    scheduler: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z',
+    employees: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z',
+    payroll: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+    shifts: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
+    reports: 'M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
+    settings: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z',
+    users: 'M5.121 17.804A9 9 0 0112 15a9 9 0 016.879 2.804M15 11a3 3 0 11-6 0 3 3 0 016 0z',
+    dashboard: 'M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z',
+  };
+
+  // Map route keys to feature flags (routes not in this map are always visible)
+  const ROUTE_FEATURE_FLAGS = {
+    payroll: 'enablePayroll',
+    pos: 'enablePOS',
+    reports: 'enableReports',
+    dashboard: 'enableDashboard',
+  };
 
   const userRole = user?.role;
-  const visibleNavItems = navItems.filter(
-    (item) => ROLE_NAV_PERMISSIONS[item.id]?.includes(userRole)
-  );
+
+  // Build visible nav items: use API-ordered dbNavItems if available, else fall back to hardcoded
+  const visibleNavItems = useMemo(() => {
+    if (dbNavItems && dbNavItems.length > 0) {
+      return dbNavItems
+        .filter((item) => {
+          // Role-based visibility from nav item config
+          if (userRole === 'admin' && !item.visibleAdmin) return false;
+          if (userRole === 'manager' && !item.visibleManager) return false;
+          if ((userRole === 'employee' || userRole === 'viewer') && !item.visibleEmployee) return false;
+          // Feature flag gating
+          const flagKey = ROUTE_FEATURE_FLAGS[item.routeKey];
+          if (flagKey && featureFlags[flagKey] === false) return false;
+          return true;
+        })
+        .map((item) => ({
+          id: item.routeKey,
+          labelKey: item.routeKey === 'users' ? 'common:nav.userManagement' : `common:nav.${item.routeKey}`,
+          icon: NAV_ICONS[item.routeKey] || NAV_ICONS.settings,
+          badge: null,
+        }));
+    }
+    // Fallback: use hardcoded permissions
+    const fallbackItems = [
+      { id: 'pos', labelKey: 'common:nav.pos' },
+      { id: 'scheduler', labelKey: 'common:nav.scheduler' },
+      { id: 'employees', labelKey: 'common:nav.employees' },
+      { id: 'payroll', labelKey: 'common:nav.payroll' },
+      { id: 'shifts', labelKey: 'common:nav.shifts' },
+      { id: 'reports', labelKey: 'common:nav.reports' },
+      { id: 'settings', labelKey: 'common:nav.settings' },
+      { id: 'users', labelKey: 'common:nav.userManagement' },
+      { id: 'dashboard', labelKey: 'common:nav.dashboard' },
+    ];
+    return fallbackItems
+      .filter((item) => ROLE_NAV_PERMISSIONS[item.id]?.includes(userRole))
+      .map((item) => ({ ...item, icon: NAV_ICONS[item.id] || NAV_ICONS.settings, badge: null }));
+  }, [dbNavItems, featureFlags, userRole]);
 
   return (
     <nav className="bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100">

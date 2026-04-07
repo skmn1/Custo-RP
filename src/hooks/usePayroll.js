@@ -6,10 +6,10 @@ import { useSettings } from './useSettings';
 
 export const usePayroll = (employees, shifts) => {
   const { settings } = useSettings();
-  const overtimeThreshold = settings?.business?.overtimeThreshold ?? 40;
-  const doubleTimeThreshold = settings?.business?.doubleTimeThreshold ?? 60;
-  const overtimeMultiplier = settings?.business?.overtimeMultiplier ?? 1.5;
-  const doubleTimeMultiplier = settings?.business?.doubleTimeMultiplier ?? 2.0;
+  const overtimeThreshold = settings?.payroll?.overtimeThreshold ?? 40;
+  const doubleTimeThreshold = settings?.payroll?.doubleTimeThreshold ?? 60;
+  const overtimeMultiplier = settings?.payroll?.overtimeMultiplier ?? 1.5;
+  const doubleTimeMultiplier = settings?.payroll?.doubleTimeMultiplier ?? 2.0;
 
   const [selectedPayPeriod, setSelectedPayPeriod] = useState(() => {
     const now = new Date();

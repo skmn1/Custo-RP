@@ -1,27 +1,34 @@
 import { api } from './config';
 
 export const settingsApi = {
-  /** Get all app settings grouped by category (Admin) */
+  // ── App Settings ──────────────────────────────────────────────────
   getAll: () => api.get('/settings'),
-
-  /** Get settings for a specific category */
   getByCategory: (category) => api.get(`/settings/${category}`),
-
-  /** Update settings for a category (Admin) */
   updateCategory: (category, settings) => api.put(`/settings/${category}`, settings),
-
-  /** Reset a category to defaults (Admin) */
   resetCategory: (category) => api.post(`/settings/${category}/reset`),
-
-  /** Get public (non-sensitive) settings */
   getPublic: () => api.get('/settings/public'),
 
-  /** Get current user's preferences */
+  // ── Feature Flags ─────────────────────────────────────────────────
+  getFeatureFlags: () => api.get('/settings/feature-flags'),
+
+  // ── Navigation Items ──────────────────────────────────────────────
+  getNavItems: () => api.get('/settings/navigation'),
+  saveNavItems: (items) => api.post('/settings/navigation', items),
+
+  // ── User Preferences ──────────────────────────────────────────────
   getPreferences: () => api.get('/user/preferences'),
-
-  /** Update current user's preferences */
   updatePreferences: (preferences) => api.put('/user/preferences', preferences),
-
-  /** Reset current user's preferences to defaults */
   resetPreferences: () => api.post('/user/preferences/reset'),
+
+  // ── Departments ───────────────────────────────────────────────────
+  getDepartments: () => api.get('/departments'),
+  createDepartment: (dept) => api.post('/departments', dept),
+  updateDepartment: (id, dept) => api.put(`/departments/${id}`, dept),
+  deleteDepartment: (id) => api.delete(`/departments/${id}`),
+
+  // ── Shift Types ───────────────────────────────────────────────────
+  getShiftTypes: () => api.get('/shift-types'),
+  createShiftType: (st) => api.post('/shift-types', st),
+  updateShiftType: (id, st) => api.put(`/shift-types/${id}`, st),
+  deleteShiftType: (id) => api.delete(`/shift-types/${id}`),
 };
