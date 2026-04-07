@@ -138,6 +138,8 @@ const DevLoginPage = () => {
     } catch (err) {
       if (err.status === 403 && err.code === 'FORBIDDEN') {
         setError(t('auth:login.error.deactivated'));
+      } else if (!err.status || err.status >= 500) {
+        setError(t('auth:login.error.unavailable'));
       } else {
         setError(t('auth:login.error.invalid'));
       }
@@ -160,6 +162,8 @@ const DevLoginPage = () => {
     } catch (err) {
       if (err.status === 403 && err.code === 'FORBIDDEN') {
         setError(t('auth:login.error.deactivated'));
+      } else if (!err.status || err.status >= 500) {
+        setError(t('auth:login.error.unavailable'));
       } else {
         setError(t('auth:login.error.invalid'));
       }
