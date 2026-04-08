@@ -42,7 +42,7 @@ export default function InvoiceReviewView({ ocrResult, pdfFile, onCancel }) {
   const [validationErrors, setValidationErrors] = useState({});
 
   const confidence = useMemo(() => ocrResult?.confidence || {}, [ocrResult]);
-  const draft = ocrResult?.draft || {};
+  const draft = useMemo(() => ocrResult?.draft || {}, [ocrResult]);
   const threshold = 0.7;
 
   React.useEffect(() => {
@@ -82,18 +82,12 @@ export default function InvoiceReviewView({ ocrResult, pdfFile, onCancel }) {
     return [emptyLine()];
   });
 
-  const pdfUrl = useMemo(() => {
-    if (pdfFile) return URL.createObjectURL(pdfFile);
-    return null;
-  }, [pdfFile]);
-
-  // Cleanup blob URL and file store on unmount
+  // Cleanup file store on unmount
   useEffect(() => {
     return () => {
-      if (pdfUrl) URL.revokeObjectURL(pdfUrl);
       clearPdfFile();
     };
-  }, [pdfUrl]);
+  }, []);
 
   // Sync form with draft when ocrResult changes (handles delayed state)
   useEffect(() => {
@@ -264,7 +258,7 @@ export default function InvoiceReviewView({ ocrResult, pdfFile, onCancel }) {
       <div className="flex flex-col lg:flex-row" style={{ height: 'calc(100vh - 180px)' }}>
         {/* Left: PDF Viewer */}
         <div className="lg:w-1/2 w-full overflow-auto bg-gray-100 border-r border-gray-200 p-4" data-testid="pdf-viewer-pane">
-          {pdfUrl ? (
+          {pdfFile ? (
             <>
               <div className="flex items-center justify-center gap-2 mb-3">
                 <button
@@ -286,8 +280,9 @@ export default function InvoiceReviewView({ ocrResult, pdfFile, onCancel }) {
                 </button>
               </div>
               <Document
-                file={pdfUrl}
+                file={pdfFile}
                 onLoadSuccess={({ numPages: n }) => setNumPages(n)}
+                onLoadError={(err) => console.error('PDF load error:', err)}
                 className="flex justify-center"
               >
                 <Page pageNumber={currentPage} width={500} />

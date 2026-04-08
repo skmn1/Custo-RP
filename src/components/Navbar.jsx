@@ -15,7 +15,6 @@ const ROLE_NAV_PERMISSIONS = {
   stock:     ['admin', 'manager'],
   invoices:  ['admin', 'manager'],
   shifts:    ['admin', 'manager'],
-  reports:   ['admin', 'manager'],
   settings:  ['admin', 'manager', 'employee', 'viewer'],
   dashboard: ['admin', 'manager', 'employee', 'viewer'],
   users:     ['admin'],
@@ -134,7 +133,6 @@ const Navbar = () => {
     payroll: 'enablePayroll',
     pos: 'enablePOS',
     stock: 'enableStock',
-    reports: 'enableReports',
     dashboard: 'enableDashboard',
   };
 
@@ -143,8 +141,10 @@ const Navbar = () => {
   // Build visible nav items: use API-ordered dbNavItems if available, else fall back to hardcoded
   const visibleNavItems = useMemo(() => {
     if (dbNavItems && dbNavItems.length > 0) {
-      return dbNavItems
+      const canSeeInvoices = ['admin', 'manager'].includes(userRole);
+      const mapped = dbNavItems
         .filter((item) => {
+          if (item.routeKey === 'reports') return false; // reports removed
           // Role-based visibility from nav item config
           if (userRole === 'admin' && !item.visibleAdmin) return false;
           if (userRole === 'manager' && !item.visibleManager) return false;
@@ -160,6 +160,22 @@ const Navbar = () => {
           icon: NAV_ICONS[item.routeKey] || NAV_ICONS.settings,
           badge: null,
         }));
+      // Inject invoices for admin/manager if the backend didn't include it
+      if (canSeeInvoices && !mapped.find((i) => i.id === 'invoices')) {
+        const stockIdx = mapped.findIndex((i) => i.id === 'stock');
+        const invoicesItem = {
+          id: 'invoices',
+          labelKey: 'common:nav.invoices',
+          icon: NAV_ICONS.invoices,
+          badge: null,
+        };
+        if (stockIdx !== -1) {
+          mapped.splice(stockIdx + 1, 0, invoicesItem);
+        } else {
+          mapped.push(invoicesItem);
+        }
+      }
+      return mapped;
     }
     // Fallback: use hardcoded permissions
     const fallbackItems = [
@@ -170,7 +186,6 @@ const Navbar = () => {
       { id: 'stock', labelKey: 'common:nav.stock' },
       { id: 'invoices', labelKey: 'common:nav.invoices' },
       { id: 'shifts', labelKey: 'common:nav.shifts' },
-      { id: 'reports', labelKey: 'common:nav.reports' },
       { id: 'settings', labelKey: 'common:nav.settings' },
       { id: 'users', labelKey: 'common:nav.userManagement' },
       { id: 'dashboard', labelKey: 'common:nav.dashboard' },
