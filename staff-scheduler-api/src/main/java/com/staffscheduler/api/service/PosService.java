@@ -283,6 +283,8 @@ public class PosService {
                 .managerId(pos.getManagerId())
                 .managerName(pos.getManagerName())
                 .isActive(pos.getIsActive())
+                .googleRating(pos.getGoogleRating())
+                .googleReviewCount(pos.getGoogleReviewCount())
                 .createdAt(pos.getCreatedAt() != null ? pos.getCreatedAt().toString() : null)
                 .updatedAt(pos.getUpdatedAt() != null ? pos.getUpdatedAt().toString() : null)
                 .build();

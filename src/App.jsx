@@ -37,7 +37,6 @@ import InvoiceListPage from './pages/invoices/InvoiceListPage';
 import InvoiceFormPage from './pages/invoices/InvoiceFormPage';
 import InvoiceDetailPage from './pages/invoices/InvoiceDetailPage';
 import InvoiceReviewPage from './pages/invoices/InvoiceReviewPage';
-import PosProfilePage from './pages/PosProfilePage';
 
 const ProtectedLayout = ({ children }) => (
   <AuthGuard>
@@ -68,7 +67,6 @@ const App = () => {
           <Route path="/payroll" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager', 'employee']}><PayrollPage /></RoleGuard></ProtectedLayout>} />
           <Route path="/pos" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><PosListPage /></RoleGuard></ProtectedLayout>} />
           <Route path="/pos/:id" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><PosDetailPage /></RoleGuard></ProtectedLayout>} />
-          <Route path="/pos/:id/profile" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><PosProfilePage /></RoleGuard></ProtectedLayout>} />
           <Route path="/admin/users" element={<ProtectedLayout><RoleGuard roles={['admin']}><UserManagementPage /></RoleGuard></ProtectedLayout>} />
           <Route path="/settings" element={<ProtectedLayout><SettingsPage /></ProtectedLayout>} />
           <Route path="/access-denied" element={<ProtectedLayout><AccessDeniedPage /></ProtectedLayout>} />

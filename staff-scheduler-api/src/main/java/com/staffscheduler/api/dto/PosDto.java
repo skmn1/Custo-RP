@@ -40,6 +40,12 @@ public class PosDto {
     @Schema(description = "Whether the location is active", example = "true")
     private Boolean isActive;
 
+    @Schema(description = "Google rating (0-5)", example = "4.3", accessMode = Schema.AccessMode.READ_ONLY)
+    private Double googleRating;
+
+    @Schema(description = "Number of Google reviews", example = "127", accessMode = Schema.AccessMode.READ_ONLY)
+    private Integer googleReviewCount;
+
     @Schema(description = "Creation timestamp (ISO 8601)", accessMode = Schema.AccessMode.READ_ONLY)
     private String createdAt;
 

@@ -29,6 +29,8 @@ export const usePos = () => {
   const [posList, setPosList] = useState([]);
   const [selectedPos, setSelectedPos] = useState(null);
   const [managers, setManagers] = useState([]);
+  const [profile, setProfile] = useState(null);
+  const [incidents, setIncidents] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -261,10 +263,94 @@ export const usePos = () => {
     }
   }, []);
 
+  // ── Profile & Incidents ──
+
+  const fetchProfile = useCallback(async (posId) => {
+    try {
+      const data = await posApi.getProfile(posId);
+      setProfile(data);
+      return data;
+    } catch (err) {
+      console.warn('Failed to fetch profile:', err.message);
+      return null;
+    }
+  }, []);
+
+  const updateProfile = useCallback(async (posId, data) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const updated = await posApi.updateProfile(posId, data);
+      setProfile(updated);
+      return updated;
+    } catch (err) {
+      setError(err.message || 'Failed to update profile');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const updateGoogleReviews = useCallback(async (posId, data) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const updated = await posApi.updateGoogleReviews(posId, data);
+      setProfile(updated);
+      return updated;
+    } catch (err) {
+      setError(err.message || 'Failed to update Google reviews');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const fetchIncidents = useCallback(async (posId, filters = {}) => {
+    try {
+      const data = await posApi.listIncidents(posId, filters);
+      setIncidents(data);
+      return data;
+    } catch (err) {
+      console.warn('Failed to fetch incidents:', err.message);
+      return [];
+    }
+  }, []);
+
+  const createIncident = useCallback(async (posId, data) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const created = await posApi.createIncident(posId, data);
+      return created;
+    } catch (err) {
+      setError(err.message || 'Failed to create incident');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const updateIncident = useCallback(async (posId, incidentId, data) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const updated = await posApi.updateIncident(posId, incidentId, data);
+      return updated;
+    } catch (err) {
+      setError(err.message || 'Failed to update incident');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   return {
     posList,
     selectedPos,
     managers,
+    profile,
+    incidents,
     isLoading,
     error,
     fetchPosList,
@@ -279,6 +365,12 @@ export const usePos = () => {
     removeEmployee,
     swapEmployee,
     fetchAvailableEmployees,
+    fetchProfile,
+    updateProfile,
+    updateGoogleReviews,
+    fetchIncidents,
+    createIncident,
+    updateIncident,
     clearError,
     clearSelectedPos,
   };
