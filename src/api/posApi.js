@@ -5,6 +5,26 @@ import { api } from './config';
  * Replaces the in-memory posApi mock from data/pos.js.
  */
 export const posApi = {
+  // ── Terminal-scoped endpoints ──
+
+  /** List terminals assigned to the current user. */
+  myTerminals: () => api.get('/pos/my-terminals'),
+
+  /** Get dashboard KPIs for a terminal. */
+  dashboardKpis: (terminalId) => api.get(`/pos/${terminalId}/dashboard-kpis`),
+
+  /** Get daily sales report for a terminal. */
+  dailySales: (terminalId, date) => {
+    const qs = date ? `?date=${date}` : '';
+    return api.get(`/pos/${terminalId}/reports/daily-sales${qs}`);
+  },
+
+  /** Get period summary report for a terminal. */
+  periodSummary: (terminalId, from, to) =>
+    api.get(`/pos/${terminalId}/reports/period-summary?from=${from}&to=${to}`),
+
+  // ── PoS CRUD ──
+
   /** List PoS locations. */
   list: (includeInactive = false) =>
     api.get(`/pos${includeInactive ? '?includeInactive=true' : ''}`),
@@ -90,4 +110,10 @@ export const posApi = {
     const qs = status ? `?status=${status}` : '';
     return api.get(`/pos/admin/incidents${qs}`);
   },
+
+  // ── Stock lookup (read-only for PoS) ──
+
+  /** Search stock items (pos_manager read access). */
+  searchStock: (search) =>
+    api.get(`/stock/items${search ? `?search=${encodeURIComponent(search)}` : ''}`),
 };

@@ -69,7 +69,10 @@ INSERT INTO users (id, email, password_hash, first_name, last_name, role, is_act
 ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'admin@staffscheduler.com',    '$2b$12$cy3eWzkf/hLfSt3mV1zwKOaPs9YPGrpWf/Wd1y5JVEhG87N0qn5LG', 'System',  'Admin',   'super_admin',      true, NULL,   NOW(), NOW()),
 ('b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22', 'manager@staffscheduler.com',  '$2b$12$HpgVI3BNYxGjXbxXEP71N.vo/htl13rBqPRff5M8pXTFPpDoSN9Py', 'Jane',    'Smith',   'hr_manager',       true, 'emp7', NOW(), NOW()),
 ('c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a33', 'employee@staffscheduler.com', '$2b$12$6pb0EUl.JzsyeIMJtxnjNeBiR74daytthc31gH3zqVYbk8jAroHKq', 'Sarah',   'Johnson', 'employee',         true, 'emp1', NOW(), NOW()),
-('d0eebc99-9c0b-4ef8-bb6d-6bb9bd380a44', 'viewer@staffscheduler.com',   '$2b$12$aC4oZhRL3o18HJkorip6QOuvRlMx2MvG8jX9oWSl1KQwlxVWlyGbO', 'Robert',  'Taylor',  'employee',         true, 'emp10', NOW(), NOW())
+('d0eebc99-9c0b-4ef8-bb6d-6bb9bd380a44', 'viewer@staffscheduler.com',   '$2b$12$aC4oZhRL3o18HJkorip6QOuvRlMx2MvG8jX9oWSl1KQwlxVWlyGbO', 'Robert',  'Taylor',  'employee',         true, 'emp10', NOW(), NOW()),
+('e0eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 'pos@staffscheduler.com',      '$2b$12$cy3eWzkf/hLfSt3mV1zwKOaPs9YPGrpWf/Wd1y5JVEhG87N0qn5LG', 'Marc',    'Dupont',  'pos_manager',      true, 'emp8',  NOW(), NOW()),
+('f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', 'accounting@staffscheduler.com','$2b$12$cy3eWzkf/hLfSt3mV1zwKOaPs9YPGrpWf/Wd1y5JVEhG87N0qn5LG', 'Sophie',  'Martin',  'accounting_agent', true, NULL,    NOW(), NOW()),
+('a1eebc99-9c0b-4ef8-bb6d-6bb9bd380a77', 'stock@staffscheduler.com',    '$2b$12$cy3eWzkf/hLfSt3mV1zwKOaPs9YPGrpWf/Wd1y5JVEhG87N0qn5LG', 'Pierre',  'Leroy',   'stock_manager',    true, NULL,    NOW(), NOW())
 ON CONFLICT DO NOTHING;
 
 -- ═══════════════════════════════════════════════════════════════════
@@ -439,4 +442,14 @@ INSERT INTO stock_movements (id, item_id, location_id, movement_type, qty_change
 (gen_random_uuid(), (SELECT id FROM stock_items WHERE sku='PROD-003'), (SELECT id FROM stock_locations WHERE name='Walk-in cooler' LIMIT 1),  'consumed', -12, 1.50,  'Daily use', NOW() - INTERVAL '7 days', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'),
 (gen_random_uuid(), (SELECT id FROM stock_items WHERE sku='DAIRY-001'), (SELECT id FROM stock_locations WHERE name='Walk-in cooler' LIMIT 1), 'consumed', -25, 3.75,  'Daily use', NOW() - INTERVAL '7 days', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'),
 (gen_random_uuid(), (SELECT id FROM stock_items WHERE sku='BEV-001'), (SELECT id FROM stock_locations WHERE name='Dry store' LIMIT 1),         'consumed', -20, 22.50, 'Daily use', NOW() - INTERVAL '7 days', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11')
+ON CONFLICT DO NOTHING;
+
+-- ══════════════════════════════════════════════════════
+-- PoS Terminal Assignments
+-- pos@staffscheduler.com (pos_manager) → terminals 1, 2
+-- admin@staffscheduler.com (super_admin) sees all via role bypass
+-- ══════════════════════════════════════════════════════
+INSERT INTO pos_assignments (id, user_id, pos_terminal_id, assigned_by, assigned_at) VALUES
+(gen_random_uuid(), 'e0eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 1, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', NOW()),
+(gen_random_uuid(), 'e0eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 2, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', NOW())
 ON CONFLICT DO NOTHING;

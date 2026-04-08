@@ -18,6 +18,8 @@ import {
   TruckIcon as TruckOutline,
   ClipboardDocumentListIcon as ClipboardDocListOutline,
   ArrowPathIcon as ArrowPathOutline,
+  BuildingStorefrontIcon as BuildingStorefrontOutline,
+  ChartBarIcon as ChartBarOutline,
 } from '@heroicons/react/24/outline';
 
 import {
@@ -36,6 +38,8 @@ import {
   TruckIcon as TruckSolid,
   ClipboardDocumentListIcon as ClipboardDocListSolid,
   ArrowPathIcon as ArrowPathSolid,
+  BuildingStorefrontIcon as BuildingStorefrontSolid,
+  ChartBarIcon as ChartBarSolid,
 } from '@heroicons/react/24/solid';
 
 const outlineMap = {
@@ -54,6 +58,8 @@ const outlineMap = {
   TruckIcon: TruckOutline,
   ClipboardDocumentListIcon: ClipboardDocListOutline,
   ArrowPathIcon: ArrowPathOutline,
+  BuildingStorefrontIcon: BuildingStorefrontOutline,
+  ChartBarIcon: ChartBarOutline,
 };
 
 const solidMap = {
@@ -72,6 +78,8 @@ const solidMap = {
   TruckIcon: TruckSolid,
   ClipboardDocumentListIcon: ClipboardDocListSolid,
   ArrowPathIcon: ArrowPathSolid,
+  BuildingStorefrontIcon: BuildingStorefrontSolid,
+  ChartBarIcon: ChartBarSolid,
 };
 
 export function getIconComponent(iconName, variant = 'outline') {

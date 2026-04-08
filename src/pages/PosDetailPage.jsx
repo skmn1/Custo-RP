@@ -52,7 +52,8 @@ const DETAIL_TABS = ['overview', 'identity', 'google', 'incidents', 'history'];
 
 const PosDetailPage = () => {
   const { t } = useTranslation(['pos', 'common']);
-  const { id } = useParams();
+  const { id, terminalId } = useParams();
+  const posId = terminalId || id;
   const navigate = useNavigate();
   const {
     selectedPos,
@@ -95,18 +96,18 @@ const PosDetailPage = () => {
   const [incidentFilter, setIncidentFilter] = useState({ status: '', category: '', severity: '' });
 
   useEffect(() => {
-    if (id) {
-      fetchPosDetail(id).catch(() => {});
-      fetchProfile(id);
+    if (posId) {
+      fetchPosDetail(posId).catch(() => {});
+      fetchProfile(posId);
     }
     fetchManagers().catch(() => {});
-  }, [id, fetchPosDetail, fetchProfile, fetchManagers]);
+  }, [posId, fetchPosDetail, fetchProfile, fetchManagers]);
 
   useEffect(() => {
-    if (id) {
-      fetchIncidents(id, incidentFilter);
+    if (posId) {
+      fetchIncidents(posId, incidentFilter);
     }
-  }, [id, incidentFilter, fetchIncidents]);
+  }, [posId, incidentFilter, fetchIncidents]);
 
   // Sync identity form when profile loads
   useEffect(() => {
@@ -139,26 +140,26 @@ const PosDetailPage = () => {
 
   const handleEditSubmit = useCallback(
     async (data) => {
-      await updatePos(id, data);
-      await fetchPosDetail(id);
+      await updatePos(posId, data);
+      await fetchPosDetail(posId);
       await fetchManagers();
     },
-    [id, updatePos, fetchPosDetail, fetchManagers]
+    [posId, updatePos, fetchPosDetail, fetchManagers]
   );
 
   const handleDelete = useCallback(async () => {
     try {
-      await deletePos(id);
-      navigate('/pos');
+      await deletePos(posId);
+      navigate('/app/pos');
     } catch {
       // error handled by hook
     }
     setDeleteConfirm(false);
-  }, [id, deletePos, navigate]);
+  }, [posId, deletePos, navigate]);
 
   const handleSaveIdentity = async () => {
     try {
-      await updateProfile(id, identityForm);
+      await updateProfile(posId, identityForm);
       setEditingIdentity(false);
     } catch {
       // error handled by hook
@@ -173,7 +174,7 @@ const PosDetailPage = () => {
         googleRating: googleForm.googleRating ? parseFloat(googleForm.googleRating) : null,
         googleReviewCount: googleForm.googleReviewCount ? parseInt(googleForm.googleReviewCount, 10) : null,
       };
-      await updateGoogleReviews(id, payload);
+      await updateGoogleReviews(posId, payload);
       setEditingGoogle(false);
     } catch {
       // error handled by hook
@@ -182,14 +183,14 @@ const PosDetailPage = () => {
 
   const handleIncidentCreated = async () => {
     setIncidentModalOpen(false);
-    await fetchIncidents(id, incidentFilter);
-    await fetchProfile(id);
+    await fetchIncidents(posId, incidentFilter);
+    await fetchProfile(posId);
   };
 
   const handleIncidentUpdated = async () => {
     setSelectedIncident(null);
-    await fetchIncidents(id, incidentFilter);
-    await fetchProfile(id);
+    await fetchIncidents(posId, incidentFilter);
+    await fetchProfile(posId);
   };
 
   // Loading state
@@ -743,7 +744,7 @@ const PosDetailPage = () => {
       <DeclareIncidentModal
         isOpen={incidentModalOpen}
         onClose={() => setIncidentModalOpen(false)}
-        posId={Number(id)}
+        posId={Number(posId)}
         onCreated={handleIncidentCreated}
       />
 
@@ -751,7 +752,7 @@ const PosDetailPage = () => {
       {selectedIncident && (
         <IncidentDrawer
           incident={selectedIncident}
-          posId={Number(id)}
+          posId={Number(posId)}
           onClose={() => setSelectedIncident(null)}
           onUpdated={handleIncidentUpdated}
         />

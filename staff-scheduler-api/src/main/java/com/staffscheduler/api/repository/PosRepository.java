@@ -17,4 +17,6 @@ public interface PosRepository extends JpaRepository<PointOfSale, Long> {
     boolean existsByNameIgnoreCaseAndIsActiveTrue(String name);
 
     boolean existsByNameIgnoreCaseAndIsActiveTrueAndIdNot(String name, Long id);
+
+    List<PointOfSale> findByIdInAndIsActiveTrue(List<Long> ids);
 }

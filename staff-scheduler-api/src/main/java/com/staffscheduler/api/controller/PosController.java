@@ -20,11 +20,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -39,6 +42,53 @@ public class PosController {
     private final PosService posService;
     private final EmployeeService employeeService;
     private final IncidentService incidentService;
+
+    // ── Terminal-scoped endpoints ──
+
+    @GetMapping("/my-terminals")
+    @Operation(summary = "List terminals assigned to the current user",
+            description = "Returns PoS terminals the authenticated user has access to. "
+                    + "SUPER_ADMIN sees all active terminals; POS_MANAGER sees only assigned ones.")
+    @ApiResponse(responseCode = "200", description = "User's terminals",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = PosDto.class))))
+    public ResponseEntity<List<PosDto>> myTerminals(Authentication authentication) {
+        UUID userId = UUID.fromString(authentication.getName());
+        String role = authentication.getAuthorities().iterator().next()
+                .getAuthority().replace("ROLE_", "");
+        return ResponseEntity.ok(posService.findMyTerminals(userId, role));
+    }
+
+    @GetMapping("/{terminalId}/dashboard-kpis")
+    @Operation(summary = "Get terminal dashboard KPIs",
+            description = "Returns key performance indicators for a terminal: employee count, open incidents, etc.")
+    public ResponseEntity<Map<String, Object>> dashboardKpis(
+            Authentication authentication,
+            @PathVariable Long terminalId) {
+        enforceAccess(authentication, terminalId);
+        return ResponseEntity.ok(posService.getTerminalDashboardKpis(terminalId));
+    }
+
+    @GetMapping("/{terminalId}/reports/daily-sales")
+    @Operation(summary = "Get daily sales report for a terminal")
+    public ResponseEntity<Map<String, Object>> dailySales(
+            Authentication authentication,
+            @PathVariable Long terminalId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        enforceAccess(authentication, terminalId);
+        if (date == null) date = LocalDate.now();
+        return ResponseEntity.ok(posService.getDailySales(terminalId, date));
+    }
+
+    @GetMapping("/{terminalId}/reports/period-summary")
+    @Operation(summary = "Get period summary report for a terminal")
+    public ResponseEntity<Map<String, Object>> periodSummary(
+            Authentication authentication,
+            @PathVariable Long terminalId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+        enforceAccess(authentication, terminalId);
+        return ResponseEntity.ok(posService.getPeriodSummary(terminalId, from, to));
+    }
 
     // ── PoS CRUD ──
 
@@ -319,5 +369,14 @@ public class PosController {
     public ResponseEntity<List<IncidentDto>> listAllIncidents(
             @RequestParam(required = false) String status) {
         return ResponseEntity.ok(incidentService.findAll(status));
+    }
+
+    // ── Helpers ──
+
+    private void enforceAccess(Authentication authentication, Long terminalId) {
+        UUID userId = UUID.fromString(authentication.getName());
+        String role = authentication.getAuthorities().iterator().next()
+                .getAuthority().replace("ROLE_", "");
+        posService.enforceTerminalAccess(userId, role, terminalId);
     }
 }

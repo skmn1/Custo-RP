@@ -14,9 +14,10 @@ import { getAppColor } from '../../apps/colors';
  * @param {Array}    items     — Nav items array: { label, icon, to, roles?, children? }
  * @param {boolean}  collapsed — Whether sidebar is in icon-only mode
  * @param {function} onToggle  — Callback to toggle collapsed state
+ * @param {ReactNode} headerSlot — Optional slot rendered below the app header
  */
-const AppSidebar = ({ appId, items = [], collapsed, onToggle, mobile = false }) => {
-  const { t } = useTranslation(['apps']);
+const AppSidebar = ({ appId, items = [], collapsed, onToggle, mobile = false, headerSlot }) => {
+  const { t } = useTranslation(['apps', 'pos']);
   const { user } = useAuth();
   const location = useLocation();
 
@@ -53,6 +54,9 @@ const AppSidebar = ({ appId, items = [], collapsed, onToggle, mobile = false }) 
           </div>
         </div>
       )}
+
+      {/* Optional header slot (e.g. terminal selector) */}
+      {headerSlot}
 
       {/* Nav items */}
       <nav className="flex-1 overflow-y-auto py-3 px-2" aria-label="Sidebar">

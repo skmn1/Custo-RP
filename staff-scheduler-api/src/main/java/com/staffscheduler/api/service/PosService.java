@@ -11,9 +11,13 @@ import com.staffscheduler.api.exception.DuplicateResourceException;
 import com.staffscheduler.api.exception.ResourceNotFoundException;
 import com.staffscheduler.api.model.Employee;
 import com.staffscheduler.api.model.PointOfSale;
+import com.staffscheduler.api.model.PosAssignment;
 import com.staffscheduler.api.repository.EmployeeRepository;
+import com.staffscheduler.api.repository.PosAssignmentRepository;
 import com.staffscheduler.api.repository.PosRepository;
+import com.staffscheduler.api.security.RoleConstants;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +31,7 @@ import java.util.stream.Collectors;
 public class PosService {
 
     private final PosRepository posRepository;
+    private final PosAssignmentRepository posAssignmentRepository;
     private final EmployeeRepository employeeRepository;
     private final EmployeeService employeeService;
     private final IncidentService incidentService;
@@ -68,7 +73,96 @@ public class PosService {
                         .build())
                 .build();
     }
+    // ── Terminal-scoped queries ──
 
+    /**
+     * Returns terminals the current user has access to.
+     * SUPER_ADMIN sees all active terminals; POS_MANAGER sees only assigned ones.
+     */
+    public List<PosDto> findMyTerminals(UUID userId, String role) {
+        String normalised = RoleConstants.normalise(role);
+        if ("SUPER_ADMIN".equals(normalised)) {
+            return findAll(false);
+        }
+        List<PosAssignment> assignments = posAssignmentRepository.findByUserId(userId);
+        List<Long> terminalIds = assignments.stream()
+                .map(PosAssignment::getPosTerminalId)
+                .toList();
+        if (terminalIds.isEmpty()) return List.of();
+        return posRepository.findByIdInAndIsActiveTrue(terminalIds).stream()
+                .map(this::toDto)
+                .toList();
+    }
+
+    /**
+     * Checks that the given user has access to a specific terminal.
+     * Throws AccessDeniedException if not.
+     */
+    public void enforceTerminalAccess(UUID userId, String role, Long terminalId) {
+        String normalised = RoleConstants.normalise(role);
+        if ("SUPER_ADMIN".equals(normalised)) return;
+        if (!posAssignmentRepository.existsByUserIdAndPosTerminalId(userId, terminalId)) {
+            throw new AccessDeniedException("You do not have access to this terminal");
+        }
+    }
+
+    /**
+     * Returns dashboard KPIs for a terminal.
+     */
+    public Map<String, Object> getTerminalDashboardKpis(Long terminalId) {
+        PointOfSale pos = posRepository.findByIdAndIsActiveTrue(terminalId)
+                .orElseThrow(() -> new ResourceNotFoundException("PoS", String.valueOf(terminalId)));
+
+        List<EmployeeDto> employees = employeeService.findByPosId(terminalId);
+        long openIncidents = incidentService.countOpen(terminalId);
+
+        return Map.of(
+                "terminalId", pos.getId(),
+                "terminalName", pos.getName(),
+                "employeeCount", employees.size(),
+                "openIncidents", openIncidents,
+                "shiftsToday", 0,
+                "salesToday", 0,
+                "transactionCount", 0,
+                "avgBasket", 0,
+                "lowStockAlerts", 0
+        );
+    }
+
+    /**
+     * Returns a daily sales report (placeholder with structure).
+     */
+    public Map<String, Object> getDailySales(Long terminalId, LocalDate date) {
+        posRepository.findByIdAndIsActiveTrue(terminalId)
+                .orElseThrow(() -> new ResourceNotFoundException("PoS", String.valueOf(terminalId)));
+
+        // Placeholder — real implementation would query transaction table
+        return Map.of(
+                "terminalId", terminalId,
+                "date", date.toString(),
+                "totalSales", 0,
+                "transactionCount", 0,
+                "hourlySales", List.of()
+        );
+    }
+
+    /**
+     * Returns a period summary report (placeholder with structure).
+     */
+    public Map<String, Object> getPeriodSummary(Long terminalId, LocalDate from, LocalDate to) {
+        posRepository.findByIdAndIsActiveTrue(terminalId)
+                .orElseThrow(() -> new ResourceNotFoundException("PoS", String.valueOf(terminalId)));
+
+        return Map.of(
+                "terminalId", terminalId,
+                "from", from.toString(),
+                "to", to.toString(),
+                "totalSales", 0,
+                "totalTransactions", 0,
+                "avgDailySales", 0,
+                "topItems", List.of()
+        );
+    }
     // ── Mutations ──
 
     @Transactional

@@ -30,7 +30,7 @@ public class StockItemController {
     private final StockMovementService movementService;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'STOCK_MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'STOCK_MANAGER', 'POS_MANAGER')")
     @Operation(summary = "List stock items with optional filters")
     public ResponseEntity<List<StockItemDto>> list(
             @Parameter(description = "Search by name, nameEn, nameFr, or SKU")
@@ -43,28 +43,28 @@ public class StockItemController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'STOCK_MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'STOCK_MANAGER', 'POS_MANAGER')")
     @Operation(summary = "Get stock item by ID")
     public ResponseEntity<StockItemDto> getById(@PathVariable UUID id) {
         return ResponseEntity.ok(itemService.findById(id));
     }
 
     @GetMapping("/sku/{sku}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'STOCK_MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'STOCK_MANAGER', 'POS_MANAGER')")
     @Operation(summary = "Get stock item by SKU")
     public ResponseEntity<StockItemDto> getBySku(@PathVariable String sku) {
         return ResponseEntity.ok(itemService.findBySku(sku));
     }
 
     @GetMapping("/barcode/{barcode}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'STOCK_MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'STOCK_MANAGER', 'POS_MANAGER')")
     @Operation(summary = "Get stock item by barcode")
     public ResponseEntity<StockItemDto> getByBarcode(@PathVariable String barcode) {
         return ResponseEntity.ok(itemService.findByBarcode(barcode));
     }
 
     @GetMapping("/low-stock")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'STOCK_MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'STOCK_MANAGER', 'POS_MANAGER')")
     @Operation(summary = "List items with low stock (warn or critical)")
     public ResponseEntity<List<StockItemDto>> lowStock() {
         return ResponseEntity.ok(itemService.findLowStock());

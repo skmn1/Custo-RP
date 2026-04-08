@@ -12,6 +12,12 @@ import EmployeesPage from './pages/EmployeesPage';
 import PayrollPage from './pages/PayrollPage';
 import PosListPage from './pages/PosListPage';
 import PosDetailPage from './pages/PosDetailPage';
+import MyTerminalsPage from './pages/MyTerminalsPage';
+import PosTerminalDashboard from './pages/PosTerminalDashboard';
+import PosStockLookup from './pages/PosStockLookup';
+import PosReportsPage from './pages/PosReportsPage';
+import PosAppShell from './components/pos/PosAppShell';
+import TerminalGuard from './components/pos/TerminalGuard';
 import UserManagementPage from './pages/UserManagementPage';
 import SettingsPage from './pages/SettingsPage';
 import AccessDeniedPage from './pages/AccessDeniedPage';
@@ -71,9 +77,7 @@ const stockSidebar = [
   { label: 'common:nav.reorderQueue', icon: 'ArrowPathIcon', to: '/app/stock/reorder-queue' },
 ];
 
-const posSidebar = [
-  { label: 'common:nav.terminals', icon: 'ShoppingCartIcon', to: '/app/pos' },
-];
+const posSidebar = []; // PoS uses PosAppShell with dynamic sidebar
 
 const adminSidebar = [
   { label: 'common:nav.users', icon: 'UsersIcon', to: '/app/admin/users' },
@@ -148,9 +152,12 @@ const App = () => {
           </Route>
 
           {/* ═══ POS app ═══ */}
-          <Route path="/app/pos" element={<AppShell appId="pos" sidebarItems={posSidebar} />}>
-            <Route index element={<PosListPage />} />
-            <Route path=":id" element={<PosDetailPage />} />
+          <Route path="/app/pos" element={<PosAppShell />}>
+            <Route index element={<MyTerminalsPage />} />
+            <Route path=":terminalId/dashboard" element={<TerminalGuard><PosTerminalDashboard /></TerminalGuard>} />
+            <Route path=":terminalId/detail" element={<TerminalGuard><PosDetailPage /></TerminalGuard>} />
+            <Route path=":terminalId/stock" element={<TerminalGuard><PosStockLookup /></TerminalGuard>} />
+            <Route path=":terminalId/reports" element={<TerminalGuard><PosReportsPage /></TerminalGuard>} />
           </Route>
 
           {/* ═══ Admin app ═══ */}
@@ -166,7 +173,7 @@ const App = () => {
           <Route path="/employees" element={<Navigate to="/app/planning/employees" replace />} />
           <Route path="/payroll" element={<Navigate to="/app/payroll" replace />} />
           <Route path="/pos" element={<Navigate to="/app/pos" replace />} />
-          <Route path="/pos/:id" element={<Navigate to="/app/pos/:id" replace />} />
+          <Route path="/pos/:id" element={<Navigate to="/app/pos" replace />} />
           <Route path="/admin/users" element={<Navigate to="/app/admin/users" replace />} />
           <Route path="/settings" element={<Navigate to="/app/admin/settings" replace />} />
           <Route path="/stock/*" element={<Navigate to="/app/stock" replace />} />

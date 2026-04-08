@@ -56,6 +56,57 @@ const TEST_ACCOUNTS = [
       </svg>
     ),
   },
+  {
+    role: 'pos_manager',
+    email: 'pos@staffscheduler.com',
+    password: 'Admin@123',
+    firstName: 'Marc',
+    lastName: 'Dupont',
+    description: 'PoS terminals — assigned terminals only',
+    color: 'from-teal-500 to-cyan-600',
+    bg: 'bg-teal-50 border-teal-200 hover:border-teal-400 hover:bg-teal-100',
+    badge: 'bg-teal-100 text-teal-700',
+    icon: (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+          d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72" />
+      </svg>
+    ),
+  },
+  {
+    role: 'accounting_agent',
+    email: 'accounting@staffscheduler.com',
+    password: 'Admin@123',
+    firstName: 'Sophie',
+    lastName: 'Martin',
+    description: 'Invoices, payroll review — accounting features',
+    color: 'from-amber-500 to-orange-600',
+    bg: 'bg-amber-50 border-amber-200 hover:border-amber-400 hover:bg-amber-100',
+    badge: 'bg-amber-100 text-amber-700',
+    icon: (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+          d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    ),
+  },
+  {
+    role: 'stock_manager',
+    email: 'stock@staffscheduler.com',
+    password: 'Admin@123',
+    firstName: 'Pierre',
+    lastName: 'Leroy',
+    description: 'Stock items, movements, purchase orders',
+    color: 'from-orange-500 to-red-600',
+    bg: 'bg-orange-50 border-orange-200 hover:border-orange-400 hover:bg-orange-100',
+    badge: 'bg-orange-100 text-orange-700',
+    icon: (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+          d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+      </svg>
+    ),
+  },
 ];
 
 // ── RoleCard ─────────────────────────────────────────────────────────────────
