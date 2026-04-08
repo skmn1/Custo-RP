@@ -257,7 +257,7 @@ export default function InvoiceForm() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} data-testid="invoice-form" className="space-y-6">
         {/* Supplier Info */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('invoices:field.supplier')}</h2>
@@ -266,6 +266,7 @@ export default function InvoiceForm() {
               <label className="block text-sm font-medium text-gray-700">{t('invoices:field.supplier')} *</label>
               <input
                 type="text"
+                data-testid="supplier-name-input"
                 value={form.counterpartyName}
                 onChange={(e) => handleFieldChange('counterpartyName', e.target.value)}
                 className={`mt-1 block w-full rounded-md border ${validationErrors.counterpartyName ? 'border-red-300' : 'border-gray-300'} px-3 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500`}
@@ -294,6 +295,7 @@ export default function InvoiceForm() {
               <label className="block text-sm font-medium text-gray-700">{t('invoices:field.supplierSiret')}</label>
               <input
                 type="text"
+                data-testid="siret-input"
                 maxLength={14}
                 value={form.supplierSiret}
                 onChange={(e) => handleFieldChange('supplierSiret', e.target.value.replace(/\D/g, ''))}
@@ -306,6 +308,7 @@ export default function InvoiceForm() {
               <label className="block text-sm font-medium text-gray-700">{t('invoices:field.supplierVat')}</label>
               <input
                 type="text"
+                data-testid="vat-input"
                 maxLength={20}
                 value={form.supplierVatNumber}
                 onChange={(e) => handleFieldChange('supplierVatNumber', e.target.value)}
@@ -561,7 +564,7 @@ export default function InvoiceForm() {
           <Button variant="secondary" type="button" onClick={() => navigate('/invoices')}>
             {t('invoices:action.cancel')}
           </Button>
-          <Button type="submit" disabled={isLoading}>
+          <Button type="submit" data-testid="submit-invoice-btn" disabled={isLoading}>
             {isLoading ? t('common:status.loading') : t('invoices:action.save')}
           </Button>
         </div>

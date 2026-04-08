@@ -118,15 +118,15 @@ export default function InvoiceDetail() {
               <Button variant="secondary" onClick={() => navigate(`/invoices/${id}`, { state: { edit: true } })}>
                 {t('invoices:action.edit')}
               </Button>
-              <Button onClick={handleApprove}>
+              <Button data-testid="approve-btn" onClick={handleApprove}>
                 {t('invoices:action.approve')}
               </Button>
             </>
           )}
-          <Button variant="secondary" onClick={handleDuplicate}>
+          <Button data-testid="duplicate-btn" variant="secondary" onClick={handleDuplicate}>
             {t('invoices:action.duplicate')}
           </Button>
-          <Button variant="secondary" onClick={handlePdfExport}>
+          <Button data-testid="pdf-btn" variant="secondary" onClick={handlePdfExport}>
             {t('invoices:action.pdf')}
           </Button>
         </div>
@@ -256,7 +256,7 @@ export default function InvoiceDetail() {
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-900">{t('invoices:payment.title')}</h2>
           {canPay && (
-            <Button size="sm" onClick={() => setShowPaymentForm(true)}>
+            <Button data-testid="record-payment-btn" size="sm" onClick={() => setShowPaymentForm(true)}>
               {t('invoices:payment.record')}
             </Button>
           )}
@@ -323,7 +323,7 @@ export default function InvoiceDetail() {
               <Button type="button" variant="ghost" size="sm" onClick={() => setShowPaymentForm(false)}>
                 {t('invoices:action.cancel')}
               </Button>
-              <Button type="submit" size="sm" disabled={isLoading}>
+              <Button type="submit" data-testid="submit-payment-btn" size="sm" disabled={isLoading}>
                 {t('invoices:payment.record')}
               </Button>
             </div>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-const StatCard = ({ title, value, subtitle, icon, color = 'blue', change, description }) => {
+const StatCard = ({ title, value, subtitle, icon, color = 'blue', change, description, ...rest }) => {
   const { t } = useTranslation(['common']);
   const colorClasses = {
     blue: 'bg-blue-500',
@@ -26,7 +26,7 @@ const StatCard = ({ title, value, subtitle, icon, color = 'blue', change, descri
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+    <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100" {...rest}>
       <div className="flex items-center">
         <div className="flex-shrink-0">
           <div className={`w-10 h-10 ${colorClasses[color]} rounded-lg flex items-center justify-center text-white text-lg`}>

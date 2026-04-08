@@ -49,18 +49,21 @@ export default function InvoiceKPIWidgets() {
       {/* Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <StatCard
+          data-testid="kpi-unpaid"
           title={t('invoices:kpi.apUnpaid')}
           value={formatAmountFR(kpi.apUnpaidTotal)}
           icon="💰"
           color="orange"
         />
         <StatCard
+          data-testid="kpi-paid-mtd"
           title={t('invoices:kpi.apPaidMtd')}
           value={formatAmountFR(kpi.apPaidMtd)}
           icon="✅"
           color="green"
         />
         <StatCard
+          data-testid="kpi-pending"
           title={t('invoices:kpi.apPendingApproval')}
           value={kpi.apPendingApproval || 0}
           icon="⏳"

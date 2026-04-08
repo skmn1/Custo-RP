@@ -12,6 +12,8 @@ A full-stack workforce management platform with a React frontend, Spring Boot RE
 | **Employees** | Full CRUD, search/filter/sort, department & role management |
 | **Payroll** | Automated calculations (overtime, double-time, taxes, benefits), CSV export |
 | **Point of Sale** | PoS location CRUD, employee assignment, cross-location swap |
+| **Stock Management** | Items, categories, movements, stocktakes, purchase orders, supplier catalogue |
+| **Supplier Invoices (AP)** | French-law compliant AP module — SIRET/TVA validation, PDF archival, payment tracking, KPI dashboard |
 
 ## Tech Stack
 
@@ -22,6 +24,8 @@ A full-stack workforce management platform with a React frontend, Spring Boot RE
 - **@dnd-kit** — accessible drag-and-drop
 - **date-fns** — date utilities
 - **React Router 7** — client-side routing
+- **recharts 3** — KPI charts and dashboards
+- **@react-pdf/renderer** — in-browser PDF generation (supplier invoice archival)
 
 ### Backend
 - **Spring Boot 3.2** — REST API
@@ -53,25 +57,29 @@ scheduler/
 │   │   ├── employeesApi.js    # Employee API calls
 │   │   ├── shiftsApi.js       # Shift API calls
 │   │   ├── payrollApi.js      # Payroll API calls
-│   │   └── posApi.js          # PoS API calls
+│   │   ├── posApi.js          # PoS API calls
+│   │   ├── stockApi.js        # Stock API calls
+│   │   └── invoicesApi.js     # Supplier Invoice API calls
 │   ├── components/
 │   │   ├── ui/                # Reusable: Button, Modal, StatCard
 │   │   ├── scheduler/         # StaffScheduler, DraggableShift, etc.
 │   │   ├── employees/         # EmployeeGrid, EmployeeModal, etc.
 │   │   ├── payroll/           # PayrollDashboard, PayrollExport, etc.
-│   │   └── pos/               # PosDashboard, PosModal, etc.
-│   ├── hooks/                 # Custom hooks (useShifts, useEmployees, ...)
+│   │   ├── pos/               # PosDashboard, PosModal, etc.
+│   │   ├── stock/             # Stock items, movements, purchase orders
+│   │   └── invoices/          # InvoiceList, InvoiceForm, InvoiceDetail, InvoicePDF
+│   ├── hooks/                 # Custom hooks (useShifts, useEmployees, useInvoices ...)
 │   ├── pages/                 # Route pages
 │   ├── utils/                 # dateUtils, shiftUtils
 │   ├── data/                  # Fallback mock data
 │   └── constants/             # App-wide constants
 ├── staff-scheduler-api/       # Spring Boot backend
 │   └── src/main/java/com/staffscheduler/api/
-│       ├── controller/        # REST controllers (4)
-│       ├── service/           # Business logic (4)
-│       ├── repository/        # Spring Data JPA repos (3)
-│       ├── model/             # JPA entities (3)
-│       ├── dto/               # Data Transfer Objects (7)
+│       ├── controller/        # REST controllers
+│       ├── service/           # Business logic
+│       ├── repository/        # Spring Data JPA repos
+│       ├── model/             # JPA entities
+│       ├── dto/               # Data Transfer Objects
 │       ├── config/            # CORS, OpenAPI config
 │       ├── exception/         # Global error handling
 │       └── util/              # PayrollCalculator
@@ -100,6 +108,8 @@ npm start
 # — or —
 ./scripts/start-all.sh
 ```
+
+> **Port conflicts**: The startup scripts automatically detect and terminate any existing process on ports 8080 and 5173 before starting. If a previous run crashed without cleanup, the scripts will gracefully free the ports.
 
 ### Start Individually
 
@@ -165,6 +175,20 @@ All endpoints are under `/api`. Full interactive documentation is available at t
 | `GET` | `/api/payroll/departments?startDate=&endDate=` | Department breakdown |
 | `GET` | `/api/payroll/statistics?startDate=&endDate=` | Statistics |
 | `GET` | `/api/payroll/export/csv?startDate=&endDate=` | CSV download |
+
+### Supplier Invoices (AP) — `/api/invoices`
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/api/invoices` | List with filters (status, supplier, date range, page) |
+| `POST` | `/api/invoices` | Create invoice (auto-numbers as FAC-XXXXXX) |
+| `GET` | `/api/invoices/{id}` | Get full detail (lines, payments) |
+| `PUT` | `/api/invoices/{id}` | Update (received status only) |
+| `POST` | `/api/invoices/{id}/approve` | Approve → posts stock movements |
+| `POST` | `/api/invoices/{id}/payments` | Record partial or full payment |
+| `POST` | `/api/invoices/{id}/duplicate` | Duplicate to new draft |
+| `GET` | `/api/invoices/export` | Export filtered list as CSV |
+| `GET` | `/api/dashboard/ap-kpis` | AP KPI dashboard (unpaid, paid MTD, pending, charts) |
 
 ### Point of Sale — `/api/pos`
 
@@ -315,6 +339,18 @@ On first start the backend auto-creates all tables and seeds:
 2. **New frontend page**: Create page in `src/pages/`, add route in `App.jsx`
 3. **New hook**: Add to `src/hooks/` following the `use[Feature]` convention
 4. **New component**: Add to appropriate `src/components/` subfolder
+
+### French Legal Compliance (Supplier Invoices)
+
+The Supplier Invoice module (AP) is compliant with **Article L441-9 du Code de commerce**. Each invoice PDF includes:
+- Supplier SIRET number (validated as 14 digits)
+- French VAT number (validated as `FR` + 2 digits + 9-digit SIREN)
+- Invoice number with sequential autonumber (format: `FAC-XXXXXX`)
+- Issue date, delivery date, and due date (JJ/MM/AAAA)
+- TVA rates restricted to French statutory rates: 20%, 10%, 5.5%, 2.1%
+- Early payment discount (escompte) and late payment interest rate
+- Fixed indemnity for recovery costs (40 € — Articles L441-10 et D441-5)
+- Amounts in HT / TVA / TTC breakdown per rate
 
 ---
 

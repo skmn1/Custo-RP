@@ -30,12 +30,31 @@ if (( JAVA_VER < 17 )); then
 fi
 
 # ── Free port 8080 if already in use ──
-EXISTING_PID=$(lsof -ti tcp:8080 2>/dev/null || true)
-if [[ -n "$EXISTING_PID" ]]; then
-  echo "⚠️   Port 8080 already in use (PID $EXISTING_PID). Stopping it..."
-  kill "$EXISTING_PID" 2>/dev/null || true
-  sleep 2
-fi
+free_port() {
+  local port="$1"
+  local pids
+  pids=$(lsof -ti tcp:"$port" 2>/dev/null || true)
+  if [[ -n "$pids" ]]; then
+    echo "⚠️   Port $port in use (PID $pids). Stopping..."
+    # Graceful first, then force
+    kill $pids 2>/dev/null || true
+    sleep 2
+    # Force-kill any survivors
+    pids=$(lsof -ti tcp:"$port" 2>/dev/null || true)
+    [[ -n "$pids" ]] && kill -9 $pids 2>/dev/null || true
+    # Wait until port is actually free (max 10s)
+    for i in $(seq 1 10); do
+      lsof -ti tcp:"$port" >/dev/null 2>&1 || break
+      sleep 1
+    done
+    if lsof -ti tcp:"$port" >/dev/null 2>&1; then
+      echo "❌  Could not free port $port after 10s"
+      exit 1
+    fi
+    echo "✔   Port $port is now free."
+  fi
+}
+free_port 8080
 
 # ── Parse profile (default: dev) ──
 PROFILE="${1:-dev}"

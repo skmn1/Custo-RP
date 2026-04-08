@@ -82,6 +82,7 @@ const RoleCard = ({ account, onLogin, loading }) => {
   return (
     <button
       type="button"
+      data-role={account.role}
       disabled={!!loading}
       onClick={() => onLogin(account)}
       className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-200 ${account.bg} ${
@@ -310,6 +311,7 @@ const DevLoginPage = () => {
               <button
                 key={account.role}
                 type="button"
+                data-role={account.role}
                 disabled={!!roleLoading || submitting}
                 onClick={() => handleRoleLogin(account)}
                 className={`flex items-center gap-2 p-2.5 rounded-lg border-2 transition-all text-left ${account.bg} ${

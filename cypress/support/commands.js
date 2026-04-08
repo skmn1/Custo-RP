@@ -82,8 +82,18 @@ Cypress.Commands.add('verifyToast', (message) => {
 
 // -- This is a parent command --
 // Cypress.Commands.add('login', (email, password) => { ... })
-//
-//
+
+/**
+ * Log in as a test account using the dev login quick-access panel.
+ * @param {'admin'|'manager'|'employee'|'viewer'} role
+ */
+Cypress.Commands.add('loginAs', (role = 'admin') => {
+  cy.visit('/login');
+  // The right-panel role cards (desktop viewport) or bottom-panel mobile cards
+  cy.get(`[data-role="${role}"]`, { timeout: 10000 }).first().click();
+  cy.url({ timeout: 15000 }).should('not.include', '/login');
+});
+
 // -- This is a child command --
 // Cypress.Commands.add('drag', { prevSubject: 'element'}, (subject, options) => { ... })
 //

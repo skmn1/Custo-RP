@@ -2383,5 +2383,151 @@ X-RateLimit-Reset: 1703000000
 ---
 
 **Document Owner:** API Team  
-**Version:** 1.0  
-**Last Updated:** December 18, 2024
+**Version:** 1.1  
+**Last Updated:** April 8, 2026
+
+---
+
+## Supplier Invoices (AP) — `/api/invoices`
+
+All endpoints require role `ADMIN` or `MANAGER`.
+
+### List Invoices
+
+**Endpoint:** `GET /api/invoices`
+
+| Query Param | Type | Description |
+|-------------|------|-------------|
+| `status` | string | Filter by status: `received`, `approved`, `paid`, `cancelled` |
+| `supplier` | string | Filter by supplier name (contains, case-insensitive) |
+| `dateFrom` | date | Issue date ≥ (YYYY-MM-DD) |
+| `dateTo` | date | Issue date ≤ (YYYY-MM-DD) |
+| `page` | int | Page number (0-based) |
+| `size` | int | Page size (default: 50) |
+
+**Response:** Paginated list of invoice summaries.
+
+---
+
+### Create Invoice
+
+**Endpoint:** `POST /api/invoices`
+
+```json
+{
+  "counterpartyName": "SAS Dupont Fournitures",
+  "counterpartyEmail": "contact@dupont.fr",
+  "counterpartyAddress": "12 Rue de la Paix, 75002 Paris",
+  "supplierSiret": "12345678901234",
+  "supplierVatNumber": "FR12345678901",
+  "buyerVatNumber": "FR98765432109",
+  "issueDate": "2026-04-08",
+  "deliveryDate": "2026-04-10",
+  "dueDate": "2026-05-08",
+  "taxRate": 20.0,
+  "earlyPaymentDiscount": 2.0,
+  "latePaymentRate": 12.37,
+  "paymentTerms": "30 jours net",
+  "notes": "",
+  "poId": null,
+  "lines": [
+    {
+      "stockItemId": null,
+      "description": "Fournitures de bureau",
+      "qty": 10,
+      "unitPrice": 25.50,
+      "discountPct": 0,
+      "taxRate": 20.0
+    }
+  ]
+}
+```
+
+Auto-generates invoice number in format `FAC-XXXXXX`.
+
+---
+
+### Get Invoice Detail
+
+**Endpoint:** `GET /api/invoices/{id}`
+
+Returns full invoice with lines and payments.
+
+---
+
+### Update Invoice
+
+**Endpoint:** `PUT /api/invoices/{id}`
+
+Only allowed when status is `received`. Same body as create.
+
+---
+
+### Approve Invoice
+
+**Endpoint:** `POST /api/invoices/{id}/approve`
+
+Transitions `received → approved`. Posts `received` stock movements for any line with a `stockItemId`.
+
+---
+
+### Record Payment
+
+**Endpoint:** `POST /api/invoices/{id}/payments`
+
+```json
+{
+  "paymentDate": "2026-05-01",
+  "amount": 255.00,
+  "method": "bank_transfer",
+  "reference": "VIR-2026-001",
+  "note": ""
+}
+```
+
+Auto-transitions invoice to `paid` when `amountOutstanding` reaches zero.
+
+---
+
+### Duplicate Invoice
+
+**Endpoint:** `POST /api/invoices/{id}/duplicate`
+
+Creates a copy in `received` status with a new auto-generated number. Returns the new invoice.
+
+---
+
+### Export CSV
+
+**Endpoint:** `GET /api/invoices/export`
+
+Accepts the same filter params as the list endpoint. Returns `text/csv`.
+
+---
+
+## AP KPI Dashboard — `/api/dashboard`
+
+### AP KPIs
+
+**Endpoint:** `GET /api/dashboard/ap-kpis`
+
+Requires role `ADMIN` or `MANAGER`.
+
+**Response:**
+```json
+{
+  "apUnpaidTotal": 12450.00,
+  "apPaidMtd": 8300.00,
+  "apPendingApproval": 3,
+  "monthlySpend": [
+    { "month": "2026-01", "amount": 7200.00 },
+    { "month": "2026-02", "amount": 5340.00 }
+  ],
+  "statusDistribution": [
+    { "status": "received", "count": 5 },
+    { "status": "approved", "count": 3 },
+    { "status": "paid", "count": 12 }
+  ]
+}
+```
+

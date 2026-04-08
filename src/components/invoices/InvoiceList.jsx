@@ -51,16 +51,16 @@ export default function InvoiceList() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div data-testid="invoice-list-page" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900 mb-4 sm:mb-0">
           {t('invoices:title')}
         </h1>
         <div className="flex gap-2">
-          <Button variant="secondary" onClick={handleExport}>
+          <Button variant="secondary" onClick={handleExport} data-testid="export-csv-btn">
             {t('invoices:action.export')}
           </Button>
-          <Button onClick={() => navigate('/invoices/new')}>
+          <Button onClick={() => navigate('/invoices/new')} data-testid="new-invoice-btn">
             {t('invoices:action.new')}
           </Button>
         </div>
@@ -70,6 +70,7 @@ export default function InvoiceList() {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
           <select
+            data-testid="status-filter"
             value={filters.status}
             onChange={(e) => handleFilterChange('status', e.target.value)}
             className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500"
@@ -122,7 +123,7 @@ export default function InvoiceList() {
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('common:status.label', 'Statut')}</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody data-testid="invoice-table-body" className="bg-white divide-y divide-gray-200">
               {isLoading ? (
                 <tr><td colSpan="7" className="px-4 py-8 text-center text-gray-500">{t('common:status.loading')}</td></tr>
               ) : invoices.length === 0 ? (
@@ -154,7 +155,7 @@ export default function InvoiceList() {
       </div>
 
       {/* Card layout (mobile) */}
-      <div className="md:hidden space-y-3">
+      <div data-testid="invoice-mobile-cards" className="md:hidden space-y-3">
         {isLoading ? (
           <div className="text-center py-8 text-gray-500">{t('common:status.loading')}</div>
         ) : invoices.length === 0 ? (
