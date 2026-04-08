@@ -395,6 +395,7 @@ const SettingsPage = () => {
   const [featureFlagsDraft, setFeatureFlagsDraft] = useState({});
   const [securityDraft, setSecurityDraft] = useState({});
   const [dataPrivacyDraft, setDataPrivacyDraft] = useState({});
+  const [invoicesDraft, setInvoicesDraft] = useState({});
   const [displayDraft, setDisplayDraft] = useState({});
   const [accessibilityDraft, setAccessibilityDraft] = useState({});
   const [navDraft, setNavDraft] = useState([]);
@@ -417,6 +418,7 @@ const SettingsPage = () => {
     setFeatureFlagsDraft(appSettings.featureFlags);
     setSecurityDraft(appSettings.security);
     setDataPrivacyDraft(appSettings.dataPrivacy);
+    setInvoicesDraft(appSettings.invoices || {});
   }, [appSettings]);
 
   useEffect(() => {
@@ -435,14 +437,14 @@ const SettingsPage = () => {
     general: generalDraft, scheduling: schedulingDraft, payroll: payrollDraft,
     timeOff: timeOffDraft, swaps: swapsDraft, notifications: notificationsDraft,
     featureFlags: featureFlagsDraft, security: securityDraft, dataPrivacy: dataPrivacyDraft,
-    display: displayDraft, accessibility: accessibilityDraft,
+    invoices: invoicesDraft, display: displayDraft, accessibility: accessibilityDraft,
   };
 
   const setDraft = {
     general: setGeneralDraft, scheduling: setSchedulingDraft, payroll: setPayrollDraft,
     timeOff: setTimeOffDraft, swaps: setSwapsDraft, notifications: setNotificationsDraft,
     featureFlags: setFeatureFlagsDraft, security: setSecurityDraft, dataPrivacy: setDataPrivacyDraft,
-    display: setDisplayDraft, accessibility: setAccessibilityDraft,
+    invoices: setInvoicesDraft, display: setDisplayDraft, accessibility: setAccessibilityDraft,
   };
 
   const originals = useMemo(() => {
@@ -451,6 +453,7 @@ const SettingsPage = () => {
       general: appSettings.general, scheduling: appSettings.scheduling, payroll: appSettings.payroll,
       timeOff: appSettings.timeOff, swaps: appSettings.swaps, notifications: appSettings.notifications,
       featureFlags: appSettings.featureFlags, security: appSettings.security, dataPrivacy: appSettings.dataPrivacy,
+      invoices: appSettings.invoices || {},
       display: displayPrefs, accessibility: { fontSize, highContrast, reducedMotion, focusRingAlwaysVisible },
     };
   }, [appSettings, preferences]);
@@ -465,7 +468,7 @@ const SettingsPage = () => {
     if (!draft || !original) return false;
     return Object.keys(draft).some((k) => String(draft[k]) !== String(original[k]));
   }, [generalDraft, schedulingDraft, payrollDraft, timeOffDraft, swapsDraft,
-    notificationsDraft, featureFlagsDraft, securityDraft, dataPrivacyDraft,
+    notificationsDraft, featureFlagsDraft, securityDraft, dataPrivacyDraft, invoicesDraft,
     displayDraft, accessibilityDraft, navDraft, appSettings, preferences, savedNavItems, originals]);
 
   const updateDraftField = (category, key, value) => {
@@ -505,7 +508,7 @@ const SettingsPage = () => {
       setSaving(false);
     }
   }, [generalDraft, schedulingDraft, payrollDraft, timeOffDraft, swapsDraft,
-    notificationsDraft, featureFlagsDraft, securityDraft, dataPrivacyDraft,
+    notificationsDraft, featureFlagsDraft, securityDraft, dataPrivacyDraft, invoicesDraft,
     displayDraft, accessibilityDraft, navDraft, originals,
     updateAppSettings, updatePreferences, saveNavItems, t]);
 
@@ -959,7 +962,6 @@ const SettingsPage = () => {
   );
 
   const renderInvoices = () => {
-    const invoiceSettings = localSettings.invoices || {};
     const readOnly = !isAdmin;
     const inputClass = readOnly
       ? 'block w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-500 cursor-not-allowed'
@@ -975,23 +977,23 @@ const SettingsPage = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">{t('settings:invoices.defaultCurrency')}</label>
-              <input type="text" value={invoiceSettings.defaultCurrency || 'EUR'} onChange={(e) => handleChange('invoices', 'defaultCurrency', e.target.value)} className={inputClass} readOnly={readOnly} />
+              <input type="text" value={invoicesDraft.defaultCurrency || 'EUR'} onChange={(e) => updateDraftField('invoices', 'defaultCurrency', e.target.value)} className={inputClass} readOnly={readOnly} />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">{t('settings:invoices.defaultTaxRate')}</label>
-              <input type="number" step="0.01" value={invoiceSettings.defaultTaxRate ?? 20} onChange={(e) => handleChange('invoices', 'defaultTaxRate', e.target.value)} className={inputClass} readOnly={readOnly} />
+              <input type="number" step="0.01" value={invoicesDraft.defaultTaxRate ?? 20} onChange={(e) => updateDraftField('invoices', 'defaultTaxRate', e.target.value)} className={inputClass} readOnly={readOnly} />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">{t('settings:invoices.defaultPaymentTerms')}</label>
-              <input type="text" value={invoiceSettings.defaultPaymentTerms || ''} onChange={(e) => handleChange('invoices', 'defaultPaymentTerms', e.target.value)} className={inputClass} readOnly={readOnly} />
+              <input type="text" value={invoicesDraft.defaultPaymentTerms || ''} onChange={(e) => updateDraftField('invoices', 'defaultPaymentTerms', e.target.value)} className={inputClass} readOnly={readOnly} />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">{t('settings:invoices.defaultEarlyPaymentDiscount')}</label>
-              <input type="number" step="0.01" value={invoiceSettings.defaultEarlyPaymentDiscount ?? 0} onChange={(e) => handleChange('invoices', 'defaultEarlyPaymentDiscount', e.target.value)} className={inputClass} readOnly={readOnly} />
+              <input type="number" step="0.01" value={invoicesDraft.defaultEarlyPaymentDiscount ?? 0} onChange={(e) => updateDraftField('invoices', 'defaultEarlyPaymentDiscount', e.target.value)} className={inputClass} readOnly={readOnly} />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">{t('settings:invoices.defaultLatePaymentRate')}</label>
-              <input type="number" step="0.01" value={invoiceSettings.defaultLatePaymentRate ?? 12.37} onChange={(e) => handleChange('invoices', 'defaultLatePaymentRate', e.target.value)} className={inputClass} readOnly={readOnly} />
+              <input type="number" step="0.01" value={invoicesDraft.defaultLatePaymentRate ?? 12.37} onChange={(e) => updateDraftField('invoices', 'defaultLatePaymentRate', e.target.value)} className={inputClass} readOnly={readOnly} />
             </div>
           </div>
         </fieldset>
@@ -1005,13 +1007,13 @@ const SettingsPage = () => {
                 <label className="text-sm font-medium text-gray-700">{t('settings:invoices.autoNumbering')}</label>
                 <p className="text-xs text-gray-500">{t('settings:invoices.autoNumbering_desc')}</p>
               </div>
-              <button type="button" role="switch" aria-checked={!!invoiceSettings.autoNumbering} disabled={readOnly} onClick={() => !readOnly && handleChange('invoices', 'autoNumbering', !invoiceSettings.autoNumbering)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${invoiceSettings.autoNumbering ? 'bg-indigo-600' : 'bg-gray-200'} ${readOnly ? 'opacity-50' : ''}`}>
-                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${invoiceSettings.autoNumbering ? 'translate-x-6' : 'translate-x-1'}`} />
+              <button type="button" role="switch" aria-checked={!!invoicesDraft.autoNumbering} disabled={readOnly} onClick={() => !readOnly && updateDraftField('invoices', 'autoNumbering', !invoicesDraft.autoNumbering)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${invoicesDraft.autoNumbering ? 'bg-indigo-600' : 'bg-gray-200'} ${readOnly ? 'opacity-50' : ''}`}>
+                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${invoicesDraft.autoNumbering ? 'translate-x-6' : 'translate-x-1'}`} />
               </button>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">{t('settings:invoices.numberPrefix')}</label>
-              <input type="text" value={invoiceSettings.numberPrefix || 'FAC-'} onChange={(e) => handleChange('invoices', 'numberPrefix', e.target.value)} className={inputClass} readOnly={readOnly} />
+              <input type="text" value={invoicesDraft.numberPrefix || 'FAC-'} onChange={(e) => updateDraftField('invoices', 'numberPrefix', e.target.value)} className={inputClass} readOnly={readOnly} />
             </div>
           </div>
         </fieldset>
@@ -1025,8 +1027,8 @@ const SettingsPage = () => {
                 <label className="text-sm font-medium text-gray-700">{t('settings:invoices.requireSiret')}</label>
                 <p className="text-xs text-gray-500">{t('settings:invoices.requireSiret_desc')}</p>
               </div>
-              <button type="button" role="switch" aria-checked={!!invoiceSettings.requireSiret} disabled={readOnly} onClick={() => !readOnly && handleChange('invoices', 'requireSiret', !invoiceSettings.requireSiret)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${invoiceSettings.requireSiret ? 'bg-indigo-600' : 'bg-gray-200'} ${readOnly ? 'opacity-50' : ''}`}>
-                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${invoiceSettings.requireSiret ? 'translate-x-6' : 'translate-x-1'}`} />
+              <button type="button" role="switch" aria-checked={!!invoicesDraft.requireSiret} disabled={readOnly} onClick={() => !readOnly && updateDraftField('invoices', 'requireSiret', !invoicesDraft.requireSiret)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${invoicesDraft.requireSiret ? 'bg-indigo-600' : 'bg-gray-200'} ${readOnly ? 'opacity-50' : ''}`}>
+                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${invoicesDraft.requireSiret ? 'translate-x-6' : 'translate-x-1'}`} />
               </button>
             </div>
             <div className="flex items-center justify-between">
@@ -1034,8 +1036,8 @@ const SettingsPage = () => {
                 <label className="text-sm font-medium text-gray-700">{t('settings:invoices.requireVatNumber')}</label>
                 <p className="text-xs text-gray-500">{t('settings:invoices.requireVatNumber_desc')}</p>
               </div>
-              <button type="button" role="switch" aria-checked={!!invoiceSettings.requireVatNumber} disabled={readOnly} onClick={() => !readOnly && handleChange('invoices', 'requireVatNumber', !invoiceSettings.requireVatNumber)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${invoiceSettings.requireVatNumber ? 'bg-indigo-600' : 'bg-gray-200'} ${readOnly ? 'opacity-50' : ''}`}>
-                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${invoiceSettings.requireVatNumber ? 'translate-x-6' : 'translate-x-1'}`} />
+              <button type="button" role="switch" aria-checked={!!invoicesDraft.requireVatNumber} disabled={readOnly} onClick={() => !readOnly && updateDraftField('invoices', 'requireVatNumber', !invoicesDraft.requireVatNumber)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${invoicesDraft.requireVatNumber ? 'bg-indigo-600' : 'bg-gray-200'} ${readOnly ? 'opacity-50' : ''}`}>
+                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${invoicesDraft.requireVatNumber ? 'translate-x-6' : 'translate-x-1'}`} />
               </button>
             </div>
           </div>
@@ -1047,22 +1049,22 @@ const SettingsPage = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">{t('settings:invoices.ocrProvider')}</label>
-              <select value={invoiceSettings.ocrProvider || 'mistral'} onChange={(e) => handleChange('invoices', 'ocrProvider', e.target.value)} className={inputClass} disabled={readOnly}>
+              <select value={invoicesDraft.ocrProvider || 'mistral'} onChange={(e) => updateDraftField('invoices', 'ocrProvider', e.target.value)} className={inputClass} disabled={readOnly}>
                 <option value="mistral">Mistral AI (mistral-ocr-latest)</option>
                 <option value="tesseract">Tesseract.js (local)</option>
               </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">{t('settings:invoices.ocrConfidenceThreshold')}</label>
-              <input type="number" step="0.05" min="0" max="1" value={invoiceSettings.ocrConfidenceThreshold ?? 0.7} onChange={(e) => handleChange('invoices', 'ocrConfidenceThreshold', e.target.value)} className={inputClass} readOnly={readOnly} />
+              <input type="number" step="0.05" min="0" max="1" value={invoicesDraft.ocrConfidenceThreshold ?? 0.7} onChange={(e) => updateDraftField('invoices', 'ocrConfidenceThreshold', e.target.value)} className={inputClass} readOnly={readOnly} />
             </div>
             <div className="flex items-center justify-between sm:col-span-2">
               <div>
                 <label className="text-sm font-medium text-gray-700">{t('settings:invoices.ocrAutoImport')}</label>
                 <p className="text-xs text-gray-500">{t('settings:invoices.ocrAutoImport_desc')}</p>
               </div>
-              <button type="button" role="switch" aria-checked={!!invoiceSettings.ocrAutoImport} disabled={readOnly} onClick={() => !readOnly && handleChange('invoices', 'ocrAutoImport', !invoiceSettings.ocrAutoImport)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${invoiceSettings.ocrAutoImport ? 'bg-indigo-600' : 'bg-gray-200'} ${readOnly ? 'opacity-50' : ''}`}>
-                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${invoiceSettings.ocrAutoImport ? 'translate-x-6' : 'translate-x-1'}`} />
+              <button type="button" role="switch" aria-checked={!!invoicesDraft.ocrAutoImport} disabled={readOnly} onClick={() => !readOnly && updateDraftField('invoices', 'ocrAutoImport', !invoicesDraft.ocrAutoImport)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${invoicesDraft.ocrAutoImport ? 'bg-indigo-600' : 'bg-gray-200'} ${readOnly ? 'opacity-50' : ''}`}>
+                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${invoicesDraft.ocrAutoImport ? 'translate-x-6' : 'translate-x-1'}`} />
               </button>
             </div>
           </div>
@@ -1070,14 +1072,7 @@ const SettingsPage = () => {
 
         {/* Save/Reset */}
         {isAdmin && (
-          <div className="flex gap-3 pt-4 border-t border-gray-200">
-            <button type="button" onClick={() => handleSave('invoices')} className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 transition-colors" data-testid="save-invoice-settings-btn">
-              {t('settings:actions.saveChanges')}
-            </button>
-            <button type="button" onClick={() => handleReset('invoices')} className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
-              {t('settings:actions.resetSection')}
-            </button>
-          </div>
+          <SectionActions hasChanges={hasChanges('invoices')} onSave={() => saveCategory('invoices')} onReset={() => resetCategory('invoices')} saving={saving} t={t} />
         )}
       </div>
     );

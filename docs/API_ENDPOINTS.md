@@ -2489,6 +2489,30 @@ Auto-transitions invoice to `paid` when `amountOutstanding` reaches zero.
 
 ---
 
+### Cancel Invoice
+
+**Endpoint:** `POST /api/invoices/{id}/cancel`
+
+**Auth:** `ADMIN` or `MANAGER`
+
+Sets the invoice status to `cancelled`. Not allowed if already cancelled or paid.
+
+**Response:** `200 OK` — updated invoice DTO.
+
+---
+
+### Delete Invoice
+
+**Endpoint:** `DELETE /api/invoices/{id}`
+
+**Auth:** `ADMIN` or `MANAGER`
+
+Permanently deletes the invoice, its lines, and payment records. Only allowed when the invoice status is `received` or `cancelled`.
+
+**Response:** `204 No Content`
+
+---
+
 ### Duplicate Invoice
 
 **Endpoint:** `POST /api/invoices/{id}/duplicate`

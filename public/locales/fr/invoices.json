@@ -73,6 +73,11 @@
     "export": "Exporter",
     "save": "Enregistrer",
     "cancel": "Annuler",
+    "cancelInvoice": "Annuler la facture",
+    "cancelConfirm": "Annuler cette facture ? Cette action est irréversible.",
+    "delete": "Supprimer",
+    "deleteConfirm": "Supprimer définitivement cette facture ? Cette action est irréversible.",
+    "actions": "Actions",
     "back": "Retour"
   },
   "kpi": {

@@ -95,6 +95,7 @@ const App = () => {
           <Route path="/invoices" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><InvoiceListPage /></RoleGuard></ProtectedLayout>} />
           <Route path="/invoices/new" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><InvoiceFormPage /></RoleGuard></ProtectedLayout>} />
           <Route path="/invoices/review" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><InvoiceReviewPage /></RoleGuard></ProtectedLayout>} />
+          <Route path="/invoices/:id/edit" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><InvoiceFormPage /></RoleGuard></ProtectedLayout>} />
           <Route path="/invoices/:id" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><InvoiceDetailPage /></RoleGuard></ProtectedLayout>} />
         </Routes>
         </SettingsProvider>

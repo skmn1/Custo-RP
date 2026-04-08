@@ -1,9 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { useInvoices } from '../../hooks/useInvoices';
 import { useStock } from '../../hooks/useStock';
+import { clearPdfFile } from '../../utils/pdfFileStore';
 import Button from '../ui/Button';
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
@@ -85,6 +86,47 @@ export default function InvoiceReviewView({ ocrResult, pdfFile, onCancel }) {
     if (pdfFile) return URL.createObjectURL(pdfFile);
     return null;
   }, [pdfFile]);
+
+  // Cleanup blob URL and file store on unmount
+  useEffect(() => {
+    return () => {
+      if (pdfUrl) URL.revokeObjectURL(pdfUrl);
+      clearPdfFile();
+    };
+  }, [pdfUrl]);
+
+  // Sync form with draft when ocrResult changes (handles delayed state)
+  useEffect(() => {
+    if (!draft || Object.keys(draft).length === 0) return;
+    setForm({
+      counterpartyName: draft.counterpartyName || '',
+      counterpartyEmail: draft.counterpartyEmail || '',
+      counterpartyAddress: draft.counterpartyAddress || '',
+      supplierSiret: draft.supplierSiret || '',
+      supplierVatNumber: draft.supplierVatNumber || '',
+      buyerVatNumber: draft.buyerVatNumber || '',
+      deliveryDate: draft.deliveryDate || '',
+      issueDate: draft.issueDate || new Date().toISOString().slice(0, 10),
+      dueDate: draft.dueDate || '',
+      currency: draft.currency || 'EUR',
+      taxRate: draft.taxRate?.toString() || '20.00',
+      paymentTerms: draft.paymentTerms || '',
+      earlyPaymentDiscount: draft.earlyPaymentDiscount?.toString() || '0',
+      latePaymentRate: draft.latePaymentRate?.toString() || '12.37',
+      notes: draft.notes || '',
+      poId: '',
+    });
+    if (draft.lines && draft.lines.length > 0) {
+      setLines(draft.lines.map((l) => ({
+        stockItemId: '',
+        description: l.description || '',
+        qty: l.qty?.toString() || '',
+        unitPrice: l.unitPrice?.toString() || '',
+        discountPct: l.discountPct?.toString() || '0',
+        taxRate: l.taxRate?.toString() || '20.00',
+      })));
+    }
+  }, [draft]);
 
   const isLowConfidence = (field) => {
     return confidence[field] !== undefined && confidence[field] < threshold;

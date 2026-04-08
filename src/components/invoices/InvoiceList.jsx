@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useInvoices } from '../../hooks/useInvoices';
 import InvoiceImportModal from './InvoiceImportModal';
+import { storePdfFile } from '../../utils/pdfFileStore';
 import Button from '../ui/Button';
 
 const STATUS_COLORS = {
@@ -26,7 +27,7 @@ const formatDate = (dateStr) => {
 export default function InvoiceList() {
   const { t } = useTranslation(['invoices', 'common']);
   const navigate = useNavigate();
-  const { invoices, isLoading, fetchInvoices, exportCsv, importPdf } = useInvoices();
+  const { invoices, isLoading, fetchInvoices, exportCsv, importPdf, cancelInvoice, deleteInvoice } = useInvoices();
 
   const [filters, setFilters] = useState({
     status: '',
@@ -55,7 +56,22 @@ export default function InvoiceList() {
 
   const handleImportComplete = (result, pdfFile) => {
     setShowImportModal(false);
-    navigate('/invoices/review', { state: { ocrResult: result, pdfFile } });
+    storePdfFile(pdfFile);
+    navigate('/invoices/review', { state: { ocrResult: result } });
+  };
+
+  const handleCancelInvoice = async (e, inv) => {
+    e.stopPropagation();
+    if (!window.confirm(t('invoices:action.cancelConfirm'))) return;
+    await cancelInvoice(inv.id);
+    fetchInvoices(filters);
+  };
+
+  const handleDeleteInvoice = async (e, inv) => {
+    e.stopPropagation();
+    if (!window.confirm(t('invoices:action.deleteConfirm'))) return;
+    await deleteInvoice(inv.id);
+    fetchInvoices(filters);
   };
 
   return (
@@ -139,13 +155,14 @@ export default function InvoiceList() {
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('invoices:field.total')}</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('invoices:field.outstanding')}</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('common:status.label', 'Statut')}</th>
+                <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">{t('invoices:action.actions')}</th>
               </tr>
             </thead>
             <tbody data-testid="invoice-table-body" className="bg-white divide-y divide-gray-200">
               {isLoading ? (
-                <tr><td colSpan="7" className="px-4 py-8 text-center text-gray-500">{t('common:status.loading')}</td></tr>
+                <tr><td colSpan="8" className="px-4 py-8 text-center text-gray-500">{t('common:status.loading')}</td></tr>
               ) : invoices.length === 0 ? (
-                <tr><td colSpan="7" className="px-4 py-8 text-center text-gray-500">{t('invoices:empty')}</td></tr>
+                <tr><td colSpan="8" className="px-4 py-8 text-center text-gray-500">{t('invoices:empty')}</td></tr>
               ) : (
                 invoices.map((inv) => (
                   <tr
@@ -163,6 +180,34 @@ export default function InvoiceList() {
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[inv.status] || 'bg-gray-100 text-gray-800'}`}>
                         {t(`invoices:status.${inv.status}`)}
                       </span>
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        {inv.status === 'received' && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); navigate(`/invoices/${inv.id}/edit`); }}
+                            className="text-xs text-indigo-600 hover:text-indigo-800 font-medium px-1"
+                          >
+                            {t('invoices:action.edit')}
+                          </button>
+                        )}
+                        {inv.status !== 'cancelled' && inv.status !== 'paid' && (
+                          <button
+                            onClick={(e) => handleCancelInvoice(e, inv)}
+                            className="text-xs text-amber-600 hover:text-amber-800 font-medium px-1"
+                          >
+                            {t('invoices:action.cancelInvoice')}
+                          </button>
+                        )}
+                        {(inv.status === 'received' || inv.status === 'cancelled') && (
+                          <button
+                            onClick={(e) => handleDeleteInvoice(e, inv)}
+                            className="text-xs text-red-600 hover:text-red-800 font-medium px-1"
+                          >
+                            {t('invoices:action.delete')}
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -195,6 +240,32 @@ export default function InvoiceList() {
               <div className="flex items-center justify-between mt-2">
                 <span className="text-lg font-bold text-gray-900">{formatAmount(inv.totalAmount)}</span>
                 <span className="text-xs text-gray-500">{formatDate(inv.issueDate)}</span>
+              </div>
+              <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">
+                {inv.status === 'received' && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); navigate(`/invoices/${inv.id}/edit`); }}
+                    className="text-xs text-indigo-600 hover:text-indigo-800 font-medium"
+                  >
+                    {t('invoices:action.edit')}
+                  </button>
+                )}
+                {inv.status !== 'cancelled' && inv.status !== 'paid' && (
+                  <button
+                    onClick={(e) => handleCancelInvoice(e, inv)}
+                    className="text-xs text-amber-600 hover:text-amber-800 font-medium"
+                  >
+                    {t('invoices:action.cancelInvoice')}
+                  </button>
+                )}
+                {(inv.status === 'received' || inv.status === 'cancelled') && (
+                  <button
+                    onClick={(e) => handleDeleteInvoice(e, inv)}
+                    className="text-xs text-red-600 hover:text-red-800 font-medium"
+                  >
+                    {t('invoices:action.delete')}
+                  </button>
+                )}
               </div>
             </div>
           ))

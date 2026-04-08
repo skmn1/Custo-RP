@@ -213,6 +213,31 @@ public class InvoiceService {
         return ocrFieldMapper.mapToResult(ocrJson, ocrJson, "mistral");
     }
 
+    @Transactional
+    public InvoiceDto cancelInvoice(UUID id) {
+        Invoice inv = getEntity(id);
+        if ("cancelled".equals(inv.getStatus())) {
+            throw new IllegalStateException("Invoice is already cancelled");
+        }
+        if ("paid".equals(inv.getStatus())) {
+            throw new IllegalStateException("Cannot cancel a paid invoice");
+        }
+        inv.setStatus("cancelled");
+        invoiceRepo.save(inv);
+        return toDetailDto(inv);
+    }
+
+    @Transactional
+    public void deleteInvoice(UUID id) {
+        Invoice inv = getEntity(id);
+        if (!"received".equals(inv.getStatus()) && !"cancelled".equals(inv.getStatus())) {
+            throw new IllegalStateException("Only received or cancelled invoices can be deleted");
+        }
+        lineRepo.deleteAll(inv.getLines());
+        paymentRepo.deleteAll(inv.getPayments());
+        invoiceRepo.delete(inv);
+    }
+
     public InvoiceKpiDto getKpis() {
         LocalDate today = LocalDate.now();
         YearMonth currentMonth = YearMonth.from(today);

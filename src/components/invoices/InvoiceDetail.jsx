@@ -31,7 +31,8 @@ export default function InvoiceDetail() {
   const navigate = useNavigate();
   const { id } = useParams();
   const {
-    invoice, fetchInvoice, approveInvoice, recordPayment, duplicateInvoice, isLoading, error,
+    invoice, fetchInvoice, approveInvoice, cancelInvoice, deleteInvoice,
+    recordPayment, duplicateInvoice, isLoading, error,
   } = useInvoices();
 
   const [showPaymentForm, setShowPaymentForm] = useState(false);
@@ -58,6 +59,18 @@ export default function InvoiceDetail() {
     if (result?.id) {
       navigate(`/invoices/${result.id}`);
     }
+  };
+
+  const handleCancel = async () => {
+    if (!window.confirm(t('invoices:action.cancelConfirm'))) return;
+    await cancelInvoice(id);
+    fetchInvoice(id);
+  };
+
+  const handleDelete = async () => {
+    if (!window.confirm(t('invoices:action.deleteConfirm'))) return;
+    await deleteInvoice(id);
+    navigate('/invoices');
   };
 
   const handleRecordPayment = async (e) => {
@@ -95,6 +108,8 @@ export default function InvoiceDetail() {
 
   const isEditable = invoice.status === 'received';
   const canPay = invoice.status === 'approved';
+  const canCancel = invoice.status !== 'cancelled' && invoice.status !== 'paid';
+  const canDelete = invoice.status === 'received' || invoice.status === 'cancelled';
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -115,7 +130,7 @@ export default function InvoiceDetail() {
           </Button>
           {isEditable && (
             <>
-              <Button variant="secondary" onClick={() => navigate(`/invoices/${id}`, { state: { edit: true } })}>
+              <Button variant="secondary" onClick={() => navigate(`/invoices/${id}/edit`)}>
                 {t('invoices:action.edit')}
               </Button>
               <Button data-testid="approve-btn" onClick={handleApprove}>
@@ -129,6 +144,16 @@ export default function InvoiceDetail() {
           <Button data-testid="pdf-btn" variant="secondary" onClick={handlePdfExport}>
             {t('invoices:action.pdf')}
           </Button>
+          {canCancel && (
+            <Button data-testid="cancel-btn" variant="secondary" onClick={handleCancel}>
+              {t('invoices:action.cancelInvoice')}
+            </Button>
+          )}
+          {canDelete && (
+            <Button data-testid="delete-btn" variant="danger" onClick={handleDelete}>
+              {t('invoices:action.delete')}
+            </Button>
+          )}
         </div>
       </div>
 

@@ -1,4 +1,4 @@
-// Invoice OCR Import, Settings & Navbar Integration E2E Tests
+// Invoice OCR Import, Settings, Management & Navbar E2E Tests
 describe('Invoice OCR Import & Settings', () => {
   beforeEach(() => {
     // Login as admin
@@ -47,7 +47,6 @@ describe('Invoice OCR Import & Settings', () => {
 
     it('should reject non-PDF files', () => {
       cy.get('[data-testid="import-pdf-btn"]').click();
-      // Create a fake text file
       const blob = new Blob(['test content'], { type: 'text/plain' });
       const file = new File([blob], 'test.txt', { type: 'text/plain' });
       const dataTransfer = new DataTransfer();
@@ -62,6 +61,30 @@ describe('Invoice OCR Import & Settings', () => {
     it('should have the submit button disabled when no file selected', () => {
       cy.get('[data-testid="import-pdf-btn"]').click();
       cy.get('[data-testid="import-submit-btn"]').should('be.disabled');
+    });
+  });
+
+  describe('Invoice List - Management actions', () => {
+    beforeEach(() => {
+      cy.visit('/invoices');
+    });
+
+    it('should show New Invoice button', () => {
+      cy.get('[data-testid="new-invoice-btn"]').should('exist').and('be.visible');
+    });
+
+    it('should navigate to new invoice form', () => {
+      cy.get('[data-testid="new-invoice-btn"]').click();
+      cy.url().should('include', '/invoices/new');
+    });
+
+    it('should show Export CSV button', () => {
+      cy.get('[data-testid="export-csv-btn"]').should('exist').and('be.visible');
+    });
+
+    it('should show actions column header in table', () => {
+      cy.get('[data-testid="invoice-list-page"]').should('exist');
+      cy.get('th').contains('Actions').should('exist');
     });
   });
 
@@ -95,13 +118,14 @@ describe('Invoice OCR Import & Settings', () => {
 
     it('should show save button for admin', () => {
       cy.contains('Factures').click();
-      cy.get('[data-testid="save-invoice-settings-btn"]').should('exist');
+      cy.get('[data-testid="invoice-settings-section"]')
+        .contains('Enregistrer')
+        .should('exist');
     });
   });
 
   describe('Invoice Settings - Manager view', () => {
     beforeEach(() => {
-      // Re-login as manager
       cy.visit('/login');
       cy.get('[data-testid="dev-login-manager"]').click();
       cy.url().should('not.include', '/login');
@@ -111,8 +135,11 @@ describe('Invoice OCR Import & Settings', () => {
     it('should show invoices category as read-only for manager', () => {
       cy.contains('Factures').click();
       cy.get('[data-testid="invoice-settings-section"]').should('exist');
-      // Save button should not exist for managers
-      cy.get('[data-testid="save-invoice-settings-btn"]').should('not.exist');
+      // Manager should not see save/reset buttons
+      cy.get('[data-testid="invoice-settings-section"]')
+        .find('button')
+        .filter(':contains("Enregistrer")')
+        .should('not.exist');
     });
   });
 });

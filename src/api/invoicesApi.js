@@ -23,6 +23,10 @@ export const invoicesApi = {
 
   duplicate: (id) => api.post(`/invoices/${id}/duplicate`),
 
+  cancel: (id) => api.post(`/invoices/${id}/cancel`),
+
+  remove: (id) => api.delete(`/invoices/${id}`),
+
   importPdf: async (file) => {
     const formData = new FormData();
     formData.append('file', file);

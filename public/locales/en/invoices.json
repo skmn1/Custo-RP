@@ -73,6 +73,11 @@
     "export": "Export",
     "save": "Save",
     "cancel": "Cancel",
+    "cancelInvoice": "Cancel Invoice",
+    "cancelConfirm": "Cancel this invoice? This action cannot be undone.",
+    "delete": "Delete",
+    "deleteConfirm": "Permanently delete this invoice? This action cannot be undone.",
+    "actions": "Actions",
     "back": "Back"
   },
   "kpi": {

@@ -99,6 +99,21 @@ public class InvoiceController {
         return ResponseEntity.status(HttpStatus.CREATED).body(invoiceService.duplicate(id, userId));
     }
 
+    @PostMapping("/{id}/cancel")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @Operation(summary = "Cancel invoice — sets status to cancelled")
+    public ResponseEntity<InvoiceDto> cancel(@PathVariable UUID id) {
+        return ResponseEntity.ok(invoiceService.cancelInvoice(id));
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @Operation(summary = "Delete invoice (received or cancelled status only)")
+    public ResponseEntity<Void> delete(@PathVariable UUID id) {
+        invoiceService.deleteInvoice(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping(value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     @Operation(summary = "Import invoice from PDF via OCR")

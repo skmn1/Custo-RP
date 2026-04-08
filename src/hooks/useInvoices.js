@@ -153,6 +153,35 @@ export function useInvoices() {
     }
   }, []);
 
+  const cancelInvoice = useCallback(async (id) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const result = await invoicesApi.cancel(id);
+      setInvoice(result);
+      return result;
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const deleteInvoice = useCallback(async (id) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      await invoicesApi.remove(id);
+      setInvoice(null);
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   return {
     invoices,
     invoice,
@@ -165,6 +194,8 @@ export function useInvoices() {
     createInvoice,
     updateInvoice,
     approveInvoice,
+    cancelInvoice,
+    deleteInvoice,
     recordPayment,
     duplicateInvoice,
     exportCsv,
