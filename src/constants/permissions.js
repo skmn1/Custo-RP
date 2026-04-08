@@ -11,6 +11,7 @@ export const PERMISSIONS = {
     'schedule:view-all', 'schedule:view-own', 'schedule:create', 'schedule:edit', 'schedule:delete',
     'employees:view-all', 'employees:view-own', 'employees:create', 'employees:edit', 'employees:edit-own', 'employees:delete',
     'payroll:view-all', 'payroll:view-own', 'payroll:export', 'payroll:modify-rates',
+    'invoices:view', 'invoices:create', 'invoices:edit', 'invoices:approve', 'invoices:export',
     'users:view', 'users:create', 'users:edit', 'users:delete',
     'settings:view', 'settings:edit',
   ],
@@ -19,6 +20,7 @@ export const PERMISSIONS = {
     'schedule:view-all', 'schedule:view-own', 'schedule:create', 'schedule:edit', 'schedule:delete',
     'employees:view-all', 'employees:view-own', 'employees:create', 'employees:edit', 'employees:edit-own',
     'payroll:view-all', 'payroll:view-own', 'payroll:export',
+    'invoices:view', 'invoices:create', 'invoices:edit', 'invoices:approve', 'invoices:export',
     'settings:view',
   ],
   employee: [

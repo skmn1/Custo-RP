@@ -1,0 +1,106 @@
+{
+  "title": "Factures fournisseurs",
+  "type": {
+    "AP": "Facture fournisseur"
+  },
+  "status": {
+    "received": "Reçue",
+    "approved": "Approuvée",
+    "paid": "Payée",
+    "cancelled": "Annulée"
+  },
+  "field": {
+    "number": "Numéro de facture",
+    "supplier": "Fournisseur",
+    "supplierSiret": "SIRET fournisseur",
+    "supplierVat": "N° TVA fournisseur",
+    "buyerVat": "N° TVA acheteur",
+    "supplierEmail": "Courriel fournisseur",
+    "supplierAddress": "Adresse fournisseur",
+    "issueDate": "Date d'émission",
+    "deliveryDate": "Date de livraison / prestation",
+    "dueDate": "Date d'échéance",
+    "currency": "Devise",
+    "taxRate": "Taux de TVA (%)",
+    "paymentTerms": "Conditions de règlement",
+    "earlyPaymentDiscount": "Escompte paiement anticipé (%)",
+    "latePaymentRate": "Taux pénalités de retard (%)",
+    "notes": "Notes",
+    "po": "Bon de commande",
+    "subtotal": "Total HT",
+    "taxAmount": "Montant TVA",
+    "discountAmount": "Remise",
+    "total": "Total TTC",
+    "paid": "Montant réglé",
+    "outstanding": "Reste à payer"
+  },
+  "line": {
+    "item": "Article",
+    "description": "Désignation",
+    "qty": "Qté",
+    "unitPrice": "Prix unitaire HT",
+    "discount": "Remise (%)",
+    "taxRate": "TVA (%)",
+    "lineTotal": "Total HT",
+    "addLine": "Ajouter une ligne",
+    "removeLine": "Supprimer",
+    "freeText": "Ligne texte libre (sans article)"
+  },
+  "payment": {
+    "title": "Règlements",
+    "record": "Enregistrer un règlement",
+    "date": "Date de règlement",
+    "amount": "Montant",
+    "method": "Mode de paiement",
+    "methods": {
+      "cash": "Espèces",
+      "bank_transfer": "Virement bancaire",
+      "card": "Carte bancaire",
+      "cheque": "Chèque",
+      "other": "Autre"
+    },
+    "reference": "Référence",
+    "note": "Note",
+    "noPayments": "Aucun règlement enregistré"
+  },
+  "action": {
+    "new": "Nouvelle facture",
+    "edit": "Modifier",
+    "approve": "Approuver",
+    "approveConfirm": "Approuver cette facture ? Les quantités en stock seront mises à jour et la facture sera verrouillée.",
+    "duplicate": "Dupliquer",
+    "pdf": "Télécharger le PDF",
+    "export": "Exporter",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "back": "Retour"
+  },
+  "kpi": {
+    "apUnpaid": "Total fournisseurs impayés",
+    "apPaidMtd": "Total réglé (mois courant)",
+    "apPendingApproval": "En attente d'approbation",
+    "monthlySpend": "Dépenses fournisseurs (12 mois)",
+    "statusDist": "Répartition par statut"
+  },
+  "empty": "Aucune facture trouvée",
+  "filter": {
+    "allStatuses": "Tous les statuts",
+    "dateFrom": "Du",
+    "dateTo": "Au",
+    "supplier": "Fournisseur"
+  },
+  "validation": {
+    "siretRequired": "Le SIRET fournisseur est requis",
+    "siretFormat": "Le SIRET doit contenir exactement 14 chiffres",
+    "vatFormat": "Le N° TVA doit suivre le format : FR + 2 chiffres + 9 chiffres SIREN",
+    "supplierRequired": "Le nom du fournisseur est requis",
+    "issueDateRequired": "La date d'émission est requise",
+    "dueDateRequired": "La date d'échéance est requise",
+    "atLeastOneLine": "Au moins une ligne est requise",
+    "qtyRequired": "La quantité est requise",
+    "unitPriceRequired": "Le prix unitaire est requis",
+    "descriptionRequired": "La désignation est requise"
+  },
+  "poWarning": "Les quantités diffèrent du bon de commande lié",
+  "invoice": "Facture"
+}

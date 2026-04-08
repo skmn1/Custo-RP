@@ -33,6 +33,9 @@ import PurchaseOrderFormPage from './pages/stock/PurchaseOrderFormPage';
 import StocktakeListPage from './pages/stock/StocktakeListPage';
 import StocktakeSessionPage from './pages/stock/StocktakeSessionPage';
 import ReorderQueuePage from './pages/stock/ReorderQueuePage';
+import InvoiceListPage from './pages/invoices/InvoiceListPage';
+import InvoiceFormPage from './pages/invoices/InvoiceFormPage';
+import InvoiceDetailPage from './pages/invoices/InvoiceDetailPage';
 
 const ProtectedLayout = ({ children }) => (
   <AuthGuard>
@@ -86,6 +89,11 @@ const App = () => {
           <Route path="/stock/stocktakes" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><StocktakeListPage /></RoleGuard></ProtectedLayout>} />
           <Route path="/stock/stocktakes/:id" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><StocktakeSessionPage /></RoleGuard></ProtectedLayout>} />
           <Route path="/stock/reorder-queue" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><ReorderQueuePage /></RoleGuard></ProtectedLayout>} />
+
+          {/* Invoice management routes */}
+          <Route path="/invoices" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><InvoiceListPage /></RoleGuard></ProtectedLayout>} />
+          <Route path="/invoices/new" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><InvoiceFormPage /></RoleGuard></ProtectedLayout>} />
+          <Route path="/invoices/:id" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><InvoiceDetailPage /></RoleGuard></ProtectedLayout>} />
         </Routes>
         </SettingsProvider>
       </AuthProvider>

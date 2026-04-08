@@ -26,6 +26,7 @@ export const NAMESPACES = [
   'validation',
   'settings',
   'stock',
+  'invoices',
 ];
 
 i18n

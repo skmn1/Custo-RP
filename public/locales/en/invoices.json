@@ -1,0 +1,106 @@
+{
+  "title": "Supplier Invoices",
+  "type": {
+    "AP": "Supplier Invoice"
+  },
+  "status": {
+    "received": "Received",
+    "approved": "Approved",
+    "paid": "Paid",
+    "cancelled": "Cancelled"
+  },
+  "field": {
+    "number": "Invoice Number",
+    "supplier": "Supplier",
+    "supplierSiret": "Supplier SIRET",
+    "supplierVat": "Supplier VAT Number",
+    "buyerVat": "Buyer VAT Number",
+    "supplierEmail": "Supplier Email",
+    "supplierAddress": "Supplier Address",
+    "issueDate": "Issue Date",
+    "deliveryDate": "Delivery / Service Date",
+    "dueDate": "Due Date",
+    "currency": "Currency",
+    "taxRate": "VAT Rate (%)",
+    "paymentTerms": "Payment Terms",
+    "earlyPaymentDiscount": "Early Payment Discount (%)",
+    "latePaymentRate": "Late Payment Penalty Rate (%)",
+    "notes": "Notes",
+    "po": "Purchase Order",
+    "subtotal": "Subtotal (excl. VAT)",
+    "taxAmount": "VAT Amount",
+    "discountAmount": "Discount",
+    "total": "Total (incl. VAT)",
+    "paid": "Amount Paid",
+    "outstanding": "Outstanding"
+  },
+  "line": {
+    "item": "Item",
+    "description": "Description",
+    "qty": "Qty",
+    "unitPrice": "Unit Price (excl. VAT)",
+    "discount": "Discount (%)",
+    "taxRate": "VAT (%)",
+    "lineTotal": "Total (excl. VAT)",
+    "addLine": "Add a line",
+    "removeLine": "Remove",
+    "freeText": "Free-text line (no item)"
+  },
+  "payment": {
+    "title": "Payments",
+    "record": "Record a Payment",
+    "date": "Payment Date",
+    "amount": "Amount",
+    "method": "Payment Method",
+    "methods": {
+      "cash": "Cash",
+      "bank_transfer": "Bank Transfer",
+      "card": "Card",
+      "cheque": "Cheque",
+      "other": "Other"
+    },
+    "reference": "Reference",
+    "note": "Note",
+    "noPayments": "No payments recorded"
+  },
+  "action": {
+    "new": "New Invoice",
+    "edit": "Edit",
+    "approve": "Approve",
+    "approveConfirm": "Approve this invoice? Stock quantities will be updated and the invoice will be locked.",
+    "duplicate": "Duplicate",
+    "pdf": "Download PDF",
+    "export": "Export",
+    "save": "Save",
+    "cancel": "Cancel",
+    "back": "Back"
+  },
+  "kpi": {
+    "apUnpaid": "Total AP Unpaid",
+    "apPaidMtd": "Total Paid (current month)",
+    "apPendingApproval": "Pending Approval",
+    "monthlySpend": "Monthly AP Spend (12 months)",
+    "statusDist": "Status Distribution"
+  },
+  "empty": "No invoices found",
+  "filter": {
+    "allStatuses": "All Statuses",
+    "dateFrom": "From",
+    "dateTo": "To",
+    "supplier": "Supplier"
+  },
+  "validation": {
+    "siretRequired": "Supplier SIRET is required",
+    "siretFormat": "SIRET must be exactly 14 digits",
+    "vatFormat": "VAT number must follow format: FR + 2 digits + 9-digit SIREN",
+    "supplierRequired": "Supplier name is required",
+    "issueDateRequired": "Issue date is required",
+    "dueDateRequired": "Due date is required",
+    "atLeastOneLine": "At least one line is required",
+    "qtyRequired": "Quantity is required",
+    "unitPriceRequired": "Unit price is required",
+    "descriptionRequired": "Description is required"
+  },
+  "poWarning": "Quantities differ from the linked purchase order",
+  "invoice": "Invoice"
+}
