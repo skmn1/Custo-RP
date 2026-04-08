@@ -20,7 +20,7 @@ public class StockKpiController {
     private final DashboardKpiService service;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'VIEWER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'STOCK_MANAGER')")
     @Operation(summary = "Get all stock KPI metrics for dashboard")
     public ResponseEntity<StockKpiDto> getKpis() {
         return ResponseEntity.ok(service.getKpis());

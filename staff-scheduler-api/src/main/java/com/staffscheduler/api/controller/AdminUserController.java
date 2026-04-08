@@ -3,9 +3,12 @@ package com.staffscheduler.api.controller;
 import com.staffscheduler.api.dto.AdminUserDto;
 import com.staffscheduler.api.exception.DuplicateResourceException;
 import com.staffscheduler.api.exception.ResourceNotFoundException;
+import com.staffscheduler.api.model.PosAssignment;
 import com.staffscheduler.api.model.User;
+import com.staffscheduler.api.repository.PosAssignmentRepository;
 import com.staffscheduler.api.repository.RefreshTokenRepository;
 import com.staffscheduler.api.repository.UserRepository;
+import com.staffscheduler.api.security.RoleConstants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -14,7 +17,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,10 +35,10 @@ import java.util.stream.Collectors;
 public class AdminUserController {
 
     private static final Logger log = LoggerFactory.getLogger(AdminUserController.class);
-    private static final Set<String> VALID_ROLES = Set.of("admin", "manager", "employee", "viewer");
 
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final PosAssignmentRepository posAssignmentRepository;
     private final PasswordEncoder passwordEncoder;
 
     @GetMapping
@@ -70,7 +75,7 @@ public class AdminUserController {
                 .passwordHash(passwordEncoder.encode(dto.getPassword()))
                 .firstName(dto.getFirstName().trim())
                 .lastName(dto.getLastName().trim())
-                .role(dto.getRole().toLowerCase().trim())
+                .role(RoleConstants.normalise(dto.getRole()))
                 .isActive(dto.getIsActive() != null ? dto.getIsActive() : true)
                 .employeeId(dto.getEmployeeId())
                 .build();
@@ -96,7 +101,7 @@ public class AdminUserController {
         if (dto.getLastName() != null) user.setLastName(dto.getLastName().trim());
         if (dto.getRole() != null) {
             validateRole(dto.getRole());
-            user.setRole(dto.getRole().toLowerCase().trim());
+            user.setRole(RoleConstants.normalise(dto.getRole()));
         }
         if (dto.getIsActive() != null) user.setIsActive(dto.getIsActive());
         if (dto.getEmployeeId() != null) user.setEmployeeId(dto.getEmployeeId());
@@ -144,11 +149,98 @@ public class AdminUserController {
         return ResponseEntity.ok(Map.of("message", "User deleted successfully"));
     }
 
+    // ── Role change ──
+
+    @PutMapping("/{id}/role")
+    @Operation(summary = "Change a user's role")
+    public ResponseEntity<AdminUserDto> changeRole(@PathVariable UUID id, @RequestBody Map<String, String> body) {
+        String newRole = body.get("role");
+        validateRole(newRole);
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User", id.toString()));
+        user.setRole(RoleConstants.normalise(newRole));
+        userRepository.save(user);
+        log.info("Admin changed role of user {} to {}", user.getEmail(), user.getRole());
+        return ResponseEntity.ok(toDto(user));
+    }
+
+    // ── Roles list ──
+
+    @GetMapping("/roles")
+    @Operation(summary = "List all valid canonical roles")
+    public ResponseEntity<Set<String>> listRoles() {
+        return ResponseEntity.ok(RoleConstants.VALID_ROLES);
+    }
+
+    // ── PoS Assignments ──
+
+    @GetMapping("/{id}/pos-assignments")
+    @Operation(summary = "List PoS terminal assignments for a user")
+    public ResponseEntity<List<Map<String, Object>>> getPosAssignments(@PathVariable UUID id) {
+        userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User", id.toString()));
+        List<Map<String, Object>> assignments = posAssignmentRepository.findByUserId(id).stream()
+                .map(a -> Map.<String, Object>of(
+                        "id", a.getId(),
+                        "posTerminalId", a.getPosTerminalId(),
+                        "assignedBy", a.getAssignedBy() != null ? a.getAssignedBy().toString() : "",
+                        "assignedAt", a.getAssignedAt().toString()
+                ))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(assignments);
+    }
+
+    @PostMapping("/{id}/pos-assignments")
+    @Operation(summary = "Assign a PoS terminal to a user")
+    @Transactional
+    public ResponseEntity<Map<String, Object>> assignTerminal(
+            @PathVariable UUID id,
+            @RequestBody Map<String, Long> body,
+            Authentication authentication) {
+        userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User", id.toString()));
+        Long terminalId = body.get("posTerminalId");
+        if (terminalId == null) {
+            throw new IllegalArgumentException("posTerminalId is required");
+        }
+        if (posAssignmentRepository.existsByUserIdAndPosTerminalId(id, terminalId)) {
+            throw new DuplicateResourceException("User already assigned to this terminal");
+        }
+
+        UUID assignedBy = (UUID) authentication.getPrincipal();
+        PosAssignment assignment = PosAssignment.builder()
+                .userId(id)
+                .posTerminalId(terminalId)
+                .assignedBy(assignedBy)
+                .build();
+        posAssignmentRepository.save(assignment);
+        log.info("Admin assigned terminal {} to user {}", terminalId, id);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
+                "id", assignment.getId(),
+                "posTerminalId", assignment.getPosTerminalId(),
+                "assignedAt", assignment.getAssignedAt().toString()
+        ));
+    }
+
+    @DeleteMapping("/{userId}/pos-assignments/{terminalId}")
+    @Operation(summary = "Remove a PoS terminal assignment from a user")
+    @Transactional
+    public ResponseEntity<Map<String, String>> removeTerminalAssignment(
+            @PathVariable UUID userId,
+            @PathVariable Long terminalId) {
+        posAssignmentRepository.deleteByUserIdAndPosTerminalId(userId, terminalId);
+        log.info("Admin removed terminal {} assignment from user {}", terminalId, userId);
+        return ResponseEntity.ok(Map.of("message", "Terminal assignment removed"));
+    }
+
     // ── Helpers ──
 
     private void validateRole(String role) {
-        if (role == null || !VALID_ROLES.contains(role.toLowerCase().trim())) {
-            throw new IllegalArgumentException("Invalid role: " + role + ". Must be one of: " + VALID_ROLES);
+        if (role == null || !RoleConstants.isValid(role)) {
+            throw new IllegalArgumentException(
+                    "Invalid role: " + role + ". Must be one of: " + RoleConstants.VALID_ROLES);
         }
     }
 

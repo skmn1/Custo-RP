@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { fetchUsers, createUser, updateUser, deactivateUser, activateUser, deleteUser } from '../api/adminApi';
+import { ALL_ROLES } from '../constants/roles';
 
-const ROLES = ['admin', 'manager', 'employee', 'viewer'];
+const ROLES = ALL_ROLES;
 
 const UserManagementPage = () => {
   const { t } = useTranslation(['auth', 'common']);
@@ -262,7 +263,7 @@ const UserFormModal = ({ user, onSave, onClose }) => {
     email: user?.email || '',
     firstName: user?.firstName || '',
     lastName: user?.lastName || '',
-    role: user?.role || 'viewer',
+    role: user?.role || 'employee',
     password: '',
     employeeId: user?.employeeId || '',
   });
@@ -346,7 +347,7 @@ const UserFormModal = ({ user, onSave, onClose }) => {
               onChange={(e) => setForm({ ...form, role: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
             >
-              {['admin', 'manager', 'employee', 'viewer'].map((r) => (
+              {ROLES.map((r) => (
                 <option key={r} value={r}>{t(`common:role.${r}`)}</option>
               ))}
             </select>

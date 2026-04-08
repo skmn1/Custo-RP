@@ -24,21 +24,21 @@ public class StocktakeController {
     private final StocktakeService service;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'VIEWER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'STOCK_MANAGER')")
     @Operation(summary = "List all stocktake sessions")
     public ResponseEntity<List<StocktakeDto>> list() {
         return ResponseEntity.ok(service.findAll());
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'VIEWER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'STOCK_MANAGER')")
     @Operation(summary = "Get stocktake session with counts")
     public ResponseEntity<StocktakeDto> getById(@PathVariable UUID id) {
         return ResponseEntity.ok(service.findById(id));
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'STOCK_MANAGER')")
     @Operation(summary = "Start a new stocktake session")
     public ResponseEntity<StocktakeDto> start(
             Authentication authentication,
@@ -48,7 +48,7 @@ public class StocktakeController {
     }
 
     @PatchMapping("/{id}/count")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'STOCK_MANAGER')")
     @Operation(summary = "Submit a count for an item in the session")
     public ResponseEntity<StocktakeDto> submitCount(
             @PathVariable UUID id,
@@ -58,7 +58,7 @@ public class StocktakeController {
     }
 
     @PatchMapping("/{id}/finalise")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'STOCK_MANAGER')")
     @Operation(summary = "Finalise stocktake session and post adjustments")
     public ResponseEntity<StocktakeDto> finalise(
             Authentication authentication,

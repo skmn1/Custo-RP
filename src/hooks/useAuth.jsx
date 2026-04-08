@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { loginApi, registerApi, logoutApi, refreshTokenApi, getMeApi } from '../api/authApi';
 import { hasPermission, hasAnyPermission } from '../constants/permissions';
+import { normaliseRole, ROLES } from '../constants/roles';
 
 const AuthContext = createContext(null);
 
@@ -13,6 +14,14 @@ function parseJwtPayload(token) {
   } catch {
     return null;
   }
+}
+
+/** Normalise the role on a user object (in-place, returns same ref). */
+function normaliseUser(user) {
+  if (user && user.role) {
+    user.role = normaliseRole(user.role);
+  }
+  return user;
 }
 
 export function AuthProvider({ children }) {
@@ -50,7 +59,7 @@ export function AuthProvider({ children }) {
         if (!rt) return;
         const data = await refreshTokenApi(rt);
         storeTokens(data.accessToken, data.refreshToken);
-        setUser(data.user);
+        setUser(normaliseUser(data.user));
         scheduleRefresh(data.accessToken);
       } catch {
         clearTokens();
@@ -72,7 +81,7 @@ export function AuthProvider({ children }) {
 
       try {
         const userData = await getMeApi();
-        setUser(userData);
+        setUser(normaliseUser(userData));
         scheduleRefresh(accessToken);
       } catch (err) {
         // Access token expired — try refresh
@@ -80,7 +89,7 @@ export function AuthProvider({ children }) {
           try {
             const data = await refreshTokenApi(refreshToken);
             storeTokens(data.accessToken, data.refreshToken);
-            setUser(data.user);
+            setUser(normaliseUser(data.user));
             scheduleRefresh(data.accessToken);
           } catch {
             clearTokens();
@@ -106,7 +115,7 @@ export function AuthProvider({ children }) {
   const login = useCallback(async (email, password) => {
     const data = await loginApi(email, password);
     storeTokens(data.accessToken, data.refreshToken);
-    setUser(data.user);
+    setUser(normaliseUser(data.user));
     scheduleRefresh(data.accessToken);
     return data.user;
   }, [storeTokens, scheduleRefresh]);
@@ -114,7 +123,7 @@ export function AuthProvider({ children }) {
   const register = useCallback(async ({ email, password, firstName, lastName }) => {
     const data = await registerApi({ email, password, firstName, lastName });
     storeTokens(data.accessToken, data.refreshToken);
-    setUser(data.user);
+    setUser(normaliseUser(data.user));
     scheduleRefresh(data.accessToken);
     return data.user;
   }, [storeTokens, scheduleRefresh]);
@@ -138,10 +147,13 @@ export function AuthProvider({ children }) {
     return user ? hasAnyPermission(user.role, ...permissions) : false;
   }, [user]);
 
-  const isAdmin = useMemo(() => user?.role === 'admin', [user]);
-  const isManager = useMemo(() => user?.role === 'manager', [user]);
-  const isEmployee = useMemo(() => user?.role === 'employee', [user]);
-  const isViewer = useMemo(() => user?.role === 'viewer', [user]);
+  const isAdmin = useMemo(() => user?.role === ROLES.SUPER_ADMIN, [user]);
+  const isManager = useMemo(() => user?.role === ROLES.HR_MANAGER, [user]);
+  const isPlanner = useMemo(() => user?.role === ROLES.PLANNER, [user]);
+  const isAccountingAgent = useMemo(() => user?.role === ROLES.ACCOUNTING_AGENT, [user]);
+  const isStockManager = useMemo(() => user?.role === ROLES.STOCK_MANAGER, [user]);
+  const isPosManager = useMemo(() => user?.role === ROLES.POS_MANAGER, [user]);
+  const isEmployee = useMemo(() => user?.role === ROLES.EMPLOYEE, [user]);
 
   const value = {
     user,
@@ -154,8 +166,11 @@ export function AuthProvider({ children }) {
     canAny,
     isAdmin,
     isManager,
+    isPlanner,
+    isAccountingAgent,
+    isStockManager,
+    isPosManager,
     isEmployee,
-    isViewer,
   };
 
   return (

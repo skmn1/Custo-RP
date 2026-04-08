@@ -27,21 +27,21 @@ public class ShiftTypeController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'HR_MANAGER')")
     @Operation(summary = "Create a new shift type")
     public ResponseEntity<ShiftTypeDto> create(@RequestBody ShiftTypeDto dto) {
         return ResponseEntity.ok(shiftTypeService.create(dto));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'HR_MANAGER')")
     @Operation(summary = "Update an existing shift type")
     public ResponseEntity<ShiftTypeDto> update(@PathVariable UUID id, @RequestBody ShiftTypeDto dto) {
         return ResponseEntity.ok(shiftTypeService.update(id, dto));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'HR_MANAGER')")
     @Operation(summary = "Delete a shift type")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         shiftTypeService.delete(id);

@@ -27,7 +27,7 @@ public class StockMovementController {
     private final StockMovementService service;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'VIEWER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'STOCK_MANAGER')")
     @Operation(summary = "List movements with optional filters")
     public ResponseEntity<List<StockMovementDto>> list(
             @Parameter(description = "Filter by item ID")
@@ -44,7 +44,7 @@ public class StockMovementController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'STOCK_MANAGER')")
     @Operation(summary = "Create a stock movement")
     public ResponseEntity<StockMovementDto> create(
             Authentication authentication,
@@ -55,7 +55,7 @@ public class StockMovementController {
     }
 
     @PostMapping("/transfer")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'STOCK_MANAGER')")
     @Operation(summary = "Transfer stock between locations")
     public ResponseEntity<Map<String, String>> transfer(
             Authentication authentication,

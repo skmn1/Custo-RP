@@ -20,7 +20,7 @@ public class DashboardController {
     private final InvoiceService invoiceService;
 
     @GetMapping("/ap-kpis")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'HR_MANAGER', 'PLANNER', 'ACCOUNTING_AGENT', 'STOCK_MANAGER', 'POS_MANAGER')")
     @Operation(summary = "Get all AP invoice KPI widget data")
     public ResponseEntity<InvoiceKpiDto> getApKpis() {
         return ResponseEntity.ok(invoiceService.getKpis());

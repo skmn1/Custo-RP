@@ -33,7 +33,7 @@ public class EmployeeController {
     private final EmployeeService service;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'VIEWER', 'EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'HR_MANAGER', 'PLANNER', 'ACCOUNTING_AGENT', 'EMPLOYEE')")
     @Operation(
             summary = "List employees",
             description = "Returns all employees with optional search, role filtering, and sorting. "
@@ -67,7 +67,7 @@ public class EmployeeController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'VIEWER', 'EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'HR_MANAGER', 'PLANNER', 'ACCOUNTING_AGENT', 'EMPLOYEE')")
     @Operation(summary = "Get employee by ID", description = "Returns a single employee by their unique identifier.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Employee found",
@@ -84,7 +84,7 @@ public class EmployeeController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'HR_MANAGER')")
     @Operation(summary = "Create employee",
             description = "Creates a new employee. Avatar initials and color are auto-generated if not provided.")
     @ApiResponses({
@@ -100,7 +100,7 @@ public class EmployeeController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'HR_MANAGER', 'EMPLOYEE')")
     @Operation(summary = "Update employee", description = "Updates an existing employee's details.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Employee updated",
@@ -119,7 +119,7 @@ public class EmployeeController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     @Operation(summary = "Delete employee", description = "Permanently deletes an employee and disassociates them from shifts and PoS locations.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Employee deleted",
@@ -136,7 +136,7 @@ public class EmployeeController {
     }
 
     @GetMapping("/roles")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'VIEWER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'HR_MANAGER', 'PLANNER', 'ACCOUNTING_AGENT')")
     @Operation(summary = "List all roles",
             description = "Returns a distinct list of role names across all employees.")
     @ApiResponse(responseCode = "200", description = "Role list",

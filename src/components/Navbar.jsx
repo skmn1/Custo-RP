@@ -9,16 +9,16 @@ import { useDarkMode } from '../hooks/useDarkMode';
 
 // Fallback role permissions when navItems haven't loaded from API yet
 const ROLE_NAV_PERMISSIONS = {
-  pos:       ['admin', 'manager'],
-  scheduler: ['admin', 'manager', 'employee', 'viewer'],
-  employees: ['admin', 'manager', 'employee', 'viewer'],
-  payroll:   ['admin', 'manager', 'employee'],
-  stock:     ['admin', 'manager'],
-  invoices:  ['admin', 'manager'],
-  shifts:    ['admin', 'manager'],
-  settings:  ['admin', 'manager', 'employee', 'viewer'],
-  dashboard: ['admin', 'manager', 'employee', 'viewer'],
-  users:     ['admin'],
+  pos:       ['super_admin', 'pos_manager'],
+  scheduler: ['super_admin', 'hr_manager', 'planner', 'employee'],
+  employees: ['super_admin', 'hr_manager', 'planner', 'accounting_agent', 'employee'],
+  payroll:   ['super_admin', 'hr_manager', 'accounting_agent', 'employee'],
+  stock:     ['super_admin', 'stock_manager'],
+  invoices:  ['super_admin', 'pos_manager', 'accounting_agent'],
+  shifts:    ['super_admin', 'hr_manager', 'planner'],
+  settings:  ['super_admin', 'hr_manager', 'planner', 'accounting_agent', 'stock_manager', 'pos_manager', 'employee'],
+  dashboard: ['super_admin', 'hr_manager', 'planner', 'accounting_agent', 'stock_manager', 'pos_manager', 'employee'],
+  users:     ['super_admin'],
 };
 
 const LanguageSwitcher = ({ className = '' }) => {
@@ -169,14 +169,14 @@ const Navbar = () => {
   // Build visible nav items: use API-ordered dbNavItems if available, else fall back to hardcoded
   const visibleNavItems = useMemo(() => {
     if (dbNavItems && dbNavItems.length > 0) {
-      const canSeeInvoices = ['admin', 'manager'].includes(userRole);
+      const canSeeInvoices = ['super_admin', 'pos_manager', 'accounting_agent'].includes(userRole);
       const mapped = dbNavItems
         .filter((item) => {
           if (item.routeKey === 'reports') return false; // reports removed
           // Role-based visibility from nav item config
-          if (userRole === 'admin' && !item.visibleAdmin) return false;
-          if (userRole === 'manager' && !item.visibleManager) return false;
-          if ((userRole === 'employee' || userRole === 'viewer') && !item.visibleEmployee) return false;
+          if (userRole === 'super_admin' && !item.visibleAdmin) return false;
+          if (['hr_manager', 'planner', 'accounting_agent', 'stock_manager', 'pos_manager'].includes(userRole) && !item.visibleManager) return false;
+          if (userRole === 'employee' && !item.visibleEmployee) return false;
           // Feature flag gating
           const flagKey = ROUTE_FEATURE_FLAGS[item.routeKey];
           if (flagKey && featureFlags[flagKey] === false) return false;

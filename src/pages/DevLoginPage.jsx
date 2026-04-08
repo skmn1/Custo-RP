@@ -6,7 +6,7 @@ import { useAuth } from '../hooks/useAuth';
 // ── Seed test accounts (created by data.sql) ────────────────────────────────
 const TEST_ACCOUNTS = [
   {
-    role: 'admin',
+    role: 'super_admin',
     email: 'admin@staffscheduler.com',
     password: 'Admin@123',
     firstName: 'System',
@@ -23,12 +23,12 @@ const TEST_ACCOUNTS = [
     ),
   },
   {
-    role: 'manager',
+    role: 'hr_manager',
     email: 'manager@staffscheduler.com',
     password: 'Manager@123',
     firstName: 'Jane',
     lastName: 'Smith',
-    description: 'Manage schedules, employees, payroll — no user admin',
+    description: 'HR, scheduling, payroll — no user admin',
     color: 'from-blue-500 to-cyan-600',
     bg: 'bg-blue-50 border-blue-200 hover:border-blue-400 hover:bg-blue-100',
     badge: 'bg-blue-100 text-blue-700',
@@ -53,23 +53,6 @@ const TEST_ACCOUNTS = [
       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
           d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-      </svg>
-    ),
-  },
-  {
-    role: 'viewer',
-    email: 'viewer@staffscheduler.com',
-    password: 'Viewer@123',
-    firstName: 'Robert',
-    lastName: 'Taylor',
-    description: 'Read-only — schedules and employees, no payroll',
-    color: 'from-amber-500 to-orange-600',
-    bg: 'bg-amber-50 border-amber-200 hover:border-amber-400 hover:bg-amber-100',
-    badge: 'bg-amber-100 text-amber-700',
-    icon: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-          d="M15 12a3 3 0 11-6 0 3 3 0 016 0zm-3-9a9 9 0 100 18A9 9 0 0012 3z" />
       </svg>
     ),
   },

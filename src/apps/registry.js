@@ -4,8 +4,11 @@
  *
  * icon  — Heroicons 24/outline component name (resolved at render time)
  * color — Tailwind color token used for theming (--app-color)
- * roles — roles that may access this app
+ * roles — canonical roles that may access this app
  */
+
+import { normaliseRole } from '../constants/roles';
+
 export const APPS = [
   {
     id: 'planning',
@@ -13,7 +16,7 @@ export const APPS = [
     icon: 'CalendarDaysIcon',
     color: 'blue',
     route: '/app/planning',
-    roles: ['super_admin', 'hr_manager', 'planner', 'employee', 'admin', 'manager'],
+    roles: ['super_admin', 'hr_manager', 'planner', 'employee'],
   },
   {
     id: 'hr',
@@ -21,7 +24,7 @@ export const APPS = [
     icon: 'UsersIcon',
     color: 'green',
     route: '/app/hr',
-    roles: ['super_admin', 'hr_manager', 'admin', 'manager'],
+    roles: ['super_admin', 'hr_manager', 'planner', 'accounting_agent'],
   },
   {
     id: 'payroll',
@@ -29,7 +32,7 @@ export const APPS = [
     icon: 'BanknotesIcon',
     color: 'violet',
     route: '/app/payroll',
-    roles: ['super_admin', 'hr_manager', 'admin', 'manager'],
+    roles: ['super_admin', 'hr_manager', 'accounting_agent', 'employee'],
   },
   {
     id: 'accounting',
@@ -37,7 +40,7 @@ export const APPS = [
     icon: 'ReceiptPercentIcon',
     color: 'amber',
     route: '/app/accounting',
-    roles: ['super_admin', 'accounting_agent', 'admin', 'manager'],
+    roles: ['super_admin', 'accounting_agent', 'pos_manager'],
   },
   {
     id: 'stock',
@@ -45,7 +48,7 @@ export const APPS = [
     icon: 'ArchiveBoxIcon',
     color: 'orange',
     route: '/app/stock',
-    roles: ['super_admin', 'stock_manager', 'pos_manager', 'admin', 'manager'],
+    roles: ['super_admin', 'stock_manager', 'pos_manager'],
   },
   {
     id: 'pos',
@@ -53,7 +56,7 @@ export const APPS = [
     icon: 'ShoppingCartIcon',
     color: 'teal',
     route: '/app/pos',
-    roles: ['super_admin', 'pos_manager', 'admin', 'manager'],
+    roles: ['super_admin', 'pos_manager'],
   },
   {
     id: 'admin',
@@ -61,16 +64,18 @@ export const APPS = [
     icon: 'Cog8ToothIcon',
     color: 'slate',
     route: '/app/admin',
-    roles: ['super_admin', 'admin'],
+    roles: ['super_admin'],
   },
 ];
 
 /**
  * Returns apps accessible by the given role.
+ * Normalises the role before comparison.
  */
 export function getAccessibleApps(userRole) {
   if (!userRole) return [];
-  return APPS.filter((app) => app.roles.includes(userRole));
+  const role = normaliseRole(userRole);
+  return APPS.filter((app) => app.roles.includes(role));
 }
 
 /**

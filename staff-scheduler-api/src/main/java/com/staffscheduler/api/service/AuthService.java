@@ -8,6 +8,7 @@ import com.staffscheduler.api.model.User;
 import com.staffscheduler.api.repository.RefreshTokenRepository;
 import com.staffscheduler.api.repository.UserRepository;
 import com.staffscheduler.api.security.JwtService;
+import com.staffscheduler.api.security.RoleConstants;
 
 import io.jsonwebtoken.Claims;
 import org.slf4j.Logger;
@@ -51,7 +52,9 @@ public class AuthService {
 
         String role = request.getRole();
         if (role == null || role.isBlank()) {
-            role = "viewer";
+            role = RoleConstants.EMPLOYEE;
+        } else {
+            role = RoleConstants.normalise(role);
         }
 
         User user = User.builder()

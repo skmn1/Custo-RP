@@ -1,0 +1,20 @@
+{
+  "names": {
+    "super_admin": "Super Admin",
+    "hr_manager": "Responsable RH",
+    "planner": "Planificateur",
+    "accounting_agent": "Agent comptable",
+    "stock_manager": "Gestionnaire de stock",
+    "pos_manager": "Gestionnaire PdV",
+    "employee": "Employé"
+  },
+  "descriptions": {
+    "super_admin": "Accès complet — toutes les fonctionnalités et gestion des utilisateurs",
+    "hr_manager": "RH, planification, paie et gestion des employés",
+    "planner": "Création de plannings et gestion des quarts",
+    "accounting_agent": "Paie, facturation et rapports financiers",
+    "stock_manager": "Inventaire, achats et inventaires physiques",
+    "pos_manager": "Gestion des terminaux PdV et opérations quotidiennes",
+    "employee": "Libre-service — votre planning, profil et fiches de paie"
+  }
+}

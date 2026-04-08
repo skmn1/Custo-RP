@@ -23,35 +23,35 @@ public class SupplierController {
     private final SupplierService service;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'VIEWER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'STOCK_MANAGER')")
     @Operation(summary = "List active suppliers")
     public ResponseEntity<List<SupplierDto>> list() {
         return ResponseEntity.ok(service.findAll());
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'VIEWER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'STOCK_MANAGER')")
     @Operation(summary = "Get supplier by ID")
     public ResponseEntity<SupplierDto> getById(@PathVariable UUID id) {
         return ResponseEntity.ok(service.findById(id));
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'STOCK_MANAGER')")
     @Operation(summary = "Create supplier")
     public ResponseEntity<SupplierDto> create(@RequestBody SupplierDto dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(dto));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'STOCK_MANAGER')")
     @Operation(summary = "Update supplier")
     public ResponseEntity<SupplierDto> update(@PathVariable UUID id, @RequestBody SupplierDto dto) {
         return ResponseEntity.ok(service.update(id, dto));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     @Operation(summary = "Soft-delete supplier")
     public ResponseEntity<Map<String, String>> delete(@PathVariable UUID id) {
         service.delete(id);

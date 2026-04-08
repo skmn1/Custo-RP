@@ -34,7 +34,7 @@ public class PayrollController {
     private final EmployeeService employeeService;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'HR_MANAGER', 'ACCOUNTING_AGENT', 'EMPLOYEE')")
     @Operation(summary = "Get payroll summary")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Payroll summary",
@@ -51,7 +51,7 @@ public class PayrollController {
     }
 
     @GetMapping("/employees")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'HR_MANAGER', 'ACCOUNTING_AGENT', 'EMPLOYEE')")
     @Operation(summary = "Get per-employee payroll")
     @ApiResponse(responseCode = "200", description = "Employee payroll list",
             content = @Content(array = @ArraySchema(schema = @Schema(implementation = PayrollDto.EmployeePayroll.class))))
@@ -76,7 +76,7 @@ public class PayrollController {
     }
 
     @GetMapping("/departments")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'HR_MANAGER', 'ACCOUNTING_AGENT')")
     @Operation(summary = "Get department payroll breakdown")
     @ApiResponse(responseCode = "200", description = "Department payroll breakdown",
             content = @Content(array = @ArraySchema(schema = @Schema(implementation = PayrollDto.DepartmentSummary.class))))
@@ -90,7 +90,7 @@ public class PayrollController {
     }
 
     @GetMapping("/statistics")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'HR_MANAGER', 'ACCOUNTING_AGENT')")
     @Operation(summary = "Get payroll statistics")
     @ApiResponse(responseCode = "200", description = "Payroll statistics",
             content = @Content(schema = @Schema(implementation = PayrollDto.Statistics.class)))
@@ -104,7 +104,7 @@ public class PayrollController {
     }
 
     @GetMapping("/export/csv")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'HR_MANAGER', 'ACCOUNTING_AGENT')")
     @Operation(summary = "Export payroll as CSV")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "CSV file download",

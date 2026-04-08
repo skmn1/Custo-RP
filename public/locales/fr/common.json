@@ -89,10 +89,16 @@
     "date": "Date"
   },
   "role": {
-    "admin": "Administrateur",
-    "manager": "Responsable",
+    "super_admin": "Super Admin",
+    "hr_manager": "Responsable RH",
+    "planner": "Planificateur",
+    "accounting_agent": "Agent comptable",
+    "stock_manager": "Gestionnaire de stock",
+    "pos_manager": "Gestionnaire PdV",
     "employee": "Employé",
-    "viewer": "Lecteur"
+    "admin": "Super Admin",
+    "manager": "Responsable RH",
+    "viewer": "Employé"
   },
   "accessDenied": {
     "title": "Accès refusé",

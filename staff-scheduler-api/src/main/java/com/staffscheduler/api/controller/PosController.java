@@ -32,7 +32,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/pos")
 @RequiredArgsConstructor
-@PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+@PreAuthorize("hasAnyRole('SUPER_ADMIN', 'POS_MANAGER')")
 @Tag(name = "Point of Sale", description = "PoS location management")
 public class PosController {
 
@@ -314,7 +314,7 @@ public class PosController {
     // ── Admin cross-terminal incidents ──
 
     @GetMapping("/admin/incidents")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     @Operation(summary = "List all incidents across terminals (admin)")
     public ResponseEntity<List<IncidentDto>> listAllIncidents(
             @RequestParam(required = false) String status) {

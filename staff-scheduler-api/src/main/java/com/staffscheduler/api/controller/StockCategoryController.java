@@ -23,42 +23,42 @@ public class StockCategoryController {
     private final StockCategoryService service;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'VIEWER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'STOCK_MANAGER')")
     @Operation(summary = "List categories as nested tree")
     public ResponseEntity<List<StockCategoryDto>> list() {
         return ResponseEntity.ok(service.findAll());
     }
 
     @GetMapping("/flat")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'VIEWER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'STOCK_MANAGER')")
     @Operation(summary = "List categories as flat list")
     public ResponseEntity<List<StockCategoryDto>> listFlat() {
         return ResponseEntity.ok(service.findFlat());
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'VIEWER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'STOCK_MANAGER')")
     @Operation(summary = "Get category by ID")
     public ResponseEntity<StockCategoryDto> getById(@PathVariable UUID id) {
         return ResponseEntity.ok(service.findById(id));
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'STOCK_MANAGER')")
     @Operation(summary = "Create category")
     public ResponseEntity<StockCategoryDto> create(@RequestBody StockCategoryDto dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(dto));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'STOCK_MANAGER')")
     @Operation(summary = "Update category")
     public ResponseEntity<StockCategoryDto> update(@PathVariable UUID id, @RequestBody StockCategoryDto dto) {
         return ResponseEntity.ok(service.update(id, dto));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     @Operation(summary = "Soft-delete category")
     public ResponseEntity<Map<String, String>> delete(@PathVariable UUID id) {
         service.delete(id);

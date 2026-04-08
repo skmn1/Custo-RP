@@ -1,0 +1,20 @@
+{
+  "names": {
+    "super_admin": "Super Admin",
+    "hr_manager": "HR Manager",
+    "planner": "Planner",
+    "accounting_agent": "Accounting Agent",
+    "stock_manager": "Stock Manager",
+    "pos_manager": "PoS Manager",
+    "employee": "Employee"
+  },
+  "descriptions": {
+    "super_admin": "Full system access — all features and user management",
+    "hr_manager": "HR, scheduling, payroll, and employee management",
+    "planner": "Schedule creation and shift management",
+    "accounting_agent": "Payroll, invoicing, and financial reporting",
+    "stock_manager": "Inventory, purchasing, and stocktakes",
+    "pos_manager": "Point-of-sale terminal management and daily operations",
+    "employee": "Self-service — own schedule, profile, and payslips"
+  }
+}

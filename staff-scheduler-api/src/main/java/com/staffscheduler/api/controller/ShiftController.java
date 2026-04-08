@@ -36,7 +36,7 @@ public class ShiftController {
     private final EmployeeService employeeService;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'VIEWER', 'EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'HR_MANAGER', 'PLANNER', 'EMPLOYEE')")
     @Operation(
             summary = "List shifts",
             description = "Returns shifts with optional filters. Employee role sees only own shifts.")
@@ -63,7 +63,7 @@ public class ShiftController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER', 'VIEWER', 'EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'HR_MANAGER', 'PLANNER', 'EMPLOYEE')")
     @Operation(summary = "Get shift by ID", description = "Returns a single shift by its unique identifier.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Shift found",
@@ -81,7 +81,7 @@ public class ShiftController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'HR_MANAGER', 'PLANNER')")
     @Operation(summary = "Create shift",
             description = "Creates a new shift. Duration is calculated automatically from start/end times.")
     @ApiResponses({
@@ -95,7 +95,7 @@ public class ShiftController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'HR_MANAGER', 'PLANNER')")
     @Operation(summary = "Update shift", description = "Replaces shift details. Duration is recalculated automatically.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Shift updated",
@@ -110,7 +110,7 @@ public class ShiftController {
     }
 
     @PatchMapping("/{id}/move")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'HR_MANAGER', 'PLANNER')")
     @Operation(summary = "Move shift (drag-and-drop)")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Shift moved",
@@ -125,7 +125,7 @@ public class ShiftController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'HR_MANAGER', 'PLANNER')")
     @Operation(summary = "Delete shift", description = "Permanently removes a shift from the schedule.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Shift deleted",

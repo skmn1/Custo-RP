@@ -89,10 +89,16 @@
     "date": "Date"
   },
   "role": {
-    "admin": "Administrator",
-    "manager": "Manager",
+    "super_admin": "Super Admin",
+    "hr_manager": "HR Manager",
+    "planner": "Planner",
+    "accounting_agent": "Accounting Agent",
+    "stock_manager": "Stock Manager",
+    "pos_manager": "PoS Manager",
     "employee": "Employee",
-    "viewer": "Viewer"
+    "admin": "Super Admin",
+    "manager": "HR Manager",
+    "viewer": "Employee"
   },
   "accessDenied": {
     "title": "Access Denied",

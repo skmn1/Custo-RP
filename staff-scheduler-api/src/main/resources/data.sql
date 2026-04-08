@@ -66,10 +66,10 @@ SELECT setval(pg_get_serial_sequence('point_of_sale', 'id'), 5);
 -- Passwords: Admin@123, Manager@123, Employee@123, Viewer@123
 -- ══════════════════════════════════════════════════════
 INSERT INTO users (id, email, password_hash, first_name, last_name, role, is_active, employee_id, created_at, updated_at) VALUES
-('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'admin@staffscheduler.com',    '$2b$12$cy3eWzkf/hLfSt3mV1zwKOaPs9YPGrpWf/Wd1y5JVEhG87N0qn5LG', 'System',  'Admin',   'admin',    true, NULL,   NOW(), NOW()),
-('b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22', 'manager@staffscheduler.com',  '$2b$12$HpgVI3BNYxGjXbxXEP71N.vo/htl13rBqPRff5M8pXTFPpDoSN9Py', 'Jane',    'Smith',   'manager',  true, 'emp7', NOW(), NOW()),
-('c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a33', 'employee@staffscheduler.com', '$2b$12$6pb0EUl.JzsyeIMJtxnjNeBiR74daytthc31gH3zqVYbk8jAroHKq', 'Sarah',   'Johnson', 'employee', true, 'emp1', NOW(), NOW()),
-('d0eebc99-9c0b-4ef8-bb6d-6bb9bd380a44', 'viewer@staffscheduler.com',   '$2b$12$aC4oZhRL3o18HJkorip6QOuvRlMx2MvG8jX9oWSl1KQwlxVWlyGbO', 'Robert',  'Taylor',  'viewer',   true, 'emp10', NOW(), NOW())
+('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'admin@staffscheduler.com',    '$2b$12$cy3eWzkf/hLfSt3mV1zwKOaPs9YPGrpWf/Wd1y5JVEhG87N0qn5LG', 'System',  'Admin',   'super_admin',      true, NULL,   NOW(), NOW()),
+('b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22', 'manager@staffscheduler.com',  '$2b$12$HpgVI3BNYxGjXbxXEP71N.vo/htl13rBqPRff5M8pXTFPpDoSN9Py', 'Jane',    'Smith',   'hr_manager',       true, 'emp7', NOW(), NOW()),
+('c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a33', 'employee@staffscheduler.com', '$2b$12$6pb0EUl.JzsyeIMJtxnjNeBiR74daytthc31gH3zqVYbk8jAroHKq', 'Sarah',   'Johnson', 'employee',         true, 'emp1', NOW(), NOW()),
+('d0eebc99-9c0b-4ef8-bb6d-6bb9bd380a44', 'viewer@staffscheduler.com',   '$2b$12$aC4oZhRL3o18HJkorip6QOuvRlMx2MvG8jX9oWSl1KQwlxVWlyGbO', 'Robert',  'Taylor',  'employee',         true, 'emp10', NOW(), NOW())
 ON CONFLICT DO NOTHING;
 
 -- ═══════════════════════════════════════════════════════════════════
@@ -184,6 +184,89 @@ UPDATE app_settings SET setting_value = 'true' WHERE category = 'featureFlags' A
 INSERT INTO nav_items (id, route_key, display_order, visible_admin, visible_manager, visible_employee, system_locked, updated_at)
 VALUES (gen_random_uuid(), 'stock', 5, true, true, false, false, NOW())
 ON CONFLICT (route_key) DO NOTHING;
+
+-- ═══════════════════════════════════════════════════════════════════
+-- Role migration: normalise legacy 4-role names → 7 canonical roles
+-- ═══════════════════════════════════════════════════════════════════
+UPDATE users SET role = 'super_admin' WHERE role = 'admin';
+UPDATE users SET role = 'hr_manager'  WHERE role = 'manager';
+UPDATE users SET role = 'employee'    WHERE role = 'viewer';
+
+-- ═══════════════════════════════════════════════════════════════════
+-- Apps registry
+-- ═══════════════════════════════════════════════════════════════════
+INSERT INTO apps (id, display_name, description, created_at) VALUES
+('planning',   'Planning',       'Schedule & shift management',              NOW()),
+('hr',         'HR',             'Employee management & onboarding',         NOW()),
+('payroll',    'Payroll',        'Payroll calculation & export',             NOW()),
+('accounting', 'Accounting',     'Invoices & financial reporting',           NOW()),
+('stock',      'Stock',          'Inventory, purchasing & stocktakes',       NOW()),
+('pos',        'Point of Sale',  'PoS terminal management & daily ops',     NOW()),
+('admin',      'Administration', 'System settings & user management',       NOW())
+ON CONFLICT DO NOTHING;
+
+-- ═══════════════════════════════════════════════════════════════════
+-- App permissions (role × app matrix)
+-- permission_level: full | read | none
+-- ═══════════════════════════════════════════════════════════════════
+INSERT INTO app_permissions (app_id, role, permission_level) VALUES
+-- super_admin: full on everything
+('planning',   'super_admin',      'full'),
+('hr',         'super_admin',      'full'),
+('payroll',    'super_admin',      'full'),
+('accounting', 'super_admin',      'full'),
+('stock',      'super_admin',      'full'),
+('pos',        'super_admin',      'full'),
+('admin',      'super_admin',      'full'),
+-- hr_manager
+('planning',   'hr_manager',       'full'),
+('hr',         'hr_manager',       'full'),
+('payroll',    'hr_manager',       'full'),
+('accounting', 'hr_manager',       'read'),
+('stock',      'hr_manager',       'none'),
+('pos',        'hr_manager',       'none'),
+('admin',      'hr_manager',       'none'),
+-- planner
+('planning',   'planner',          'full'),
+('hr',         'planner',          'read'),
+('payroll',    'planner',          'none'),
+('accounting', 'planner',          'none'),
+('stock',      'planner',          'none'),
+('pos',        'planner',          'none'),
+('admin',      'planner',          'none'),
+-- accounting_agent
+('planning',   'accounting_agent', 'none'),
+('hr',         'accounting_agent', 'read'),
+('payroll',    'accounting_agent', 'full'),
+('accounting', 'accounting_agent', 'full'),
+('stock',      'accounting_agent', 'none'),
+('pos',        'accounting_agent', 'none'),
+('admin',      'accounting_agent', 'none'),
+-- stock_manager
+('planning',   'stock_manager',    'none'),
+('hr',         'stock_manager',    'none'),
+('payroll',    'stock_manager',    'none'),
+('accounting', 'stock_manager',    'none'),
+('stock',      'stock_manager',    'full'),
+('pos',        'stock_manager',    'read'),
+('admin',      'stock_manager',    'none'),
+-- pos_manager
+('planning',   'pos_manager',      'none'),
+('hr',         'pos_manager',      'none'),
+('payroll',    'pos_manager',      'none'),
+('accounting', 'pos_manager',      'read'),
+('stock',      'pos_manager',      'read'),
+('pos',        'pos_manager',      'full'),
+('admin',      'pos_manager',      'none'),
+-- employee
+('planning',   'employee',         'read'),
+('hr',         'employee',         'none'),
+('payroll',    'employee',         'read'),
+('accounting', 'employee',         'none'),
+('stock',      'employee',         'none'),
+('pos',        'employee',         'none'),
+('admin',      'employee',         'none')
+ON CONFLICT DO NOTHING;
 
 -- ═══════════════════════════════════════════════════════════════════
 -- Departments

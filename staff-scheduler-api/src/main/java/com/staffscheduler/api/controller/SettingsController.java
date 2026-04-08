@@ -27,7 +27,7 @@ public class SettingsController {
     // ── App Settings (Admin) ────────────────────────────────────────────
 
     @GetMapping("/settings")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     @Operation(summary = "Get all application settings grouped by category")
     public ResponseEntity<Map<String, List<AppSettingDto>>> getAllSettings() {
         return ResponseEntity.ok(settingsService.getAllSettings());
@@ -46,14 +46,14 @@ public class SettingsController {
     }
 
     @GetMapping("/settings/{category}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'HR_MANAGER')")
     @Operation(summary = "Get settings by category")
     public ResponseEntity<List<AppSettingDto>> getSettingsByCategory(@PathVariable String category) {
         return ResponseEntity.ok(settingsService.getSettingsByCategory(category));
     }
 
     @PutMapping("/settings/{category}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     @Operation(summary = "Update settings for a category (Admin only)")
     public ResponseEntity<List<AppSettingDto>> updateCategory(
             @PathVariable String category,
@@ -64,7 +64,7 @@ public class SettingsController {
     }
 
     @PostMapping("/settings/{category}/reset")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     @Operation(summary = "Reset category to defaults (Admin only)")
     public ResponseEntity<List<AppSettingDto>> resetCategory(@PathVariable String category) {
         return ResponseEntity.ok(settingsService.resetCategory(category));
@@ -79,7 +79,7 @@ public class SettingsController {
     }
 
     @PostMapping("/settings/navigation")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     @Operation(summary = "Save nav item order and visibility (Admin only)")
     public ResponseEntity<List<NavItemDto>> saveNavItems(@RequestBody List<NavItemDto> items) {
         return ResponseEntity.ok(settingsService.saveNavItems(items));

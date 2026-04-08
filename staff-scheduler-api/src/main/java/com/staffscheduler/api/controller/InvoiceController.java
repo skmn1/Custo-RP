@@ -32,7 +32,7 @@ public class InvoiceController {
     private final InvoiceService invoiceService;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'POS_MANAGER', 'ACCOUNTING_AGENT')")
     @Operation(summary = "List AP invoices with optional filters")
     public ResponseEntity<List<InvoiceDto>> list(
             @Parameter(description = "Filter by status") @RequestParam(required = false) String status,
@@ -43,7 +43,7 @@ public class InvoiceController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'POS_MANAGER', 'ACCOUNTING_AGENT')")
     @Operation(summary = "Create AP invoice")
     public ResponseEntity<InvoiceDto> create(
             Authentication authentication,
@@ -53,14 +53,14 @@ public class InvoiceController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'POS_MANAGER', 'ACCOUNTING_AGENT')")
     @Operation(summary = "Get invoice detail with lines and payments")
     public ResponseEntity<InvoiceDto> getById(@PathVariable UUID id) {
         return ResponseEntity.ok(invoiceService.findById(id));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'POS_MANAGER', 'ACCOUNTING_AGENT')")
     @Operation(summary = "Update invoice (received status only)")
     public ResponseEntity<InvoiceDto> update(
             @PathVariable UUID id,
@@ -69,7 +69,7 @@ public class InvoiceController {
     }
 
     @PostMapping("/{id}/approve")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'POS_MANAGER', 'ACCOUNTING_AGENT')")
     @Operation(summary = "Approve invoice — locks invoice and posts stock movements")
     public ResponseEntity<InvoiceDto> approve(
             Authentication authentication,
@@ -79,7 +79,7 @@ public class InvoiceController {
     }
 
     @PostMapping("/{id}/payments")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'POS_MANAGER', 'ACCOUNTING_AGENT')")
     @Operation(summary = "Record payment on an approved invoice")
     public ResponseEntity<InvoicePaymentDto> recordPayment(
             Authentication authentication,
@@ -90,7 +90,7 @@ public class InvoiceController {
     }
 
     @PostMapping("/{id}/duplicate")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'POS_MANAGER', 'ACCOUNTING_AGENT')")
     @Operation(summary = "Duplicate invoice as new received invoice")
     public ResponseEntity<InvoiceDto> duplicate(
             Authentication authentication,
@@ -100,14 +100,14 @@ public class InvoiceController {
     }
 
     @PostMapping("/{id}/cancel")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'POS_MANAGER', 'ACCOUNTING_AGENT')")
     @Operation(summary = "Cancel invoice — sets status to cancelled")
     public ResponseEntity<InvoiceDto> cancel(@PathVariable UUID id) {
         return ResponseEntity.ok(invoiceService.cancelInvoice(id));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'POS_MANAGER', 'ACCOUNTING_AGENT')")
     @Operation(summary = "Delete invoice (received or cancelled status only)")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         invoiceService.deleteInvoice(id);
@@ -115,7 +115,7 @@ public class InvoiceController {
     }
 
     @PostMapping(value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'POS_MANAGER', 'ACCOUNTING_AGENT')")
     @Operation(summary = "Import invoice from PDF via OCR")
     public ResponseEntity<OcrImportResultDto> importPdf(
             @RequestParam("file") MultipartFile file) {
@@ -138,7 +138,7 @@ public class InvoiceController {
     }
 
     @GetMapping("/export")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'POS_MANAGER', 'ACCOUNTING_AGENT')")
     @Operation(summary = "Export invoices as CSV")
     public ResponseEntity<byte[]> export(
             @RequestParam(required = false) String status,

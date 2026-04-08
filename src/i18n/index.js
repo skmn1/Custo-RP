@@ -28,6 +28,7 @@ export const NAMESPACES = [
   'stock',
   'invoices',
   'apps',
+  'roles',
 ];
 
 i18n
