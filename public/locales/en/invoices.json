@@ -114,7 +114,7 @@
     "maxSize": "PDF only, 10 MB max.",
     "submit": "Analyze Document",
     "processing": "Analyzing…",
-    "useFallback": "Use local mode (Tesseract.js) instead of server",
+    "useFallback": "Use local extraction (PDF.js) instead of server",
     "errorFormat": "Only PDF files are accepted",
     "errorSize": "File exceeds the 10 MB limit",
     "errorOcr": "OCR recognition failed",

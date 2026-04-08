@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Document, Page, pdfjs } from 'react-pdf';
@@ -39,7 +39,47 @@ export default function InvoiceReviewView({ ocrResult, pdfFile, onCancel }) {
   const { items: stockItems, fetchItems } = useStock();
   const [numPages, setNumPages] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [scale, setScale] = useState(1.0);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [isPanning, setIsPanning] = useState(false);
+  const panStart = useRef(null);
+  const panOrigin = useRef({ x: 0, y: 0 });
   const [validationErrors, setValidationErrors] = useState({});
+
+  const MIN_SCALE = 0.5;
+  const MAX_SCALE = 4.0;
+  const zoomIn  = useCallback(() => setScale((s) => Math.min(MAX_SCALE, parseFloat((s + 0.25).toFixed(2)))), []);
+  const zoomOut = useCallback(() => setScale((s) => Math.max(MIN_SCALE, parseFloat((s - 0.25).toFixed(2)))), []);
+  const resetZoom = useCallback(() => { setScale(1.0); setPan({ x: 0, y: 0 }); }, []);
+
+  const handleWheelZoom = useCallback((e) => {
+    if (!e.ctrlKey && !e.metaKey) return;
+    e.preventDefault();
+    setScale((s) => {
+      const delta = e.deltaY < 0 ? 0.1 : -0.1;
+      return Math.min(MAX_SCALE, Math.max(MIN_SCALE, parseFloat((s + delta).toFixed(2))));
+    });
+  }, []);
+
+  const handleMouseDown = useCallback((e) => {
+    if (e.button !== 0) return;
+    setIsPanning(true);
+    panStart.current = { x: e.clientX, y: e.clientY };
+    panOrigin.current = pan;
+  }, [pan]);
+
+  const handleMouseMove = useCallback((e) => {
+    if (!isPanning || !panStart.current) return;
+    setPan({
+      x: panOrigin.current.x + (e.clientX - panStart.current.x),
+      y: panOrigin.current.y + (e.clientY - panStart.current.y),
+    });
+  }, [isPanning]);
+
+  const handleMouseUp = useCallback(() => {
+    setIsPanning(false);
+    panStart.current = null;
+  }, []);
 
   const confidence = useMemo(() => ocrResult?.confidence || {}, [ocrResult]);
   const draft = useMemo(() => ocrResult?.draft || {}, [ocrResult]);
@@ -257,36 +297,93 @@ export default function InvoiceReviewView({ ocrResult, pdfFile, onCancel }) {
       {/* Split pane */}
       <div className="flex flex-col lg:flex-row" style={{ height: 'calc(100vh - 180px)' }}>
         {/* Left: PDF Viewer */}
-        <div className="lg:w-1/2 w-full overflow-auto bg-gray-100 border-r border-gray-200 p-4" data-testid="pdf-viewer-pane">
+        <div
+          className="lg:w-1/2 w-full overflow-hidden bg-gray-100 border-r border-gray-200 flex flex-col"
+          data-testid="pdf-viewer-pane"
+        >
           {pdfFile ? (
             <>
-              <div className="flex items-center justify-center gap-2 mb-3">
-                <button
-                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                  disabled={currentPage <= 1}
-                  className="px-2 py-1 rounded bg-white border text-sm disabled:opacity-40"
-                >
-                  ←
-                </button>
-                <span className="text-sm text-gray-600">
-                  {currentPage} / {numPages || '?'}
-                </span>
-                <button
-                  onClick={() => setCurrentPage((p) => Math.min(numPages || 1, p + 1))}
-                  disabled={currentPage >= (numPages || 1)}
-                  className="px-2 py-1 rounded bg-white border text-sm disabled:opacity-40"
-                >
-                  →
-                </button>
+              {/* Toolbar */}
+              <div className="flex items-center justify-between gap-2 px-3 py-2 bg-white border-b border-gray-200 flex-shrink-0">
+                {/* Page nav */}
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => { setCurrentPage((p) => Math.max(1, p - 1)); setPan({ x: 0, y: 0 }); }}
+                    disabled={currentPage <= 1}
+                    className="px-2 py-1 rounded bg-gray-100 border text-sm disabled:opacity-40 hover:bg-gray-200"
+                    title="Page précédente"
+                  >
+                    ←
+                  </button>
+                  <span className="text-sm text-gray-600 px-1 min-w-[4rem] text-center">
+                    {currentPage} / {numPages || '?'}
+                  </span>
+                  <button
+                    onClick={() => { setCurrentPage((p) => Math.min(numPages || 1, p + 1)); setPan({ x: 0, y: 0 }); }}
+                    disabled={currentPage >= (numPages || 1)}
+                    className="px-2 py-1 rounded bg-gray-100 border text-sm disabled:opacity-40 hover:bg-gray-200"
+                    title="Page suivante"
+                  >
+                    →
+                  </button>
+                </div>
+                {/* Zoom controls */}
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={zoomOut}
+                    disabled={scale <= MIN_SCALE}
+                    className="w-7 h-7 flex items-center justify-center rounded bg-gray-100 border text-sm font-bold disabled:opacity-40 hover:bg-gray-200"
+                    title="Zoom arrière (Ctrl+Scroll)"
+                  >
+                    −
+                  </button>
+                  <button
+                    onClick={resetZoom}
+                    className="px-2 py-1 rounded bg-gray-100 border text-xs hover:bg-gray-200 min-w-[3.5rem] text-center"
+                    title="Réinitialiser le zoom"
+                  >
+                    {Math.round(scale * 100)}%
+                  </button>
+                  <button
+                    onClick={zoomIn}
+                    disabled={scale >= MAX_SCALE}
+                    className="w-7 h-7 flex items-center justify-center rounded bg-gray-100 border text-sm font-bold disabled:opacity-40 hover:bg-gray-200"
+                    title="Zoom avant (Ctrl+Scroll)"
+                  >
+                    +
+                  </button>
+                </div>
+                <span className="text-xs text-gray-400 hidden sm:block">Ctrl+Scroll ou glisser</span>
               </div>
-              <Document
-                file={pdfFile}
-                onLoadSuccess={({ numPages: n }) => setNumPages(n)}
-                onLoadError={(err) => console.error('PDF load error:', err)}
-                className="flex justify-center"
+              {/* Canvas area — scrollable + draggable */}
+              <div
+                className="flex-1 overflow-auto select-none"
+                style={{ cursor: isPanning ? 'grabbing' : scale > 1 ? 'grab' : 'default' }}
+                onWheel={handleWheelZoom}
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseUp}
               >
-                <Page pageNumber={currentPage} width={500} />
-              </Document>
+                <div
+                  style={{
+                    transform: `translate(${pan.x}px, ${pan.y}px)`,
+                    transformOrigin: 'top center',
+                    transition: isPanning ? 'none' : 'transform 0.05s',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    padding: '1rem',
+                  }}
+                >
+                  <Document
+                    file={pdfFile}
+                    onLoadSuccess={({ numPages: n }) => setNumPages(n)}
+                    onLoadError={(err) => console.error('PDF load error:', err)}
+                  >
+                    <Page pageNumber={currentPage} scale={scale} renderTextLayer={false} renderAnnotationLayer={false} />
+                  </Document>
+                </div>
+              </div>
             </>
           ) : (
             <div className="flex items-center justify-center h-full text-gray-400">

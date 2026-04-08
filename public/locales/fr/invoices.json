@@ -114,7 +114,7 @@
     "maxSize": "PDF uniquement, 10 Mo max.",
     "submit": "Analyser le document",
     "processing": "Analyse en cours…",
-    "useFallback": "Utiliser le mode local (Tesseract.js) au lieu du serveur",
+    "useFallback": "Utiliser l'extraction locale (PDF.js) au lieu du serveur",
     "errorFormat": "Seuls les fichiers PDF sont acceptés",
     "errorSize": "Le fichier dépasse la limite de 10 Mo",
     "errorOcr": "Échec de la reconnaissance optique",

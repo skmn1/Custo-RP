@@ -60,40 +60,44 @@ export default function InvoiceImportModal({ isOpen, onClose, onImportComplete, 
     setError(null);
   }, [validateFile]);
 
-  const handleTesseractFallback = useCallback(async (pdfFile) => {
+  const handlePdfjsFallback = useCallback(async (pdfFile) => {
     setProgress(20);
     try {
-      const { createWorker } = await import('tesseract.js');
-      setProgress(40);
-
-      // Convert PDF page to image using canvas (simplified: first page only)
       const pdfJS = await import('pdfjs-dist');
       pdfJS.GlobalWorkerOptions.workerSrc = new URL(
         'pdfjs-dist/build/pdf.worker.min.mjs',
         import.meta.url
       ).toString();
+      setProgress(40);
 
       const arrayBuffer = await pdfFile.arrayBuffer();
       const pdf = await pdfJS.getDocument({ data: arrayBuffer }).promise;
-      const page = await pdf.getPage(1);
-      const viewport = page.getViewport({ scale: 2.0 });
-      const canvas = document.createElement('canvas');
-      canvas.width = viewport.width;
-      canvas.height = viewport.height;
-      const ctx = canvas.getContext('2d');
-      await page.render({ canvasContext: ctx, viewport }).promise;
-      setProgress(60);
+      setProgress(55);
 
-      const imageData = canvas.toDataURL('image/png');
-      const worker = await createWorker('fra');
-      setProgress(70);
+      // Extract text from all pages with positional data
+      const allItems = [];
+      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+        const page = await pdf.getPage(pageNum);
+        const content = await page.getTextContent();
+        // Offset y-coordinates by page so items don't overlap across pages
+        const pageOffset = (pageNum - 1) * 10000;
+        content.items.forEach((item) => {
+          if (item.str) {
+            allItems.push({
+              ...item,
+              transform: [
+                item.transform[0], item.transform[1], item.transform[2],
+                item.transform[3], item.transform[4],
+                item.transform[5] + pageOffset,
+              ],
+            });
+          }
+        });
+        setProgress(55 + Math.round((pageNum / pdf.numPages) * 35));
+      }
 
-      const { data } = await worker.recognize(imageData);
-      setProgress(90);
-      await worker.terminate();
-
-      const { mapOcrTextToInvoice } = await import('../../utils/fieldMapper');
-      const result = mapOcrTextToInvoice(data.text);
+      const { mapTextItemsToInvoice } = await import('../../utils/fieldMapper');
+      const result = mapTextItemsToInvoice(allItems);
       setProgress(100);
       return result;
     } catch (err) {
@@ -110,15 +114,15 @@ export default function InvoiceImportModal({ isOpen, onClose, onImportComplete, 
     try {
       let result;
       if (useFallback) {
-        result = await handleTesseractFallback(file);
+        result = await handlePdfjsFallback(file);
       } else {
         try {
           result = await importPdf(file);
           setProgress(100);
         } catch (serverErr) {
-          // Fallback to tesseract.js on server error
+          // Fallback to pdf.js text extraction on server error
           setError(null);
-          result = await handleTesseractFallback(file);
+          result = await handlePdfjsFallback(file);
         }
       }
       onImportComplete(result, file);
@@ -127,7 +131,7 @@ export default function InvoiceImportModal({ isOpen, onClose, onImportComplete, 
     } finally {
       setIsProcessing(false);
     }
-  }, [file, useFallback, importPdf, handleTesseractFallback, onImportComplete]);
+  }, [file, useFallback, importPdf, handlePdfjsFallback, onImportComplete]);
 
   const handleClose = useCallback(() => {
     setFile(null);
