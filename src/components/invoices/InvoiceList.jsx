@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useInvoices } from '../../hooks/useInvoices';
+import InvoiceImportModal from './InvoiceImportModal';
 import Button from '../ui/Button';
 
 const STATUS_COLORS = {
@@ -25,7 +26,7 @@ const formatDate = (dateStr) => {
 export default function InvoiceList() {
   const { t } = useTranslation(['invoices', 'common']);
   const navigate = useNavigate();
-  const { invoices, isLoading, fetchInvoices, exportCsv } = useInvoices();
+  const { invoices, isLoading, fetchInvoices, exportCsv, importPdf } = useInvoices();
 
   const [filters, setFilters] = useState({
     status: '',
@@ -50,6 +51,13 @@ export default function InvoiceList() {
     exportCsv(filters);
   };
 
+  const [showImportModal, setShowImportModal] = useState(false);
+
+  const handleImportComplete = (result, pdfFile) => {
+    setShowImportModal(false);
+    navigate('/invoices/review', { state: { ocrResult: result, pdfFile } });
+  };
+
   return (
     <div data-testid="invoice-list-page" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
@@ -60,11 +68,21 @@ export default function InvoiceList() {
           <Button variant="secondary" onClick={handleExport} data-testid="export-csv-btn">
             {t('invoices:action.export')}
           </Button>
+          <Button variant="secondary" onClick={() => setShowImportModal(true)} data-testid="import-pdf-btn">
+            {t('invoices:import.importBtn')}
+          </Button>
           <Button onClick={() => navigate('/invoices/new')} data-testid="new-invoice-btn">
             {t('invoices:action.new')}
           </Button>
         </div>
       </div>
+
+      <InvoiceImportModal
+        isOpen={showImportModal}
+        onClose={() => setShowImportModal(false)}
+        onImportComplete={handleImportComplete}
+        importPdf={importPdf}
+      />
 
       {/* Filters */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">

@@ -23,6 +23,25 @@ export const invoicesApi = {
 
   duplicate: (id) => api.post(`/invoices/${id}/duplicate`),
 
+  importPdf: async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const url = `${API_BASE_URL}/invoices/import`;
+    const accessToken = localStorage.getItem('accessToken');
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+      },
+      body: formData,
+    });
+    if (!res.ok) {
+      const msg = res.status === 413 ? 'File too large (10MB max)' : `Import failed (${res.status})`;
+      throw new Error(msg);
+    }
+    return res.json();
+  },
+
   exportCsv: async (params = {}) => {
     const q = new URLSearchParams();
     if (params.status) q.set('status', params.status);

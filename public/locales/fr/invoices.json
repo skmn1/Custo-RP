@@ -102,5 +102,22 @@
     "descriptionRequired": "La désignation est requise"
   },
   "poWarning": "Les quantités diffèrent du bon de commande lié",
-  "invoice": "Facture"
+  "invoice": "Facture",
+  "import": {
+    "title": "Importer une facture PDF",
+    "dropzone": "Glissez un fichier PDF ou cliquez pour sélectionner",
+    "maxSize": "PDF uniquement, 10 Mo max.",
+    "submit": "Analyser le document",
+    "processing": "Analyse en cours…",
+    "useFallback": "Utiliser le mode local (Tesseract.js) au lieu du serveur",
+    "errorFormat": "Seuls les fichiers PDF sont acceptés",
+    "errorSize": "Le fichier dépasse la limite de 10 Mo",
+    "errorOcr": "Échec de la reconnaissance optique",
+    "reviewTitle": "Vérification de la facture importée",
+    "confirmImport": "Confirmer et créer la facture",
+    "lowConfidence": "Confiance faible — à vérifier",
+    "highConfidence": "Confiance élevée",
+    "noPdf": "Aucun PDF à afficher",
+    "importBtn": "Importer un PDF"
+  }
 }

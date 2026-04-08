@@ -124,6 +124,20 @@ public class SettingsService {
             dto("anonymousAnalytics", "false", "boolean"),
             dto("cookieConsentBanner", "true", "boolean")
         ));
+        map.put("invoices", List.of(
+            dto("defaultCurrency", "EUR", "string"),
+            dto("defaultTaxRate", "20.00", "number"),
+            dto("defaultPaymentTerms", "30 jours net", "string"),
+            dto("defaultEarlyPaymentDiscount", "0", "number"),
+            dto("defaultLatePaymentRate", "12.37", "number"),
+            dto("autoNumbering", "true", "boolean"),
+            dto("numberPrefix", "FAC-", "string"),
+            dto("requireSiret", "true", "boolean"),
+            dto("requireVatNumber", "false", "boolean"),
+            dto("ocrProvider", "mistral", "string"),
+            dto("ocrConfidenceThreshold", "0.7", "number"),
+            dto("ocrAutoImport", "false", "boolean")
+        ));
         DEFAULTS = Collections.unmodifiableMap(map);
     }
 

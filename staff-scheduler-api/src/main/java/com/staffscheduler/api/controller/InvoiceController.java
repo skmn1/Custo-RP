@@ -3,6 +3,7 @@ package com.staffscheduler.api.controller;
 import com.staffscheduler.api.dto.InvoiceDto;
 import com.staffscheduler.api.dto.InvoiceDto.InvoicePaymentDto;
 import com.staffscheduler.api.dto.InvoiceKpiDto;
+import com.staffscheduler.api.dto.OcrImportResultDto;
 import com.staffscheduler.api.service.InvoiceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -16,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -95,6 +97,29 @@ public class InvoiceController {
             @PathVariable UUID id) {
         UUID userId = UUID.fromString(authentication.getName());
         return ResponseEntity.status(HttpStatus.CREATED).body(invoiceService.duplicate(id, userId));
+    }
+
+    @PostMapping(value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @Operation(summary = "Import invoice from PDF via OCR")
+    public ResponseEntity<OcrImportResultDto> importPdf(
+            @RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.equals("application/pdf")) {
+            return ResponseEntity.badRequest().build();
+        }
+        if (file.getSize() > 10 * 1024 * 1024) {
+            return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).build();
+        }
+        try {
+            OcrImportResultDto result = invoiceService.importFromPdf(file.getBytes());
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping("/export")

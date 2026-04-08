@@ -4,6 +4,7 @@ import com.staffscheduler.api.dto.InvoiceDto;
 import com.staffscheduler.api.dto.InvoiceDto.InvoiceLineDto;
 import com.staffscheduler.api.dto.InvoiceDto.InvoicePaymentDto;
 import com.staffscheduler.api.dto.InvoiceKpiDto;
+import com.staffscheduler.api.dto.OcrImportResultDto;
 import com.staffscheduler.api.exception.ResourceNotFoundException;
 import com.staffscheduler.api.model.*;
 import com.staffscheduler.api.repository.*;
@@ -28,6 +29,8 @@ public class InvoiceService {
     private final InvoicePaymentRepository paymentRepo;
     private final StockMovementRepository movementRepo;
     private final PurchaseOrderRepository poRepo;
+    private final MistralOcrService mistralOcrService;
+    private final OcrFieldMapper ocrFieldMapper;
 
     private static final String PREFIX = "FAC-";
 
@@ -203,6 +206,11 @@ public class InvoiceService {
 
     public List<InvoiceDto> findAllForExport(String status, String supplier, LocalDate dateFrom, LocalDate dateTo) {
         return findAll(status, supplier, dateFrom, dateTo);
+    }
+
+    public OcrImportResultDto importFromPdf(byte[] pdfBytes) throws Exception {
+        String ocrJson = mistralOcrService.extractFromPdf(pdfBytes);
+        return ocrFieldMapper.mapToResult(ocrJson, ocrJson, "mistral");
     }
 
     public InvoiceKpiDto getKpis() {

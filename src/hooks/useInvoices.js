@@ -139,6 +139,20 @@ export function useInvoices() {
     }
   }, []);
 
+  const importPdf = useCallback(async (file) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const result = await invoicesApi.importPdf(file);
+      return result;
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   return {
     invoices,
     invoice,
@@ -155,5 +169,6 @@ export function useInvoices() {
     duplicateInvoice,
     exportCsv,
     fetchKpi,
+    importPdf,
   };
 }

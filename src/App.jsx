@@ -36,6 +36,7 @@ import ReorderQueuePage from './pages/stock/ReorderQueuePage';
 import InvoiceListPage from './pages/invoices/InvoiceListPage';
 import InvoiceFormPage from './pages/invoices/InvoiceFormPage';
 import InvoiceDetailPage from './pages/invoices/InvoiceDetailPage';
+import InvoiceReviewPage from './pages/invoices/InvoiceReviewPage';
 
 const ProtectedLayout = ({ children }) => (
   <AuthGuard>
@@ -93,6 +94,7 @@ const App = () => {
           {/* Invoice management routes */}
           <Route path="/invoices" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><InvoiceListPage /></RoleGuard></ProtectedLayout>} />
           <Route path="/invoices/new" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><InvoiceFormPage /></RoleGuard></ProtectedLayout>} />
+          <Route path="/invoices/review" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><InvoiceReviewPage /></RoleGuard></ProtectedLayout>} />
           <Route path="/invoices/:id" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><InvoiceDetailPage /></RoleGuard></ProtectedLayout>} />
         </Routes>
         </SettingsProvider>

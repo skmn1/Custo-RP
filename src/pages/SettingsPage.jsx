@@ -197,6 +197,7 @@ const CATEGORY_ICONS = {
   dataPrivacy: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
   departments: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4',
   shiftTypes: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
+  invoices: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
 };
 
 // ── Departments Inline CRUD ─────────────────────────────────────────
@@ -574,12 +575,14 @@ const SettingsPage = () => {
         { id: 'swaps', labelKey: 'settings:category.swaps' },
         { id: 'notifications', labelKey: 'settings:category.notifications' },
         { id: 'featureFlags', labelKey: 'settings:category.featureFlags' },
+        { id: 'invoices', labelKey: 'settings:category.invoices' },
       );
     } else if (isManager) {
       cats.push(
         { id: 'scheduling', labelKey: 'settings:category.scheduling' },
         { id: 'language', labelKey: 'settings:category.language' },
         { id: 'notifications', labelKey: 'settings:category.notifications' },
+        { id: 'invoices', labelKey: 'settings:category.invoices' },
       );
     } else {
       cats.push(
@@ -955,6 +958,131 @@ const SettingsPage = () => {
     />
   );
 
+  const renderInvoices = () => {
+    const invoiceSettings = localSettings.invoices || {};
+    const readOnly = !isAdmin;
+    const inputClass = readOnly
+      ? 'block w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-500 cursor-not-allowed'
+      : 'block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500';
+
+    return (
+      <div className="space-y-6" data-testid="invoice-settings-section">
+        <p className="text-sm text-gray-500">{t('settings:invoices.description')}</p>
+
+        {/* Defaults */}
+        <fieldset>
+          <legend className="text-sm font-semibold text-gray-700 mb-3">{t('settings:invoices.defaults')}</legend>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('settings:invoices.defaultCurrency')}</label>
+              <input type="text" value={invoiceSettings.defaultCurrency || 'EUR'} onChange={(e) => handleChange('invoices', 'defaultCurrency', e.target.value)} className={inputClass} readOnly={readOnly} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('settings:invoices.defaultTaxRate')}</label>
+              <input type="number" step="0.01" value={invoiceSettings.defaultTaxRate ?? 20} onChange={(e) => handleChange('invoices', 'defaultTaxRate', e.target.value)} className={inputClass} readOnly={readOnly} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('settings:invoices.defaultPaymentTerms')}</label>
+              <input type="text" value={invoiceSettings.defaultPaymentTerms || ''} onChange={(e) => handleChange('invoices', 'defaultPaymentTerms', e.target.value)} className={inputClass} readOnly={readOnly} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('settings:invoices.defaultEarlyPaymentDiscount')}</label>
+              <input type="number" step="0.01" value={invoiceSettings.defaultEarlyPaymentDiscount ?? 0} onChange={(e) => handleChange('invoices', 'defaultEarlyPaymentDiscount', e.target.value)} className={inputClass} readOnly={readOnly} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('settings:invoices.defaultLatePaymentRate')}</label>
+              <input type="number" step="0.01" value={invoiceSettings.defaultLatePaymentRate ?? 12.37} onChange={(e) => handleChange('invoices', 'defaultLatePaymentRate', e.target.value)} className={inputClass} readOnly={readOnly} />
+            </div>
+          </div>
+        </fieldset>
+
+        {/* Numbering */}
+        <fieldset>
+          <legend className="text-sm font-semibold text-gray-700 mb-3">{t('settings:invoices.numbering')}</legend>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex items-center justify-between sm:col-span-2">
+              <div>
+                <label className="text-sm font-medium text-gray-700">{t('settings:invoices.autoNumbering')}</label>
+                <p className="text-xs text-gray-500">{t('settings:invoices.autoNumbering_desc')}</p>
+              </div>
+              <button type="button" role="switch" aria-checked={!!invoiceSettings.autoNumbering} disabled={readOnly} onClick={() => !readOnly && handleChange('invoices', 'autoNumbering', !invoiceSettings.autoNumbering)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${invoiceSettings.autoNumbering ? 'bg-indigo-600' : 'bg-gray-200'} ${readOnly ? 'opacity-50' : ''}`}>
+                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${invoiceSettings.autoNumbering ? 'translate-x-6' : 'translate-x-1'}`} />
+              </button>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('settings:invoices.numberPrefix')}</label>
+              <input type="text" value={invoiceSettings.numberPrefix || 'FAC-'} onChange={(e) => handleChange('invoices', 'numberPrefix', e.target.value)} className={inputClass} readOnly={readOnly} />
+            </div>
+          </div>
+        </fieldset>
+
+        {/* Validation */}
+        <fieldset>
+          <legend className="text-sm font-semibold text-gray-700 mb-3">{t('settings:invoices.validationRules')}</legend>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <label className="text-sm font-medium text-gray-700">{t('settings:invoices.requireSiret')}</label>
+                <p className="text-xs text-gray-500">{t('settings:invoices.requireSiret_desc')}</p>
+              </div>
+              <button type="button" role="switch" aria-checked={!!invoiceSettings.requireSiret} disabled={readOnly} onClick={() => !readOnly && handleChange('invoices', 'requireSiret', !invoiceSettings.requireSiret)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${invoiceSettings.requireSiret ? 'bg-indigo-600' : 'bg-gray-200'} ${readOnly ? 'opacity-50' : ''}`}>
+                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${invoiceSettings.requireSiret ? 'translate-x-6' : 'translate-x-1'}`} />
+              </button>
+            </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <label className="text-sm font-medium text-gray-700">{t('settings:invoices.requireVatNumber')}</label>
+                <p className="text-xs text-gray-500">{t('settings:invoices.requireVatNumber_desc')}</p>
+              </div>
+              <button type="button" role="switch" aria-checked={!!invoiceSettings.requireVatNumber} disabled={readOnly} onClick={() => !readOnly && handleChange('invoices', 'requireVatNumber', !invoiceSettings.requireVatNumber)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${invoiceSettings.requireVatNumber ? 'bg-indigo-600' : 'bg-gray-200'} ${readOnly ? 'opacity-50' : ''}`}>
+                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${invoiceSettings.requireVatNumber ? 'translate-x-6' : 'translate-x-1'}`} />
+              </button>
+            </div>
+          </div>
+        </fieldset>
+
+        {/* OCR */}
+        <fieldset>
+          <legend className="text-sm font-semibold text-gray-700 mb-3">{t('settings:invoices.ocr')}</legend>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('settings:invoices.ocrProvider')}</label>
+              <select value={invoiceSettings.ocrProvider || 'mistral'} onChange={(e) => handleChange('invoices', 'ocrProvider', e.target.value)} className={inputClass} disabled={readOnly}>
+                <option value="mistral">Mistral AI (mistral-ocr-latest)</option>
+                <option value="tesseract">Tesseract.js (local)</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('settings:invoices.ocrConfidenceThreshold')}</label>
+              <input type="number" step="0.05" min="0" max="1" value={invoiceSettings.ocrConfidenceThreshold ?? 0.7} onChange={(e) => handleChange('invoices', 'ocrConfidenceThreshold', e.target.value)} className={inputClass} readOnly={readOnly} />
+            </div>
+            <div className="flex items-center justify-between sm:col-span-2">
+              <div>
+                <label className="text-sm font-medium text-gray-700">{t('settings:invoices.ocrAutoImport')}</label>
+                <p className="text-xs text-gray-500">{t('settings:invoices.ocrAutoImport_desc')}</p>
+              </div>
+              <button type="button" role="switch" aria-checked={!!invoiceSettings.ocrAutoImport} disabled={readOnly} onClick={() => !readOnly && handleChange('invoices', 'ocrAutoImport', !invoiceSettings.ocrAutoImport)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${invoiceSettings.ocrAutoImport ? 'bg-indigo-600' : 'bg-gray-200'} ${readOnly ? 'opacity-50' : ''}`}>
+                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${invoiceSettings.ocrAutoImport ? 'translate-x-6' : 'translate-x-1'}`} />
+              </button>
+            </div>
+          </div>
+        </fieldset>
+
+        {/* Save/Reset */}
+        {isAdmin && (
+          <div className="flex gap-3 pt-4 border-t border-gray-200">
+            <button type="button" onClick={() => handleSave('invoices')} className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 transition-colors" data-testid="save-invoice-settings-btn">
+              {t('settings:actions.saveChanges')}
+            </button>
+            <button type="button" onClick={() => handleReset('invoices')} className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+              {t('settings:actions.resetSection')}
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   const renderContent = () => {
     switch (activeCategory) {
       case 'general': return renderGeneral();
@@ -966,6 +1094,7 @@ const SettingsPage = () => {
       case 'swaps': return renderSwaps();
       case 'notifications': return renderNotifications();
       case 'featureFlags': return renderFeatureFlags();
+      case 'invoices': return renderInvoices();
       case 'display': return renderDisplay();
       case 'accessibility': return renderAccessibility();
       case 'security': return renderSecurity();

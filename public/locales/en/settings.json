@@ -16,7 +16,31 @@
     "security": "Security",
     "dataPrivacy": "Data & Privacy",
     "departments": "Departments",
-    "shiftTypes": "Shift Types"
+    "shiftTypes": "Shift Types",
+    "invoices": "Invoices"
+  },
+  "invoices": {
+    "description": "Configure default values for supplier invoices and OCR import settings.",
+    "defaults": "Default Values",
+    "defaultCurrency": "Default Currency",
+    "defaultTaxRate": "Default VAT Rate (%)",
+    "defaultPaymentTerms": "Default Payment Terms",
+    "defaultEarlyPaymentDiscount": "Default Early Payment Discount (%)",
+    "defaultLatePaymentRate": "Default Late Payment Penalty Rate (%)",
+    "numbering": "Numbering",
+    "autoNumbering": "Auto-Numbering",
+    "autoNumbering_desc": "Automatically assign a sequential number to new invoices",
+    "numberPrefix": "Number Prefix",
+    "validationRules": "Validation Rules",
+    "requireSiret": "SIRET Required",
+    "requireSiret_desc": "Require supplier SIRET number on every invoice",
+    "requireVatNumber": "VAT Number Required",
+    "requireVatNumber_desc": "Require supplier intra-community VAT number",
+    "ocr": "Optical Character Recognition (OCR)",
+    "ocrProvider": "OCR Provider",
+    "ocrConfidenceThreshold": "OCR Confidence Threshold (0–1)",
+    "ocrAutoImport": "Auto-Import",
+    "ocrAutoImport_desc": "Automatically create invoice if all fields exceed confidence threshold"
   },
   "general": {
     "companyName": "Company Name",

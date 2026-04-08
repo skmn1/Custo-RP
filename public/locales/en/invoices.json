@@ -102,5 +102,22 @@
     "descriptionRequired": "Description is required"
   },
   "poWarning": "Quantities differ from the linked purchase order",
-  "invoice": "Invoice"
+  "invoice": "Invoice",
+  "import": {
+    "title": "Import PDF Invoice",
+    "dropzone": "Drag a PDF file here or click to select",
+    "maxSize": "PDF only, 10 MB max.",
+    "submit": "Analyze Document",
+    "processing": "Analyzing…",
+    "useFallback": "Use local mode (Tesseract.js) instead of server",
+    "errorFormat": "Only PDF files are accepted",
+    "errorSize": "File exceeds the 10 MB limit",
+    "errorOcr": "OCR recognition failed",
+    "reviewTitle": "Review Imported Invoice",
+    "confirmImport": "Confirm & Create Invoice",
+    "lowConfidence": "Low confidence — please review",
+    "highConfidence": "High confidence",
+    "noPdf": "No PDF to display",
+    "importBtn": "Import PDF"
+  }
 }

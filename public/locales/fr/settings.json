@@ -16,7 +16,31 @@
     "security": "Sécurité",
     "dataPrivacy": "Données et confidentialité",
     "departments": "Départements",
-    "shiftTypes": "Types de quarts"
+    "shiftTypes": "Types de quarts",
+    "invoices": "Factures"
+  },
+  "invoices": {
+    "description": "Configurer les paramètres par défaut des factures fournisseurs et l'import OCR.",
+    "defaults": "Valeurs par défaut",
+    "defaultCurrency": "Devise par défaut",
+    "defaultTaxRate": "Taux de TVA par défaut (%)",
+    "defaultPaymentTerms": "Conditions de règlement par défaut",
+    "defaultEarlyPaymentDiscount": "Escompte paiement anticipé par défaut (%)",
+    "defaultLatePaymentRate": "Taux de pénalités de retard par défaut (%)",
+    "numbering": "Numérotation",
+    "autoNumbering": "Numérotation automatique",
+    "autoNumbering_desc": "Attribuer automatiquement un numéro séquentiel aux nouvelles factures",
+    "numberPrefix": "Préfixe de numérotation",
+    "validationRules": "Règles de validation",
+    "requireSiret": "SIRET obligatoire",
+    "requireSiret_desc": "Exiger le numéro SIRET du fournisseur sur chaque facture",
+    "requireVatNumber": "N° TVA obligatoire",
+    "requireVatNumber_desc": "Exiger le numéro de TVA intracommunautaire du fournisseur",
+    "ocr": "Reconnaissance optique (OCR)",
+    "ocrProvider": "Fournisseur OCR",
+    "ocrConfidenceThreshold": "Seuil de confiance OCR (0–1)",
+    "ocrAutoImport": "Import automatique",
+    "ocrAutoImport_desc": "Créer automatiquement la facture si tous les champs dépassent le seuil de confiance"
   },
   "general": {
     "companyName": "Nom de l'entreprise",

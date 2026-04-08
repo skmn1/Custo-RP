@@ -103,6 +103,20 @@ const APP_DEFAULTS = {
     cookieConsentRequired: false,
     privacyPolicyUrl: '',
   },
+  invoices: {
+    defaultCurrency: 'EUR',
+    defaultTaxRate: 20.00,
+    defaultPaymentTerms: '30 jours net',
+    defaultEarlyPaymentDiscount: 0,
+    defaultLatePaymentRate: 12.37,
+    autoNumbering: true,
+    numberPrefix: 'FAC-',
+    requireSiret: true,
+    requireVatNumber: false,
+    ocrProvider: 'mistral',
+    ocrConfidenceThreshold: 0.7,
+    ocrAutoImport: false,
+  },
 };
 
 const PREF_DEFAULTS = {
@@ -138,6 +152,8 @@ const NUMBER_KEYS = new Set([
   'sessionTimeoutMinutes', 'maxLoginAttempts', 'lockoutDurationMinutes',
   'passwordMinLength', 'passwordExpiryDays', 'auditLogRetentionDays',
   'dataRetentionDays', 'fiscalYearStart',
+  'defaultTaxRate', 'defaultEarlyPaymentDiscount', 'defaultLatePaymentRate',
+  'ocrConfidenceThreshold',
 ]);
 
 const BOOLEAN_KEYS = new Set([
@@ -158,6 +174,7 @@ const BOOLEAN_KEYS = new Set([
   'reducedMotion', 'highContrast', 'focusRingAlwaysVisible',
   'myShiftAssignment', 'mySchedulePublished', 'mySwapRequests',
   'myTimeOffDecision', 'myPerformanceReviews',
+  'autoNumbering', 'requireSiret', 'requireVatNumber', 'ocrAutoImport',
 ]);
 
 function coerce(key, value) {
@@ -188,7 +205,7 @@ function groupedApiToState(grouped) {
 // All backend categories
 const ALL_CATEGORIES = [
   'general', 'scheduling', 'payroll', 'timeOff', 'swaps',
-  'notifications', 'featureFlags', 'security', 'dataPrivacy',
+  'notifications', 'featureFlags', 'security', 'dataPrivacy', 'invoices',
 ];
 
 // ── Provider ────────────────────────────────────────────────────────
