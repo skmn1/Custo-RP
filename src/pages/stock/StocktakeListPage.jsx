@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useStock } from '../../hooks/useStock';
-import StockSubNav from '../../components/stock/StockSubNav';
 
 const STATUS_COLORS = {
   open: 'bg-blue-100 text-blue-800',
@@ -22,12 +21,11 @@ const StocktakeListPage = () => {
   const handleStart = async (e) => {
     e.preventDefault();
     const session = await startStocktake({ locationId: startForm.locationId || null });
-    if (session) navigate(`/stock/stocktakes/${session.id}`);
+    if (session) navigate(`/app/stock/stocktakes/${session.id}`);
   };
 
   return (
     <div className="space-y-6">
-      <StockSubNav />
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{t('stocktakes.title')}</h1>
@@ -77,7 +75,7 @@ const StocktakeListPage = () => {
             </thead>
             <tbody className="divide-y divide-gray-200">
               {stocktakes.map((s) => (
-                <tr key={s.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => navigate(`/stock/stocktakes/${s.id}`)}>
+                <tr key={s.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => navigate(`/app/stock/stocktakes/${s.id}`)}>
                   <td className="px-4 py-3 text-sm text-gray-900">
                     {s.stocktakeDate ? new Date(s.stocktakeDate).toLocaleDateString() : '—'}
                   </td>

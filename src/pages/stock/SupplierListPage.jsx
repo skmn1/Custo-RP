@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useStock } from '../../hooks/useStock';
-import StockSubNav from '../../components/stock/StockSubNav';
 
 const SupplierListPage = () => {
   const { t } = useTranslation(['stock', 'common']);
@@ -19,14 +18,13 @@ const SupplierListPage = () => {
 
   return (
     <div className="space-y-6">
-      <StockSubNav />
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{t('suppliers.title')}</h1>
           <p className="text-sm text-gray-500">{t('suppliers.subtitle')}</p>
         </div>
         <button
-          onClick={() => navigate('/stock/suppliers/new')}
+          onClick={() => navigate('/app/stock/suppliers/new')}
           className="px-4 py-2 bg-indigo-600 text-white rounded-md text-sm font-medium hover:bg-indigo-700"
         >
           {t('suppliers.btn.add')}
@@ -61,7 +59,7 @@ const SupplierListPage = () => {
                   <td className="px-4 py-3 text-sm text-gray-500">{s.leadTimeDays != null ? `${s.leadTimeDays}d` : '—'}</td>
                   <td className="px-4 py-3 text-sm text-gray-500">{s.paymentTerms || '—'}</td>
                   <td className="px-4 py-3 text-sm text-right space-x-2">
-                    <button onClick={() => navigate(`/stock/suppliers/${s.id}/edit`)} className="text-indigo-600 hover:text-indigo-900 text-sm">{t('common:edit')}</button>
+                    <button onClick={() => navigate(`/app/stock/suppliers/${s.id}/edit`)} className="text-indigo-600 hover:text-indigo-900 text-sm">{t('common:edit')}</button>
                     <button onClick={() => handleDelete(s.id)} className="text-red-600 hover:text-red-900 text-sm">{t('common:delete')}</button>
                   </td>
                 </tr>

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useStock } from '../../hooks/useStock';
-import StockSubNav from '../../components/stock/StockSubNav';
 
 const SupplierFormPage = () => {
   const { t } = useTranslation(['stock', 'common']);
@@ -37,14 +36,13 @@ const SupplierFormPage = () => {
     } else {
       await createSupplier(data);
     }
-    navigate('/stock/suppliers');
+    navigate('/app/stock/suppliers');
   };
 
   const set = (field) => (e) => setForm({ ...form, [field]: e.target.value });
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
-      <StockSubNav />
       <div>
         <h1 className="text-2xl font-bold text-gray-900">
           {isEdit ? t('suppliers.form.editTitle') : t('suppliers.form.addTitle')}
@@ -108,7 +106,7 @@ const SupplierFormPage = () => {
           <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded-md text-sm font-medium hover:bg-indigo-700">
             {isEdit ? t('common:save') : t('common:create')}
           </button>
-          <button type="button" onClick={() => navigate('/stock/suppliers')}
+          <button type="button" onClick={() => navigate('/app/stock/suppliers')}
             className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-md text-sm font-medium hover:bg-gray-50">
             {t('common:cancel')}
           </button>

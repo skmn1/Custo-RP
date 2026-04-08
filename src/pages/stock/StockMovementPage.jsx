@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { useStock } from '../../hooks/useStock';
-import StockSubNav from '../../components/stock/StockSubNav';
 
 const MOVEMENT_TYPES = ['received', 'consumed', 'wasted', 'adjustment', 'transfer_in', 'transfer_out', 'returned'];
 
@@ -54,7 +53,6 @@ const StockMovementPage = () => {
 
   return (
     <div className="space-y-6">
-      <StockSubNav />
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{t('movements.title')}</h1>

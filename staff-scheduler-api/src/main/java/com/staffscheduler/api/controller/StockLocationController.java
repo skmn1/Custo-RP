@@ -23,14 +23,14 @@ public class StockLocationController {
     private final StockLocationService service;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'STOCK_MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'STOCK_MANAGER', 'POS_MANAGER')")
     @Operation(summary = "List locations")
     public ResponseEntity<List<StockLocationDto>> list() {
         return ResponseEntity.ok(service.findAll());
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'STOCK_MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'STOCK_MANAGER', 'POS_MANAGER')")
     @Operation(summary = "Get location by ID")
     public ResponseEntity<StockLocationDto> getById(@PathVariable UUID id) {
         return ResponseEntity.ok(service.findById(id));

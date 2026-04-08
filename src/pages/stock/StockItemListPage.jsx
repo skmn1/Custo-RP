@@ -3,11 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useStock } from '../../hooks/useStock';
 import Button from '../../components/ui/Button';
-import StockSubNav from '../../components/stock/StockSubNav';
+import StockReadOnlyBanner from '../../components/stock/StockReadOnlyBanner';
+import { useAuth } from '../../hooks/useAuth';
+import { hasPermission } from '../../constants/permissions';
 
 const StockItemListPage = () => {
   const { t } = useTranslation(['stock', 'common']);
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const canWrite = user && hasPermission(user.role, 'stock:create');
   const {
     items, categoriesFlat, locations, isLoading,
     fetchItems, fetchCategoriesFlat, fetchLocations,
@@ -55,15 +59,17 @@ const StockItemListPage = () => {
 
   return (
     <div className="space-y-6">
-      <StockSubNav />
+      <StockReadOnlyBanner />
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{t('items.title')}</h1>
           <p className="text-sm text-gray-500">{t('items.subtitle')}</p>
         </div>
-        <div className="flex gap-2">
-          <Button onClick={() => navigate('/stock/items/new')}>{t('items.btn.add')}</Button>
-        </div>
+        {canWrite && (
+          <div className="flex gap-2">
+            <Button onClick={() => navigate('/app/stock/items/new')}>{t('items.btn.add')}</Button>
+          </div>
+        )}
       </div>
 
       {/* Filters */}
@@ -124,7 +130,7 @@ const StockItemListPage = () => {
                 <tr
                   key={item.id}
                   className="hover:bg-gray-50 cursor-pointer"
-                  onClick={() => navigate(`/stock/items/${item.id}`)}
+                  onClick={() => navigate(`/app/stock/items/${item.id}`)}
                 >
                   <td className="px-4 py-3 text-sm font-mono text-gray-600">{item.sku}</td>
                   <td className="px-4 py-3 text-sm font-medium text-gray-900">
@@ -138,13 +144,15 @@ const StockItemListPage = () => {
                   <td className="px-4 py-3 text-sm text-right">${Number(item.avgCost).toFixed(2)}</td>
                   <td className="px-4 py-3 text-center">{statusBadge(item.stockStatus)}</td>
                   <td className="px-4 py-3 text-right">
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={(e) => { e.stopPropagation(); navigate(`/stock/items/${item.id}/edit`); }}
-                    >
-                      {t('items.btn.edit')}
-                    </Button>
+                    {canWrite && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={(e) => { e.stopPropagation(); navigate(`/app/stock/items/${item.id}/edit`); }}
+                      >
+                        {t('items.btn.edit')}
+                      </Button>
+                    )}
                   </td>
                 </tr>
               ))}

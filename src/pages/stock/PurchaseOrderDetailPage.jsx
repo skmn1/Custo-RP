@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useStock } from '../../hooks/useStock';
-import StockSubNav from '../../components/stock/StockSubNav';
 
 const STATUS_COLORS = {
   draft: 'bg-gray-100 text-gray-800',
@@ -37,7 +36,7 @@ const PurchaseOrderDetailPage = () => {
   const handleCancel = async () => {
     if (!window.confirm(t('purchaseOrders.confirmCancel'))) return;
     await cancelPurchaseOrder(id);
-    navigate('/stock/purchase-orders');
+    navigate('/app/stock/purchase-orders');
   };
 
   const openReceive = (line) => {
@@ -57,11 +56,10 @@ const PurchaseOrderDetailPage = () => {
 
   return (
     <div className="space-y-6">
-      <StockSubNav />
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <button onClick={() => navigate('/stock/purchase-orders')} className="text-sm text-indigo-600 hover:text-indigo-900 mb-1">
+          <button onClick={() => navigate('/app/stock/purchase-orders')} className="text-sm text-indigo-600 hover:text-indigo-900 mb-1">
             ← {t('purchaseOrders.backToList')}
           </button>
           <h1 className="text-2xl font-bold text-gray-900">{po.poNumber}</h1>
@@ -72,7 +70,7 @@ const PurchaseOrderDetailPage = () => {
         <div className="flex gap-2">
           {isDraft && (
             <>
-              <button onClick={() => navigate(`/stock/purchase-orders/${id}/edit`)}
+              <button onClick={() => navigate(`/app/stock/purchase-orders/${id}/edit`)}
                 className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-md text-sm font-medium hover:bg-gray-50">
                 {t('common:edit')}
               </button>

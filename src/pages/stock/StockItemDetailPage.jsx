@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useStock } from '../../hooks/useStock';
 import Button from '../../components/ui/Button';
-import StockSubNav from '../../components/stock/StockSubNav';
 
 const StockItemDetailPage = () => {
   const { t } = useTranslation(['stock', 'common']);
@@ -31,16 +30,15 @@ const StockItemDetailPage = () => {
   const handleDelete = async () => {
     if (window.confirm(t('common.confirm.delete'))) {
       await deleteItem(id);
-      navigate('/stock/items');
+      navigate('/app/stock/items');
     }
   };
 
   return (
     <div className="space-y-6">
-      <StockSubNav />
       <div className="flex items-center justify-between">
         <div>
-          <Button variant="ghost" size="sm" onClick={() => navigate('/stock/items')}>
+          <Button variant="ghost" size="sm" onClick={() => navigate('/app/stock/items')}>
             ← {t('common.btn.back')}
           </Button>
           <h1 className="text-2xl font-bold text-gray-900 mt-2">
@@ -49,7 +47,7 @@ const StockItemDetailPage = () => {
           <p className="text-sm text-gray-500 font-mono">{item.sku}</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="secondary" onClick={() => navigate(`/stock/items/${id}/edit`)}>
+          <Button variant="secondary" onClick={() => navigate(`/app/stock/items/${id}/edit`)}>
             {t('items.btn.edit')}
           </Button>
           <Button variant="danger" onClick={handleDelete}>
@@ -121,7 +119,7 @@ const StockItemDetailPage = () => {
       <div className="bg-white rounded-lg shadow">
         <div className="px-6 py-4 border-b flex items-center justify-between">
           <h3 className="font-semibold text-gray-900">{t('movements.title')}</h3>
-          <Button size="sm" onClick={() => navigate(`/stock/movements?itemId=${id}`)}>
+          <Button size="sm" onClick={() => navigate(`/app/stock/movements?itemId=${id}`)}>
             {t('items.btn.viewLedger')}
           </Button>
         </div>

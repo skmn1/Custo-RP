@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useStock } from '../../hooks/useStock';
-import StockSubNav from '../../components/stock/StockSubNav';
 
 const StockCategoryPage = () => {
   const { t, i18n } = useTranslation(['stock', 'common']);
@@ -60,7 +59,6 @@ const StockCategoryPage = () => {
 
   return (
     <div className="space-y-6">
-      <StockSubNav />
       <div>
         <h1 className="text-2xl font-bold text-gray-900">{t('categories.title')}</h1>
         <p className="text-sm text-gray-500">{t('categories.subtitle')}</p>

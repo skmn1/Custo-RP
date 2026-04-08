@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useStock } from '../../hooks/useStock';
-import StockSubNav from '../../components/stock/StockSubNav';
+import StockReadOnlyBanner from '../../components/stock/StockReadOnlyBanner';
+import { useAuth } from '../../hooks/useAuth';
+import { hasPermission } from '../../constants/permissions';
 
 const StockLocationPage = () => {
   const { t } = useTranslation(['stock', 'common']);
+  const { user } = useAuth();
+  const canWrite = user && hasPermission(user.role, 'stock:create');
   const { locations, isLoading, fetchLocations, createLocation, updateLocation, deleteLocation } = useStock();
 
   const [editing, setEditing] = useState(null);
@@ -39,14 +43,14 @@ const StockLocationPage = () => {
 
   return (
     <div className="space-y-6">
-      <StockSubNav />
+      <StockReadOnlyBanner />
       <div>
         <h1 className="text-2xl font-bold text-gray-900">{t('locations.title')}</h1>
         <p className="text-sm text-gray-500">{t('locations.subtitle')}</p>
       </div>
 
-      {/* Form */}
-      <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-6 space-y-4">
+      {/* Form — only shown to users with write access */}
+      {canWrite && <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-6 space-y-4">
         <h3 className="font-semibold">{editing ? t('locations.form.editTitle') : t('locations.form.addTitle')}</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
@@ -75,7 +79,7 @@ const StockLocationPage = () => {
             </button>
           )}
         </div>
-      </form>
+      </form>}
 
       {/* Table */}
       {isLoading ? (
@@ -100,8 +104,12 @@ const StockLocationPage = () => {
                   <td className="px-4 py-3 text-sm text-gray-500">{loc.description || '—'}</td>
                   <td className="px-4 py-3 text-sm text-gray-500">{loc.sortOrder}</td>
                   <td className="px-4 py-3 text-sm text-right space-x-2">
-                    <button onClick={() => startEdit(loc)} className="text-indigo-600 hover:text-indigo-900 text-sm">{t('common:edit')}</button>
-                    <button onClick={() => handleDelete(loc.id)} className="text-red-600 hover:text-red-900 text-sm">{t('common:delete')}</button>
+                    {canWrite && (
+                      <>
+                        <button onClick={() => startEdit(loc)} className="text-indigo-600 hover:text-indigo-900 text-sm">{t('common:edit')}</button>
+                        <button onClick={() => handleDelete(loc.id)} className="text-red-600 hover:text-red-900 text-sm">{t('common:delete')}</button>
+                      </>
+                    )}
                   </td>
                 </tr>
               ))}

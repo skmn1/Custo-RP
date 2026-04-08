@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useStock } from '../../hooks/useStock';
-import StockSubNav from '../../components/stock/StockSubNav';
 
 const STATUS_COLORS = {
   draft: 'bg-gray-100 text-gray-800',
@@ -26,14 +25,13 @@ const PurchaseOrderListPage = () => {
 
   return (
     <div className="space-y-6">
-      <StockSubNav />
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{t('purchaseOrders.title')}</h1>
           <p className="text-sm text-gray-500">{t('purchaseOrders.subtitle')}</p>
         </div>
         <button
-          onClick={() => navigate('/stock/purchase-orders/new')}
+          onClick={() => navigate('/app/stock/purchase-orders/new')}
           className="px-4 py-2 bg-indigo-600 text-white rounded-md text-sm font-medium hover:bg-indigo-700"
         >
           {t('purchaseOrders.btn.add')}
@@ -67,7 +65,7 @@ const PurchaseOrderListPage = () => {
             </thead>
             <tbody className="divide-y divide-gray-200">
               {filtered.map((po) => (
-                <tr key={po.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => navigate(`/stock/purchase-orders/${po.id}`)}>
+                <tr key={po.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => navigate(`/app/stock/purchase-orders/${po.id}`)}>
                   <td className="px-4 py-3 text-sm font-mono font-medium text-indigo-600">{po.poNumber}</td>
                   <td className="px-4 py-3 text-sm text-gray-900">{po.supplierName || '—'}</td>
                   <td className="px-4 py-3 text-sm">

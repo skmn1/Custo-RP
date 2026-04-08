@@ -3,7 +3,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useStock } from '../../hooks/useStock';
 import Button from '../../components/ui/Button';
-import StockSubNav from '../../components/stock/StockSubNav';
 
 const StockItemFormPage = () => {
   const { t } = useTranslation(['stock', 'common']);
@@ -74,12 +73,11 @@ const StockItemFormPage = () => {
     } else {
       await createItem(data);
     }
-    navigate('/stock/items');
+    navigate('/app/stock/items');
   };
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
-      <StockSubNav />
       <div>
         <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
           ← {t('common.btn.back')}

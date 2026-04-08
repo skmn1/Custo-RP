@@ -23,21 +23,21 @@ public class StockCategoryController {
     private final StockCategoryService service;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'STOCK_MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'STOCK_MANAGER', 'POS_MANAGER')")
     @Operation(summary = "List categories as nested tree")
     public ResponseEntity<List<StockCategoryDto>> list() {
         return ResponseEntity.ok(service.findAll());
     }
 
     @GetMapping("/flat")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'STOCK_MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'STOCK_MANAGER', 'POS_MANAGER')")
     @Operation(summary = "List categories as flat list")
     public ResponseEntity<List<StockCategoryDto>> listFlat() {
         return ResponseEntity.ok(service.findFlat());
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'STOCK_MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'STOCK_MANAGER', 'POS_MANAGER')")
     @Operation(summary = "Get category by ID")
     public ResponseEntity<StockCategoryDto> getById(@PathVariable UUID id) {
         return ResponseEntity.ok(service.findById(id));

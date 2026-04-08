@@ -33,6 +33,7 @@ import StockItemFormPage from './pages/stock/StockItemFormPage';
 import StockMovementPage from './pages/stock/StockMovementPage';
 import StockCategoryPage from './pages/stock/StockCategoryPage';
 import StockLocationPage from './pages/stock/StockLocationPage';
+import StockValuationPage from './pages/stock/StockValuationPage';
 import SupplierListPage from './pages/stock/SupplierListPage';
 import SupplierFormPage from './pages/stock/SupplierFormPage';
 import PurchaseOrderListPage from './pages/stock/PurchaseOrderListPage';
@@ -76,15 +77,16 @@ const accountingSidebar = [
 ];
 
 const stockSidebar = [
-  { label: 'common:nav.stockDashboard', icon: 'Squares2X2Icon', to: '/app/stock' },
-  { label: 'common:nav.items', icon: 'ArchiveBoxIcon', to: '/app/stock/items' },
-  { label: 'common:nav.movements', icon: 'ArrowsRightLeftIcon', to: '/app/stock/movements' },
-  { label: 'common:nav.categories', icon: 'TagIcon', to: '/app/stock/categories' },
-  { label: 'common:nav.locations', icon: 'MapPinIcon', to: '/app/stock/locations' },
-  { label: 'common:nav.suppliers', icon: 'TruckIcon', to: '/app/stock/suppliers' },
-  { label: 'common:nav.purchaseOrders', icon: 'ClipboardDocumentListIcon', to: '/app/stock/purchase-orders' },
-  { label: 'common:nav.stocktakes', icon: 'ClipboardDocumentCheckIcon', to: '/app/stock/stocktakes' },
-  { label: 'common:nav.reorderQueue', icon: 'ArrowPathIcon', to: '/app/stock/reorder-queue' },
+  { label: 'common:nav.stockDashboard',  icon: 'Squares2X2Icon',              to: '/app/stock',                     roles: ['super_admin', 'stock_manager'] },
+  { label: 'common:nav.items',           icon: 'ArchiveBoxIcon',               to: '/app/stock/items',               roles: ['super_admin', 'stock_manager', 'pos_manager'] },
+  { label: 'common:nav.movements',       icon: 'ArrowsRightLeftIcon',          to: '/app/stock/movements',           roles: ['super_admin', 'stock_manager'] },
+  { label: 'common:nav.categories',      icon: 'TagIcon',                      to: '/app/stock/categories',          roles: ['super_admin', 'stock_manager'] },
+  { label: 'common:nav.locations',       icon: 'MapPinIcon',                   to: '/app/stock/locations',           roles: ['super_admin', 'stock_manager', 'pos_manager'] },
+  { label: 'common:nav.valuation',       icon: 'CurrencyEuroIcon',             to: '/app/stock/valuation',           roles: ['super_admin', 'stock_manager'] },
+  { label: 'common:nav.suppliers',       icon: 'TruckIcon',                    to: '/app/stock/suppliers',           roles: ['super_admin', 'stock_manager'] },
+  { label: 'common:nav.purchaseOrders',  icon: 'ClipboardDocumentListIcon',    to: '/app/stock/purchase-orders',     roles: ['super_admin', 'stock_manager'] },
+  { label: 'common:nav.stocktakes',      icon: 'ClipboardDocumentCheckIcon',   to: '/app/stock/stocktakes',          roles: ['super_admin', 'stock_manager'] },
+  { label: 'common:nav.reorderQueue',    icon: 'ArrowPathIcon',                to: '/app/stock/reorder-queue',       roles: ['super_admin', 'stock_manager'] },
 ];
 
 const posSidebar = []; // PoS uses PosAppShell with dynamic sidebar
@@ -164,6 +166,7 @@ const App = () => {
             <Route path="stocktakes" element={<StocktakeListPage />} />
             <Route path="stocktakes/:id" element={<StocktakeSessionPage />} />
             <Route path="reorder-queue" element={<ReorderQueuePage />} />
+            <Route path="valuation" element={<StockValuationPage />} />
           </Route>
 
           {/* ═══ POS app ═══ */}
@@ -195,6 +198,10 @@ const App = () => {
           <Route path="/admin/users" element={<Navigate to="/app/admin/users" replace />} />
           <Route path="/settings" element={<Navigate to="/app/admin/settings" replace />} />
           <Route path="/stock/*" element={<Navigate to="/app/stock" replace />} />
+          <Route path="/suppliers" element={<Navigate to="/app/stock/suppliers" replace />} />
+          <Route path="/suppliers/*" element={<Navigate to="/app/stock/suppliers" replace />} />
+          <Route path="/purchase-orders" element={<Navigate to="/app/stock/purchase-orders" replace />} />
+          <Route path="/purchase-orders/*" element={<Navigate to="/app/stock/purchase-orders" replace />} />
           <Route path="/invoices/*" element={<Navigate to="/app/accounting/invoices" replace />} />
         </Routes>
         </SettingsProvider>
