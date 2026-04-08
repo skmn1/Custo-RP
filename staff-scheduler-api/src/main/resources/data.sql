@@ -72,7 +72,8 @@ INSERT INTO users (id, email, password_hash, first_name, last_name, role, is_act
 ('d0eebc99-9c0b-4ef8-bb6d-6bb9bd380a44', 'viewer@staffscheduler.com',   '$2b$12$aC4oZhRL3o18HJkorip6QOuvRlMx2MvG8jX9oWSl1KQwlxVWlyGbO', 'Robert',  'Taylor',  'employee',         true, 'emp10', NOW(), NOW()),
 ('e0eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 'pos@staffscheduler.com',      '$2b$12$cy3eWzkf/hLfSt3mV1zwKOaPs9YPGrpWf/Wd1y5JVEhG87N0qn5LG', 'Marc',    'Dupont',  'pos_manager',      true, 'emp8',  NOW(), NOW()),
 ('f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a66', 'accounting@staffscheduler.com','$2b$12$cy3eWzkf/hLfSt3mV1zwKOaPs9YPGrpWf/Wd1y5JVEhG87N0qn5LG', 'Sophie',  'Martin',  'accounting_agent', true, NULL,    NOW(), NOW()),
-('a1eebc99-9c0b-4ef8-bb6d-6bb9bd380a77', 'stock@staffscheduler.com',    '$2b$12$cy3eWzkf/hLfSt3mV1zwKOaPs9YPGrpWf/Wd1y5JVEhG87N0qn5LG', 'Pierre',  'Leroy',   'stock_manager',    true, NULL,    NOW(), NOW())
+('a1eebc99-9c0b-4ef8-bb6d-6bb9bd380a77', 'stock@staffscheduler.com',    '$2b$12$cy3eWzkf/hLfSt3mV1zwKOaPs9YPGrpWf/Wd1y5JVEhG87N0qn5LG', 'Pierre',  'Leroy',   'stock_manager',    true, NULL,    NOW(), NOW()),
+('b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a88', 'planner@staffscheduler.com',  '$2b$12$cy3eWzkf/hLfSt3mV1zwKOaPs9YPGrpWf/Wd1y5JVEhG87N0qn5LG', 'Lucas',   'Bernard', 'planner',          true, NULL,    NOW(), NOW())
 ON CONFLICT DO NOTHING;
 
 -- ═══════════════════════════════════════════════════════════════════

@@ -15,16 +15,17 @@ export function PosTerminalProvider({ children }) {
     if (!user) return;
     setIsLoading(true);
     try {
-      const { data } = await posApi.myTerminals();
-      setTerminals(data);
+      const result = await posApi.myTerminals();
+      const list = Array.isArray(result) ? result : [];
+      setTerminals(list);
       // Auto-select first terminal if none selected or current selection invalid
-      if (data.length > 0) {
+      if (list.length > 0) {
         const savedId = localStorage.getItem('pos-selected-terminal');
-        const validSaved = savedId && data.some((t) => String(t.id) === savedId);
+        const validSaved = savedId && list.some((t) => String(t.id) === savedId);
         if (validSaved) {
           setSelectedTerminalId(Number(savedId));
         } else {
-          setSelectedTerminalId(data[0].id);
+          setSelectedTerminalId(list[0].id);
         }
       }
       setError(null);

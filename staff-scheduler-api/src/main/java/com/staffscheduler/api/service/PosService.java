@@ -81,7 +81,7 @@ public class PosService {
      */
     public List<PosDto> findMyTerminals(UUID userId, String role) {
         String normalised = RoleConstants.normalise(role);
-        if ("SUPER_ADMIN".equals(normalised)) {
+        if (RoleConstants.SUPER_ADMIN.equals(normalised)) {
             return findAll(false);
         }
         List<PosAssignment> assignments = posAssignmentRepository.findByUserId(userId);
@@ -100,7 +100,7 @@ public class PosService {
      */
     public void enforceTerminalAccess(UUID userId, String role, Long terminalId) {
         String normalised = RoleConstants.normalise(role);
-        if ("SUPER_ADMIN".equals(normalised)) return;
+        if (RoleConstants.SUPER_ADMIN.equals(normalised)) return;
         if (!posAssignmentRepository.existsByUserIdAndPosTerminalId(userId, terminalId)) {
             throw new AccessDeniedException("You do not have access to this terminal");
         }

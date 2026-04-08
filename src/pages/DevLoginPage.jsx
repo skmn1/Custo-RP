@@ -107,6 +107,23 @@ const TEST_ACCOUNTS = [
       </svg>
     ),
   },
+  {
+    role: 'planner',
+    email: 'planner@staffscheduler.com',
+    password: 'Admin@123',
+    firstName: 'Lucas',
+    lastName: 'Bernard',
+    description: 'Shift planning & scheduling — read-only on HR',
+    color: 'from-violet-500 to-purple-600',
+    bg: 'bg-violet-50 border-violet-200 hover:border-violet-400 hover:bg-violet-100',
+    badge: 'bg-violet-100 text-violet-700',
+    icon: (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+    ),
+  },
 ];
 
 // ── RoleCard ─────────────────────────────────────────────────────────────────
