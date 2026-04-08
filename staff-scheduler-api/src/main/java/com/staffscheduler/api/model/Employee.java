@@ -71,6 +71,12 @@ public class Employee {
     @Column(name = "is_manager", nullable = false)
     private Boolean isManager = false;
 
+    @Column(name = "reports_to_id", length = 50)
+    private String reportsToId;
+
+    @Column(name = "job_title", length = 100)
+    private String jobTitle;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

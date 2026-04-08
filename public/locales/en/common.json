@@ -52,7 +52,22 @@
     "switchToFrench": "Switch to French",
     "switchToEnglish": "Switch to English",
     "notifications": "Notifications",
-    "profile": "Profile"
+    "profile": "Profile",
+    "users": "Users",
+    "stockDashboard": "Dashboard",
+    "items": "Items",
+    "movements": "Movements",
+    "categories": "Categories",
+    "locations": "Locations",
+    "suppliers": "Suppliers",
+    "purchaseOrders": "Purchase Orders",
+    "stocktakes": "Stocktakes",
+    "reorderQueue": "Reorder Queue",
+    "invoiceReview": "Invoice Review",
+    "skills": "Skills",
+    "performance": "Performance",
+    "orgChart": "Org Chart",
+    "documents": "Documents"
   },
   "status": {
     "active": "Active",

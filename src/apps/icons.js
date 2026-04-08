@@ -20,6 +20,10 @@ import {
   ArrowPathIcon as ArrowPathOutline,
   BuildingStorefrontIcon as BuildingStorefrontOutline,
   ChartBarIcon as ChartBarOutline,
+  AcademicCapIcon as AcademicCapOutline,
+  StarIcon as StarOutline,
+  FolderIcon as FolderOutline,
+  RectangleGroupIcon as RectangleGroupOutline,
 } from '@heroicons/react/24/outline';
 
 import {
@@ -40,6 +44,10 @@ import {
   ArrowPathIcon as ArrowPathSolid,
   BuildingStorefrontIcon as BuildingStorefrontSolid,
   ChartBarIcon as ChartBarSolid,
+  AcademicCapIcon as AcademicCapSolid,
+  StarIcon as StarSolid,
+  FolderIcon as FolderSolid,
+  RectangleGroupIcon as RectangleGroupSolid,
 } from '@heroicons/react/24/solid';
 
 const outlineMap = {
@@ -60,6 +68,10 @@ const outlineMap = {
   ArrowPathIcon: ArrowPathOutline,
   BuildingStorefrontIcon: BuildingStorefrontOutline,
   ChartBarIcon: ChartBarOutline,
+  AcademicCapIcon: AcademicCapOutline,
+  StarIcon: StarOutline,
+  FolderIcon: FolderOutline,
+  RectangleGroupIcon: RectangleGroupOutline,
 };
 
 const solidMap = {
@@ -80,6 +92,10 @@ const solidMap = {
   ArrowPathIcon: ArrowPathSolid,
   BuildingStorefrontIcon: BuildingStorefrontSolid,
   ChartBarIcon: ChartBarSolid,
+  AcademicCapIcon: AcademicCapSolid,
+  StarIcon: StarSolid,
+  FolderIcon: FolderSolid,
+  RectangleGroupIcon: RectangleGroupSolid,
 };
 
 export function getIconComponent(iconName, variant = 'outline') {

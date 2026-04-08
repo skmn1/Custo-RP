@@ -45,6 +45,11 @@ import InvoiceListPage from './pages/invoices/InvoiceListPage';
 import InvoiceFormPage from './pages/invoices/InvoiceFormPage';
 import InvoiceDetailPage from './pages/invoices/InvoiceDetailPage';
 import InvoiceReviewPage from './pages/invoices/InvoiceReviewPage';
+import HrSkillsPage from './pages/hr/HrSkillsPage';
+import HrPerformancePage from './pages/hr/HrPerformancePage';
+import OrgChartPage from './pages/hr/OrgChartPage';
+import HrDocumentsPage from './pages/hr/HrDocumentsPage';
+import HrEmployeeDetailPage from './pages/hr/HrEmployeeDetailPage';
 
 /* ─── Sidebar nav items per app ───────────────────────────────── */
 const planningSidebar = [
@@ -54,7 +59,11 @@ const planningSidebar = [
 ];
 
 const hrSidebar = [
-  { label: 'common:nav.employees', icon: 'UsersIcon', to: '/app/hr/employees' },
+  { label: 'common:nav.employees',   icon: 'UsersIcon',           to: '/app/hr/employees'  },
+  { label: 'common:nav.skills',      icon: 'AcademicCapIcon',     to: '/app/hr/skills'     },
+  { label: 'common:nav.performance', icon: 'StarIcon',            to: '/app/hr/performance' },
+  { label: 'common:nav.orgChart',    icon: 'RectangleGroupIcon',  to: '/app/hr/org-chart'  },
+  { label: 'common:nav.documents',   icon: 'FolderIcon',          to: '/app/hr/documents'  },
 ];
 
 const payrollSidebar = [
@@ -113,6 +122,11 @@ const App = () => {
           <Route path="/app/hr" element={<AppShell appId="hr" sidebarItems={hrSidebar} />}>
             <Route index element={<Navigate to="/app/hr/employees" replace />} />
             <Route path="employees" element={<EmployeesPage />} />
+            <Route path="employees/:id" element={<HrEmployeeDetailPage />} />
+            <Route path="skills" element={<HrSkillsPage />} />
+            <Route path="performance" element={<HrPerformancePage />} />
+            <Route path="org-chart" element={<OrgChartPage />} />
+            <Route path="documents" element={<HrDocumentsPage />} />
           </Route>
 
           {/* ═══ Payroll app ═══ */}

@@ -52,7 +52,22 @@
     "switchToFrench": "Passer en français",
     "switchToEnglish": "Passer en anglais",
     "notifications": "Notifications",
-    "profile": "Profil"
+    "profile": "Profil",
+    "users": "Utilisateurs",
+    "stockDashboard": "Tableau de bord",
+    "items": "Articles",
+    "movements": "Mouvements",
+    "categories": "Catégories",
+    "locations": "Emplacements",
+    "suppliers": "Fournisseurs",
+    "purchaseOrders": "Bons de commande",
+    "stocktakes": "Inventaires",
+    "reorderQueue": "File de réapprovisionnement",
+    "invoiceReview": "Révision des factures",
+    "skills": "Compétences",
+    "performance": "Performance",
+    "orgChart": "Organigramme",
+    "documents": "Documents"
   },
   "status": {
     "active": "Actif",

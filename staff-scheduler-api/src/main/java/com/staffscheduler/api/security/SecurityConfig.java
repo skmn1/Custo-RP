@@ -33,6 +33,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/settings/public").permitAll()
                 .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/api-docs/**", "/v3/api-docs/**").permitAll()
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                // Document file download uses HMAC-signed URL as auth — no JWT required
+                .requestMatchers(HttpMethod.GET, "/api/hr/documents/*/file").permitAll()
                 // Admin-only endpoints
                 .requestMatchers("/api/admin/**").hasRole("SUPER_ADMIN")
                 .requestMatchers("/api/**").authenticated()
