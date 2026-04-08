@@ -34,6 +34,11 @@ spring:
     serialization:
       write-dates-as-timestamps: false
 
+  messages:
+    basename: messages
+    encoding: UTF-8
+    fallback-to-system-locale: false
+
 server:
   port: 8080
 
