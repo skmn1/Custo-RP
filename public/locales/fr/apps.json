@@ -1,0 +1,55 @@
+{
+  "launcher": {
+    "welcome": "Bon retour, {{name}}",
+    "subtitle": "Sélectionnez une application pour commencer",
+    "comingSoon": "Bientôt disponible"
+  },
+  "switcher": {
+    "title": "Changer d'application"
+  },
+  "accessDenied": {
+    "title": "Accès refusé",
+    "message": "Vous n'avez pas la permission d'accéder à cette application.",
+    "back": "Retour à l'accueil"
+  },
+  "planning": {
+    "name": "Planning",
+    "description": "Horaires, quarts et disponibilités"
+  },
+  "hr": {
+    "name": "RH",
+    "description": "Employés, compétences et performance"
+  },
+  "payroll": {
+    "name": "Paie",
+    "description": "Bulletins de paie, retenues et primes"
+  },
+  "accounting": {
+    "name": "Comptabilité",
+    "description": "Factures, paiements et rapports"
+  },
+  "stock": {
+    "name": "Stock",
+    "description": "Inventaire, fournisseurs et commandes"
+  },
+  "pos": {
+    "name": "Point de vente",
+    "description": "Terminaux, sessions et ventes"
+  },
+  "admin": {
+    "name": "Admin",
+    "description": "Utilisateurs, rôles et paramètres système"
+  },
+  "sidebar": {
+    "collapse": "Réduire la barre latérale",
+    "expand": "Développer la barre latérale"
+  },
+  "topbar": {
+    "openSwitcher": "Ouvrir le sélecteur d'applications",
+    "notifications": "Notifications",
+    "userMenu": "Menu utilisateur",
+    "profile": "Mon profil",
+    "switchLanguage": "Changer de langue",
+    "logout": "Déconnexion"
+  }
+}

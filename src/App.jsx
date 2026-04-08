@@ -3,8 +3,8 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './hooks/useAuth';
 import { SettingsProvider } from './hooks/useSettings';
 import AuthGuard from './components/ui/AuthGuard';
-import RoleGuard from './components/ui/RoleGuard';
-import Navbar from './components/Navbar';
+import AppShell from './components/shell/AppShell';
+import AppLauncherPage from './pages/AppLauncherPage';
 import Dashboard from './pages/Dashboard';
 import SchedulerPage from './pages/SchedulerPage';
 import EmployeesPage from './pages/EmployeesPage';
@@ -38,14 +38,46 @@ import InvoiceFormPage from './pages/invoices/InvoiceFormPage';
 import InvoiceDetailPage from './pages/invoices/InvoiceDetailPage';
 import InvoiceReviewPage from './pages/invoices/InvoiceReviewPage';
 
-const ProtectedLayout = ({ children }) => (
-  <AuthGuard>
-    <div className="min-h-screen bg-gray-50">
-      <Navbar />
-      {children}
-    </div>
-  </AuthGuard>
-);
+/* ─── Sidebar nav items per app ───────────────────────────────── */
+const planningSidebar = [
+  { label: 'common:nav.dashboard', icon: 'Squares2X2Icon', to: '/app/planning' },
+  { label: 'common:nav.scheduler', icon: 'CalendarDaysIcon', to: '/app/planning/scheduler' },
+  { label: 'common:nav.employees', icon: 'UsersIcon', to: '/app/planning/employees' },
+];
+
+const hrSidebar = [
+  { label: 'common:nav.employees', icon: 'UsersIcon', to: '/app/hr/employees' },
+];
+
+const payrollSidebar = [
+  { label: 'common:nav.payroll', icon: 'BanknotesIcon', to: '/app/payroll' },
+];
+
+const accountingSidebar = [
+  { label: 'common:nav.invoices', icon: 'ReceiptPercentIcon', to: '/app/accounting/invoices' },
+  { label: 'common:nav.invoiceReview', icon: 'ClipboardDocumentCheckIcon', to: '/app/accounting/invoices/review' },
+];
+
+const stockSidebar = [
+  { label: 'common:nav.stockDashboard', icon: 'Squares2X2Icon', to: '/app/stock' },
+  { label: 'common:nav.items', icon: 'ArchiveBoxIcon', to: '/app/stock/items' },
+  { label: 'common:nav.movements', icon: 'ArrowsRightLeftIcon', to: '/app/stock/movements' },
+  { label: 'common:nav.categories', icon: 'TagIcon', to: '/app/stock/categories' },
+  { label: 'common:nav.locations', icon: 'MapPinIcon', to: '/app/stock/locations' },
+  { label: 'common:nav.suppliers', icon: 'TruckIcon', to: '/app/stock/suppliers' },
+  { label: 'common:nav.purchaseOrders', icon: 'ClipboardDocumentListIcon', to: '/app/stock/purchase-orders' },
+  { label: 'common:nav.stocktakes', icon: 'ClipboardDocumentCheckIcon', to: '/app/stock/stocktakes' },
+  { label: 'common:nav.reorderQueue', icon: 'ArrowPathIcon', to: '/app/stock/reorder-queue' },
+];
+
+const posSidebar = [
+  { label: 'common:nav.terminals', icon: 'ShoppingCartIcon', to: '/app/pos' },
+];
+
+const adminSidebar = [
+  { label: 'common:nav.users', icon: 'UsersIcon', to: '/app/admin/users' },
+  { label: 'common:nav.settings', icon: 'Cog8ToothIcon', to: '/app/admin/settings' },
+];
 
 const App = () => {
   return (
@@ -59,44 +91,84 @@ const App = () => {
           <Route path="/login/classic" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
 
-          {/* Protected routes */}
-          <Route path="/" element={<ProtectedLayout><Navigate to="/scheduler" replace /></ProtectedLayout>} />
-          <Route path="/dashboard" element={<ProtectedLayout><Dashboard /></ProtectedLayout>} />
-          <Route path="/scheduler" element={<ProtectedLayout><SchedulerPage /></ProtectedLayout>} />
-          <Route path="/employees" element={<ProtectedLayout><EmployeesPage /></ProtectedLayout>} />
-          <Route path="/payroll" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager', 'employee']}><PayrollPage /></RoleGuard></ProtectedLayout>} />
-          <Route path="/pos" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><PosListPage /></RoleGuard></ProtectedLayout>} />
-          <Route path="/pos/:id" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><PosDetailPage /></RoleGuard></ProtectedLayout>} />
-          <Route path="/admin/users" element={<ProtectedLayout><RoleGuard roles={['admin']}><UserManagementPage /></RoleGuard></ProtectedLayout>} />
-          <Route path="/settings" element={<ProtectedLayout><SettingsPage /></ProtectedLayout>} />
-          <Route path="/access-denied" element={<ProtectedLayout><AccessDeniedPage /></ProtectedLayout>} />
+          {/* App Launcher (home) */}
+          <Route path="/" element={<AuthGuard><AppLauncherPage /></AuthGuard>} />
+          <Route path="/access-denied" element={<AuthGuard><AccessDeniedPage /></AuthGuard>} />
 
-          {/* Stock management routes */}
-          <Route path="/stock" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><StockDashboardPage /></RoleGuard></ProtectedLayout>} />
-          <Route path="/stock/items" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><StockItemListPage /></RoleGuard></ProtectedLayout>} />
-          <Route path="/stock/items/new" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><StockItemFormPage /></RoleGuard></ProtectedLayout>} />
-          <Route path="/stock/items/:id" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><StockItemDetailPage /></RoleGuard></ProtectedLayout>} />
-          <Route path="/stock/items/:id/edit" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><StockItemFormPage /></RoleGuard></ProtectedLayout>} />
-          <Route path="/stock/movements" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><StockMovementPage /></RoleGuard></ProtectedLayout>} />
-          <Route path="/stock/categories" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><StockCategoryPage /></RoleGuard></ProtectedLayout>} />
-          <Route path="/stock/locations" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><StockLocationPage /></RoleGuard></ProtectedLayout>} />
-          <Route path="/stock/suppliers" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><SupplierListPage /></RoleGuard></ProtectedLayout>} />
-          <Route path="/stock/suppliers/new" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><SupplierFormPage /></RoleGuard></ProtectedLayout>} />
-          <Route path="/stock/suppliers/:id/edit" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><SupplierFormPage /></RoleGuard></ProtectedLayout>} />
-          <Route path="/stock/purchase-orders" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><PurchaseOrderListPage /></RoleGuard></ProtectedLayout>} />
-          <Route path="/stock/purchase-orders/new" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><PurchaseOrderFormPage /></RoleGuard></ProtectedLayout>} />
-          <Route path="/stock/purchase-orders/:id" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><PurchaseOrderDetailPage /></RoleGuard></ProtectedLayout>} />
-          <Route path="/stock/purchase-orders/:id/edit" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><PurchaseOrderFormPage /></RoleGuard></ProtectedLayout>} />
-          <Route path="/stock/stocktakes" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><StocktakeListPage /></RoleGuard></ProtectedLayout>} />
-          <Route path="/stock/stocktakes/:id" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><StocktakeSessionPage /></RoleGuard></ProtectedLayout>} />
-          <Route path="/stock/reorder-queue" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><ReorderQueuePage /></RoleGuard></ProtectedLayout>} />
+          {/* ═══ Planning app ═══ */}
+          <Route path="/app/planning" element={<AppShell appId="planning" sidebarItems={planningSidebar} />}>
+            <Route index element={<Dashboard />} />
+            <Route path="scheduler" element={<SchedulerPage />} />
+            <Route path="employees" element={<EmployeesPage />} />
+          </Route>
 
-          {/* Invoice management routes */}
-          <Route path="/invoices" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><InvoiceListPage /></RoleGuard></ProtectedLayout>} />
-          <Route path="/invoices/new" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><InvoiceFormPage /></RoleGuard></ProtectedLayout>} />
-          <Route path="/invoices/review" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><InvoiceReviewPage /></RoleGuard></ProtectedLayout>} />
-          <Route path="/invoices/:id/edit" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><InvoiceFormPage /></RoleGuard></ProtectedLayout>} />
-          <Route path="/invoices/:id" element={<ProtectedLayout><RoleGuard roles={['admin', 'manager']}><InvoiceDetailPage /></RoleGuard></ProtectedLayout>} />
+          {/* ═══ HR app ═══ */}
+          <Route path="/app/hr" element={<AppShell appId="hr" sidebarItems={hrSidebar} />}>
+            <Route index element={<Navigate to="/app/hr/employees" replace />} />
+            <Route path="employees" element={<EmployeesPage />} />
+          </Route>
+
+          {/* ═══ Payroll app ═══ */}
+          <Route path="/app/payroll" element={<AppShell appId="payroll" sidebarItems={payrollSidebar} />}>
+            <Route index element={<PayrollPage />} />
+          </Route>
+
+          {/* ═══ Accounting app ═══ */}
+          <Route path="/app/accounting" element={<AppShell appId="accounting" sidebarItems={accountingSidebar} />}>
+            <Route index element={<Navigate to="/app/accounting/invoices" replace />} />
+            <Route path="invoices" element={<InvoiceListPage />} />
+            <Route path="invoices/new" element={<InvoiceFormPage />} />
+            <Route path="invoices/review" element={<InvoiceReviewPage />} />
+            <Route path="invoices/:id/edit" element={<InvoiceFormPage />} />
+            <Route path="invoices/:id" element={<InvoiceDetailPage />} />
+          </Route>
+
+          {/* ═══ Stock app ═══ */}
+          <Route path="/app/stock" element={<AppShell appId="stock" sidebarItems={stockSidebar} />}>
+            <Route index element={<StockDashboardPage />} />
+            <Route path="items" element={<StockItemListPage />} />
+            <Route path="items/new" element={<StockItemFormPage />} />
+            <Route path="items/:id" element={<StockItemDetailPage />} />
+            <Route path="items/:id/edit" element={<StockItemFormPage />} />
+            <Route path="movements" element={<StockMovementPage />} />
+            <Route path="categories" element={<StockCategoryPage />} />
+            <Route path="locations" element={<StockLocationPage />} />
+            <Route path="suppliers" element={<SupplierListPage />} />
+            <Route path="suppliers/new" element={<SupplierFormPage />} />
+            <Route path="suppliers/:id/edit" element={<SupplierFormPage />} />
+            <Route path="purchase-orders" element={<PurchaseOrderListPage />} />
+            <Route path="purchase-orders/new" element={<PurchaseOrderFormPage />} />
+            <Route path="purchase-orders/:id" element={<PurchaseOrderDetailPage />} />
+            <Route path="purchase-orders/:id/edit" element={<PurchaseOrderFormPage />} />
+            <Route path="stocktakes" element={<StocktakeListPage />} />
+            <Route path="stocktakes/:id" element={<StocktakeSessionPage />} />
+            <Route path="reorder-queue" element={<ReorderQueuePage />} />
+          </Route>
+
+          {/* ═══ POS app ═══ */}
+          <Route path="/app/pos" element={<AppShell appId="pos" sidebarItems={posSidebar} />}>
+            <Route index element={<PosListPage />} />
+            <Route path=":id" element={<PosDetailPage />} />
+          </Route>
+
+          {/* ═══ Admin app ═══ */}
+          <Route path="/app/admin" element={<AppShell appId="admin" sidebarItems={adminSidebar} />}>
+            <Route index element={<Navigate to="/app/admin/users" replace />} />
+            <Route path="users" element={<UserManagementPage />} />
+            <Route path="settings" element={<SettingsPage />} />
+          </Route>
+
+          {/* ─── Legacy route redirects ─── */}
+          <Route path="/dashboard" element={<Navigate to="/app/planning" replace />} />
+          <Route path="/scheduler" element={<Navigate to="/app/planning/scheduler" replace />} />
+          <Route path="/employees" element={<Navigate to="/app/planning/employees" replace />} />
+          <Route path="/payroll" element={<Navigate to="/app/payroll" replace />} />
+          <Route path="/pos" element={<Navigate to="/app/pos" replace />} />
+          <Route path="/pos/:id" element={<Navigate to="/app/pos/:id" replace />} />
+          <Route path="/admin/users" element={<Navigate to="/app/admin/users" replace />} />
+          <Route path="/settings" element={<Navigate to="/app/admin/settings" replace />} />
+          <Route path="/stock/*" element={<Navigate to="/app/stock" replace />} />
+          <Route path="/invoices/*" element={<Navigate to="/app/accounting/invoices" replace />} />
         </Routes>
         </SettingsProvider>
       </AuthProvider>

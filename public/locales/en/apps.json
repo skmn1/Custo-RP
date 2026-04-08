@@ -1,0 +1,55 @@
+{
+  "launcher": {
+    "welcome": "Welcome back, {{name}}",
+    "subtitle": "Select an application to get started",
+    "comingSoon": "Coming soon"
+  },
+  "switcher": {
+    "title": "Switch Application"
+  },
+  "accessDenied": {
+    "title": "Access Denied",
+    "message": "You do not have permission to access this application.",
+    "back": "Back to Home"
+  },
+  "planning": {
+    "name": "Planning",
+    "description": "Schedules, shifts, and availability"
+  },
+  "hr": {
+    "name": "HR",
+    "description": "Employees, skills, and performance"
+  },
+  "payroll": {
+    "name": "Payroll",
+    "description": "Pay runs, slips, and deductions"
+  },
+  "accounting": {
+    "name": "Accounting",
+    "description": "Invoices, payments, and reports"
+  },
+  "stock": {
+    "name": "Stock",
+    "description": "Inventory, suppliers, and orders"
+  },
+  "pos": {
+    "name": "Point of Sale",
+    "description": "Terminals, sessions, and sales"
+  },
+  "admin": {
+    "name": "Admin",
+    "description": "Users, roles, and system settings"
+  },
+  "sidebar": {
+    "collapse": "Collapse sidebar",
+    "expand": "Expand sidebar"
+  },
+  "topbar": {
+    "openSwitcher": "Open app switcher",
+    "notifications": "Notifications",
+    "userMenu": "User menu",
+    "profile": "My Profile",
+    "switchLanguage": "Switch Language",
+    "logout": "Log out"
+  }
+}

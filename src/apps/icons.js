@@ -1,0 +1,80 @@
+/**
+ * Maps app registry icon names to Heroicons components.
+ * Outline variants for default state, solid for active state.
+ */
+import {
+  CalendarDaysIcon as CalendarDaysOutline,
+  UsersIcon as UsersOutline,
+  BanknotesIcon as BanknotesOutline,
+  ReceiptPercentIcon as ReceiptPercentOutline,
+  ArchiveBoxIcon as ArchiveBoxOutline,
+  ShoppingCartIcon as ShoppingCartOutline,
+  Cog8ToothIcon as Cog8ToothOutline,
+  Squares2X2Icon as Squares2X2Outline,
+  ClipboardDocumentCheckIcon as ClipboardDocCheckOutline,
+  ArrowsRightLeftIcon as ArrowsRightLeftOutline,
+  TagIcon as TagOutline,
+  MapPinIcon as MapPinOutline,
+  TruckIcon as TruckOutline,
+  ClipboardDocumentListIcon as ClipboardDocListOutline,
+  ArrowPathIcon as ArrowPathOutline,
+} from '@heroicons/react/24/outline';
+
+import {
+  CalendarDaysIcon as CalendarDaysSolid,
+  UsersIcon as UsersSolid,
+  BanknotesIcon as BanknotesSolid,
+  ReceiptPercentIcon as ReceiptPercentSolid,
+  ArchiveBoxIcon as ArchiveBoxSolid,
+  ShoppingCartIcon as ShoppingCartSolid,
+  Cog8ToothIcon as Cog8ToothSolid,
+  Squares2X2Icon as Squares2X2Solid,
+  ClipboardDocumentCheckIcon as ClipboardDocCheckSolid,
+  ArrowsRightLeftIcon as ArrowsRightLeftSolid,
+  TagIcon as TagSolid,
+  MapPinIcon as MapPinSolid,
+  TruckIcon as TruckSolid,
+  ClipboardDocumentListIcon as ClipboardDocListSolid,
+  ArrowPathIcon as ArrowPathSolid,
+} from '@heroicons/react/24/solid';
+
+const outlineMap = {
+  CalendarDaysIcon: CalendarDaysOutline,
+  UsersIcon: UsersOutline,
+  BanknotesIcon: BanknotesOutline,
+  ReceiptPercentIcon: ReceiptPercentOutline,
+  ArchiveBoxIcon: ArchiveBoxOutline,
+  ShoppingCartIcon: ShoppingCartOutline,
+  Cog8ToothIcon: Cog8ToothOutline,
+  Squares2X2Icon: Squares2X2Outline,
+  ClipboardDocumentCheckIcon: ClipboardDocCheckOutline,
+  ArrowsRightLeftIcon: ArrowsRightLeftOutline,
+  TagIcon: TagOutline,
+  MapPinIcon: MapPinOutline,
+  TruckIcon: TruckOutline,
+  ClipboardDocumentListIcon: ClipboardDocListOutline,
+  ArrowPathIcon: ArrowPathOutline,
+};
+
+const solidMap = {
+  CalendarDaysIcon: CalendarDaysSolid,
+  UsersIcon: UsersSolid,
+  BanknotesIcon: BanknotesSolid,
+  ReceiptPercentIcon: ReceiptPercentSolid,
+  ArchiveBoxIcon: ArchiveBoxSolid,
+  ShoppingCartIcon: ShoppingCartSolid,
+  Cog8ToothIcon: Cog8ToothSolid,
+  Squares2X2Icon: Squares2X2Solid,
+  ClipboardDocumentCheckIcon: ClipboardDocCheckSolid,
+  ArrowsRightLeftIcon: ArrowsRightLeftSolid,
+  TagIcon: TagSolid,
+  MapPinIcon: MapPinSolid,
+  TruckIcon: TruckSolid,
+  ClipboardDocumentListIcon: ClipboardDocListSolid,
+  ArrowPathIcon: ArrowPathSolid,
+};
+
+export function getIconComponent(iconName, variant = 'outline') {
+  const map = variant === 'solid' ? solidMap : outlineMap;
+  return map[iconName] || null;
+}
