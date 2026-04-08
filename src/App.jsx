@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './hooks/useAuth';
 import { SettingsProvider } from './hooks/useSettings';
+import { DarkModeProvider } from './hooks/useDarkMode.jsx';
 import AuthGuard from './components/ui/AuthGuard';
 import AppShell from './components/shell/AppShell';
 import AppLauncherPage from './pages/AppLauncherPage';
@@ -81,6 +82,7 @@ const adminSidebar = [
 
 const App = () => {
   return (
+    <DarkModeProvider>
     <BrowserRouter>
       <AuthProvider>
         <SettingsProvider>
@@ -173,6 +175,7 @@ const App = () => {
         </SettingsProvider>
       </AuthProvider>
     </BrowserRouter>
+    </DarkModeProvider>
   );
 };
 

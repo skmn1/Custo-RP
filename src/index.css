@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Enable class-based dark mode for Tailwind v4 */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* Reset and base styles */
 * {
   box-sizing: border-box;
@@ -113,3 +116,90 @@ html.focus-visible-always *:focus {
   outline: 2px solid #4f46e5 !important;
   outline-offset: 2px !important;
 }
+
+/* ── Dark mode global overrides ───────────────────────────────── */
+/*
+ * Rather than adding dark: classes to every component, we use global overrides
+ * under .dark so existing Tailwind utility classes flip automatically.
+ * Specificity: 0-1-0 (class) defeats Tailwind's :where() 0-0-0 utilities.
+ */
+
+/* Page canvas */
+.dark body {
+  background-color: #0f172a; /* slate-950 */
+  color: #f1f5f9;            /* slate-100 */
+}
+
+/* --- Backgrounds --- */
+.dark .bg-white     { background-color: #1e293b !important; } /* slate-800 */
+.dark .bg-gray-50   { background-color: #0f172a !important; } /* slate-950 */
+.dark .bg-gray-100  { background-color: #1e293b !important; } /* slate-800 */
+.dark .bg-gray-200  { background-color: #334155 !important; } /* slate-700 */
+
+/* Navbar translucent */
+.dark .bg-white\/95 { background-color: rgba(15, 23, 42, 0.95) !important; }
+.dark .bg-white\/90 { background-color: rgba(15, 23, 42, 0.90) !important; }
+
+/* --- Text --- */
+.dark .text-gray-900 { color: #f1f5f9 !important; } /* slate-100 */
+.dark .text-gray-800 { color: #e2e8f0 !important; } /* slate-200 */
+.dark .text-gray-700 { color: #cbd5e1 !important; } /* slate-300 */
+.dark .text-gray-600 { color: #94a3b8 !important; } /* slate-400 */
+.dark .text-gray-500 { color: #64748b !important; } /* slate-500 */
+
+/* --- Borders --- */
+.dark .border-gray-100 { border-color: #334155 !important; } /* slate-700 */
+.dark .border-gray-200 { border-color: #334155 !important; } /* slate-700 */
+.dark .border-gray-300 { border-color: #475569 !important; } /* slate-600 */
+
+/* --- Shadows: darken so cards appear subtly elevated --- */
+.dark .shadow-sm { box-shadow: 0 1px 2px 0 rgba(0,0,0,0.5) !important; }
+.dark .shadow    { box-shadow: 0 1px 3px 0 rgba(0,0,0,0.5), 0 1px 2px -1px rgba(0,0,0,0.5) !important; }
+.dark .shadow-md { box-shadow: 0 4px 6px -1px rgba(0,0,0,0.5), 0 2px 4px -2px rgba(0,0,0,0.5) !important; }
+.dark .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5), 0 4px 6px -4px rgba(0,0,0,0.5) !important; }
+.dark .shadow-xl { box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5), 0 8px 10px -6px rgba(0,0,0,0.5) !important; }
+
+/* --- Form inputs --- */
+.dark input,
+.dark textarea,
+.dark select {
+  background-color: #1e293b;   /* slate-800 */
+  color: #f1f5f9;              /* slate-100 */
+  border-color: #475569;       /* slate-600 */
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #64748b;
+}
+
+/* --- Hover states --- */
+.dark .hover\:bg-gray-50:hover   { background-color: #1e293b !important; }
+.dark .hover\:bg-gray-100:hover  { background-color: #334155 !important; }
+
+/* --- Dropdown menus / modals --- */
+.dark [role="menu"],
+.dark [role="dialog"],
+.dark .absolute.bg-white,
+.dark .fixed.bg-white {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+/* --- Tables --- */
+.dark .divide-gray-200 > * + *   { border-color: #334155 !important; }
+.dark .divide-y > * + *          { border-color: #334155 !important; }
+.dark thead.bg-gray-50           { background-color: #1e293b !important; }
+.dark tbody.bg-white             { background-color: #0f172a !important; }
+.dark tr:hover                   { background-color: #1e293b !important; }
+
+/* --- Scrollbar in dark mode --- */
+.dark .schedule-container::-webkit-scrollbar-track { background: #1e293b; }
+.dark .schedule-container::-webkit-scrollbar-thumb { background: #475569; }
+.dark .schedule-container::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+/* Smooth transition when switching modes */
+html {
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
