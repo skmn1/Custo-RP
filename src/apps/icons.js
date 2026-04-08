@@ -75,7 +75,9 @@ const outlineMap = {
   FolderIcon: FolderOutline,
   RectangleGroupIcon: RectangleGroupOutline,
   CurrencyEuroIcon: CurrencyEuroOutline,
-}; = {
+};
+
+const solidMap = {
   CalendarDaysIcon: CalendarDaysSolid,
   UsersIcon: UsersSolid,
   BanknotesIcon: BanknotesSolid,
