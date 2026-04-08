@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.staffscheduler.api.dto.EmployeeDto;
 import com.staffscheduler.api.dto.PosDetailDto;
 import com.staffscheduler.api.dto.PosDto;
+import com.staffscheduler.api.dto.PosProfileDto;
 import com.staffscheduler.api.exception.DuplicateResourceException;
 import com.staffscheduler.api.exception.ResourceNotFoundException;
 import com.staffscheduler.api.model.Employee;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -27,6 +29,7 @@ public class PosService {
     private final PosRepository posRepository;
     private final EmployeeRepository employeeRepository;
     private final EmployeeService employeeService;
+    private final IncidentService incidentService;
     private final ObjectMapper objectMapper;
 
     // ── Queries ──
@@ -193,6 +196,65 @@ public class PosService {
         ));
     }
 
+    // ── Profile ──
+
+    public PosProfileDto getProfile(Long id) {
+        PointOfSale pos = posRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("PoS", String.valueOf(id)));
+        return toProfileDto(pos);
+    }
+
+    @Transactional
+    public PosProfileDto updateProfile(Long id, PosProfileDto dto) {
+        PointOfSale pos = posRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("PoS", String.valueOf(id)));
+
+        if (dto.getAddressLine1() != null) pos.setAddressLine1(dto.getAddressLine1());
+        if (dto.getAddressLine2() != null) pos.setAddressLine2(dto.getAddressLine2());
+        if (dto.getCity() != null) pos.setCity(dto.getCity());
+        if (dto.getPostalCode() != null) pos.setPostalCode(dto.getPostalCode());
+        if (dto.getCountry() != null) pos.setCountry(dto.getCountry());
+        if (dto.getSiret() != null) pos.setSiret(dto.getSiret());
+        if (dto.getVatNumber() != null) pos.setVatNumber(dto.getVatNumber());
+        if (dto.getNafCode() != null) pos.setNafCode(dto.getNafCode());
+        if (dto.getLegalName() != null) pos.setLegalName(dto.getLegalName());
+        if (dto.getLaunchedAt() != null) pos.setLaunchedAt(LocalDate.parse(dto.getLaunchedAt()));
+        if (dto.getPhone() != null) pos.setPhone(dto.getPhone());
+
+        pos.setUpdatedAt(Instant.now());
+        return toProfileDto(posRepository.save(pos));
+    }
+
+    @Transactional
+    public PosProfileDto updatePhoto(Long id, String photoKey) {
+        PointOfSale pos = posRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("PoS", String.valueOf(id)));
+        pos.setPhotoKey(photoKey);
+        pos.setUpdatedAt(Instant.now());
+        return toProfileDto(posRepository.save(pos));
+    }
+
+    @Transactional
+    public PosProfileDto updateGoogleReviews(Long id, PosProfileDto dto) {
+        PointOfSale pos = posRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("PoS", String.valueOf(id)));
+
+        if (dto.getGooglePlaceId() != null) pos.setGooglePlaceId(dto.getGooglePlaceId());
+        if (dto.getGoogleMapsUrl() != null) pos.setGoogleMapsUrl(dto.getGoogleMapsUrl());
+        if (dto.getGoogleRating() != null) pos.setGoogleRating(dto.getGoogleRating());
+        if (dto.getGoogleReviewCount() != null) pos.setGoogleReviewCount(dto.getGoogleReviewCount());
+        if (dto.getGoogleReviewsJson() != null) {
+            try {
+                pos.setGoogleReviewsJson(objectMapper.writeValueAsString(dto.getGoogleReviewsJson()));
+            } catch (JsonProcessingException e) {
+                throw new IllegalArgumentException("Invalid Google reviews JSON");
+            }
+        }
+        pos.setGoogleReviewsUpdatedAt(Instant.now());
+        pos.setUpdatedAt(Instant.now());
+        return toProfileDto(posRepository.save(pos));
+    }
+
     // ── Helpers ──
 
     private void applyDto(PointOfSale entity, PosDto dto) {
@@ -243,6 +305,58 @@ public class PosService {
         Set<String> validTypes = Set.of("BUTCHER", "GROCERY", "FAST_FOOD", "MIXED");
         if (type == null || !validTypes.contains(type)) {
             throw new IllegalArgumentException("Invalid type. Must be one of: BUTCHER, GROCERY, FAST_FOOD, MIXED");
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private PosProfileDto toProfileDto(PointOfSale pos) {
+        Object reviews = null;
+        if (pos.getGoogleReviewsJson() != null) {
+            try {
+                reviews = objectMapper.readValue(pos.getGoogleReviewsJson(), Object.class);
+            } catch (JsonProcessingException ignored) {}
+        }
+
+        return PosProfileDto.builder()
+                .id(pos.getId())
+                .name(pos.getName())
+                .address(pos.getAddress())
+                .type(pos.getType())
+                .phone(pos.getPhone())
+                .managerId(pos.getManagerId())
+                .managerName(pos.getManagerName())
+                .openingHours(parseOpeningHoursGeneric(pos.getOpeningHoursJson()))
+                .isActive(pos.getIsActive())
+                .createdAt(pos.getCreatedAt() != null ? pos.getCreatedAt().toString() : null)
+                .updatedAt(pos.getUpdatedAt() != null ? pos.getUpdatedAt().toString() : null)
+                .photoUrl(pos.getPhotoKey())
+                .addressLine1(pos.getAddressLine1())
+                .addressLine2(pos.getAddressLine2())
+                .city(pos.getCity())
+                .postalCode(pos.getPostalCode())
+                .country(pos.getCountry())
+                .siret(pos.getSiret())
+                .vatNumber(pos.getVatNumber())
+                .nafCode(pos.getNafCode())
+                .legalName(pos.getLegalName())
+                .launchedAt(pos.getLaunchedAt() != null ? pos.getLaunchedAt().toString() : null)
+                .googlePlaceId(pos.getGooglePlaceId())
+                .googleMapsUrl(pos.getGoogleMapsUrl())
+                .googleRating(pos.getGoogleRating())
+                .googleReviewCount(pos.getGoogleReviewCount())
+                .googleReviewsJson(reviews)
+                .googleReviewsUpdatedAt(pos.getGoogleReviewsUpdatedAt() != null ? pos.getGoogleReviewsUpdatedAt().toString() : null)
+                .openIncidentsCount(incidentService.countOpen(pos.getId()))
+                .build();
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> parseOpeningHoursGeneric(String json) {
+        if (json == null || json.isBlank()) return null;
+        try {
+            return objectMapper.readValue(json, new TypeReference<Map<String, Object>>() {});
+        } catch (JsonProcessingException e) {
+            return null;
         }
     }
 }

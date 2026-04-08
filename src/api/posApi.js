@@ -48,4 +48,46 @@ export const posApi = {
   /** List employees available to be assigned to a PoS. */
   listAvailableEmployees: (posId) =>
     api.get(`/pos/${posId}/available-employees`),
+
+  // ── Profile ──
+
+  /** Get terminal profile (identity + fiscal + Google reviews). */
+  getProfile: (id) => api.get(`/pos/${id}/profile`),
+
+  /** Update terminal profile (identity + fiscal fields). */
+  updateProfile: (id, data) => api.put(`/pos/${id}/profile`, data),
+
+  /** Update terminal photo key. */
+  updatePhoto: (id, photoKey) => api.put(`/pos/${id}/photo`, { photoKey }),
+
+  /** Update Google reviews data. */
+  updateGoogleReviews: (id, data) => api.put(`/pos/${id}/google-reviews`, data),
+
+  // ── Incidents ──
+
+  /** List incidents for a terminal with optional filters. */
+  listIncidents: (posId, { status, category, severity } = {}) => {
+    const params = new URLSearchParams();
+    if (status) params.set('status', status);
+    if (category) params.set('category', category);
+    if (severity) params.set('severity', severity);
+    const qs = params.toString();
+    return api.get(`/pos/${posId}/incidents${qs ? `?${qs}` : ''}`);
+  },
+
+  /** Declare a new incident. */
+  createIncident: (posId, data) => api.post(`/pos/${posId}/incidents`, data),
+
+  /** Get a single incident. */
+  getIncident: (posId, incidentId) => api.get(`/pos/${posId}/incidents/${incidentId}`),
+
+  /** Update an incident. */
+  updateIncident: (posId, incidentId, data) =>
+    api.put(`/pos/${posId}/incidents/${incidentId}`, data),
+
+  /** List all incidents across terminals (admin). */
+  listAllIncidents: (status) => {
+    const qs = status ? `?status=${status}` : '';
+    return api.get(`/pos/admin/incidents${qs}`);
+  },
 };

@@ -141,6 +141,16 @@ const PosDetailPage = () => {
         </button>
         <div className="flex items-center gap-2">
           <button
+            onClick={() => navigate(`/pos/${id}/profile`)}
+            data-testid="pos-detail-profile-btn"
+            className="text-indigo-600 hover:text-indigo-800 p-2 rounded-full hover:bg-indigo-50 transition-colors"
+            title={t('pos:btn.profile')}
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+          </button>
+          <button
             onClick={handleEdit}
             data-testid="pos-detail-edit-btn"
             className="text-indigo-600 hover:text-indigo-800 p-2 rounded-full hover:bg-indigo-50 transition-colors"

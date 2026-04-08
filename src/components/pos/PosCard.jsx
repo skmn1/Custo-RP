@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { POS_TYPE_COLORS } from '../../constants/pos';
 
@@ -6,6 +7,7 @@ const TYPE_KEY_MAP = { BUTCHER: 'butcher', GROCERY: 'grocery', FAST_FOOD: 'fastF
 
 const PosCard = ({ pos, onView, onEdit, onDelete }) => {
   const { t } = useTranslation(['pos']);
+  const navigate = useNavigate();
   const typeColor = POS_TYPE_COLORS[pos.type] || POS_TYPE_COLORS.MIXED;
 
   return (
@@ -72,6 +74,15 @@ const PosCard = ({ pos, onView, onEdit, onDelete }) => {
 
       {/* Action buttons */}
       <div className="flex items-center gap-1 pt-4 border-t border-gray-100">
+        <button
+          onClick={() => navigate(`/pos/${pos.id}/profile`)}
+          className="text-indigo-600 hover:text-indigo-800 p-1.5 rounded-full hover:bg-indigo-50 transition-colors"
+          title={t('pos:btn.profile')}
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+        </button>
         <button
           onClick={() => onView(pos)}
           className="text-indigo-600 hover:text-indigo-800 p-1.5 rounded-full hover:bg-indigo-50 transition-colors"

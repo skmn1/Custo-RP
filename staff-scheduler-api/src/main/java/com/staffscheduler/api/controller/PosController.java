@@ -2,9 +2,12 @@ package com.staffscheduler.api.controller;
 
 import com.staffscheduler.api.dto.EmployeeDto;
 import com.staffscheduler.api.dto.ErrorResponse;
+import com.staffscheduler.api.dto.IncidentDto;
 import com.staffscheduler.api.dto.PosDetailDto;
 import com.staffscheduler.api.dto.PosDto;
+import com.staffscheduler.api.dto.PosProfileDto;
 import com.staffscheduler.api.service.EmployeeService;
+import com.staffscheduler.api.service.IncidentService;
 import com.staffscheduler.api.service.PosService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -24,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/pos")
@@ -34,6 +38,7 @@ public class PosController {
 
     private final PosService posService;
     private final EmployeeService employeeService;
+    private final IncidentService incidentService;
 
     // ── PoS CRUD ──
 
@@ -237,5 +242,82 @@ public class PosController {
             @RequestBody Map<String, String> body) {
         String newEmpId = body.get("newEmpId");
         return ResponseEntity.ok(posService.swapEmployee(posId, currentEmpId, newEmpId));
+    }
+
+    // ── Profile endpoints ──
+
+    @GetMapping("/{id}/profile")
+    @Operation(summary = "Get terminal profile", description = "Returns extended profile with identity, fiscal, and Google review data.")
+    public ResponseEntity<PosProfileDto> getProfile(@PathVariable Long id) {
+        return ResponseEntity.ok(posService.getProfile(id));
+    }
+
+    @PutMapping("/{id}/profile")
+    @Operation(summary = "Update terminal profile", description = "Updates identity and fiscal fields.")
+    public ResponseEntity<PosProfileDto> updateProfile(@PathVariable Long id, @RequestBody PosProfileDto dto) {
+        return ResponseEntity.ok(posService.updateProfile(id, dto));
+    }
+
+    @PutMapping("/{id}/photo")
+    @Operation(summary = "Update terminal photo", description = "Updates the terminal photo key.")
+    public ResponseEntity<PosProfileDto> updatePhoto(@PathVariable Long id, @RequestBody Map<String, String> body) {
+        String photoKey = body.get("photoKey");
+        return ResponseEntity.ok(posService.updatePhoto(id, photoKey));
+    }
+
+    @PutMapping("/{id}/google-reviews")
+    @Operation(summary = "Update Google reviews", description = "Updates Google Place ID, rating, reviews data.")
+    public ResponseEntity<PosProfileDto> updateGoogleReviews(@PathVariable Long id, @RequestBody PosProfileDto dto) {
+        return ResponseEntity.ok(posService.updateGoogleReviews(id, dto));
+    }
+
+    // ── Incident endpoints ──
+
+    @GetMapping("/{posId}/incidents")
+    @Operation(summary = "List incidents for a terminal")
+    public ResponseEntity<List<IncidentDto>> listIncidents(
+            @PathVariable Long posId,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String severity) {
+        return ResponseEntity.ok(incidentService.findByTerminal(posId, status, category, severity));
+    }
+
+    @PostMapping("/{posId}/incidents")
+    @Operation(summary = "Declare a new incident")
+    public ResponseEntity<IncidentDto> createIncident(
+            @PathVariable Long posId,
+            @Valid @RequestBody IncidentDto dto) {
+        Long userId = dto.getDeclaredBy() != null ? dto.getDeclaredBy() : 1L;
+        String userName = dto.getDeclaredByName() != null ? dto.getDeclaredByName() : "System";
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(incidentService.create(posId, dto, userId, userName));
+    }
+
+    @GetMapping("/{posId}/incidents/{incidentId}")
+    @Operation(summary = "Get incident detail")
+    public ResponseEntity<IncidentDto> getIncident(
+            @PathVariable Long posId,
+            @PathVariable UUID incidentId) {
+        return ResponseEntity.ok(incidentService.findById(incidentId));
+    }
+
+    @PutMapping("/{posId}/incidents/{incidentId}")
+    @Operation(summary = "Update an incident")
+    public ResponseEntity<IncidentDto> updateIncident(
+            @PathVariable Long posId,
+            @PathVariable UUID incidentId,
+            @RequestBody IncidentDto dto) {
+        return ResponseEntity.ok(incidentService.update(incidentId, dto));
+    }
+
+    // ── Admin cross-terminal incidents ──
+
+    @GetMapping("/admin/incidents")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "List all incidents across terminals (admin)")
+    public ResponseEntity<List<IncidentDto>> listAllIncidents(
+            @RequestParam(required = false) String status) {
+        return ResponseEntity.ok(incidentService.findAll(status));
     }
 }

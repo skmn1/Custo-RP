@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import java.time.Instant;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "point_of_sale")
@@ -43,6 +44,61 @@ public class PointOfSale {
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
 
+    // ── Profile extension fields ──
+
+    @Column(name = "photo_key", length = 500)
+    private String photoKey;
+
+    @Column(name = "address_line1", length = 200)
+    private String addressLine1;
+
+    @Column(name = "address_line2", length = 200)
+    private String addressLine2;
+
+    @Column(length = 100)
+    private String city;
+
+    @Column(name = "postal_code", length = 20)
+    private String postalCode;
+
+    @Column(length = 100)
+    private String country;
+
+    @Column(length = 14)
+    private String siret;
+
+    @Column(name = "vat_number", length = 30)
+    private String vatNumber;
+
+    @Column(name = "naf_code", length = 10)
+    private String nafCode;
+
+    @Column(name = "legal_name", length = 200)
+    private String legalName;
+
+    @Column(name = "launched_at")
+    private LocalDate launchedAt;
+
+    // ── Google Reviews fields ──
+
+    @Column(name = "google_place_id", length = 200)
+    private String googlePlaceId;
+
+    @Column(name = "google_maps_url", length = 500)
+    private String googleMapsUrl;
+
+    @Column(name = "google_rating", columnDefinition = "NUMERIC(2,1)")
+    private Double googleRating;
+
+    @Column(name = "google_review_count")
+    private Integer googleReviewCount;
+
+    @Column(name = "google_reviews_json", columnDefinition = "TEXT")
+    private String googleReviewsJson;
+
+    @Column(name = "google_reviews_updated_at")
+    private Instant googleReviewsUpdatedAt;
+
     @Column(name = "created_at")
     private Instant createdAt;
 
@@ -52,6 +108,7 @@ public class PointOfSale {
     @PrePersist
     private void onCreate() {
         if (createdAt == null) createdAt = Instant.now();
+        if (country == null) country = "France";
     }
 
     @PreUpdate
