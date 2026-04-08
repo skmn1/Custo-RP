@@ -224,17 +224,24 @@
 
   "myTerminals.title": "My Terminals",
   "myTerminals.subtitle": "Select a terminal to manage",
+  "myTerminals.titleAdmin": "All Terminals",
+  "myTerminals.subtitleAdmin": "All active PoS terminals — click one to manage it",
   "myTerminals.empty": "No terminals assigned",
   "myTerminals.emptyDesc": "Contact your administrator to get assigned to a terminal.",
+  "myTerminals.emptyAdmin": "No terminals configured",
+  "myTerminals.emptyDescAdmin": "No PoS terminals have been created yet. Create one to get started.",
+  "myTerminals.manageAssignments": "Manage Access",
   "myTerminals.openDashboard": "Open Dashboard",
 
   "terminalSelector.label": "Terminal",
 
   "sidebar.myTerminals": "My Terminals",
+  "sidebar.allTerminals": "All Terminals",
   "sidebar.dashboard": "Dashboard",
   "sidebar.terminal": "Terminal Detail",
   "sidebar.stockLookup": "Stock Lookup",
   "sidebar.reports": "Reports",
+  "sidebar.manageAccess": "Manage Access",
 
   "dashboard.subtitle": "Terminal overview and key metrics",
   "dashboard.openIncidents": "Open Incidents",
@@ -272,5 +279,15 @@
   "reports.noHourlyData": "No hourly data available yet.",
   "reports.periodSummaryFor": "Period: {{from}} to {{to}}",
   "reports.totalTransactions": "Total Transactions",
-  "reports.avgDailySales": "Avg Daily Sales"
+  "reports.avgDailySales": "Avg Daily Sales",
+
+  "assignments.title": "Terminal Access Management",
+  "assignments.subtitle": "Assign PoS terminals to pos_manager accounts",
+  "assignments.posManagers": "PoS Managers",
+  "assignments.noPosManagers": "No active PoS manager accounts found.",
+  "assignments.selectUser": "Select a user to manage their terminal access",
+  "assignments.assignedTerminals": "Assigned Terminals",
+  "assignments.availableTerminals": "Available Terminals",
+  "assignments.noAssignedTerminals": "No terminals assigned to this user.",
+  "assignments.allAssigned": "All terminals are already assigned to this user."
 }

@@ -220,19 +220,7 @@
   "incident.action.resolve": "Marquer comme résolu",
   "incident.action.close": "Fermer l'incident",
 
-  "myTerminals.title": "Mes terminaux",
-  "myTerminals.subtitle": "Sélectionnez un terminal à gérer",
-  "myTerminals.empty": "Aucun terminal assigné",
-  "myTerminals.emptyDesc": "Contactez votre administrateur pour être assigné à un terminal.",
-  "myTerminals.openDashboard": "Ouvrir le tableau de bord",
-
   "terminalSelector.label": "Terminal",
-
-  "sidebar.myTerminals": "Mes terminaux",
-  "sidebar.dashboard": "Tableau de bord",
-  "sidebar.terminal": "Détail du terminal",
-  "sidebar.stockLookup": "Recherche stock",
-  "sidebar.reports": "Rapports",
 
   "dashboard.subtitle": "Aperçu du terminal et indicateurs clés",
   "dashboard.openIncidents": "Incidents ouverts",
@@ -270,5 +258,34 @@
   "reports.noHourlyData": "Aucune donnée horaire disponible.",
   "reports.periodSummaryFor": "Période : {{from}} au {{to}}",
   "reports.totalTransactions": "Total transactions",
-  "reports.avgDailySales": "Ventes quotidiennes moyennes"
+  "reports.avgDailySales": "Ventes quotidiennes moyennes",
+
+  "myTerminals.title": "Mes terminaux",
+  "myTerminals.subtitle": "Sélectionnez un terminal à gérer",
+  "myTerminals.titleAdmin": "Tous les terminaux",
+  "myTerminals.subtitleAdmin": "Tous les terminaux PoS actifs — cliquez pour gérer",
+  "myTerminals.empty": "Aucun terminal assigné",
+  "myTerminals.emptyDesc": "Contactez votre administrateur pour être assigné à un terminal.",
+  "myTerminals.emptyAdmin": "Aucun terminal configuré",
+  "myTerminals.emptyDescAdmin": "Aucun terminal PoS n'a encore été créé.",
+  "myTerminals.manageAssignments": "Gérer les accès",
+  "myTerminals.openDashboard": "Ouvrir le tableau de bord",
+
+  "sidebar.myTerminals": "Mes terminaux",
+  "sidebar.allTerminals": "Tous les terminaux",
+  "sidebar.dashboard": "Tableau de bord",
+  "sidebar.terminal": "Détail du terminal",
+  "sidebar.stockLookup": "Recherche de stock",
+  "sidebar.reports": "Rapports",
+  "sidebar.manageAccess": "Gérer les accès",
+
+  "assignments.title": "Gestion des accès aux terminaux",
+  "assignments.subtitle": "Assignez des terminaux PoS aux comptes pos_manager",
+  "assignments.posManagers": "Responsables PoS",
+  "assignments.noPosManagers": "Aucun responsable PoS actif trouvé.",
+  "assignments.selectUser": "Sélectionnez un utilisateur pour gérer ses accès aux terminaux",
+  "assignments.assignedTerminals": "Terminaux assignés",
+  "assignments.availableTerminals": "Terminaux disponibles",
+  "assignments.noAssignedTerminals": "Aucun terminal assigné à cet utilisateur.",
+  "assignments.allAssigned": "Tous les terminaux sont déjà assignés à cet utilisateur."
 }

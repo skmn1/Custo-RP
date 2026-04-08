@@ -1,12 +1,15 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ShoppingCartIcon, MapPinIcon, PhoneIcon, UserIcon } from '@heroicons/react/24/outline';
+import { ShoppingCartIcon, MapPinIcon, PhoneIcon, UserIcon, UsersIcon } from '@heroicons/react/24/outline';
 import { usePosTerminal } from '../hooks/usePosTerminal';
+import { useAuth } from '../hooks/useAuth';
 
 const MyTerminalsPage = () => {
   const { t } = useTranslation(['pos', 'common']);
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const isSuperAdmin = user?.role === 'super_admin';
   const { terminals, isLoading, error } = usePosTerminal();
 
   if (isLoading) {
@@ -30,24 +33,44 @@ const MyTerminalsPage = () => {
       <div className="text-center py-16">
         <ShoppingCartIcon className="mx-auto h-12 w-12 text-gray-400" />
         <h3 className="mt-3 text-lg font-semibold text-gray-900 dark:text-gray-100">
-          {t('pos:myTerminals.empty')}
+          {t(isSuperAdmin ? 'pos:myTerminals.emptyAdmin' : 'pos:myTerminals.empty')}
         </h3>
         <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-          {t('pos:myTerminals.emptyDesc')}
+          {t(isSuperAdmin ? 'pos:myTerminals.emptyDescAdmin' : 'pos:myTerminals.emptyDesc')}
         </p>
+        {isSuperAdmin && (
+          <Link
+            to="/app/pos/admin/assignments"
+            className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-teal-600 text-white text-sm font-medium rounded-lg hover:bg-teal-700 transition-colors"
+          >
+            <UsersIcon className="w-4 h-4" />
+            {t('pos:myTerminals.manageAssignments')}
+          </Link>
+        )}
       </div>
     );
   }
 
   return (
     <div>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-          {t('pos:myTerminals.title')}
-        </h1>
-        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-          {t('pos:myTerminals.subtitle')}
-        </p>
+      <div className="mb-6 flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            {t(isSuperAdmin ? 'pos:myTerminals.titleAdmin' : 'pos:myTerminals.title')}
+          </h1>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            {t(isSuperAdmin ? 'pos:myTerminals.subtitleAdmin' : 'pos:myTerminals.subtitle')}
+          </p>
+        </div>
+        {isSuperAdmin && (
+          <Link
+            to="/app/pos/admin/assignments"
+            className="shrink-0 inline-flex items-center gap-2 px-4 py-2 bg-teal-600 text-white text-sm font-medium rounded-lg hover:bg-teal-700 transition-colors shadow-sm"
+          >
+            <UsersIcon className="w-4 h-4" />
+            {t('pos:myTerminals.manageAssignments')}
+          </Link>
+        )}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

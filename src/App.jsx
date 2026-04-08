@@ -16,6 +16,7 @@ import MyTerminalsPage from './pages/MyTerminalsPage';
 import PosTerminalDashboard from './pages/PosTerminalDashboard';
 import PosStockLookup from './pages/PosStockLookup';
 import PosReportsPage from './pages/PosReportsPage';
+import PosTerminalAssignmentsPage from './pages/PosTerminalAssignmentsPage';
 import PosAppShell from './components/pos/PosAppShell';
 import TerminalGuard from './components/pos/TerminalGuard';
 import UserManagementPage from './pages/UserManagementPage';
@@ -154,6 +155,9 @@ const App = () => {
           {/* ═══ POS app ═══ */}
           <Route path="/app/pos" element={<PosAppShell />}>
             <Route index element={<MyTerminalsPage />} />
+            {/* Admin-only routes — must be before :terminalId to avoid param collision */}
+            <Route path="admin/assignments" element={<PosTerminalAssignmentsPage />} />
+            <Route path="admin/terminals" element={<PosListPage />} />
             <Route path=":terminalId/dashboard" element={<TerminalGuard><PosTerminalDashboard /></TerminalGuard>} />
             <Route path=":terminalId/detail" element={<TerminalGuard><PosDetailPage /></TerminalGuard>} />
             <Route path=":terminalId/stock" element={<TerminalGuard><PosStockLookup /></TerminalGuard>} />

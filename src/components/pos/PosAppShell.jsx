@@ -8,6 +8,7 @@ import AppSidebar from '../shell/AppSidebar';
 import AppGuard from '../shell/AppGuard';
 import TerminalSelector from './TerminalSelector';
 import { PosTerminalProvider } from '../../hooks/usePosTerminal';
+import { useAuth } from '../../hooks/useAuth';
 
 const SIDEBAR_KEY = 'app-sidebar-collapsed';
 
@@ -19,6 +20,8 @@ const PosAppShell = () => {
   const app = getAppById('pos');
   const appColor = app ? getAppColor(app.color) : null;
   const { terminalId } = useParams();
+  const { user } = useAuth();
+  const isSuperAdmin = user?.role === 'super_admin';
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
     try {
@@ -51,21 +54,30 @@ const PosAppShell = () => {
     setMobileSidebarOpen(false);
   }, [terminalId]);
 
-  // Dynamic sidebar items scoped to the current terminal
+  // Dynamic sidebar items scoped to the current terminal and role
   const sidebarItems = useMemo(() => {
-    if (!terminalId) {
-      return [
-        { label: 'pos:sidebar.myTerminals', icon: 'ShoppingCartIcon', to: '/app/pos' },
-      ];
-    }
-    return [
-      { label: 'pos:sidebar.myTerminals', icon: 'ShoppingCartIcon', to: '/app/pos' },
-      { label: 'pos:sidebar.dashboard', icon: 'Squares2X2Icon', to: `/app/pos/${terminalId}/dashboard` },
-      { label: 'pos:sidebar.terminal', icon: 'BuildingStorefrontIcon', to: `/app/pos/${terminalId}/detail` },
-      { label: 'pos:sidebar.stockLookup', icon: 'ArchiveBoxIcon', to: `/app/pos/${terminalId}/stock` },
-      { label: 'pos:sidebar.reports', icon: 'ChartBarIcon', to: `/app/pos/${terminalId}/reports` },
+    const terminalLabel = isSuperAdmin ? 'pos:sidebar.allTerminals' : 'pos:sidebar.myTerminals';
+    const items = [
+      { label: terminalLabel, icon: 'ShoppingCartIcon', to: '/app/pos' },
     ];
-  }, [terminalId]);
+
+    if (terminalId) {
+      items.push(
+        { label: 'pos:sidebar.dashboard', icon: 'Squares2X2Icon', to: `/app/pos/${terminalId}/dashboard` },
+        { label: 'pos:sidebar.terminal', icon: 'BuildingStorefrontIcon', to: `/app/pos/${terminalId}/detail` },
+        { label: 'pos:sidebar.stockLookup', icon: 'ArchiveBoxIcon', to: `/app/pos/${terminalId}/stock` },
+        { label: 'pos:sidebar.reports', icon: 'ChartBarIcon', to: `/app/pos/${terminalId}/reports` },
+      );
+    }
+
+    if (isSuperAdmin) {
+      items.push(
+        { label: 'pos:sidebar.manageAccess', icon: 'UsersIcon', to: '/app/pos/admin/assignments' },
+      );
+    }
+
+    return items;
+  }, [terminalId, isSuperAdmin]);
 
   return (
     <AppGuard appId="pos">
