@@ -215,8 +215,40 @@
   },
   "notifications": {
     "title": "Notifications",
-    "empty": "Aucune notification",
-    "markAllRead": "Tout marquer comme lu"
+    "markAllRead": "Tout marquer comme lu",
+    "viewAll": "Voir toutes les notifications",
+    "empty": "Vous êtes à jour ! Aucune notification.",
+    "unreadOnly": "Non lues uniquement",
+    "delete": "Supprimer",
+    "deleteConfirm": "Supprimer cette notification ?",
+    "loadMore": "Charger plus",
+    "filter": {
+      "all": "Toutes",
+      "payslips": "Fiches de paie",
+      "schedule": "Planning",
+      "profile": "Profil",
+      "leave": "Congés"
+    },
+    "timeAgo": {
+      "justNow": "À l'instant",
+      "minutesAgo": "il y a {{n}} min",
+      "hoursAgo": "il y a {{n}}h",
+      "yesterday": "Hier",
+      "daysAgo": "il y a {{n}} jours"
+    },
+    "types": {
+      "payslip_available": "Fiche de paie disponible",
+      "schedule_published": "Planning publié",
+      "profile_change_approved": "Modification de profil approuvée",
+      "profile_change_rejected": "Modification de profil refusée",
+      "leave_approved": "Congé approuvé",
+      "leave_rejected": "Congé refusé",
+      "leave_balance_adjusted": "Solde de congés ajusté",
+      "leave_starting": "Rappel de congé",
+      "shift_updated": "Créneau modifié",
+      "system_announcement": "Annonce",
+      "general": "Notification"
+    }
   },
   "errors": {
     "noEmployeeRecord": "Votre compte n'est pas lié à un dossier employé. Veuillez contacter les RH.",

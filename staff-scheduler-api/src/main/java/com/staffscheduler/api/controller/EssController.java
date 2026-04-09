@@ -7,6 +7,7 @@ import com.staffscheduler.api.model.EmployeeBankDetails;
 import com.staffscheduler.api.model.EmployeeExperience;
 import com.staffscheduler.api.model.EmployeeQualification;
 import com.staffscheduler.api.model.LeaveRequest;
+import com.staffscheduler.api.model.Notification;
 import com.staffscheduler.api.model.PaySlip;
 import com.staffscheduler.api.model.ProfileEditRequest;
 import com.staffscheduler.api.repository.AppSettingRepository;
@@ -16,11 +17,13 @@ import com.staffscheduler.api.repository.EmployeeExperienceRepository;
 import com.staffscheduler.api.repository.EmployeeQualificationRepository;
 import com.staffscheduler.api.repository.EmployeeRepository;
 import com.staffscheduler.api.repository.LeaveRequestRepository;
+import com.staffscheduler.api.repository.NotificationRepository;
 import com.staffscheduler.api.repository.PaySlipRepository;
 import com.staffscheduler.api.repository.ProfileEditRequestRepository;
 import com.staffscheduler.api.repository.ShiftRepository;
 import com.staffscheduler.api.repository.UserRepository;
 import com.staffscheduler.api.service.EmployeeService;
+import com.staffscheduler.api.service.NotificationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
@@ -36,6 +39,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.PrintWriter;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -72,6 +76,8 @@ public class EssController {
     private final EmployeeExperienceRepository experienceRepository;
     private final EmployeeQualificationRepository qualificationRepository;
     private final ProfileEditRequestRepository profileEditRequestRepository;
+    private final NotificationRepository notificationRepository;
+    private final NotificationService notificationService;
 
     // ─── /api/ess/me ────────────────────────────────────────────
 
@@ -944,7 +950,100 @@ public class EssController {
         return m;
     }
 
+    // ─── /api/ess/notifications ────────────────────────────────────
+
+    @GetMapping("/notifications")
+    @Operation(summary = "List own notifications (paginated)")
+    public ResponseEntity<Map<String, Object>> listNotifications(
+            Authentication authentication,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int pageSize,
+            @RequestParam(defaultValue = "false") boolean unreadOnly) {
+
+        UUID userId = resolveUserId(authentication);
+        PageRequest pageable = PageRequest.of(Math.max(0, page - 1), Math.min(pageSize, 100));
+
+        Page<Notification> result = unreadOnly
+                ? notificationRepository.findByUserIdAndIsReadFalseOrderByCreatedAtDesc(userId, pageable)
+                : notificationRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
+
+        List<Map<String, Object>> items = result.getContent().stream()
+                .map(this::toNotificationItem).collect(Collectors.toList());
+
+        Map<String, Object> pagination = new LinkedHashMap<>();
+        pagination.put("page", page);
+        pagination.put("pageSize", pageSize);
+        pagination.put("total", result.getTotalElements());
+        pagination.put("hasNextPage", result.hasNext());
+
+        return ResponseEntity.ok(Map.of("data", items, "pagination", pagination));
+    }
+
+    @GetMapping("/notifications/unread-count")
+    @Operation(summary = "Get unread notification count")
+    public ResponseEntity<Map<String, Object>> getUnreadCount(Authentication authentication) {
+        UUID userId = resolveUserId(authentication);
+        long count = notificationRepository.countByUserIdAndIsReadFalse(userId);
+        return ResponseEntity.ok(Map.of("data", Map.of("count", count)));
+    }
+
+    @PutMapping("/notifications/{id}/read")
+    @Operation(summary = "Mark a single notification as read")
+    public ResponseEntity<Map<String, Object>> markNotificationRead(
+            Authentication authentication,
+            @PathVariable String id) {
+        UUID userId = resolveUserId(authentication);
+        Notification n = notificationRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Notification", id));
+        n.setIsRead(true);
+        n.setReadAt(LocalDateTime.now());
+        notificationRepository.save(n);
+        return ResponseEntity.ok(Map.of("message", "Notification marked as read"));
+    }
+
+    @PutMapping("/notifications/read-all")
+    @Transactional
+    @Operation(summary = "Mark all notifications as read")
+    public ResponseEntity<Map<String, Object>> markAllNotificationsRead(Authentication authentication) {
+        UUID userId = resolveUserId(authentication);
+        int updated = notificationRepository.markAllReadByUserId(userId, LocalDateTime.now());
+        return ResponseEntity.ok(Map.of("message", "Marked " + updated + " notifications as read"));
+    }
+
+    @DeleteMapping("/notifications/{id}")
+    @Transactional
+    @Operation(summary = "Delete a single notification")
+    public ResponseEntity<Map<String, Object>> deleteNotification(
+            Authentication authentication,
+            @PathVariable String id) {
+        UUID userId = resolveUserId(authentication);
+        Notification n = notificationRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Notification", id));
+        notificationRepository.delete(n);
+        return ResponseEntity.ok(Map.of("message", "Notification deleted"));
+    }
+
+    private Map<String, Object> toNotificationItem(Notification n) {
+        Map<String, Object> m = new LinkedHashMap<>();
+        m.put("id", n.getId());
+        m.put("type", n.getType());
+        m.put("title", n.getTitle());
+        m.put("body", n.getBody());
+        m.put("link", n.getLink());
+        m.put("isRead", n.getIsRead());
+        m.put("createdAt", n.getCreatedAt() != null ? n.getCreatedAt().toString() : null);
+        return m;
+    }
+
     // ─── Own-data scoping ───────────────────────────────────────
+
+    /**
+     * Resolves the UUID user_id directly from the JWT.
+     * Used by notification endpoints (which are user-scoped, not employee-scoped).
+     */
+    private UUID resolveUserId(Authentication authentication) {
+        return UUID.fromString(authentication.getName());
+    }
 
     /**
      * Resolves the employee_id for the authenticated user from the user store.

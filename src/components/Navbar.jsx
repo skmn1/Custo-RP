@@ -6,6 +6,7 @@ import useLocale from '../hooks/useLocale';
 import { useAuth } from '../hooks/useAuth';
 import { useSettings } from '../hooks/useSettings';
 import { useDarkMode } from '../hooks/useDarkMode';
+import NotificationBell from './ess/NotificationBell';
 
 // Fallback role permissions when navItems haven't loaded from API yet
 const ROLE_NAV_PERMISSIONS = {
@@ -271,6 +272,9 @@ const Navbar = () => {
             {/* Dark / Light mode toggle */}
             <DarkModeToggle />
 
+            {/* Notification bell */}
+            <NotificationBell />
+
             <div className="relative" ref={userMenuRef}>
               <button
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
@@ -321,6 +325,7 @@ const Navbar = () => {
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center space-x-1">
             <DarkModeToggle />
+            <NotificationBell />
             <Button
               variant="ghost"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}

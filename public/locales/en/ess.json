@@ -224,8 +224,40 @@
   },
   "notifications": {
     "title": "Notifications",
-    "empty": "No notifications",
-    "markAllRead": "Mark all as read"
+    "markAllRead": "Mark all read",
+    "viewAll": "View all notifications",
+    "empty": "You're all caught up! No notifications.",
+    "unreadOnly": "Unread only",
+    "delete": "Delete",
+    "deleteConfirm": "Delete this notification?",
+    "loadMore": "Load more",
+    "filter": {
+      "all": "All",
+      "payslips": "Payslips",
+      "schedule": "Schedule",
+      "profile": "Profile",
+      "leave": "Leave"
+    },
+    "timeAgo": {
+      "justNow": "Just now",
+      "minutesAgo": "{{n}} min ago",
+      "hoursAgo": "{{n}}h ago",
+      "yesterday": "Yesterday",
+      "daysAgo": "{{n}} days ago"
+    },
+    "types": {
+      "payslip_available": "Payslip available",
+      "schedule_published": "Schedule published",
+      "profile_change_approved": "Profile change approved",
+      "profile_change_rejected": "Profile change declined",
+      "leave_approved": "Leave approved",
+      "leave_rejected": "Leave declined",
+      "leave_balance_adjusted": "Leave balance adjusted",
+      "leave_starting": "Leave reminder",
+      "shift_updated": "Shift updated",
+      "system_announcement": "Announcement",
+      "general": "Notification"
+    }
   },
   "errors": {
     "noEmployeeRecord": "Your account is not linked to an employee record. Please contact HR.",

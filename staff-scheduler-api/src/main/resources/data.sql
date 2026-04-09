@@ -1310,3 +1310,22 @@ VALUES
 ('qual-emp3-2', 'emp3', 'Fire Safety Awareness', 'National Fire Service', '2023-11-15', '2025-11-15', 'FSA-778899', NULL, '2026-01-15T00:00:00', '2026-01-15T00:00:00'),
 ('qual-emp5-1', 'emp5', 'HACCP Certification', 'ISO', '2024-04-20', '2026-10-20', 'HACCP-112233', NULL, '2026-01-15T00:00:00', '2026-01-15T00:00:00')
 ON CONFLICT DO NOTHING;
+
+-- ============================================================
+-- Notifications (seed data for demo)
+-- user c0ee... = employee (Sarah Johnson / emp1)
+-- user d0ee... = viewer/employee (Robert Taylor / emp10)
+-- ============================================================
+INSERT INTO notifications (id, user_id, type, title, body, link, is_read, read_at, metadata, created_at)
+VALUES
+('notif-001', 'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a33', 'payslip_available', 'Your payslip for March 2026 is ready', 'Your net pay for March 2026 has been deposited.', '/app/ess/payslips', false, NULL, NULL, '2026-04-01T10:00:00'),
+('notif-002', 'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a33', 'schedule_published', 'Schedule published for Apr 6–12', NULL, '/app/ess/schedule', false, NULL, NULL, '2026-04-04T08:30:00'),
+('notif-003', 'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a33', 'leave_approved', 'Your leave request (Apr 20–22) has been approved', 'Approved by Jane Smith.', '/app/ess/schedule', true, '2026-04-05T14:00:00', NULL, '2026-04-05T12:00:00'),
+('notif-004', 'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a33', 'profile_change_approved', 'Your Bank Name update has been approved', NULL, '/app/ess/profile', false, NULL, NULL, '2026-04-07T09:15:00'),
+('notif-005', 'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a33', 'shift_updated', 'Your shift on Apr 14 has been updated', 'Start time changed from 09:00 to 08:00.', '/app/ess/schedule', false, NULL, NULL, '2026-04-09T16:45:00'),
+('notif-006', 'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a33', 'system_announcement', 'Office closed on Apr 18 for maintenance', 'The building will be closed for scheduled maintenance.', NULL, true, '2026-04-08T11:00:00', NULL, '2026-04-08T10:00:00'),
+('notif-007', 'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a33', 'leave_starting', 'Reminder: your leave starts tomorrow', NULL, '/app/ess/schedule', false, NULL, NULL, '2026-04-19T08:00:00'),
+('notif-008', 'd0eebc99-9c0b-4ef8-bb6d-6bb9bd380a44', 'payslip_available', 'Your payslip for March 2026 is ready', NULL, '/app/ess/payslips', false, NULL, NULL, '2026-04-01T10:00:00'),
+('notif-009', 'd0eebc99-9c0b-4ef8-bb6d-6bb9bd380a44', 'schedule_published', 'Schedule published for Apr 6–12', NULL, '/app/ess/schedule', true, '2026-04-04T12:00:00', NULL, '2026-04-04T08:30:00'),
+('notif-010', 'd0eebc99-9c0b-4ef8-bb6d-6bb9bd380a44', 'leave_rejected', 'Your leave request (Apr 15–16) was declined', 'Insufficient team coverage during the requested period.', '/app/ess/schedule', false, NULL, NULL, '2026-04-06T11:00:00')
+ON CONFLICT DO NOTHING;
