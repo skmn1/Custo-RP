@@ -1273,3 +1273,40 @@ INSERT INTO attendance_records (id, employee_id, date, status, scheduled_start, 
 ('att-emp12-2026-04-29', 'emp12', '2026-04-29', 'present', '09:00', '17:00', '09:00', '17:00', 8.0, 8.0, 0, NULL, NULL, '2026-03-15T00:00:00', '2026-03-15T00:00:00'),
 ('att-emp12-2026-04-30', 'emp12', '2026-04-30', 'present', '09:00', '17:00', '09:00', '19:00', 8.0, 10.0, 2.0, NULL, NULL, '2026-03-15T00:00:00', '2026-03-15T00:00:00')
 ON CONFLICT DO NOTHING;
+
+-- ============================================================
+-- Employee Bank Details
+-- ============================================================
+INSERT INTO employee_bank_details (id, employee_id, bank_name, iban, bic, account_holder, is_active, created_at, updated_at)
+VALUES
+('bank-emp1', 'emp1', 'BNP Paribas', 'FR7630006000011234567890189', 'BNPAFRPP', 'Jean Dupont', true, '2026-01-15T00:00:00', '2026-01-15T00:00:00'),
+('bank-emp2', 'emp2', 'Société Générale', 'FR7630003000701234567890145', 'SOGEFRPP', 'Marie Laurent', true, '2026-01-15T00:00:00', '2026-01-15T00:00:00'),
+('bank-emp3', 'emp3', 'Crédit Agricole', 'FR7630004000031234567890190', 'CRLYFRPP', 'Pierre Martin', true, '2026-01-15T00:00:00', '2026-01-15T00:00:00'),
+('bank-emp5', 'emp5', 'Caisse d''Épargne', 'FR7617515900001234567890133', 'CEPAFRPP', 'Sophie Bernard', true, '2026-01-15T00:00:00', '2026-01-15T00:00:00')
+ON CONFLICT DO NOTHING;
+
+-- ============================================================
+-- Employee Experience
+-- ============================================================
+INSERT INTO employee_experience (id, employee_id, company_name, position_title, start_date, end_date, description, is_current, sort_order, created_at, updated_at)
+VALUES
+('exp-emp1-1', 'emp1', 'Acme Corp', 'Junior Developer', '2019-03-01', '2021-06-30', 'Full-stack development in React and Node.js', false, 1, '2026-01-15T00:00:00', '2026-01-15T00:00:00'),
+('exp-emp1-2', 'emp1', 'TechStart SAS', 'Senior Developer', '2021-07-01', '2023-12-31', 'Led a team of 4 developers on internal tooling projects', false, 2, '2026-01-15T00:00:00', '2026-01-15T00:00:00'),
+('exp-emp1-3', 'emp1', 'Current Company', 'Lead Engineer', '2024-01-01', NULL, 'Engineering lead for the scheduling platform', true, 3, '2026-01-15T00:00:00', '2026-01-15T00:00:00'),
+('exp-emp2-1', 'emp2', 'DesignHub', 'UX Designer', '2020-01-01', '2022-08-31', 'User research and interface design for SaaS products', false, 1, '2026-01-15T00:00:00', '2026-01-15T00:00:00'),
+('exp-emp3-1', 'emp3', 'RetailMax', 'Store Associate', '2018-06-01', '2020-12-31', 'Customer service and inventory management', false, 1, '2026-01-15T00:00:00', '2026-01-15T00:00:00'),
+('exp-emp3-2', 'emp3', 'RetailMax', 'Shift Supervisor', '2021-01-01', NULL, 'Supervising a team of 8 store associates', true, 2, '2026-01-15T00:00:00', '2026-01-15T00:00:00')
+ON CONFLICT DO NOTHING;
+
+-- ============================================================
+-- Employee Qualifications
+-- ============================================================
+INSERT INTO employee_qualifications (id, employee_id, name, issuing_body, date_obtained, expiry_date, credential_number, document_key, created_at, updated_at)
+VALUES
+('qual-emp1-1', 'emp1', 'AWS Solutions Architect', 'Amazon Web Services', '2023-06-15', '2026-06-15', 'AWS-SA-12345', NULL, '2026-01-15T00:00:00', '2026-01-15T00:00:00'),
+('qual-emp1-2', 'emp1', 'Professional Scrum Master I', 'Scrum.org', '2022-03-01', NULL, 'PSM-67890', NULL, '2026-01-15T00:00:00', '2026-01-15T00:00:00'),
+('qual-emp2-1', 'emp2', 'First Aid Certificate', 'Red Cross', '2025-01-10', '2027-01-10', 'FA-2025-001', NULL, '2026-01-15T00:00:00', '2026-01-15T00:00:00'),
+('qual-emp3-1', 'emp3', 'Food Safety Level 2', 'CIEH', '2024-09-01', '2026-09-01', 'FS-L2-334455', NULL, '2026-01-15T00:00:00', '2026-01-15T00:00:00'),
+('qual-emp3-2', 'emp3', 'Fire Safety Awareness', 'National Fire Service', '2023-11-15', '2025-11-15', 'FSA-778899', NULL, '2026-01-15T00:00:00', '2026-01-15T00:00:00'),
+('qual-emp5-1', 'emp5', 'HACCP Certification', 'ISO', '2024-04-20', '2026-10-20', 'HACCP-112233', NULL, '2026-01-15T00:00:00', '2026-01-15T00:00:00')
+ON CONFLICT DO NOTHING;

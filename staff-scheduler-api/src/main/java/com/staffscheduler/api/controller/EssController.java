@@ -3,19 +3,28 @@ package com.staffscheduler.api.controller;
 import com.staffscheduler.api.exception.ResourceNotFoundException;
 import com.staffscheduler.api.model.AttendanceRecord;
 import com.staffscheduler.api.model.Employee;
+import com.staffscheduler.api.model.EmployeeBankDetails;
+import com.staffscheduler.api.model.EmployeeExperience;
+import com.staffscheduler.api.model.EmployeeQualification;
 import com.staffscheduler.api.model.LeaveRequest;
 import com.staffscheduler.api.model.PaySlip;
+import com.staffscheduler.api.model.ProfileEditRequest;
 import com.staffscheduler.api.repository.AppSettingRepository;
 import com.staffscheduler.api.repository.AttendanceRecordRepository;
+import com.staffscheduler.api.repository.EmployeeBankDetailsRepository;
+import com.staffscheduler.api.repository.EmployeeExperienceRepository;
+import com.staffscheduler.api.repository.EmployeeQualificationRepository;
 import com.staffscheduler.api.repository.EmployeeRepository;
 import com.staffscheduler.api.repository.LeaveRequestRepository;
 import com.staffscheduler.api.repository.PaySlipRepository;
+import com.staffscheduler.api.repository.ProfileEditRequestRepository;
 import com.staffscheduler.api.repository.ShiftRepository;
 import com.staffscheduler.api.repository.UserRepository;
 import com.staffscheduler.api.service.EmployeeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,6 +38,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -58,6 +68,10 @@ public class EssController {
     private final AttendanceRecordRepository attendanceRecordRepository;
     private final AppSettingRepository appSettingRepository;
     private final EmployeeService employeeService;
+    private final EmployeeBankDetailsRepository bankDetailsRepository;
+    private final EmployeeExperienceRepository experienceRepository;
+    private final EmployeeQualificationRepository qualificationRepository;
+    private final ProfileEditRequestRepository profileEditRequestRepository;
 
     // ─── /api/ess/me ────────────────────────────────────────────
 
@@ -532,6 +546,375 @@ public class EssController {
             return "\"" + value.replace("\"", "\"\"") + "\"";
         }
         return value;
+    }
+
+    // ─── /api/ess/profile ───────────────────────────────────────
+
+    /**
+     * Full profile: personal info, contract, bank details (masked IBAN),
+     * experience, qualifications, pending change-request count, and
+     * profile-completeness percentage.
+     */
+    @GetMapping("/profile")
+    @Operation(summary = "Get full employee profile (own data)")
+    public ResponseEntity<Map<String, Object>> getProfile(Authentication authentication) {
+        String employeeId = resolveEmployeeId(authentication);
+        Employee emp = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee", employeeId));
+
+        // Personal info
+        Map<String, Object> personal = new LinkedHashMap<>();
+        personal.put("employeeId", emp.getId());
+        personal.put("firstName", splitFirstName(emp.getName()));
+        personal.put("lastName", splitLastName(emp.getName()));
+        personal.put("name", emp.getName());
+        personal.put("email", emp.getEmail());
+        personal.put("phone", emp.getPhone());
+        personal.put("avatar", emp.getAvatar());
+
+        // Contract / job info
+        Map<String, Object> contract = new LinkedHashMap<>();
+        contract.put("jobTitle", emp.getJobTitle());
+        contract.put("department", emp.getDepartment());
+        contract.put("role", emp.getRole());
+        contract.put("hireDate", emp.getHireDate() != null ? emp.getHireDate().toString() : null);
+        contract.put("maxHours", emp.getMaxHours());
+        contract.put("status", emp.getStatus());
+
+        // Bank details (masked IBAN for employee)
+        Map<String, Object> bankDetails = null;
+        Optional<EmployeeBankDetails> bankOpt = bankDetailsRepository.findByEmployeeId(employeeId);
+        if (bankOpt.isPresent()) {
+            EmployeeBankDetails bd = bankOpt.get();
+            bankDetails = new LinkedHashMap<>();
+            bankDetails.put("id", bd.getId());
+            bankDetails.put("bankName", bd.getBankName());
+            bankDetails.put("iban", maskIban(bd.getIban()));
+            bankDetails.put("bic", bd.getBic());
+            bankDetails.put("accountHolder", bd.getAccountHolder());
+            bankDetails.put("isActive", bd.getIsActive());
+        }
+
+        // Experience
+        List<Map<String, Object>> experience = experienceRepository
+                .findByEmployeeIdOrderBySortOrderAsc(employeeId)
+                .stream().map(this::toExperienceItem).collect(Collectors.toList());
+
+        // Qualifications (with expiry flags)
+        List<Map<String, Object>> qualifications = qualificationRepository
+                .findByEmployeeIdOrderByDateObtainedDesc(employeeId)
+                .stream().map(this::toQualificationItem).collect(Collectors.toList());
+
+        // Pending change requests count
+        long pendingRequests = profileEditRequestRepository
+                .countByEmployeeIdAndStatus(employeeId, "pending");
+
+        // Profile completeness
+        int completeness = calculateCompleteness(emp, bankOpt.isPresent(),
+                !experience.isEmpty(), !qualifications.isEmpty());
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("personal", personal);
+        result.put("contract", contract);
+        result.put("bankDetails", bankDetails);
+        result.put("experience", experience);
+        result.put("qualifications", qualifications);
+        result.put("pendingRequests", pendingRequests);
+        result.put("completeness", completeness);
+        return ResponseEntity.ok(result);
+    }
+
+    // ─── Change requests ────────────────────────────────────────
+
+    @PostMapping("/profile/change-request")
+    @Operation(summary = "Submit a profile change request")
+    public ResponseEntity<Map<String, Object>> submitChangeRequest(
+            Authentication authentication,
+            @RequestBody Map<String, Object> body) {
+
+        String employeeId = resolveEmployeeId(authentication);
+        String fieldName = (String) body.get("fieldName");
+        String fieldLabel = (String) body.get("fieldLabel");
+        String oldValue = body.get("oldValue") != null ? body.get("oldValue").toString() : "";
+        String newValue = body.get("newValue") != null ? body.get("newValue").toString() : "";
+
+        if (fieldName == null || fieldName.isBlank() || newValue.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "fieldName and newValue are required"));
+        }
+
+        // Cancel existing pending requests for same bank_ field group
+        if (fieldName.startsWith("bank_")) {
+            List<ProfileEditRequest> existing = profileEditRequestRepository
+                    .findByEmployeeIdAndFieldNameStartingWithAndStatus(employeeId, "bank_", "pending");
+            for (ProfileEditRequest p : existing) {
+                p.setStatus("cancelled");
+                profileEditRequestRepository.save(p);
+            }
+        }
+
+        ProfileEditRequest req = new ProfileEditRequest();
+        req.setEmployeeId(employeeId);
+        req.setFieldName(fieldName);
+        req.setFieldLabel(fieldLabel != null ? fieldLabel : fieldName);
+        req.setOldValue(oldValue);
+        req.setNewValue(newValue);
+        req.setStatus("pending");
+        profileEditRequestRepository.save(req);
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("id", req.getId());
+        result.put("status", req.getStatus());
+        result.put("message", "Change request submitted for approval");
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/profile/change-requests")
+    @Operation(summary = "List own profile change requests")
+    public ResponseEntity<List<Map<String, Object>>> listChangeRequests(Authentication authentication) {
+        String employeeId = resolveEmployeeId(authentication);
+        List<ProfileEditRequest> requests = profileEditRequestRepository
+                .findByEmployeeIdOrderByCreatedAtDesc(employeeId);
+
+        List<Map<String, Object>> items = requests.stream().map(r -> {
+            Map<String, Object> m = new LinkedHashMap<>();
+            m.put("id", r.getId());
+            m.put("fieldName", r.getFieldName());
+            m.put("fieldLabel", r.getFieldLabel());
+            m.put("oldValue", r.getOldValue());
+            m.put("newValue", r.getNewValue());
+            m.put("status", r.getStatus());
+            m.put("reviewedBy", r.getReviewedBy());
+            m.put("reviewNotes", r.getReviewNotes());
+            m.put("createdAt", r.getCreatedAt() != null ? r.getCreatedAt().toString() : null);
+            m.put("updatedAt", r.getUpdatedAt() != null ? r.getUpdatedAt().toString() : null);
+            return m;
+        }).collect(Collectors.toList());
+
+        return ResponseEntity.ok(items);
+    }
+
+    @DeleteMapping("/profile/change-requests/{id}")
+    @Operation(summary = "Cancel own pending change request")
+    public ResponseEntity<Map<String, Object>> cancelChangeRequest(
+            Authentication authentication,
+            @PathVariable String id) {
+        String employeeId = resolveEmployeeId(authentication);
+        ProfileEditRequest req = profileEditRequestRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("ProfileEditRequest", id));
+
+        if (!req.getEmployeeId().equals(employeeId)) {
+            return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
+        }
+        if (!"pending".equals(req.getStatus())) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Only pending requests can be cancelled"));
+        }
+
+        req.setStatus("cancelled");
+        profileEditRequestRepository.save(req);
+        return ResponseEntity.ok(Map.of("message", "Change request cancelled"));
+    }
+
+    // ─── Experience (self-managed CRUD) ─────────────────────────
+
+    @GetMapping("/profile/experience")
+    @Operation(summary = "List own work experience entries")
+    public ResponseEntity<List<Map<String, Object>>> listExperience(Authentication authentication) {
+        String employeeId = resolveEmployeeId(authentication);
+        List<Map<String, Object>> items = experienceRepository
+                .findByEmployeeIdOrderBySortOrderAsc(employeeId)
+                .stream().map(this::toExperienceItem).collect(Collectors.toList());
+        return ResponseEntity.ok(items);
+    }
+
+    @PostMapping("/profile/experience")
+    @Operation(summary = "Add a work experience entry")
+    public ResponseEntity<Map<String, Object>> addExperience(
+            Authentication authentication,
+            @RequestBody Map<String, Object> body) {
+        String employeeId = resolveEmployeeId(authentication);
+
+        EmployeeExperience exp = new EmployeeExperience();
+        exp.setEmployeeId(employeeId);
+        exp.setCompanyName((String) body.get("companyName"));
+        exp.setPositionTitle((String) body.get("positionTitle"));
+        exp.setStartDate(parseDate(body.get("startDate")));
+        exp.setEndDate(parseDate(body.get("endDate")));
+        exp.setDescription((String) body.get("description"));
+        exp.setIsCurrent(Boolean.TRUE.equals(body.get("isCurrent")));
+        exp.setSortOrder(body.get("sortOrder") != null ? ((Number) body.get("sortOrder")).intValue() : 0);
+        experienceRepository.save(exp);
+
+        return ResponseEntity.ok(toExperienceItem(exp));
+    }
+
+    @PutMapping("/profile/experience/{id}")
+    @Operation(summary = "Update own work experience entry")
+    public ResponseEntity<Map<String, Object>> updateExperience(
+            Authentication authentication,
+            @PathVariable String id,
+            @RequestBody Map<String, Object> body) {
+        String employeeId = resolveEmployeeId(authentication);
+        EmployeeExperience exp = experienceRepository.findByIdAndEmployeeId(id, employeeId)
+                .orElseThrow(() -> new ResourceNotFoundException("EmployeeExperience", id));
+
+        if (body.containsKey("companyName")) exp.setCompanyName((String) body.get("companyName"));
+        if (body.containsKey("positionTitle")) exp.setPositionTitle((String) body.get("positionTitle"));
+        if (body.containsKey("startDate")) exp.setStartDate(parseDate(body.get("startDate")));
+        if (body.containsKey("endDate")) exp.setEndDate(parseDate(body.get("endDate")));
+        if (body.containsKey("description")) exp.setDescription((String) body.get("description"));
+        if (body.containsKey("isCurrent")) exp.setIsCurrent(Boolean.TRUE.equals(body.get("isCurrent")));
+        if (body.containsKey("sortOrder")) exp.setSortOrder(((Number) body.get("sortOrder")).intValue());
+        experienceRepository.save(exp);
+
+        return ResponseEntity.ok(toExperienceItem(exp));
+    }
+
+    @DeleteMapping("/profile/experience/{id}")
+    @Transactional
+    @Operation(summary = "Delete own work experience entry")
+    public ResponseEntity<Map<String, Object>> deleteExperience(
+            Authentication authentication,
+            @PathVariable String id) {
+        String employeeId = resolveEmployeeId(authentication);
+        EmployeeExperience exp = experienceRepository.findByIdAndEmployeeId(id, employeeId)
+                .orElseThrow(() -> new ResourceNotFoundException("EmployeeExperience", id));
+        experienceRepository.delete(exp);
+        return ResponseEntity.ok(Map.of("message", "Experience entry deleted"));
+    }
+
+    // ─── Qualifications (self-managed CRUD) ─────────────────────
+
+    @GetMapping("/profile/qualifications")
+    @Operation(summary = "List own qualifications & certifications")
+    public ResponseEntity<List<Map<String, Object>>> listQualifications(Authentication authentication) {
+        String employeeId = resolveEmployeeId(authentication);
+        List<Map<String, Object>> items = qualificationRepository
+                .findByEmployeeIdOrderByDateObtainedDesc(employeeId)
+                .stream().map(this::toQualificationItem).collect(Collectors.toList());
+        return ResponseEntity.ok(items);
+    }
+
+    @PostMapping("/profile/qualifications")
+    @Operation(summary = "Add a qualification or certification")
+    public ResponseEntity<Map<String, Object>> addQualification(
+            Authentication authentication,
+            @RequestBody Map<String, Object> body) {
+        String employeeId = resolveEmployeeId(authentication);
+
+        EmployeeQualification q = new EmployeeQualification();
+        q.setEmployeeId(employeeId);
+        q.setName((String) body.get("name"));
+        q.setIssuingBody((String) body.get("issuingBody"));
+        q.setDateObtained(parseDate(body.get("dateObtained")));
+        q.setExpiryDate(parseDate(body.get("expiryDate")));
+        q.setCredentialNumber((String) body.get("credentialNumber"));
+        q.setDocumentKey((String) body.get("documentKey"));
+        qualificationRepository.save(q);
+
+        return ResponseEntity.ok(toQualificationItem(q));
+    }
+
+    @PutMapping("/profile/qualifications/{id}")
+    @Operation(summary = "Update own qualification")
+    public ResponseEntity<Map<String, Object>> updateQualification(
+            Authentication authentication,
+            @PathVariable String id,
+            @RequestBody Map<String, Object> body) {
+        String employeeId = resolveEmployeeId(authentication);
+        EmployeeQualification q = qualificationRepository.findByIdAndEmployeeId(id, employeeId)
+                .orElseThrow(() -> new ResourceNotFoundException("EmployeeQualification", id));
+
+        if (body.containsKey("name")) q.setName((String) body.get("name"));
+        if (body.containsKey("issuingBody")) q.setIssuingBody((String) body.get("issuingBody"));
+        if (body.containsKey("dateObtained")) q.setDateObtained(parseDate(body.get("dateObtained")));
+        if (body.containsKey("expiryDate")) q.setExpiryDate(parseDate(body.get("expiryDate")));
+        if (body.containsKey("credentialNumber")) q.setCredentialNumber((String) body.get("credentialNumber"));
+        if (body.containsKey("documentKey")) q.setDocumentKey((String) body.get("documentKey"));
+        qualificationRepository.save(q);
+
+        return ResponseEntity.ok(toQualificationItem(q));
+    }
+
+    @DeleteMapping("/profile/qualifications/{id}")
+    @Transactional
+    @Operation(summary = "Delete own qualification")
+    public ResponseEntity<Map<String, Object>> deleteQualification(
+            Authentication authentication,
+            @PathVariable String id) {
+        String employeeId = resolveEmployeeId(authentication);
+        EmployeeQualification q = qualificationRepository.findByIdAndEmployeeId(id, employeeId)
+                .orElseThrow(() -> new ResourceNotFoundException("EmployeeQualification", id));
+        qualificationRepository.delete(q);
+        return ResponseEntity.ok(Map.of("message", "Qualification deleted"));
+    }
+
+    // ─── Profile helper methods ─────────────────────────────────
+
+    private Map<String, Object> toExperienceItem(EmployeeExperience exp) {
+        Map<String, Object> m = new LinkedHashMap<>();
+        m.put("id", exp.getId());
+        m.put("companyName", exp.getCompanyName());
+        m.put("positionTitle", exp.getPositionTitle());
+        m.put("startDate", exp.getStartDate() != null ? exp.getStartDate().toString() : null);
+        m.put("endDate", exp.getEndDate() != null ? exp.getEndDate().toString() : null);
+        m.put("description", exp.getDescription());
+        m.put("isCurrent", exp.getIsCurrent());
+        m.put("sortOrder", exp.getSortOrder());
+        return m;
+    }
+
+    private Map<String, Object> toQualificationItem(EmployeeQualification q) {
+        Map<String, Object> m = new LinkedHashMap<>();
+        m.put("id", q.getId());
+        m.put("name", q.getName());
+        m.put("issuingBody", q.getIssuingBody());
+        m.put("dateObtained", q.getDateObtained() != null ? q.getDateObtained().toString() : null);
+        m.put("expiryDate", q.getExpiryDate() != null ? q.getExpiryDate().toString() : null);
+        m.put("credentialNumber", q.getCredentialNumber());
+        m.put("documentKey", q.getDocumentKey());
+
+        // Expiry flags
+        if (q.getExpiryDate() != null) {
+            LocalDate today = LocalDate.now();
+            boolean isExpired = q.getExpiryDate().isBefore(today);
+            boolean isExpiringSoon = !isExpired && ChronoUnit.DAYS.between(today, q.getExpiryDate()) <= 90;
+            m.put("isExpired", isExpired);
+            m.put("isExpiringSoon", isExpiringSoon);
+        } else {
+            m.put("isExpired", false);
+            m.put("isExpiringSoon", false);
+        }
+        return m;
+    }
+
+    private static String maskIban(String iban) {
+        if (iban == null || iban.length() <= 4) return iban;
+        return "****" + iban.substring(iban.length() - 4);
+    }
+
+    private int calculateCompleteness(Employee emp, boolean hasBankDetails,
+                                       boolean hasExperience, boolean hasQualifications) {
+        int filled = 0;
+        int total = 8; // email, phone, avatar, department, jobTitle, bankDetails, experience, qualifications
+
+        if (emp.getEmail() != null && !emp.getEmail().isBlank()) filled++;
+        if (emp.getPhone() != null && !emp.getPhone().isBlank()) filled++;
+        if (emp.getAvatar() != null && !emp.getAvatar().isBlank()) filled++;
+        if (emp.getDepartment() != null && !emp.getDepartment().isBlank()) filled++;
+        if (emp.getJobTitle() != null && !emp.getJobTitle().isBlank()) filled++;
+        if (hasBankDetails) filled++;
+        if (hasExperience) filled++;
+        if (hasQualifications) filled++;
+
+        return (int) Math.round((filled * 100.0) / total);
+    }
+
+    private static LocalDate parseDate(Object value) {
+        if (value == null) return null;
+        if (value instanceof String s && !s.isBlank()) {
+            return LocalDate.parse(s);
+        }
+        return null;
     }
 
     // ─── Setting gate ───────────────────────────────────────────
