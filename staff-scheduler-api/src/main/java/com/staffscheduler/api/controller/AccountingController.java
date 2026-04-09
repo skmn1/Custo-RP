@@ -15,11 +15,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.temporal.TemporalAdjusters;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/accounting")
@@ -52,14 +49,12 @@ public class AccountingController {
             final LocalDate ws = weekStart;
             final LocalDate we = weekEnd;
 
-            BigDecimal inflow = all.stream()
-                    .filter(i -> "AR".equals(i.getType()) && isOpen(i))
-                    .filter(i -> i.getDueDate() != null && !i.getDueDate().isBefore(ws) && !i.getDueDate().isAfter(we))
-                    .map(i -> i.getAmountOutstanding() != null ? i.getAmountOutstanding() : BigDecimal.ZERO)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            // All invoices in this system are AP (supplier/expense) → outflows.
+            // Inflow (AR) is reserved for future invoice types.
+            BigDecimal inflow = BigDecimal.ZERO;
 
             BigDecimal outflow = all.stream()
-                    .filter(i -> !"AR".equals(i.getType()) && isOpen(i))
+                    .filter(i -> isOpen(i))
                     .filter(i -> i.getDueDate() != null && !i.getDueDate().isBefore(ws) && !i.getDueDate().isAfter(we))
                     .map(i -> i.getAmountOutstanding() != null ? i.getAmountOutstanding() : BigDecimal.ZERO)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -98,14 +93,13 @@ public class AccountingController {
             for (InvoicePaymentDto p : inv.getPayments()) {
                 if (dateFrom != null && p.getPaymentDate() != null && p.getPaymentDate().isBefore(dateFrom)) continue;
                 if (dateTo != null && p.getPaymentDate() != null && p.getPaymentDate().isAfter(dateTo)) continue;
-                if (type != null && !type.equalsIgnoreCase(inv.getType())) continue;
                 if (method != null && !method.equalsIgnoreCase(p.getMethod())) continue;
 
                 Map<String, Object> row = new LinkedHashMap<>();
                 row.put("date", p.getPaymentDate());
                 row.put("invoiceNumber", inv.getInvoiceNumber());
                 row.put("invoiceId", inv.getId());
-                row.put("type", inv.getType());
+                row.put("type", "AP"); // all invoices in this system are AP supplier invoices
                 row.put("counterpartyName", inv.getCounterpartyName());
                 row.put("amount", p.getAmount());
                 row.put("method", p.getMethod());
@@ -154,11 +148,8 @@ public class AccountingController {
             String month = inv.getIssueDate() != null ? inv.getIssueDate().toString().substring(0, 7) : null;
             if (month == null) continue;
             BigDecimal tax = inv.getTaxAmount() != null ? inv.getTaxAmount() : BigDecimal.ZERO;
-            if ("AR".equals(inv.getType())) {
-                collected.merge(month, tax, BigDecimal::add);
-            } else {
-                paid.merge(month, tax, BigDecimal::add);
-            }
+            // All invoices are AP (supplier): tax goes into "paid" (deductible input VAT).
+            paid.merge(month, tax, BigDecimal::add);
         }
 
         Set<String> months = new TreeSet<>();
@@ -208,15 +199,11 @@ public class AccountingController {
         List<InvoiceDto> all = invoiceService.findAll(null, null, null, null);
         Map<String, BigDecimal> map = new TreeMap<>();
         for (InvoiceDto inv : all) {
-            if ("paid".equalsIgnoreCase(inv.getStatus())) {
-                boolean isAr = "AR".equals(inv.getType());
-                if (typeFilter != null && !typeFilter.equals(inv.getType())) continue;
-                if (typeFilter == null && isAr) continue; // expense = not AR
-                String month = inv.getIssueDate() != null ? inv.getIssueDate().toString().substring(0, 7) : null;
-                if (month == null) continue;
-                BigDecimal amount = inv.getTotalAmount() != null ? inv.getTotalAmount() : BigDecimal.ZERO;
-                map.merge(month, amount, BigDecimal::add);
-            }
+            if (!"paid".equalsIgnoreCase(inv.getStatus())) continue;
+            String month = inv.getIssueDate() != null ? inv.getIssueDate().toString().substring(0, 7) : null;
+            if (month == null) continue;
+            BigDecimal amount = inv.getTotalAmount() != null ? inv.getTotalAmount() : BigDecimal.ZERO;
+            map.merge(month, amount, BigDecimal::add);
         }
         List<Map<String, Object>> result = new ArrayList<>();
         for (Map.Entry<String, BigDecimal> e : map.entrySet()) {
