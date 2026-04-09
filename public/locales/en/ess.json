@@ -21,12 +21,21 @@
   },
   "schedule": {
     "title": "My Schedule",
-    "noShifts": "No shifts found for this period",
+    "viewWeek": "Week",
+    "viewMonth": "Month",
+    "today": "Today",
+    "noShifts": "You have no shifts scheduled for this period.",
+    "noShiftsWeek": "Schedule not yet published for this period.",
+    "noUpcoming": "No upcoming shifts found.",
+    "upcoming": "Upcoming Shifts",
+    "readOnly": "This schedule is read-only. Contact your manager to request changes.",
+    "duration": "{{hours}}h",
+    "onLeave": "On Leave",
     "shift": "Shift",
     "start": "Start",
     "end": "End",
-    "duration": "Duration",
-    "department": "Department"
+    "department": "Department",
+    "notes": "Notes"
   },
   "payslips": {
     "title": "My Payslips",

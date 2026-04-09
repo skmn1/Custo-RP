@@ -2,17 +2,21 @@ package com.staffscheduler.api.controller;
 
 import com.staffscheduler.api.exception.ResourceNotFoundException;
 import com.staffscheduler.api.model.Employee;
+import com.staffscheduler.api.model.LeaveRequest;
 import com.staffscheduler.api.repository.EmployeeRepository;
+import com.staffscheduler.api.repository.LeaveRequestRepository;
 import com.staffscheduler.api.repository.ShiftRepository;
 import com.staffscheduler.api.repository.UserRepository;
 import com.staffscheduler.api.service.EmployeeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -38,6 +42,7 @@ public class EssController {
     private final UserRepository userRepository;
     private final EmployeeRepository employeeRepository;
     private final ShiftRepository shiftRepository;
+    private final LeaveRequestRepository leaveRequestRepository;
     private final EmployeeService employeeService;
 
     // ─── /api/ess/me ────────────────────────────────────────────
@@ -66,15 +71,37 @@ public class EssController {
 
     // ─── /api/ess/schedule ──────────────────────────────────────
 
+    /**
+     * Returns own shifts for the given date range.
+     *
+     * Defaults to the current ISO week (Monday–Sunday) when no params are provided.
+     * The employee_id is ALWAYS resolved from the JWT — the caller cannot override it.
+     *
+     * @param from  inclusive start date (ISO-8601, default = Monday of current week)
+     * @param to    inclusive end date   (ISO-8601, default = Sunday of current week)
+     */
     @GetMapping("/schedule")
-    @Operation(summary = "Get own upcoming shifts (next 4 weeks)")
-    public ResponseEntity<List<Map<String, Object>>> getMySchedule(Authentication authentication) {
+    @Operation(summary = "Get own shifts for a date range (defaults to current week)")
+    public ResponseEntity<Map<String, Object>> getMySchedule(
+            Authentication authentication,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+
         String employeeId = resolveEmployeeId(authentication);
-        LocalDate today = LocalDate.now();
-        LocalDate until = today.plusWeeks(4);
+
+        // Default to current ISO week (Monday–Sunday)
+        if (from == null) {
+            LocalDate today = LocalDate.now();
+            from = today.with(DayOfWeek.MONDAY);
+        }
+        if (to == null) {
+            to = from.with(DayOfWeek.SUNDAY);
+        }
+        final LocalDate fromFinal = from;
+        final LocalDate toFinal   = to;
 
         List<Map<String, Object>> shifts = shiftRepository
-                .findByEmployeeIdAndDateBetween(employeeId, today, until)
+                .findByEmployeeIdAndDateBetween(employeeId, fromFinal, toFinal)
                 .stream()
                 .sorted(Comparator.comparing(s -> s.getDate()))
                 .map(s -> {
@@ -84,14 +111,93 @@ public class EssController {
                     m.put("startTime", s.getStartTime());
                     m.put("endTime", s.getEndTime());
                     m.put("duration", s.getDuration());
-                    m.put("type", s.getType());
+                    m.put("shiftType", s.getType());
                     m.put("department", s.getDepartment());
+                    m.put("color", s.getColor());
                     m.put("notes", s.getNotes());
                     return m;
                 })
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok(shifts);
+        Map<String, Object> period = Map.of("from", fromFinal.toString(), "to", toFinal.toString());
+        Map<String, Object> data   = Map.of("shifts", shifts, "period", period);
+        return ResponseEntity.ok(Map.of("data", data));
+    }
+
+    /**
+     * Returns the next 5 upcoming shifts from today onwards.
+     * Used by the ESS Dashboard widget.
+     */
+    @GetMapping("/schedule/upcoming")
+    @Operation(summary = "Get next 5 upcoming shifts from today")
+    public ResponseEntity<Map<String, Object>> getUpcomingShifts(Authentication authentication) {
+        String employeeId = resolveEmployeeId(authentication);
+        LocalDate today = LocalDate.now();
+
+        List<Map<String, Object>> upcoming = shiftRepository
+                .findByEmployeeIdAndDateBetween(employeeId, today, today.plusDays(365))
+                .stream()
+                .filter(s -> !s.getDate().isBefore(today))
+                .sorted(Comparator.comparing(s -> s.getDate()))
+                .limit(5)
+                .map(s -> {
+                    Map<String, Object> m = new LinkedHashMap<>();
+                    m.put("id", s.getId());
+                    m.put("date", s.getDate().toString());
+                    m.put("startTime", s.getStartTime());
+                    m.put("endTime", s.getEndTime());
+                    m.put("duration", s.getDuration());
+                    m.put("shiftType", s.getType());
+                    m.put("department", s.getDepartment());
+                    m.put("color", s.getColor());
+                    return m;
+                })
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(Map.of("data", upcoming));
+    }
+
+    /**
+     * Returns own approved leave entries that overlap the given date range.
+     * Used as an overlay on the ESS schedule calendar.
+     *
+     * Full leave management (apply/approve workflow) is delivered in task 44.
+     * This endpoint is read-only and surfaces already-approved records only.
+     */
+    @GetMapping("/schedule/leave")
+    @Operation(summary = "Get own approved leave for a date range")
+    public ResponseEntity<Map<String, Object>> getMyLeave(
+            Authentication authentication,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+
+        String employeeId = resolveEmployeeId(authentication);
+
+        if (from == null) {
+            LocalDate today = LocalDate.now();
+            from = today.with(DayOfWeek.MONDAY);
+        }
+        if (to == null) {
+            to = from.with(DayOfWeek.SUNDAY);
+        }
+
+        List<Map<String, Object>> leave = leaveRequestRepository
+                .findApprovedForEmployee(employeeId, from, to)
+                .stream()
+                .map(l -> {
+                    Map<String, Object> m = new LinkedHashMap<>();
+                    m.put("id", l.getId());
+                    m.put("startDate", l.getStartDate().toString());
+                    m.put("endDate", l.getEndDate().toString());
+                    m.put("totalDays", l.getTotalDays());
+                    m.put("leaveType", l.getLeaveType());
+                    m.put("color", l.getColor());
+                    m.put("status", l.getStatus());
+                    return m;
+                })
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(Map.of("data", leave));
     }
 
     // ─── /api/ess/payslips ──────────────────────────────────────

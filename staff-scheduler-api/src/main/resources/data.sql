@@ -458,3 +458,14 @@ INSERT INTO pos_assignments (id, user_id, pos_terminal_id, assigned_by, assigned
 (gen_random_uuid(), 'e0eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 1, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', NOW()),
 (gen_random_uuid(), 'e0eebc99-9c0b-4ef8-bb6d-6bb9bd380a55', 2, 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', NOW())
 ON CONFLICT DO NOTHING;
+
+-- ══════════════════════════════════════════════════════
+-- Leave Requests (stub data for task 44 / task 49 ESS schedule overlay)
+-- ══════════════════════════════════════════════════════
+INSERT INTO leave_requests (id, employee_id, start_date, end_date, total_days, leave_type, color, status, notes, created_at) VALUES
+('leave1',  'emp1',  '2026-04-20', '2026-04-24', 5, 'Annual Leave',  '#3B82F6', 'approved', 'Spring holiday', NOW()),
+('leave2',  'emp1',  '2026-05-01', '2026-05-01', 1, 'Public Holiday','#10B981', 'approved', 'Labour Day',     NOW()),
+('leave3',  'emp2',  '2026-04-27', '2026-04-28', 2, 'Sick Leave',    '#EF4444', 'approved', NULL,             NOW()),
+('leave4',  'emp3',  '2026-05-04', '2026-05-08', 5, 'Annual Leave',  '#3B82F6', 'approved', NULL,             NOW()),
+('leave5',  'emp4',  '2026-04-15', '2026-04-15', 1, 'Sick Leave',    '#EF4444', 'pending',  NULL,             NOW())
+ON CONFLICT DO NOTHING;
