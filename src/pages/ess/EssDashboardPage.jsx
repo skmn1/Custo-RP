@@ -10,7 +10,7 @@ const EssDashboardPage = () => {
   const [me, setMe] = useState(null);
 
   useEffect(() => {
-    apiFetch('/api/ess/me')
+    apiFetch('/ess/me')
       .then((res) => setMe(res.data))
       .catch(() => {});
   }, []);

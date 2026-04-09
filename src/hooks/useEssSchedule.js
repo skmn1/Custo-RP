@@ -90,8 +90,8 @@ export function useEssSchedule() {
     setError(null);
     try {
       const [schedRes, leaveRes] = await Promise.all([
-        apiFetch(`/api/ess/schedule?from=${dateRange.from}&to=${dateRange.to}`),
-        apiFetch(`/api/ess/schedule/leave?from=${dateRange.from}&to=${dateRange.to}`),
+        apiFetch(`/ess/schedule?from=${dateRange.from}&to=${dateRange.to}`),
+        apiFetch(`/ess/schedule/leave?from=${dateRange.from}&to=${dateRange.to}`),
       ]);
       setShifts(schedRes?.data?.shifts ?? []);
       setLeave(leaveRes?.data ?? []);
@@ -106,7 +106,7 @@ export function useEssSchedule() {
 
   const fetchUpcoming = useCallback(async () => {
     try {
-      const res = await apiFetch('/api/ess/schedule/upcoming');
+      const res = await apiFetch('/ess/schedule/upcoming');
       setUpcoming(res?.data ?? []);
     } catch {
       setUpcoming([]);

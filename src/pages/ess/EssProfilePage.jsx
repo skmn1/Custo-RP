@@ -8,7 +8,7 @@ const EssProfilePage = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    apiFetch('/api/ess/me')
+    apiFetch('/ess/me')
       .then((res) => setProfile(res.data))
       .catch(() => {})
       .finally(() => setLoading(false));
