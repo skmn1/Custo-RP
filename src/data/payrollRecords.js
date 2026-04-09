@@ -13,7 +13,7 @@ export const mayPayrollRecords = {
   employees: [
     {
       id: 'emp1',
-      name: 'Sarah Chen',
+      name: 'Sarah Johnson',
       role: 'Sales Associate',
       department: 'Sales',
       hourlyRate: 18.00,
@@ -50,7 +50,7 @@ export const mayPayrollRecords = {
     },
     {
       id: 'emp2',
-      name: 'Maria Rodriguez',
+      name: 'Emily Rodriguez',
       role: 'Stock Clerk',
       department: 'Warehouse',
       hourlyRate: 17.00,
@@ -87,7 +87,7 @@ export const mayPayrollRecords = {
     },
     {
       id: 'emp3',
-      name: 'James Wilson',
+      name: 'Jane Smith',
       role: 'Cashier',
       department: 'Sales',
       hourlyRate: 28.00,
@@ -161,7 +161,7 @@ export const mayPayrollRecords = {
     },
     {
       id: 'emp5',
-      name: 'Robert Kim',
+      name: 'Robert Taylor',
       role: 'Administrator',
       department: 'Administration',
       hourlyRate: 25.00,
@@ -198,7 +198,7 @@ export const mayPayrollRecords = {
     },
     {
       id: 'emp6',
-      name: 'Michael Brown',
+      name: 'Michael Chen',
       role: 'Cook',
       department: 'Kitchen',
       hourlyRate: 22.00,
@@ -235,7 +235,7 @@ export const mayPayrollRecords = {
     },
     {
       id: 'emp7',
-      name: 'Amanda Davis',
+      name: 'John Doe',
       role: 'Cashier',
       department: 'Sales',
       hourlyRate: 28.00,
@@ -272,7 +272,7 @@ export const mayPayrollRecords = {
     },
     {
       id: 'emp8',
-      name: 'David Martinez',
+      name: 'David Wilson',
       role: 'Stock Clerk',
       department: 'Warehouse',
       hourlyRate: 22.00,
@@ -309,7 +309,7 @@ export const mayPayrollRecords = {
     },
     {
       id: 'emp9',
-      name: 'Jennifer Garcia',
+      name: 'James Park',
       role: 'Sales Associate',
       department: 'Sales',
       hourlyRate: 35.00,
@@ -346,7 +346,7 @@ export const mayPayrollRecords = {
     },
     {
       id: 'emp10',
-      name: 'Alex Johnson',
+      name: 'Alice Brown',
       role: 'Butcher',
       department: 'Production',
       hourlyRate: 25.00,
@@ -408,7 +408,7 @@ export const junePayrollRecords = {
   employees: [
     {
       id: 'emp1',
-      name: 'Sarah Chen',
+      name: 'Sarah Johnson',
       role: 'Sales Associate',
       department: 'Sales',
       hourlyRate: 18.00,
@@ -445,7 +445,7 @@ export const junePayrollRecords = {
     },
     {
       id: 'emp2',
-      name: 'Maria Rodriguez',
+      name: 'Emily Rodriguez',
       role: 'Stock Clerk',
       department: 'Warehouse',
       hourlyRate: 17.00,
