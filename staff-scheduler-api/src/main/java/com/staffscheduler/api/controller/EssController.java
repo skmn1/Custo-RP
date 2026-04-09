@@ -431,7 +431,8 @@ public class EssController {
         long daysHoliday = breakdown.getOrDefault("holiday", 0L);
 
         // Hours
-        Object[] hours = attendanceRecordRepository.sumHoursForEmployee(employeeId, from, to);
+        List<Object[]> hourRows = attendanceRecordRepository.sumHoursForEmployee(employeeId, from, to);
+        Object[] hours = hourRows.isEmpty() ? new Object[]{0, 0} : hourRows.get(0);
         double totalActualHours = hours[0] != null ? ((Number) hours[0]).doubleValue() : 0;
         double totalOvertimeHours = hours[1] != null ? ((Number) hours[1]).doubleValue() : 0;
 

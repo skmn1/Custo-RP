@@ -29,7 +29,7 @@ public interface AttendanceRecordRepository extends JpaRepository<AttendanceReco
     @Query("SELECT COALESCE(SUM(a.actualHours), 0), COALESCE(SUM(a.overtimeHours), 0) " +
            "FROM AttendanceRecord a " +
            "WHERE a.employeeId = :employeeId AND a.date BETWEEN :from AND :to")
-    Object[] sumHoursForEmployee(
+    List<Object[]> sumHoursForEmployee(
             @Param("employeeId") String employeeId,
             @Param("from") LocalDate from,
             @Param("to") LocalDate to);
