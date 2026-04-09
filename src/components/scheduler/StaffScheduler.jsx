@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { format } from 'date-fns';
 import {
   DndContext,
   DragOverlay,
@@ -63,13 +64,11 @@ const StaffScheduler = () => {
   };
 
   const handleAddShift = (employeeId, day, shiftData = null) => {
-    if (shiftData) {
-      // Called from AddShiftModal with complete shift data
-      addShift(employeeId, day, shiftData);
-    } else {
-      // Called from quick add (clicking empty cell) - use default values
-      addShift(employeeId, day);
-    }
+    // weekDays[day] is the actual Date for the viewed week — always include ISO date
+    // so the backend can persist the correct date even when `date` param is new
+    const dateStr = weekDays[day] ? format(weekDays[day], 'yyyy-MM-dd') : null;
+    const mergedData = shiftData ? { ...shiftData, date: dateStr } : { date: dateStr };
+    addShift(employeeId, day, mergedData);
     setShowAddShiftModal(false);
   };
 

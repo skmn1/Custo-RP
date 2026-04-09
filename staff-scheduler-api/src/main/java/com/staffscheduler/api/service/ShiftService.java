@@ -71,6 +71,18 @@ public class ShiftService {
 
         Shift shift = new Shift();
         shift.setId("shift" + System.currentTimeMillis() + "_" + UUID.randomUUID().toString().substring(0, 6));
+
+        // Derive date when not explicitly provided.
+        // Frontend sends `day` (0=Mon … 6=Sun); map it to the current week's actual date.
+        if (dto.getDate() == null) {
+            if (dto.getDay() != null) {
+                LocalDate monday = LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+                shift.setDate(monday.plusDays(dto.getDay()));
+            } else {
+                shift.setDate(LocalDate.now());
+            }
+        }
+
         applyDto(shift, dto);
 
         return toDto(shiftRepository.save(shift));

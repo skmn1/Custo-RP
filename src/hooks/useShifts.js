@@ -7,21 +7,45 @@ import { createLogger } from '../utils/logger';
 
 const log = createLogger('Shifts');
 
-// ── localStorage fallback persistence ──────────────────────────
-const STORAGE_KEY = 'ssp:shifts:local';
+// ── Dual localStorage strategy ────────────────────────────────────────────────
+//
+//  SERVER_KEY  – last successful response from GET /api/shifts.
+//                Overwritten on every successful fetch.
+//                Used as fallback when the API is unreachable.
+//
+//  OFFLINE_KEY – shifts created / mutated while the API was unavailable.
+//                NEVER cleared by a successful fetch; only cleared when a
+//                pending shift is finally synced to the server or deleted.
+//                Merged on top of server data at render time.
+//
+// On page load:
+//   API ok  → state = serverShifts + offlinePending (not yet on server)
+//   API down → state = cachedServer + offlinePending (both survive)
+// ─────────────────────────────────────────────────────────────────────────────
 
-function loadLocalShifts() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
-  } catch { /* ignore parse errors */ }
-  return null;
-}
+const SERVER_KEY  = 'ssp:shifts:server';
+const OFFLINE_KEY = 'ssp:shifts:offline';
 
-function saveLocalShifts(shifts) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(shifts));
-  } catch { /* quota exceeded — silently ignore */ }
+function readJson(key)       { try { const r = localStorage.getItem(key); return r ? JSON.parse(r) : null; } catch { return null; } }
+function writeJson(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch {} }
+
+const loadServerCache  = ()          => readJson(SERVER_KEY)  ?? null;
+const saveServerCache  = (shifts)    => writeJson(SERVER_KEY, shifts);
+const loadOffline      = ()          => readJson(OFFLINE_KEY) ?? [];
+const saveOffline      = (shifts)    => writeJson(OFFLINE_KEY, shifts);
+const addToOffline     = (shift)     => saveOffline([...loadOffline(), shift]);
+const removeFromOffline = (id)       => saveOffline(loadOffline().filter(s => s.id !== id));
+const updateInOffline  = (id, patch) => saveOffline(loadOffline().map(s => s.id === id ? { ...s, ...patch } : s));
+const isOfflineOnly    = (id)        => loadOffline().some(s => s.id === id);
+
+/** Merge: server shifts + offline-pending that the server doesn't know about yet. */
+function mergeWithOffline(serverShifts) {
+  const pending = loadOffline();
+  if (!pending.length) return serverShifts;
+  const serverIds = new Set(serverShifts.map(s => s.id));
+  const newPending = pending.filter(s => !serverIds.has(s.id));
+  if (newPending.length) log.info(`Merging ${newPending.length} offline-pending shift(s) with server data`);
+  return [...serverShifts, ...newPending];
 }
 
 export const useShifts = () => {
@@ -29,23 +53,26 @@ export const useShifts = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // ── Fetch shifts from backend (falls back to localStorage → static seed) ──
+  // ── Fetch: server → merge offline pending on top ──
 
   const fetchShifts = useCallback(async (filters = {}) => {
     setIsLoading(true);
     setError(null);
     try {
       const data = await shiftsApi.list(filters);
-      setShifts(data);
+      saveServerCache(data);
+      const merged = mergeWithOffline(data);
+      setShifts(merged);
       log.info(`Loaded ${data.length} shifts from API`);
     } catch (err) {
-      const cached = loadLocalShifts();
+      const cached = loadServerCache();
+      const base   = cached ?? initialShifts;
+      const merged = mergeWithOffline(base);
+      setShifts(merged);
       if (cached) {
-        setShifts(cached);
-        log.warn(`API unavailable – restored ${cached.length} shifts from local cache`);
+        log.warn(`API unavailable – restored ${base.length} shifts from cache + ${merged.length - base.length} offline pending`);
       } else {
-        setShifts(initialShifts);
-        log.warn('API unavailable – using seed data (no local cache found)');
+        log.warn('API unavailable – using seed data', { error: err.message });
       }
       setError(null);
     } finally {
@@ -70,122 +97,105 @@ export const useShifts = () => {
   };
 
   const addShift = useCallback(async (employeeId, day, customShiftData = null) => {
+    // customShiftData.date carries the ISO date string set by StaffScheduler
+    const dateStr = customShiftData?.date ?? null;
     let payload;
 
-    if (customShiftData) {
+    if (customShiftData?.startTime) {
+      // Full data from AddShiftModal
       payload = {
-        employeeId,
-        day,
-        startTime: customShiftData.startTime,
-        endTime: customShiftData.endTime,
-        duration: customShiftData.duration,
-        type: customShiftData.type,
+        employeeId, day, date: dateStr,
+        startTime:  customShiftData.startTime,
+        endTime:    customShiftData.endTime,
+        duration:   customShiftData.duration,
+        type:       customShiftData.type,
         department: customShiftData.department,
-        color: getShiftColor(customShiftData.type),
+        color:      getShiftColor(customShiftData.type),
       };
     } else {
-      const randomShiftType = SHIFT_TYPES[Math.floor(Math.random() * SHIFT_TYPES.length)];
-      const duration = calculateShiftDuration(randomShiftType.start, randomShiftType.end);
+      // Quick-add (no modal) – pick a random shift type
+      const rnd      = SHIFT_TYPES[Math.floor(Math.random() * SHIFT_TYPES.length)];
+      const duration = calculateShiftDuration(rnd.start, rnd.end);
       payload = {
-        employeeId,
-        day,
-        startTime: randomShiftType.start,
-        endTime: randomShiftType.end,
-        duration,
-        type: randomShiftType.type,
-        color: randomShiftType.color,
-        department: 'General',
+        employeeId, day, date: dateStr,
+        startTime: rnd.start, endTime: rnd.end, duration,
+        type: rnd.type, color: rnd.color, department: 'General',
       };
     }
 
     try {
       const created = await shiftsApi.create(payload);
-      setShifts(prev => [...prev, created]);
+      setShifts(prev => {
+        const next = [...prev, created];
+        saveServerCache(next);
+        return next;
+      });
       log.info(`shift/create id=${created.id} type=${created.type}`);
       return created;
     } catch (err) {
-      const localShift = { id: generateShiftId(), ...payload };
-      setShifts(prev => {
-        const next = [...prev, localShift];
-        saveLocalShifts(next);
-        return next;
-      });
-      log.warn(`shift/create offline id=${localShift.id} type=${localShift.type}`);
+      const localShift = { id: generateShiftId(), ...payload, _offline: true };
+      addToOffline(localShift);
+      setShifts(prev => [...prev, localShift]);
+      log.warn(`shift/create offline id=${localShift.id}`, { status: err.status, error: err.message });
       return localShift;
     }
   }, []);
 
   const deleteShift = useCallback(async (shiftId) => {
-    // Optimistic removal
-    setShifts(prev => {
-      const next = prev.filter(s => s.id !== shiftId);
-      return next;
-    });
+    const wasOfflineOnly = isOfflineOnly(shiftId);
+
+    // Optimistic removal + always clear from offline store
+    removeFromOffline(shiftId);
+    setShifts(prev => prev.filter(s => s.id !== shiftId));
+
+    if (wasOfflineOnly) {
+      log.info(`shift/delete offline-only id=${shiftId}`);
+      return; // never reached server – no DELETE needed
+    }
+
     try {
       await shiftsApi.delete(shiftId);
       log.info(`shift/delete id=${shiftId}`);
-      // Persist updated list after confirmed server delete
-      setShifts(prev => { saveLocalShifts(prev); return prev; });
     } catch (err) {
-      setShifts(prev => {
-        const next = prev.filter(s => s.id !== shiftId);
-        saveLocalShifts(next);
-        return next;
-      });
-      log.warn(`shift/delete offline id=${shiftId}`);
+      log.warn(`shift/delete failed id=${shiftId}`, { status: err.status, error: err.message });
     }
   }, []);
 
   const updateShift = useCallback(async (shiftId, updates) => {
-    // Optimistic update
-    setShifts(prev =>
-      prev.map(s => (s.id === shiftId ? { ...s, ...updates } : s)),
-    );
+    setShifts(prev => prev.map(s => (s.id === shiftId ? { ...s, ...updates } : s)));
+
+    if (isOfflineOnly(shiftId)) {
+      updateInOffline(shiftId, updates);
+      log.info(`shift/update offline-only id=${shiftId}`);
+      return;
+    }
+
     try {
       const updated = await shiftsApi.update(shiftId, updates);
-      setShifts(prev => {
-        const next = prev.map(s => (s.id === shiftId ? updated : s));
-        saveLocalShifts(next);
-        return next;
-      });
+      setShifts(prev => prev.map(s => (s.id === shiftId ? updated : s)));
       log.info(`shift/update id=${shiftId}`);
     } catch (err) {
-      setShifts(prev => {
-        const next = prev.map(s => (s.id === shiftId ? { ...s, ...updates } : s));
-        saveLocalShifts(next);
-        return next;
-      });
-      log.warn(`shift/update offline id=${shiftId}`);
+      log.warn(`shift/update offline id=${shiftId}`, { status: err.status, error: err.message });
     }
   }, []);
 
   const moveShift = useCallback(async (shiftId, newEmployeeId, newDay) => {
-    // Optimistic update for drag-and-drop responsiveness
     setShifts(prev =>
-      prev.map(s =>
-        s.id === shiftId ? { ...s, employeeId: newEmployeeId, day: newDay } : s,
-      ),
+      prev.map(s => s.id === shiftId ? { ...s, employeeId: newEmployeeId, day: newDay } : s),
     );
+
+    if (isOfflineOnly(shiftId)) {
+      updateInOffline(shiftId, { employeeId: newEmployeeId, day: newDay });
+      log.info(`shift/move offline-only id=${shiftId} day=${newDay}`);
+      return;
+    }
+
     try {
-      const moved = await shiftsApi.move(shiftId, {
-        employeeId: newEmployeeId,
-        day: newDay,
-      });
-      setShifts(prev => {
-        const next = prev.map(s => (s.id === shiftId ? moved : s));
-        saveLocalShifts(next);
-        return next;
-      });
+      const moved = await shiftsApi.move(shiftId, { employeeId: newEmployeeId, day: newDay });
+      setShifts(prev => prev.map(s => (s.id === shiftId ? moved : s)));
       log.info(`shift/move id=${shiftId} day=${newDay}`);
     } catch (err) {
-      setShifts(prev => {
-        const next = prev.map(s =>
-          s.id === shiftId ? { ...s, employeeId: newEmployeeId, day: newDay } : s,
-        );
-        saveLocalShifts(next);
-        return next;
-      });
-      log.warn(`shift/move offline id=${shiftId} day=${newDay}`);
+      log.warn(`shift/move offline id=${shiftId}`, { status: err.status, error: err.message });
     }
   }, []);
 

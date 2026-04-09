@@ -20,7 +20,7 @@ function emit(level, module, message, data) {
     warn:  'color:#f59e0b;font-weight:600',
     error: 'color:#ef4444;font-weight:600',
   }[level];
-  const fn = level === 'error' ? console.error : level === 'warn' ? console.warn : console.log;
+  const fn = level === 'error' ? console.error : level === 'warn' ? console.warn : level === 'debug' ? console.debug : console.info;
   if (data !== undefined) {
     fn(tag, style, `${ICON[level]}  ${message}`, data);
   } else {

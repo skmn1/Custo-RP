@@ -176,4 +176,101 @@ describe('Planning App', () => {
       cy.contains('Export').should('be.visible');
     });
   });
+
+  // ── 8. Regression: offline shift persistence ─────────────────────────────
+  // Verifies the dual-store (ssp:shifts:server + ssp:shifts:offline) strategy
+  // introduced in fix/35-offline-persistence.
+  describe('Offline shift persistence (regression)', () => {
+    const SCHEDULE_URL = `${BASE}/app/planning/schedule`;
+
+    beforeEach(() => {
+      // Clear both stores before each test so there is no leftover state
+      cy.clearLocalStorage('ssp:shifts:server');
+      cy.clearLocalStorage('ssp:shifts:offline');
+      loginAs('planner');
+      cy.visit(SCHEDULE_URL, { timeout: 15000 });
+      cy.contains('Staff Scheduler', { timeout: 15000 }).should('be.visible');
+    });
+
+    // ── 8a. Successful POST should NOT leave shift in offline store ──────────
+    it('does not mark shift as offline when POST /api/shifts succeeds', () => {
+      // Let the API succeed normally
+      cy.intercept('POST', '/api/shifts').as('postShift');
+
+      cy.contains('Add Shift').first().click();
+      cy.wait('@postShift').its('response.statusCode').should('eq', 200);
+
+      cy.window().then((win) => {
+        const offline = JSON.parse(win.localStorage.getItem('ssp:shifts:offline') || '[]');
+        expect(offline).to.have.length(0);
+      });
+    });
+
+    // ── 8b. Failed POST should save shift to offline store ───────────────────
+    it('saves shift to offline store when POST /api/shifts returns 500', () => {
+      cy.intercept('POST', '/api/shifts', { statusCode: 500, body: { message: 'Simulated error' } }).as('failPost');
+
+      cy.contains('Add Shift').first().click();
+      cy.wait('@failPost');
+
+      // Shift should appear in the UI
+      cy.window().then((win) => {
+        const offline = JSON.parse(win.localStorage.getItem('ssp:shifts:offline') || '[]');
+        expect(offline.length).to.be.greaterThan(0);
+        expect(offline[0]._offline).to.equal(true);
+      });
+    });
+
+    // ── 8c. Offline shift survives page reload (regression for root bug) ─────
+    it('offline shifts are still visible after page reload', () => {
+      // Force shift creation offline
+      cy.intercept('POST', '/api/shifts', { statusCode: 500, body: {} }).as('failPost');
+      cy.contains('Add Shift').first().click();
+      cy.wait('@failPost');
+
+      // Capture offline shift id before reload
+      cy.window().then((win) => {
+        const offline = JSON.parse(win.localStorage.getItem('ssp:shifts:offline') || '[]');
+        expect(offline.length).to.be.greaterThan(0);
+        const offlineId = offline[0].id;
+
+        // Allow GET to succeed (server does NOT know about this shift)
+        cy.intercept('GET', '/api/shifts*', (req) => {
+          req.reply({ statusCode: 200, body: [] }); // empty server list
+        }).as('reloadFetch');
+
+        cy.reload();
+        cy.wait('@reloadFetch');
+        cy.contains('Staff Scheduler', { timeout: 15000 }).should('be.visible');
+
+        // The offline-pending shift must still be in the DOM after reload
+        cy.window().then((winAfter) => {
+          const offlineAfter = JSON.parse(winAfter.localStorage.getItem('ssp:shifts:offline') || '[]');
+          expect(offlineAfter.some(s => s.id === offlineId)).to.equal(true);
+        });
+      });
+    });
+
+    // ── 8d. Deleting an offline-only shift removes it without a DELETE call ──
+    it('deletes offline-only shift without calling DELETE /api/shifts', () => {
+      cy.intercept('POST', '/api/shifts', { statusCode: 500, body: {} }).as('failPost');
+      cy.contains('Add Shift').first().click();
+      cy.wait('@failPost');
+
+      cy.intercept('DELETE', '/api/shifts/**').as('deleteCall');
+
+      // Click the delete button on the newly added (offline) shift
+      cy.get('[data-testid="shift-card"]').last().within(() => {
+        cy.get('[data-testid="delete-shift"]').click();
+      });
+
+      // No DELETE request should have been sent
+      cy.get('@deleteCall.all').should('have.length', 0);
+
+      cy.window().then((win) => {
+        const offline = JSON.parse(win.localStorage.getItem('ssp:shifts:offline') || '[]');
+        expect(offline).to.have.length(0);
+      });
+    });
+  });
 });
