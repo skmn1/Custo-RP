@@ -1,0 +1,40 @@
+{
+  "mySchedule": {
+    "title": "Mon horaire",
+    "subtitle": "Vos quarts à venir pour la semaine",
+    "totalHoursThisWeek": "heures totales cette semaine"
+  },
+  "availability": {
+    "title": "Disponibilité",
+    "subtitleEmployee": "Définissez votre disponibilité hebdomadaire",
+    "subtitleManager": "Gérer la disponibilité des employés",
+    "morning": "Matin",
+    "afternoon": "Après-midi",
+    "evening": "Soir"
+  },
+  "timeOff": {
+    "subtitleEmployee": "Consultez et soumettez vos demandes de congé",
+    "subtitleManager": "Examiner et approuver les demandes de congé"
+  },
+  "templates": {
+    "title": "Modèles de quart",
+    "subtitle": "Créer et gérer des modèles de quarts récurrents",
+    "create": "Nouveau modèle",
+    "name": "Nom du modèle",
+    "days": "Jours",
+    "employees": "Employés"
+  },
+  "reports": {
+    "title": "Rapports de planification",
+    "subtitle": "Métriques et analyses clés de planification",
+    "weeklyCoverage": "Couverture hebdomadaire",
+    "shiftDistribution": "Répartition des quarts",
+    "overtimeSummary": "Résumé des heures supplémentaires",
+    "absenceHeatmap": "Carte des absences",
+    "unfilledShifts": "Quarts non pourvus",
+    "scheduled": "Planifié",
+    "target": "Cible",
+    "noOvertime": "Aucune heure supplémentaire enregistrée cette période",
+    "allShiftsFilled": "Tous les quarts sont attribués"
+  }
+}

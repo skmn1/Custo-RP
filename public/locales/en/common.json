@@ -68,7 +68,14 @@
     "skills": "Skills",
     "performance": "Performance",
     "orgChart": "Org Chart",
-    "documents": "Documents"
+    "documents": "Documents",
+    "schedule": "Schedule",
+    "mySchedule": "My Schedule",
+    "availability": "Availability",
+    "timeOff": "Time Off",
+    "shiftSwaps": "Shift Swaps",
+    "templates": "Templates",
+    "planningReports": "Reports"
   },
   "status": {
     "active": "Active",

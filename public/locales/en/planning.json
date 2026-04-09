@@ -1,0 +1,40 @@
+{
+  "mySchedule": {
+    "title": "My Schedule",
+    "subtitle": "Your upcoming shifts for the week",
+    "totalHoursThisWeek": "total hours this week"
+  },
+  "availability": {
+    "title": "Availability",
+    "subtitleEmployee": "Set your weekly availability",
+    "subtitleManager": "Manage employee availability",
+    "morning": "Morning",
+    "afternoon": "Afternoon",
+    "evening": "Evening"
+  },
+  "timeOff": {
+    "subtitleEmployee": "View and submit your time-off requests",
+    "subtitleManager": "Review and approve time-off requests"
+  },
+  "templates": {
+    "title": "Shift Templates",
+    "subtitle": "Create and manage recurring shift patterns",
+    "create": "New Template",
+    "name": "Template Name",
+    "days": "Days",
+    "employees": "Employees"
+  },
+  "reports": {
+    "title": "Planning Reports",
+    "subtitle": "Key planning metrics and analytics",
+    "weeklyCoverage": "Weekly Coverage",
+    "shiftDistribution": "Shift Distribution",
+    "overtimeSummary": "Overtime Summary",
+    "absenceHeatmap": "Absence Heatmap",
+    "unfilledShifts": "Unfilled Shifts",
+    "scheduled": "Scheduled",
+    "target": "Target",
+    "noOvertime": "No overtime recorded this period",
+    "allShiftsFilled": "All shifts are assigned"
+  }
+}

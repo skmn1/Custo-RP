@@ -51,13 +51,16 @@ import HrPerformancePage from './pages/hr/HrPerformancePage';
 import OrgChartPage from './pages/hr/OrgChartPage';
 import HrDocumentsPage from './pages/hr/HrDocumentsPage';
 import HrEmployeeDetailPage from './pages/hr/HrEmployeeDetailPage';
+import MySchedulePage from './pages/MySchedulePage';
+import AvailabilityPage from './pages/AvailabilityPage';
+import TimeOffPage from './pages/TimeOffPage';
+import ShiftSwapsPage from './pages/ShiftSwapsPage';
+import TemplatesPage from './pages/TemplatesPage';
+import PlanningReportsPage from './pages/PlanningReportsPage';
+import { planningSidebarItems } from './apps/planning/sidebarItems';
 
 /* ─── Sidebar nav items per app ───────────────────────────────── */
-const planningSidebar = [
-  { label: 'common:nav.dashboard', icon: 'Squares2X2Icon', to: '/app/planning' },
-  { label: 'common:nav.scheduler', icon: 'CalendarDaysIcon', to: '/app/planning/scheduler' },
-  { label: 'common:nav.employees', icon: 'UsersIcon', to: '/app/planning/employees' },
-];
+// Planning sidebar is imported from src/apps/planning/sidebarItems.js
 
 const hrSidebar = [
   { label: 'common:nav.employees',   icon: 'UsersIcon',           to: '/app/hr/employees'  },
@@ -114,10 +117,16 @@ const App = () => {
           <Route path="/access-denied" element={<AuthGuard><AccessDeniedPage /></AuthGuard>} />
 
           {/* ═══ Planning app ═══ */}
-          <Route path="/app/planning" element={<AppShell appId="planning" sidebarItems={planningSidebar} />}>
+          <Route path="/app/planning" element={<AppShell appId="planning" sidebarItems={planningSidebarItems} />}>
             <Route index element={<Dashboard />} />
-            <Route path="scheduler" element={<SchedulerPage />} />
+            <Route path="schedule" element={<SchedulerPage />} />
+            <Route path="my-schedule" element={<MySchedulePage />} />
             <Route path="employees" element={<EmployeesPage />} />
+            <Route path="availability" element={<AvailabilityPage />} />
+            <Route path="time-off" element={<TimeOffPage />} />
+            <Route path="shift-swaps" element={<ShiftSwapsPage />} />
+            <Route path="templates" element={<TemplatesPage />} />
+            <Route path="reports" element={<PlanningReportsPage />} />
           </Route>
 
           {/* ═══ HR app ═══ */}
@@ -190,7 +199,13 @@ const App = () => {
 
           {/* ─── Legacy route redirects ─── */}
           <Route path="/dashboard" element={<Navigate to="/app/planning" replace />} />
-          <Route path="/scheduler" element={<Navigate to="/app/planning/scheduler" replace />} />
+          <Route path="/scheduler" element={<Navigate to="/app/planning/schedule" replace />} />
+          <Route path="/my-schedule" element={<Navigate to="/app/planning/my-schedule" replace />} />
+          <Route path="/availability" element={<Navigate to="/app/planning/availability" replace />} />
+          <Route path="/time-off" element={<Navigate to="/app/planning/time-off" replace />} />
+          <Route path="/shifts/swap" element={<Navigate to="/app/planning/shift-swaps" replace />} />
+          <Route path="/templates" element={<Navigate to="/app/planning/templates" replace />} />
+          <Route path="/planning/reports" element={<Navigate to="/app/planning/reports" replace />} />
           <Route path="/employees" element={<Navigate to="/app/planning/employees" replace />} />
           <Route path="/payroll" element={<Navigate to="/app/payroll" replace />} />
           <Route path="/pos" element={<Navigate to="/app/pos" replace />} />

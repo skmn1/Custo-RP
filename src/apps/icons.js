@@ -25,6 +25,10 @@ import {
   FolderIcon as FolderOutline,
   RectangleGroupIcon as RectangleGroupOutline,
   CurrencyEuroIcon as CurrencyEuroOutline,
+  UserCircleIcon as UserCircleOutline,
+  ClockIcon as ClockOutline,
+  SunIcon as SunOutline,
+  DocumentDuplicateIcon as DocumentDuplicateOutline,
 } from '@heroicons/react/24/outline';
 
 import {
@@ -50,6 +54,10 @@ import {
   FolderIcon as FolderSolid,
   RectangleGroupIcon as RectangleGroupSolid,
   CurrencyEuroIcon as CurrencyEuroSolid,
+  UserCircleIcon as UserCircleSolid,
+  ClockIcon as ClockSolid,
+  SunIcon as SunSolid,
+  DocumentDuplicateIcon as DocumentDuplicateSolid,
 } from '@heroicons/react/24/solid';
 
 const outlineMap = {
@@ -75,6 +83,10 @@ const outlineMap = {
   FolderIcon: FolderOutline,
   RectangleGroupIcon: RectangleGroupOutline,
   CurrencyEuroIcon: CurrencyEuroOutline,
+  UserCircleIcon: UserCircleOutline,
+  ClockIcon: ClockOutline,
+  SunIcon: SunOutline,
+  DocumentDuplicateIcon: DocumentDuplicateOutline,
 };
 
 const solidMap = {
@@ -100,6 +112,10 @@ const solidMap = {
   FolderIcon: FolderSolid,
   RectangleGroupIcon: RectangleGroupSolid,
   CurrencyEuroIcon: CurrencyEuroSolid,
+  UserCircleIcon: UserCircleSolid,
+  ClockIcon: ClockSolid,
+  SunIcon: SunSolid,
+  DocumentDuplicateIcon: DocumentDuplicateSolid,
 };
 
 export function getIconComponent(iconName, variant = 'outline') {

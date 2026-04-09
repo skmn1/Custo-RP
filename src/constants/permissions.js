@@ -57,6 +57,9 @@ export const PERMISSIONS = {
   employee: [
     'dashboard:view',
     'schedule:view-own',
+    'availability:view-own', 'availability:edit-own',
+    'time-off:view-own', 'time-off:request',
+    'shift-swap:view-own', 'shift-swap:request',
     'employees:view-own', 'employees:edit-own',
     'payroll:view-own',
     'settings:view',

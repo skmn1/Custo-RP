@@ -68,7 +68,14 @@
     "skills": "Compétences",
     "performance": "Performance",
     "orgChart": "Organigramme",
-    "documents": "Documents"
+    "documents": "Documents",
+    "schedule": "Planning",
+    "mySchedule": "Mon horaire",
+    "availability": "Disponibilité",
+    "timeOff": "Congés",
+    "shiftSwaps": "Échanges de quarts",
+    "templates": "Modèles",
+    "planningReports": "Rapports"
   },
   "status": {
     "active": "Actif",
