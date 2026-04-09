@@ -68,6 +68,12 @@ import DirectDepositPage from './pages/DirectDepositPage';
 import PayrollExportPage from './pages/PayrollExportPage';
 import { planningSidebarItems } from './apps/planning/sidebarItems';
 import { payrollSidebarItems } from './apps/payroll/sidebarItems';
+import { accountingSidebarItems } from './apps/accounting/sidebarItems';
+import AccountingDashboardPage from './pages/accounting/AccountingDashboardPage';
+import PaymentsPage from './pages/accounting/PaymentsPage';
+import AgingPage from './pages/accounting/AgingPage';
+import AccountingReportsPage from './pages/accounting/AccountingReportsPage';
+import AccountingSettingsPage from './pages/accounting/AccountingSettingsPage';
 
 /* ─── Sidebar nav items per app ───────────────────────────────── */
 // Planning sidebar is imported from src/apps/planning/sidebarItems.js
@@ -82,10 +88,7 @@ const hrSidebar = [
 
 const payrollSidebar = payrollSidebarItems;
 
-const accountingSidebar = [
-  { label: 'common:nav.invoices', icon: 'ReceiptPercentIcon', to: '/app/accounting/invoices' },
-  { label: 'common:nav.invoiceReview', icon: 'ClipboardDocumentCheckIcon', to: '/app/accounting/invoices/review' },
-];
+const accountingSidebar = accountingSidebarItems;
 
 const stockSidebar = [
   { label: 'common:nav.stockDashboard',  icon: 'Squares2X2Icon',              to: '/app/stock',                     roles: ['super_admin', 'stock_manager'] },
@@ -167,12 +170,17 @@ const App = () => {
 
           {/* ═══ Accounting app ═══ */}
           <Route path="/app/accounting" element={<AppShell appId="accounting" sidebarItems={accountingSidebar} />}>
-            <Route index element={<Navigate to="/app/accounting/invoices" replace />} />
+            <Route index element={<Navigate to="/app/accounting/dashboard" replace />} />
+            <Route path="dashboard" element={<AccountingDashboardPage />} />
             <Route path="invoices" element={<InvoiceListPage />} />
             <Route path="invoices/new" element={<InvoiceFormPage />} />
             <Route path="invoices/review" element={<InvoiceReviewPage />} />
             <Route path="invoices/:id/edit" element={<InvoiceFormPage />} />
             <Route path="invoices/:id" element={<InvoiceDetailPage />} />
+            <Route path="payments" element={<PaymentsPage />} />
+            <Route path="aging" element={<AgingPage />} />
+            <Route path="reports" element={<AccountingReportsPage />} />
+            <Route path="settings" element={<AccountingSettingsPage />} />
           </Route>
 
           {/* ═══ Stock app ═══ */}
@@ -244,6 +252,10 @@ const App = () => {
           <Route path="/suppliers/*" element={<Navigate to="/app/stock/suppliers" replace />} />
           <Route path="/purchase-orders" element={<Navigate to="/app/stock/purchase-orders" replace />} />
           <Route path="/purchase-orders/*" element={<Navigate to="/app/stock/purchase-orders" replace />} />
+          <Route path="/invoices" element={<Navigate to="/app/accounting/invoices" replace />} />
+          <Route path="/invoices/new" element={<Navigate to="/app/accounting/invoices/new" replace />} />
+          <Route path="/invoices/aging" element={<Navigate to="/app/accounting/aging" replace />} />
+          <Route path="/invoices/:id" element={<Navigate to="/app/accounting/invoices/:id" replace />} />
           <Route path="/invoices/*" element={<Navigate to="/app/accounting/invoices" replace />} />
         </Routes>
         </SettingsProvider>

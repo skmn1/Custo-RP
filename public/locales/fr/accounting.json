@@ -1,0 +1,56 @@
+{
+  "dashboard": {
+    "title": "Tableau de bord comptabilité",
+    "arOpen": "Total AR ouvert",
+    "apOpen": "Total AP ouvert",
+    "overdueAr": "AR en retard",
+    "revenueMtd": "Revenus du mois",
+    "arVsAp": "AR vs AP (12 mois)",
+    "statusDist": "Répartition par statut",
+    "cashFlow": "Projection de trésorerie (60 jours)",
+    "expectedIn": "Entrées prévues",
+    "expectedOut": "Sorties prévues",
+    "netPosition": "Position nette",
+    "overdueTable": "Top 10 factures AR en retard",
+    "noOverdue": "Aucune facture AR en retard"
+  },
+  "payments": {
+    "title": "Journal des paiements",
+    "dateFrom": "Du",
+    "dateTo": "Au",
+    "type": "Type",
+    "method": "Mode de paiement",
+    "recordedBy": "Enregistré par",
+    "showing": "{{count}} paiements affichés"
+  },
+  "aging": {
+    "title": "Rapport d'ancienneté AR",
+    "daysOverdue": "Jours de retard"
+  },
+  "reports": {
+    "title": "Rapports comptables",
+    "revenue": "Revenus",
+    "expenses": "Dépenses",
+    "tax": "Synthèse TVA",
+    "outstanding": "Soldes ouverts",
+    "month": "Mois",
+    "revenueTotal": "Revenus",
+    "expenseTotal": "Dépenses",
+    "taxCollected": "TVA collectée (AR)",
+    "taxPaid": "TVA payée (AP)",
+    "taxNet": "TVA nette"
+  },
+  "settings": {
+    "title": "Paramètres comptables",
+    "defaultCurrency": "Devise par défaut",
+    "currencySymbol": "Symbole de devise",
+    "defaultTaxRate": "Taux de TVA par défaut (%)",
+    "arPrefix": "Préfixe facture AR",
+    "apPrefix": "Préfixe facture AP",
+    "invoiceSequence": "Séquence de numérotation",
+    "paymentTerms": "Conditions de paiement (jours)",
+    "bankDetails": "Coordonnées bancaires",
+    "fiscalYearStart": "Début de l'exercice fiscal (mois 1–12)",
+    "readOnly": "Lecture seule — incrémenté automatiquement"
+  }
+}

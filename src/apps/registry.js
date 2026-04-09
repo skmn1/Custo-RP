@@ -40,7 +40,7 @@ export const APPS = [
     icon: 'ReceiptPercentIcon',
     color: 'amber',
     route: '/app/accounting',
-    roles: ['super_admin', 'accounting_agent', 'pos_manager'],
+    roles: ['super_admin', 'accounting_agent'],
   },
   {
     id: 'stock',

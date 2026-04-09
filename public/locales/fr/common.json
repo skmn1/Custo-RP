@@ -82,7 +82,12 @@
     "myPaySlips": "Mes bulletins de paie",
     "deductions": "Déductions",
     "directDeposit": "Dépôt direct",
-    "export": "Exporter"
+    "export": "Exporter",
+    "arInvoices": "Factures AR",
+    "apInvoices": "Factures AP",
+    "payments": "Paiements",
+    "aging": "Ancienneté",
+    "accountingSettings": "Paramètres"
   },
   "status": {
     "active": "Actif",

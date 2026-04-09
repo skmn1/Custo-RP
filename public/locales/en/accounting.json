@@ -1,0 +1,56 @@
+{
+  "dashboard": {
+    "title": "Accounting Dashboard",
+    "arOpen": "Total AR Open",
+    "apOpen": "Total AP Open",
+    "overdueAr": "Overdue AR",
+    "revenueMtd": "Revenue MTD",
+    "arVsAp": "AR vs AP (12 Months)",
+    "statusDist": "Invoice Status Distribution",
+    "cashFlow": "Cash Flow Projection (60 Days)",
+    "expectedIn": "Expected In",
+    "expectedOut": "Expected Out",
+    "netPosition": "Net Position",
+    "overdueTable": "Top 10 Overdue AR Invoices",
+    "noOverdue": "No overdue AR invoices"
+  },
+  "payments": {
+    "title": "Payments Log",
+    "dateFrom": "From",
+    "dateTo": "To",
+    "type": "Type",
+    "method": "Method",
+    "recordedBy": "Recorded By",
+    "showing": "Showing {{count}} payments"
+  },
+  "aging": {
+    "title": "AR Aging Report",
+    "daysOverdue": "Days Overdue"
+  },
+  "reports": {
+    "title": "Accounting Reports",
+    "revenue": "Revenue",
+    "expenses": "Expenses",
+    "tax": "Tax Summary",
+    "outstanding": "Outstanding",
+    "month": "Month",
+    "revenueTotal": "Revenue",
+    "expenseTotal": "Expenses",
+    "taxCollected": "Tax Collected (AR)",
+    "taxPaid": "Tax Paid (AP)",
+    "taxNet": "Net VAT"
+  },
+  "settings": {
+    "title": "Accounting Settings",
+    "defaultCurrency": "Default Currency",
+    "currencySymbol": "Currency Symbol",
+    "defaultTaxRate": "Default Tax Rate (%)",
+    "arPrefix": "AR Invoice Prefix",
+    "apPrefix": "AP Invoice Prefix",
+    "invoiceSequence": "Invoice Number Sequence",
+    "paymentTerms": "Payment Terms (days)",
+    "bankDetails": "Company Bank Details",
+    "fiscalYearStart": "Fiscal Year Start (month 1–12)",
+    "readOnly": "Read-only — auto-incremented"
+  }
+}

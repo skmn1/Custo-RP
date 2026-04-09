@@ -35,6 +35,10 @@ import {
   MinusCircleIcon as MinusCircleOutline,
   BuildingLibraryIcon as BuildingLibraryOutline,
   ArrowDownTrayIcon as ArrowDownTrayOutline,
+  ArrowUpRightIcon as ArrowUpRightOutline,
+  ArrowDownLeftIcon as ArrowDownLeftOutline,
+  CreditCardIcon as CreditCardOutline,
+  Cog6ToothIcon as Cog6ToothOutline,
 } from '@heroicons/react/24/outline';
 
 import {
@@ -70,6 +74,10 @@ import {
   MinusCircleIcon as MinusCircleSolid,
   BuildingLibraryIcon as BuildingLibrarySolid,
   ArrowDownTrayIcon as ArrowDownTraySolid,
+  ArrowUpRightIcon as ArrowUpRightSolid,
+  ArrowDownLeftIcon as ArrowDownLeftSolid,
+  CreditCardIcon as CreditCardSolid,
+  Cog6ToothIcon as Cog6ToothSolid,
 } from '@heroicons/react/24/solid';
 
 const outlineMap = {
@@ -105,6 +113,10 @@ const outlineMap = {
   MinusCircleIcon: MinusCircleOutline,
   BuildingLibraryIcon: BuildingLibraryOutline,
   ArrowDownTrayIcon: ArrowDownTrayOutline,
+  ArrowUpRightIcon: ArrowUpRightOutline,
+  ArrowDownLeftIcon: ArrowDownLeftOutline,
+  CreditCardIcon: CreditCardOutline,
+  Cog6ToothIcon: Cog6ToothOutline,
 };
 
 const solidMap = {
@@ -140,6 +152,10 @@ const solidMap = {
   MinusCircleIcon: MinusCircleSolid,
   BuildingLibraryIcon: BuildingLibrarySolid,
   ArrowDownTrayIcon: ArrowDownTraySolid,
+  ArrowUpRightIcon: ArrowUpRightSolid,
+  ArrowDownLeftIcon: ArrowDownLeftSolid,
+  CreditCardIcon: CreditCardSolid,
+  Cog6ToothIcon: Cog6ToothSolid,
 };
 
 export function getIconComponent(iconName, variant = 'outline') {

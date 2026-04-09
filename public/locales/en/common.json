@@ -82,7 +82,12 @@
     "myPaySlips": "My Pay Slips",
     "deductions": "Deductions",
     "directDeposit": "Direct Deposit",
-    "export": "Export"
+    "export": "Export",
+    "arInvoices": "AR Invoices",
+    "apInvoices": "AP Invoices",
+    "payments": "Payments",
+    "aging": "Aging",
+    "accountingSettings": "Settings"
   },
   "status": {
     "active": "Active",
