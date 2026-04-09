@@ -70,6 +70,14 @@ import { planningSidebarItems } from './apps/planning/sidebarItems';
 import { payrollSidebarItems } from './apps/payroll/sidebarItems';
 import { accountingSidebarItems } from './apps/accounting/sidebarItems';
 import { adminSidebarItems } from './apps/admin/sidebarItems';
+import { essSidebarItems } from './apps/ess/sidebarItems';
+import EmployeeRoleGuard from './components/shell/EmployeeRoleGuard';
+import EssDashboardPage from './pages/ess/EssDashboardPage';
+import EssSchedulePage from './pages/ess/EssSchedulePage';
+import EssPayslipsPage from './pages/ess/EssPayslipsPage';
+import EssAttendancePage from './pages/ess/EssAttendancePage';
+import EssProfilePage from './pages/ess/EssProfilePage';
+import EssNotificationsPage from './pages/ess/EssNotificationsPage';
 import AccountingDashboardPage from './pages/accounting/AccountingDashboardPage';
 import PaymentsPage from './pages/accounting/PaymentsPage';
 import AgingPage from './pages/accounting/AgingPage';
@@ -133,7 +141,7 @@ const App = () => {
           <Route path="/access-denied" element={<AuthGuard><AccessDeniedPage /></AuthGuard>} />
 
           {/* ═══ Planning app ═══ */}
-          <Route path="/app/planning" element={<AppShell appId="planning" sidebarItems={planningSidebarItems} />}>
+          <Route path="/app/planning" element={<EmployeeRoleGuard><AppShell appId="planning" sidebarItems={planningSidebarItems} /></EmployeeRoleGuard>}>
             <Route index element={<Dashboard />} />
             <Route path="schedule" element={<SchedulerPage />} />
             <Route path="my-schedule" element={<MySchedulePage />} />
@@ -146,7 +154,7 @@ const App = () => {
           </Route>
 
           {/* ═══ HR app ═══ */}
-          <Route path="/app/hr" element={<AppShell appId="hr" sidebarItems={hrSidebar} />}>
+          <Route path="/app/hr" element={<EmployeeRoleGuard><AppShell appId="hr" sidebarItems={hrSidebar} /></EmployeeRoleGuard>}>
             <Route index element={<Navigate to="/app/hr/employees" replace />} />
             <Route path="employees" element={<EmployeesPage />} />
             <Route path="employees/:id" element={<HrEmployeeDetailPage />} />
@@ -157,7 +165,7 @@ const App = () => {
           </Route>
 
           {/* ═══ Payroll app ═══ */}
-          <Route path="/app/payroll" element={<AppShell appId="payroll" sidebarItems={payrollSidebar} />}>
+          <Route path="/app/payroll" element={<EmployeeRoleGuard><AppShell appId="payroll" sidebarItems={payrollSidebar} /></EmployeeRoleGuard>}>
             <Route index element={<Navigate to="/app/payroll/overview" replace />} />
             <Route path="overview" element={<PayrollOverviewPage />} />
             <Route path="runs" element={<PayRunListPage />} />
@@ -174,7 +182,7 @@ const App = () => {
           </Route>
 
           {/* ═══ Accounting app ═══ */}
-          <Route path="/app/accounting" element={<AppShell appId="accounting" sidebarItems={accountingSidebar} />}>
+          <Route path="/app/accounting" element={<EmployeeRoleGuard><AppShell appId="accounting" sidebarItems={accountingSidebar} /></EmployeeRoleGuard>}>
             <Route index element={<Navigate to="/app/accounting/dashboard" replace />} />
             <Route path="dashboard" element={<AccountingDashboardPage />} />
             <Route path="invoices" element={<InvoiceListPage />} />
@@ -189,7 +197,7 @@ const App = () => {
           </Route>
 
           {/* ═══ Stock app ═══ */}
-          <Route path="/app/stock" element={<AppShell appId="stock" sidebarItems={stockSidebar} />}>
+          <Route path="/app/stock" element={<EmployeeRoleGuard><AppShell appId="stock" sidebarItems={stockSidebar} /></EmployeeRoleGuard>}>
             <Route index element={<StockDashboardPage />} />
             <Route path="items" element={<StockItemListPage />} />
             <Route path="items/new" element={<StockItemFormPage />} />
@@ -212,7 +220,7 @@ const App = () => {
           </Route>
 
           {/* ═══ POS app ═══ */}
-          <Route path="/app/pos" element={<PosAppShell />}>
+          <Route path="/app/pos" element={<EmployeeRoleGuard><PosAppShell /></EmployeeRoleGuard>}>
             <Route index element={<MyTerminalsPage />} />
             {/* Admin-only routes — must be before :terminalId to avoid param collision */}
             <Route path="admin/assignments" element={<PosTerminalAssignmentsPage />} />
@@ -224,7 +232,7 @@ const App = () => {
           </Route>
 
           {/* ═══ Admin app ═══ */}
-          <Route path="/app/admin" element={<AppShell appId="admin" sidebarItems={adminSidebar} />}>
+          <Route path="/app/admin" element={<EmployeeRoleGuard><AppShell appId="admin" sidebarItems={adminSidebar} /></EmployeeRoleGuard>}>
             <Route index element={<Navigate to="/app/admin/dashboard" replace />} />
             <Route path="dashboard" element={<AdminDashboardPage />} />
             <Route path="users" element={<AdminUsersPage />} />
@@ -233,6 +241,17 @@ const App = () => {
             <Route path="audit-log" element={<AdminAuditLogPage />} />
             <Route path="settings" element={<AdminSettingsPage />} />
             <Route path="system" element={<AdminSystemHealthPage />} />
+          </Route>
+
+          {/* ═══ ESS (Employee Self-Service) app ═══ */}
+          <Route path="/app/ess" element={<AppShell appId="ess" sidebarItems={essSidebarItems} />}>
+            <Route index element={<Navigate to="/app/ess/dashboard" replace />} />
+            <Route path="dashboard" element={<EssDashboardPage />} />
+            <Route path="schedule" element={<EssSchedulePage />} />
+            <Route path="payslips" element={<EssPayslipsPage />} />
+            <Route path="attendance" element={<EssAttendancePage />} />
+            <Route path="profile" element={<EssProfilePage />} />
+            <Route path="notifications" element={<EssNotificationsPage />} />
           </Route>
 
           {/* ─── Legacy route redirects ─── */}

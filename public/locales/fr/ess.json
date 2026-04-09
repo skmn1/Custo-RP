@@ -1,0 +1,67 @@
+{
+  "appName": "Mon Portail",
+  "welcome": "Bon retour, {{firstName}}",
+  "nav": {
+    "dashboard": "Tableau de bord",
+    "schedule": "Mon planning",
+    "payslips": "Mes fiches de paie",
+    "attendance": "Présences",
+    "profile": "Mon profil",
+    "notifications": "Notifications"
+  },
+  "dashboard": {
+    "title": "Mon tableau de bord",
+    "nextShift": "Prochain quart",
+    "hoursThisWeek": "Heures cette semaine",
+    "pendingRequests": "Demandes en attente",
+    "latestPayslip": "Dernière fiche de paie",
+    "noUpcomingShift": "Aucun quart à venir",
+    "viewSchedule": "Voir le planning",
+    "viewPayslips": "Voir les fiches de paie"
+  },
+  "schedule": {
+    "title": "Mon planning",
+    "noShifts": "Aucun quart trouvé pour cette période",
+    "shift": "Quart",
+    "start": "Début",
+    "end": "Fin",
+    "duration": "Durée",
+    "department": "Département"
+  },
+  "payslips": {
+    "title": "Mes fiches de paie",
+    "noPayslips": "Aucune fiche de paie trouvée",
+    "period": "Période",
+    "grossPay": "Salaire brut",
+    "netPay": "Salaire net",
+    "download": "Télécharger"
+  },
+  "attendance": {
+    "title": "Mes présences",
+    "hoursWorked": "Heures travaillées",
+    "shiftsCompleted": "Quarts effectués",
+    "absences": "Absences",
+    "period": "Période"
+  },
+  "profile": {
+    "title": "Mon profil",
+    "personalInfo": "Informations personnelles",
+    "jobInfo": "Informations professionnelles",
+    "contactInfo": "Contact",
+    "name": "Nom complet",
+    "email": "E-mail",
+    "phone": "Téléphone",
+    "department": "Département",
+    "jobTitle": "Poste",
+    "hireDate": "Date d'embauche"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "Aucune notification",
+    "markAllRead": "Tout marquer comme lu"
+  },
+  "errors": {
+    "noEmployeeRecord": "Votre compte n'est pas lié à un dossier employé. Veuillez contacter les RH.",
+    "accessDenied": "Vous n'avez pas accès à cette section."
+  }
+}

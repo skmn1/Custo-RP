@@ -1,0 +1,67 @@
+{
+  "appName": "My Portal",
+  "welcome": "Welcome back, {{firstName}}",
+  "nav": {
+    "dashboard": "Dashboard",
+    "schedule": "My Schedule",
+    "payslips": "My Payslips",
+    "attendance": "Attendance",
+    "profile": "My Profile",
+    "notifications": "Notifications"
+  },
+  "dashboard": {
+    "title": "My Dashboard",
+    "nextShift": "Next Shift",
+    "hoursThisWeek": "Hours This Week",
+    "pendingRequests": "Pending Requests",
+    "latestPayslip": "Latest Payslip",
+    "noUpcomingShift": "No upcoming shifts",
+    "viewSchedule": "View schedule",
+    "viewPayslips": "View payslips"
+  },
+  "schedule": {
+    "title": "My Schedule",
+    "noShifts": "No shifts found for this period",
+    "shift": "Shift",
+    "start": "Start",
+    "end": "End",
+    "duration": "Duration",
+    "department": "Department"
+  },
+  "payslips": {
+    "title": "My Payslips",
+    "noPayslips": "No payslips found",
+    "period": "Period",
+    "grossPay": "Gross Pay",
+    "netPay": "Net Pay",
+    "download": "Download"
+  },
+  "attendance": {
+    "title": "My Attendance",
+    "hoursWorked": "Hours Worked",
+    "shiftsCompleted": "Shifts Completed",
+    "absences": "Absences",
+    "period": "Period"
+  },
+  "profile": {
+    "title": "My Profile",
+    "personalInfo": "Personal Information",
+    "jobInfo": "Job Information",
+    "contactInfo": "Contact",
+    "name": "Full Name",
+    "email": "Email",
+    "phone": "Phone",
+    "department": "Department",
+    "jobTitle": "Job Title",
+    "hireDate": "Hire Date"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No notifications",
+    "markAllRead": "Mark all as read"
+  },
+  "errors": {
+    "noEmployeeRecord": "Your account is not linked to an employee record. Please contact HR.",
+    "accessDenied": "You do not have access to this section."
+  }
+}

@@ -206,7 +206,8 @@ INSERT INTO apps (id, display_name, description, created_at) VALUES
 ('accounting', 'Accounting',     'Invoices & financial reporting',           NOW()),
 ('stock',      'Stock',          'Inventory, purchasing & stocktakes',       NOW()),
 ('pos',        'Point of Sale',  'PoS terminal management & daily ops',     NOW()),
-('admin',      'Administration', 'System settings & user management',       NOW())
+('admin',      'Administration', 'System settings & user management',       NOW()),
+('ess',        'Employee Portal','Personal dashboard, schedule, payslips & profile', NOW())
 ON CONFLICT DO NOTHING;
 
 -- ═══════════════════════════════════════════════════════════════════
@@ -222,6 +223,7 @@ INSERT INTO app_permissions (app_id, role, permission_level) VALUES
 ('stock',      'super_admin',      'full'),
 ('pos',        'super_admin',      'full'),
 ('admin',      'super_admin',      'full'),
+('ess',        'super_admin',      'full'),
 -- hr_manager
 ('planning',   'hr_manager',       'full'),
 ('hr',         'hr_manager',       'full'),
@@ -230,6 +232,7 @@ INSERT INTO app_permissions (app_id, role, permission_level) VALUES
 ('stock',      'hr_manager',       'none'),
 ('pos',        'hr_manager',       'none'),
 ('admin',      'hr_manager',       'none'),
+('ess',        'hr_manager',       'full'),
 -- planner
 ('planning',   'planner',          'full'),
 ('hr',         'planner',          'read'),
@@ -263,13 +266,14 @@ INSERT INTO app_permissions (app_id, role, permission_level) VALUES
 ('pos',        'pos_manager',      'full'),
 ('admin',      'pos_manager',      'none'),
 -- employee
-('planning',   'employee',         'read'),
+('planning',   'employee',         'none'),
 ('hr',         'employee',         'none'),
-('payroll',    'employee',         'read'),
+('payroll',    'employee',         'none'),
 ('accounting', 'employee',         'none'),
 ('stock',      'employee',         'none'),
 ('pos',        'employee',         'none'),
-('admin',      'employee',         'none')
+('admin',      'employee',         'none'),
+('ess',        'employee',         'full')
 ON CONFLICT DO NOTHING;
 
 -- ═══════════════════════════════════════════════════════════════════

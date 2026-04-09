@@ -16,7 +16,7 @@ export const APPS = [
     icon: 'CalendarDaysIcon',
     color: 'blue',
     route: '/app/planning',
-    roles: ['super_admin', 'hr_manager', 'planner', 'employee'],
+    roles: ['super_admin', 'hr_manager', 'planner'],
   },
   {
     id: 'hr',
@@ -32,7 +32,7 @@ export const APPS = [
     icon: 'BanknotesIcon',
     color: 'violet',
     route: '/app/payroll',
-    roles: ['super_admin', 'hr_manager', 'employee'],
+    roles: ['super_admin', 'hr_manager'],
   },
   {
     id: 'accounting',
@@ -65,6 +65,14 @@ export const APPS = [
     color: 'slate',
     route: '/app/admin',
     roles: ['super_admin'],
+  },
+  {
+    id: 'ess',
+    name: 'ess',
+    icon: 'UserCircleIcon',
+    color: 'indigo',
+    route: '/app/ess',
+    roles: ['super_admin', 'hr_manager', 'employee'],
   },
 ];
 

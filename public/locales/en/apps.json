@@ -40,6 +40,10 @@
     "name": "Admin",
     "description": "Users, roles, and system settings"
   },
+  "ess": {
+    "name": "Employee Portal",
+    "description": "Your personal dashboard, schedule, payslips, and profile"
+  },
   "sidebar": {
     "collapse": "Collapse sidebar",
     "expand": "Expand sidebar"

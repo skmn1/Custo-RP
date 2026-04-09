@@ -40,6 +40,10 @@
     "name": "Admin",
     "description": "Utilisateurs, rôles et paramètres système"
   },
+  "ess": {
+    "name": "Portail Employé",
+    "description": "Votre tableau de bord personnel, planning, fiches de paie et profil"
+  },
   "sidebar": {
     "collapse": "Réduire la barre latérale",
     "expand": "Développer la barre latérale"

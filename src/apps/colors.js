@@ -80,6 +80,17 @@ export const APP_COLORS = {
     accent: 'bg-slate-500',
     accentHover: 'hover:bg-slate-600',
   },
+  indigo: {
+    css: '99 102 241',        // indigo-500
+    bg: 'bg-indigo-50',
+    bgHover: 'hover:bg-indigo-100',
+    text: 'text-indigo-600',
+    border: 'border-indigo-500',
+    ring: 'ring-indigo-500',
+    badge: 'bg-indigo-100 text-indigo-700',
+    accent: 'bg-indigo-500',
+    accentHover: 'hover:bg-indigo-600',
+  },
 };
 
 export function getAppColor(colorName) {

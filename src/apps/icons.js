@@ -41,6 +41,7 @@ import {
   Cog6ToothIcon as Cog6ToothOutline,
   KeyIcon as KeyOutline,
   ServerIcon as ServerOutline,
+  BellIcon as BellOutline,
 } from '@heroicons/react/24/outline';
 
 import {
@@ -82,6 +83,7 @@ import {
   Cog6ToothIcon as Cog6ToothSolid,
   KeyIcon as KeySolid,
   ServerIcon as ServerSolid,
+  BellIcon as BellSolid,
 } from '@heroicons/react/24/solid';
 
 const outlineMap = {
@@ -123,6 +125,7 @@ const outlineMap = {
   Cog6ToothIcon: Cog6ToothOutline,
   KeyIcon: KeyOutline,
   ServerIcon: ServerOutline,
+  BellIcon: BellOutline,
 };
 
 const solidMap = {
@@ -164,6 +167,7 @@ const solidMap = {
   Cog6ToothIcon: Cog6ToothSolid,
   KeyIcon: KeySolid,
   ServerIcon: ServerSolid,
+  BellIcon: BellSolid,
 };
 
 export function getIconComponent(iconName, variant = 'outline') {
