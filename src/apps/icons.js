@@ -39,6 +39,8 @@ import {
   ArrowDownLeftIcon as ArrowDownLeftOutline,
   CreditCardIcon as CreditCardOutline,
   Cog6ToothIcon as Cog6ToothOutline,
+  KeyIcon as KeyOutline,
+  ServerIcon as ServerOutline,
 } from '@heroicons/react/24/outline';
 
 import {
@@ -78,6 +80,8 @@ import {
   ArrowDownLeftIcon as ArrowDownLeftSolid,
   CreditCardIcon as CreditCardSolid,
   Cog6ToothIcon as Cog6ToothSolid,
+  KeyIcon as KeySolid,
+  ServerIcon as ServerSolid,
 } from '@heroicons/react/24/solid';
 
 const outlineMap = {
@@ -117,6 +121,8 @@ const outlineMap = {
   ArrowDownLeftIcon: ArrowDownLeftOutline,
   CreditCardIcon: CreditCardOutline,
   Cog6ToothIcon: Cog6ToothOutline,
+  KeyIcon: KeyOutline,
+  ServerIcon: ServerOutline,
 };
 
 const solidMap = {
@@ -156,6 +162,8 @@ const solidMap = {
   ArrowDownLeftIcon: ArrowDownLeftSolid,
   CreditCardIcon: CreditCardSolid,
   Cog6ToothIcon: Cog6ToothSolid,
+  KeyIcon: KeySolid,
+  ServerIcon: ServerSolid,
 };
 
 export function getIconComponent(iconName, variant = 'outline') {

@@ -31,6 +31,7 @@ export const NAMESPACES = [
   'roles',
   'planning',
   'accounting',
+  'admin',
 ];
 
 i18n

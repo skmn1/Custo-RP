@@ -1,0 +1,237 @@
+{
+  "nav": {
+    "dashboard": "Tableau de bord",
+    "users": "Utilisateurs",
+    "appAccess": "Accès applications",
+    "posTerminals": "Terminaux PdV",
+    "auditLog": "Journal d'audit",
+    "settings": "Paramètres",
+    "system": "Santé système"
+  },
+  "dashboard": {
+    "title": "Tableau de bord global",
+    "refreshInterval": "Intervalle de rafraîchissement",
+    "lastUpdated": "Dernière mise à jour",
+    "unavailable": "Indisponible",
+    "section": {
+      "people": "Personnel",
+      "payroll": "Paie",
+      "accounting": "Comptabilité",
+      "stock": "Stock",
+      "pos": "Point de vente"
+    },
+    "kpi": {
+      "activeEmployees": "Employés actifs",
+      "shiftsThisWeek": "Quarts cette semaine",
+      "openTimeOff": "Demandes de congé en attente",
+      "pendingSwaps": "Échanges de quarts en attente",
+      "nextPayRun": "Prochaine période de paie",
+      "lastPayRunTotal": "Total dernière paie",
+      "pendingPayRuns": "Paies en attente",
+      "openArInvoices": "Factures AR ouvertes",
+      "overdueArInvoices": "Factures AR en retard",
+      "revenueMtd": "Revenus du mois",
+      "lowStockAlerts": "Alertes stock bas",
+      "pendingPurchaseOrders": "Bons de commande en attente",
+      "totalInventoryValue": "Valeur totale de l'inventaire",
+      "activeSessions": "Sessions actives",
+      "posSalesToday": "Ventes PdV aujourd'hui",
+      "posTransactionsToday": "Transactions PdV aujourd'hui"
+    },
+    "activityFeed": {
+      "title": "Fil d'activité inter-applications",
+      "empty": "Aucune activité récente",
+      "shiftCreated": "a créé un quart",
+      "shiftModified": "a modifié un quart",
+      "payRunApproved": "a approuvé une période de paie",
+      "invoiceFinalised": "a finalisé une facture",
+      "invoiceOverdue": "facture en retard",
+      "stockAdjustment": "a ajusté le stock",
+      "lowStockTriggered": "alerte stock bas déclenchée",
+      "posSessionOpened": "a ouvert une session PdV",
+      "posSessionClosed": "a fermé une session PdV",
+      "roleChanged": "a changé le rôle d'un utilisateur"
+    }
+  },
+  "users": {
+    "title": "Gestion des utilisateurs et rôles",
+    "subtitle": "Gérer tous les utilisateurs, rôles et permissions du système",
+    "invite": "Inviter un utilisateur",
+    "search": "Rechercher par nom ou courriel…",
+    "col": {
+      "avatar": "Avatar",
+      "name": "Nom",
+      "email": "Courriel",
+      "role": "Rôle",
+      "status": "Statut",
+      "lastLogin": "Dernière connexion",
+      "actions": "Actions"
+    },
+    "detail": {
+      "profile": "Profil",
+      "appAccess": "Accès applications",
+      "posAssignments": "Affectations PdV",
+      "auditTrail": "Piste d'audit",
+      "lastActions": "10 dernières actions de cet utilisateur"
+    },
+    "status": {
+      "active": "Actif",
+      "suspended": "Suspendu",
+      "pending": "Invitation en attente"
+    },
+    "actions": {
+      "suspend": "Suspendre l'utilisateur",
+      "unsuspend": "Réactiver l'utilisateur",
+      "resetPassword": "Réinitialiser le mot de passe",
+      "confirmSuspend": "Suspendre cet utilisateur invalidera immédiatement sa session. Êtes-vous sûr ?",
+      "confirmUnsuspend": "Réactiver le compte de cet utilisateur ?",
+      "resetLinkGenerated": "Lien de réinitialisation généré",
+      "resetLinkCopied": "Lien de réinitialisation copié"
+    },
+    "inviteForm": {
+      "title": "Inviter un nouvel utilisateur",
+      "name": "Nom complet",
+      "email": "Adresse courriel",
+      "role": "Rôle",
+      "send": "Envoyer l'invitation",
+      "success": "Invitation envoyée avec succès"
+    }
+  },
+  "invitations": {
+    "title": "Invitations en attente",
+    "empty": "Aucune invitation en attente",
+    "col": {
+      "email": "Courriel",
+      "role": "Rôle",
+      "invitedBy": "Invité par",
+      "expiresAt": "Expire le",
+      "actions": "Actions"
+    },
+    "rescind": "Annuler",
+    "confirmRescind": "Annuler cette invitation ?"
+  },
+  "appAccess": {
+    "title": "Matrice d'accès applications",
+    "subtitle": "Configurer les rôles pouvant accéder à chaque application",
+    "app": "Application",
+    "none": "—",
+    "read": "Lecture",
+    "full": "Complet",
+    "confirmTitle": "Confirmer le changement d'accès",
+    "confirmMessage": "Ce changement affectera {{count}} utilisateurs ayant le rôle {{role}}. Êtes-vous sûr ?",
+    "saved": "Matrice d'accès mise à jour"
+  },
+  "terminals": {
+    "title": "Gestion des terminaux PdV",
+    "subtitle": "Gérer tous les terminaux de point de vente et les affectations",
+    "newTerminal": "Nouveau terminal",
+    "col": {
+      "name": "Nom du terminal",
+      "location": "Emplacement",
+      "status": "Statut",
+      "managers": "Gestionnaires assignés",
+      "lastSession": "Dernière session",
+      "actions": "Actions"
+    },
+    "form": {
+      "name": "Nom du terminal",
+      "location": "Emplacement",
+      "description": "Description"
+    },
+    "actions": {
+      "edit": "Modifier le terminal",
+      "deactivate": "Désactiver",
+      "activate": "Activer",
+      "manageAssignments": "Gérer les affectations",
+      "confirmDeactivate": "Désactiver ce terminal le masquera pour tous les gestionnaires PdV. Continuer ?"
+    },
+    "status": {
+      "active": "Actif",
+      "inactive": "Inactif"
+    }
+  },
+  "auditLog": {
+    "title": "Journal d'audit",
+    "subtitle": "Consulter et exporter tous les journaux d'activité du système",
+    "filters": {
+      "dateRange": "Plage de dates",
+      "from": "Du",
+      "to": "Au",
+      "actor": "Acteur",
+      "app": "Application",
+      "actionType": "Type d'action",
+      "resourceType": "Type de ressource",
+      "allApps": "Toutes les applications",
+      "allActions": "Toutes les actions",
+      "allResources": "Toutes les ressources"
+    },
+    "col": {
+      "timestamp": "Horodatage",
+      "actor": "Acteur",
+      "app": "Appli",
+      "action": "Action",
+      "resourceType": "Type de ressource",
+      "resourceId": "ID ressource",
+      "changes": "Modifications",
+      "ip": "Adresse IP"
+    },
+    "actionTypes": {
+      "create": "Création",
+      "update": "Mise à jour",
+      "delete": "Suppression",
+      "login": "Connexion",
+      "logout": "Déconnexion"
+    },
+    "export": {
+      "csv": "Exporter CSV",
+      "excel": "Exporter Excel"
+    },
+    "expandDiff": "Voir les modifications",
+    "noDiff": "Aucun détail de modification disponible"
+  },
+  "system": {
+    "title": "Santé du système",
+    "subtitle": "Vue en temps réel de l'état du système et de l'infrastructure",
+    "panels": {
+      "apiStatus": "État de l'API",
+      "database": "Base de données",
+      "i18nCheck": "Vérification i18n",
+      "appVersion": "Version de l'application",
+      "cache": "Cache",
+      "lastBackup": "Dernière sauvegarde"
+    },
+    "status": {
+      "ok": "OK",
+      "degraded": "Dégradé",
+      "down": "Hors service",
+      "unknown": "Inconnu"
+    },
+    "api": {
+      "ping": "Ping",
+      "responseTime": "Temps de réponse"
+    },
+    "db": {
+      "connections": "Nombre de connexions",
+      "slowQueries": "Requêtes lentes (dernière heure)",
+      "size": "Taille de la base"
+    },
+    "i18n": {
+      "missingKeys": "Clés de traduction manquantes",
+      "namespace": "Espace de noms",
+      "count": "Nombre"
+    },
+    "version": {
+      "current": "Version actuelle",
+      "lastDeploy": "Dernier déploiement"
+    },
+    "cache": {
+      "hitRate": "Taux de succès",
+      "keyCount": "Nombre de clés",
+      "memoryUsage": "Utilisation mémoire"
+    },
+    "backup": {
+      "lastBackup": "Dernière sauvegarde",
+      "status": "État"
+    }
+  }
+}

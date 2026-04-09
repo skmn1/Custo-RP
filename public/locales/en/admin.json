@@ -1,0 +1,238 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "users": "Users",
+    "appAccess": "App Access",
+    "posTerminals": "PoS Terminals",
+    "auditLog": "Audit Log",
+    "settings": "Settings",
+    "system": "System Health"
+  },
+  "dashboard": {
+    "title": "Global Dashboard",
+    "refreshInterval": "Refresh interval",
+    "lastUpdated": "Last updated",
+    "unavailable": "Unavailable",
+    "section": {
+      "people": "People",
+      "payroll": "Payroll",
+      "accounting": "Accounting",
+      "stock": "Stock",
+      "pos": "Point of Sale"
+    },
+    "kpi": {
+      "activeEmployees": "Active Employees",
+      "shiftsThisWeek": "Shifts This Week",
+      "openTimeOff": "Open Time-Off Requests",
+      "pendingSwaps": "Pending Shift Swaps",
+      "nextPayRun": "Next Pay Run Date",
+      "lastPayRunTotal": "Last Pay Run Total",
+      "pendingPayRuns": "Pending Pay Runs",
+      "openArInvoices": "Open AR Invoices",
+      "overdueArInvoices": "Overdue AR Invoices",
+      "revenueMtd": "Revenue MTD",
+      "lowStockAlerts": "Low Stock Alerts",
+      "pendingPurchaseOrders": "Pending Purchase Orders",
+      "totalInventoryValue": "Total Inventory Value",
+      "activeSessions": "Active Sessions Now",
+      "posSalesToday": "PoS Sales Today",
+      "posTransactionsToday": "PoS Transactions Today"
+    },
+    "activityFeed": {
+      "title": "Cross-App Activity Feed",
+      "empty": "No recent activity",
+      "shiftCreated": "created a shift",
+      "shiftModified": "modified a shift",
+      "payRunApproved": "approved a pay run",
+      "invoiceFinalised": "finalised an invoice",
+      "invoiceOverdue": "invoice is overdue",
+      "stockAdjustment": "adjusted stock",
+      "lowStockTriggered": "triggered low stock alert",
+      "posSessionOpened": "opened a PoS session",
+      "posSessionClosed": "closed a PoS session",
+      "roleChanged": "changed a user's role"
+    }
+  },
+  "users": {
+    "title": "User & Role Management",
+    "subtitle": "Manage all system users, roles, and permissions",
+    "invite": "Invite User",
+    "search": "Search by name or email…",
+    "col": {
+      "avatar": "Avatar",
+      "name": "Name",
+      "email": "Email",
+      "role": "Role",
+      "status": "Status",
+      "lastLogin": "Last Login",
+      "actions": "Actions"
+    },
+    "detail": {
+      "profile": "Profile",
+      "appAccess": "App Access",
+      "posAssignments": "PoS Assignments",
+      "auditTrail": "Audit Trail",
+      "lastActions": "Last 10 actions by this user"
+    },
+    "status": {
+      "active": "Active",
+      "suspended": "Suspended",
+      "pending": "Pending Invitation"
+    },
+    "actions": {
+      "suspend": "Suspend User",
+      "unsuspend": "Reactivate User",
+      "resetPassword": "Reset Password",
+      "confirmSuspend": "Suspending this user will immediately invalidate their session. Are you sure?",
+      "confirmUnsuspend": "Reactivate this user's account?",
+      "resetLinkGenerated": "Password reset link generated",
+      "resetLinkCopied": "Reset link copied to clipboard"
+    },
+    "invite": "Invite User",
+    "inviteForm": {
+      "title": "Invite New User",
+      "name": "Full Name",
+      "email": "Email Address",
+      "role": "Role",
+      "send": "Send Invitation",
+      "success": "Invitation sent successfully"
+    }
+  },
+  "invitations": {
+    "title": "Pending Invitations",
+    "empty": "No pending invitations",
+    "col": {
+      "email": "Email",
+      "role": "Role",
+      "invitedBy": "Invited By",
+      "expiresAt": "Expires",
+      "actions": "Actions"
+    },
+    "rescind": "Rescind",
+    "confirmRescind": "Rescind this invitation?"
+  },
+  "appAccess": {
+    "title": "App Access Matrix",
+    "subtitle": "Configure which roles can access each application",
+    "app": "Application",
+    "none": "—",
+    "read": "Read",
+    "full": "Full",
+    "confirmTitle": "Confirm Access Change",
+    "confirmMessage": "This change will affect {{count}} users currently holding the {{role}} role. Are you sure?",
+    "saved": "App access matrix updated"
+  },
+  "terminals": {
+    "title": "PoS Terminal Management",
+    "subtitle": "Manage all point-of-sale terminals and assignments",
+    "newTerminal": "New Terminal",
+    "col": {
+      "name": "Terminal Name",
+      "location": "Location",
+      "status": "Status",
+      "managers": "Assigned Managers",
+      "lastSession": "Last Session",
+      "actions": "Actions"
+    },
+    "form": {
+      "name": "Terminal Name",
+      "location": "Location",
+      "description": "Description"
+    },
+    "actions": {
+      "edit": "Edit Terminal",
+      "deactivate": "Deactivate",
+      "activate": "Activate",
+      "manageAssignments": "Manage Assignments",
+      "confirmDeactivate": "Deactivating this terminal will hide it from all PoS managers. Continue?"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    }
+  },
+  "auditLog": {
+    "title": "Audit Log",
+    "subtitle": "View and export all system activity logs",
+    "filters": {
+      "dateRange": "Date Range",
+      "from": "From",
+      "to": "To",
+      "actor": "Actor",
+      "app": "Application",
+      "actionType": "Action Type",
+      "resourceType": "Resource Type",
+      "allApps": "All Applications",
+      "allActions": "All Actions",
+      "allResources": "All Resources"
+    },
+    "col": {
+      "timestamp": "Timestamp",
+      "actor": "Actor",
+      "app": "App",
+      "action": "Action",
+      "resourceType": "Resource Type",
+      "resourceId": "Resource ID",
+      "changes": "Changes",
+      "ip": "IP Address"
+    },
+    "actionTypes": {
+      "create": "Create",
+      "update": "Update",
+      "delete": "Delete",
+      "login": "Login",
+      "logout": "Logout"
+    },
+    "export": {
+      "csv": "Export CSV",
+      "excel": "Export Excel"
+    },
+    "expandDiff": "View Changes",
+    "noDiff": "No change details available"
+  },
+  "system": {
+    "title": "System Health",
+    "subtitle": "Real-time overview of system status and infrastructure",
+    "panels": {
+      "apiStatus": "API Status",
+      "database": "Database",
+      "i18nCheck": "i18n Check",
+      "appVersion": "App Version",
+      "cache": "Cache",
+      "lastBackup": "Last Backup"
+    },
+    "status": {
+      "ok": "OK",
+      "degraded": "Degraded",
+      "down": "Down",
+      "unknown": "Unknown"
+    },
+    "api": {
+      "ping": "Ping",
+      "responseTime": "Response Time"
+    },
+    "db": {
+      "connections": "Connection Count",
+      "slowQueries": "Slow Queries (last hour)",
+      "size": "Database Size"
+    },
+    "i18n": {
+      "missingKeys": "Missing Translation Keys",
+      "namespace": "Namespace",
+      "count": "Count"
+    },
+    "version": {
+      "current": "Current Version",
+      "lastDeploy": "Last Deploy"
+    },
+    "cache": {
+      "hitRate": "Hit Rate",
+      "keyCount": "Key Count",
+      "memoryUsage": "Memory Usage"
+    },
+    "backup": {
+      "lastBackup": "Last Backup",
+      "status": "Status"
+    }
+  }
+}

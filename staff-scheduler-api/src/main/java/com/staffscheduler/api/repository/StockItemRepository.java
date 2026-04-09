@@ -41,4 +41,16 @@ public interface StockItemRepository extends JpaRepository<StockItem, UUID> {
 
     @Query(value = "SELECT COUNT(*) FROM stock_items WHERE is_active = true", nativeQuery = true)
     long countActive();
+
+    @Query(value = "SELECT COUNT(DISTINCT si.id) FROM stock_items si " +
+           "JOIN (SELECT item_id, COALESCE(SUM(qty_change), 0) AS current_qty FROM stock_movements GROUP BY item_id) mv " +
+           "ON si.id = mv.item_id " +
+           "WHERE si.is_active = true AND mv.current_qty <= si.reorder_point", nativeQuery = true)
+    long countLowStock();
+
+    @Query(value = "SELECT COALESCE(SUM(mv.current_qty * si.avg_cost), 0) FROM stock_items si " +
+           "JOIN (SELECT item_id, COALESCE(SUM(qty_change), 0) AS current_qty FROM stock_movements GROUP BY item_id) mv " +
+           "ON si.id = mv.item_id " +
+           "WHERE si.is_active = true AND mv.current_qty > 0", nativeQuery = true)
+    java.math.BigDecimal totalInventoryValue();
 }

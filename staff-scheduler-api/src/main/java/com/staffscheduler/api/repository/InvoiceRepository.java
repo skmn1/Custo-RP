@@ -49,4 +49,10 @@ public interface InvoiceRepository extends JpaRepository<Invoice, UUID> {
 
     @Query(value = "SELECT COALESCE(MAX(CAST(SUBSTRING(invoice_number FROM '[0-9]+$') AS INTEGER)), 0) FROM invoices", nativeQuery = true)
     int findMaxInvoiceSequence();
+
+    @Query("SELECT COUNT(i) FROM Invoice i WHERE i.status <> :status")
+    long countByStatusNot(@Param("status") String status);
+
+    @Query("SELECT COUNT(i) FROM Invoice i WHERE i.status = :status")
+    long countByStatus(@Param("status") String status);
 }

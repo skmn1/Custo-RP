@@ -69,11 +69,19 @@ import PayrollExportPage from './pages/PayrollExportPage';
 import { planningSidebarItems } from './apps/planning/sidebarItems';
 import { payrollSidebarItems } from './apps/payroll/sidebarItems';
 import { accountingSidebarItems } from './apps/accounting/sidebarItems';
+import { adminSidebarItems } from './apps/admin/sidebarItems';
 import AccountingDashboardPage from './pages/accounting/AccountingDashboardPage';
 import PaymentsPage from './pages/accounting/PaymentsPage';
 import AgingPage from './pages/accounting/AgingPage';
 import AccountingReportsPage from './pages/accounting/AccountingReportsPage';
 import AccountingSettingsPage from './pages/accounting/AccountingSettingsPage';
+import AdminDashboardPage from './pages/admin/AdminDashboardPage';
+import AdminUsersPage from './pages/admin/AdminUsersPage';
+import AppAccessMatrixPage from './pages/admin/AppAccessMatrixPage';
+import AdminPosTerminalsPage from './pages/admin/AdminPosTerminalsPage';
+import AdminAuditLogPage from './pages/admin/AdminAuditLogPage';
+import AdminSystemHealthPage from './pages/admin/AdminSystemHealthPage';
+import AdminSettingsPage from './pages/admin/AdminSettingsPage';
 
 /* ─── Sidebar nav items per app ───────────────────────────────── */
 // Planning sidebar is imported from src/apps/planning/sidebarItems.js
@@ -105,10 +113,7 @@ const stockSidebar = [
 
 const posSidebar = []; // PoS uses PosAppShell with dynamic sidebar
 
-const adminSidebar = [
-  { label: 'common:nav.users', icon: 'UsersIcon', to: '/app/admin/users' },
-  { label: 'common:nav.settings', icon: 'Cog8ToothIcon', to: '/app/admin/settings' },
-];
+const adminSidebar = adminSidebarItems;
 
 const App = () => {
   return (
@@ -220,9 +225,14 @@ const App = () => {
 
           {/* ═══ Admin app ═══ */}
           <Route path="/app/admin" element={<AppShell appId="admin" sidebarItems={adminSidebar} />}>
-            <Route index element={<Navigate to="/app/admin/users" replace />} />
-            <Route path="users" element={<UserManagementPage />} />
-            <Route path="settings" element={<SettingsPage />} />
+            <Route index element={<Navigate to="/app/admin/dashboard" replace />} />
+            <Route path="dashboard" element={<AdminDashboardPage />} />
+            <Route path="users" element={<AdminUsersPage />} />
+            <Route path="app-access" element={<AppAccessMatrixPage />} />
+            <Route path="pos-terminals" element={<AdminPosTerminalsPage />} />
+            <Route path="audit-log" element={<AdminAuditLogPage />} />
+            <Route path="settings" element={<AdminSettingsPage />} />
+            <Route path="system" element={<AdminSystemHealthPage />} />
           </Route>
 
           {/* ─── Legacy route redirects ─── */}

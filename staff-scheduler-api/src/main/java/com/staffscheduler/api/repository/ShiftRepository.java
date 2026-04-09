@@ -18,6 +18,8 @@ public interface ShiftRepository extends JpaRepository<Shift, String> {
 
     List<Shift> findByDateBetween(LocalDate start, LocalDate end);
 
+    long countByDateBetween(LocalDate start, LocalDate end);
+
     List<Shift> findByEmployeeIdAndDateBetween(String employeeId, LocalDate start, LocalDate end);
 
     @Query("SELECT s FROM Shift s WHERE " +
