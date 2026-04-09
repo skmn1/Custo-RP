@@ -3,13 +3,33 @@ import { shiftsApi } from '../api/shiftsApi';
 import { initialShifts } from '../data/shifts';
 import { SHIFT_TYPES } from '../constants/scheduler';
 import { generateShiftId, calculateShiftDuration } from '../utils/shiftUtils';
+import { createLogger } from '../utils/logger';
+
+const log = createLogger('Shifts');
+
+// ── localStorage fallback persistence ──────────────────────────
+const STORAGE_KEY = 'ssp:shifts:local';
+
+function loadLocalShifts() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch { /* ignore parse errors */ }
+  return null;
+}
+
+function saveLocalShifts(shifts) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(shifts));
+  } catch { /* quota exceeded — silently ignore */ }
+}
 
 export const useShifts = () => {
   const [shifts, setShifts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // ── Fetch shifts from backend (falls back to static data) ──
+  // ── Fetch shifts from backend (falls back to localStorage → static seed) ──
 
   const fetchShifts = useCallback(async (filters = {}) => {
     setIsLoading(true);
@@ -17,9 +37,16 @@ export const useShifts = () => {
     try {
       const data = await shiftsApi.list(filters);
       setShifts(data);
+      log.info(`Loaded ${data.length} shifts from API`);
     } catch (err) {
-      console.warn('Backend unavailable, using local data:', err.message);
-      setShifts(initialShifts);
+      const cached = loadLocalShifts();
+      if (cached) {
+        setShifts(cached);
+        log.warn(`API unavailable – restored ${cached.length} shifts from local cache`);
+      } else {
+        setShifts(initialShifts);
+        log.warn('API unavailable – using seed data (no local cache found)');
+      }
       setError(null);
     } finally {
       setIsLoading(false);
@@ -74,22 +101,38 @@ export const useShifts = () => {
     try {
       const created = await shiftsApi.create(payload);
       setShifts(prev => [...prev, created]);
+      log.info(`shift/create id=${created.id} type=${created.type}`);
       return created;
     } catch (err) {
-      // Fallback to local-only if backend is down
       const localShift = { id: generateShiftId(), ...payload };
-      setShifts(prev => [...prev, localShift]);
+      setShifts(prev => {
+        const next = [...prev, localShift];
+        saveLocalShifts(next);
+        return next;
+      });
+      log.warn(`shift/create offline id=${localShift.id} type=${localShift.type}`);
       return localShift;
     }
   }, []);
 
   const deleteShift = useCallback(async (shiftId) => {
     // Optimistic removal
-    setShifts(prev => prev.filter(s => s.id !== shiftId));
+    setShifts(prev => {
+      const next = prev.filter(s => s.id !== shiftId);
+      return next;
+    });
     try {
       await shiftsApi.delete(shiftId);
+      log.info(`shift/delete id=${shiftId}`);
+      // Persist updated list after confirmed server delete
+      setShifts(prev => { saveLocalShifts(prev); return prev; });
     } catch (err) {
-      console.warn('Failed to delete shift on server:', err.message);
+      setShifts(prev => {
+        const next = prev.filter(s => s.id !== shiftId);
+        saveLocalShifts(next);
+        return next;
+      });
+      log.warn(`shift/delete offline id=${shiftId}`);
     }
   }, []);
 
@@ -100,11 +143,19 @@ export const useShifts = () => {
     );
     try {
       const updated = await shiftsApi.update(shiftId, updates);
-      setShifts(prev =>
-        prev.map(s => (s.id === shiftId ? updated : s)),
-      );
+      setShifts(prev => {
+        const next = prev.map(s => (s.id === shiftId ? updated : s));
+        saveLocalShifts(next);
+        return next;
+      });
+      log.info(`shift/update id=${shiftId}`);
     } catch (err) {
-      console.warn('Failed to update shift on server:', err.message);
+      setShifts(prev => {
+        const next = prev.map(s => (s.id === shiftId ? { ...s, ...updates } : s));
+        saveLocalShifts(next);
+        return next;
+      });
+      log.warn(`shift/update offline id=${shiftId}`);
     }
   }, []);
 
@@ -120,11 +171,21 @@ export const useShifts = () => {
         employeeId: newEmployeeId,
         day: newDay,
       });
-      setShifts(prev =>
-        prev.map(s => (s.id === shiftId ? moved : s)),
-      );
+      setShifts(prev => {
+        const next = prev.map(s => (s.id === shiftId ? moved : s));
+        saveLocalShifts(next);
+        return next;
+      });
+      log.info(`shift/move id=${shiftId} day=${newDay}`);
     } catch (err) {
-      console.warn('Failed to move shift on server:', err.message);
+      setShifts(prev => {
+        const next = prev.map(s =>
+          s.id === shiftId ? { ...s, employeeId: newEmployeeId, day: newDay } : s,
+        );
+        saveLocalShifts(next);
+        return next;
+      });
+      log.warn(`shift/move offline id=${shiftId} day=${newDay}`);
     }
   }, []);
 
