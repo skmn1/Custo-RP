@@ -75,6 +75,7 @@ import EmployeeRoleGuard from './components/shell/EmployeeRoleGuard';
 import EssDashboardPage from './pages/ess/EssDashboardPage';
 import EssSchedulePage from './pages/ess/EssSchedulePage';
 import EssPayslipsPage from './pages/ess/EssPayslipsPage';
+import EssPayslipDetailPage from './pages/ess/EssPayslipDetailPage';
 import EssAttendancePage from './pages/ess/EssAttendancePage';
 import EssProfilePage from './pages/ess/EssProfilePage';
 import EssNotificationsPage from './pages/ess/EssNotificationsPage';
@@ -249,6 +250,7 @@ const App = () => {
             <Route path="dashboard" element={<EssDashboardPage />} />
             <Route path="schedule" element={<EssSchedulePage />} />
             <Route path="payslips" element={<EssPayslipsPage />} />
+            <Route path="payslips/:id" element={<EssPayslipDetailPage />} />
             <Route path="attendance" element={<EssAttendancePage />} />
             <Route path="profile" element={<EssProfilePage />} />
             <Route path="notifications" element={<EssNotificationsPage />} />

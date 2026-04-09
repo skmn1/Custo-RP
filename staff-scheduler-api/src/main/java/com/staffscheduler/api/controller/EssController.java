@@ -3,14 +3,19 @@ package com.staffscheduler.api.controller;
 import com.staffscheduler.api.exception.ResourceNotFoundException;
 import com.staffscheduler.api.model.Employee;
 import com.staffscheduler.api.model.LeaveRequest;
+import com.staffscheduler.api.model.PaySlip;
+import com.staffscheduler.api.repository.AppSettingRepository;
 import com.staffscheduler.api.repository.EmployeeRepository;
 import com.staffscheduler.api.repository.LeaveRequestRepository;
+import com.staffscheduler.api.repository.PaySlipRepository;
 import com.staffscheduler.api.repository.ShiftRepository;
 import com.staffscheduler.api.repository.UserRepository;
 import com.staffscheduler.api.service.EmployeeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -43,6 +48,8 @@ public class EssController {
     private final EmployeeRepository employeeRepository;
     private final ShiftRepository shiftRepository;
     private final LeaveRequestRepository leaveRequestRepository;
+    private final PaySlipRepository paySlipRepository;
+    private final AppSettingRepository appSettingRepository;
     private final EmployeeService employeeService;
 
     // ─── /api/ess/me ────────────────────────────────────────────
@@ -202,13 +209,165 @@ public class EssController {
 
     // ─── /api/ess/payslips ──────────────────────────────────────
 
+    /**
+     * List own payslips (paginated, filterable by year).
+     *
+     * If the organisation setting `show_salary_to_employee` is false, returns
+     * { data: [], restricted: true, message: "..." } with HTTP 200.
+     */
     @GetMapping("/payslips")
-    @Operation(summary = "Get own payslips")
-    public ResponseEntity<List<Map<String, Object>>> getMyPayslips(Authentication authentication) {
-        // Payslip data will be implemented in task 50.
-        // Returning an empty list here so the frontend renders gracefully.
-        resolveEmployeeId(authentication); // enforce scoping check
-        return ResponseEntity.ok(Collections.emptyList());
+    @Operation(summary = "List own payslips (paginated, year-filterable)")
+    public ResponseEntity<Map<String, Object>> getMyPayslips(
+            Authentication authentication,
+            @RequestParam(required = false) Integer year,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "12") int pageSize) {
+
+        String employeeId = resolveEmployeeId(authentication);
+
+        if (!isSalaryVisibleToEmployee()) {
+            return ResponseEntity.ok(Map.of(
+                    "data", Collections.emptyList(),
+                    "restricted", true,
+                    "message", "Payslip access is currently disabled by your organisation."
+            ));
+        }
+
+        PageRequest pageable = PageRequest.of(Math.max(0, page - 1), Math.min(pageSize, 100));
+        Page<PaySlip> result;
+        if (year != null) {
+            result = paySlipRepository.findByEmployeeIdAndPeriodYearOrderByPeriodEndDesc(employeeId, year, pageable);
+        } else {
+            result = paySlipRepository.findByEmployeeIdOrderByPeriodEndDesc(employeeId, pageable);
+        }
+
+        List<Map<String, Object>> data = result.getContent().stream()
+                .map(this::toListItem)
+                .collect(Collectors.toList());
+
+        Map<String, Object> pagination = new LinkedHashMap<>();
+        pagination.put("page", page);
+        pagination.put("pageSize", pageSize);
+        pagination.put("total", result.getTotalElements());
+        pagination.put("hasNextPage", result.hasNext());
+
+        return ResponseEntity.ok(Map.of("data", data, "pagination", pagination));
+    }
+
+    /**
+     * Latest payslip summary (used by dashboard widget).
+     */
+    @GetMapping("/payslips/latest")
+    @Operation(summary = "Get latest payslip summary")
+    public ResponseEntity<Map<String, Object>> getLatestPayslip(Authentication authentication) {
+        String employeeId = resolveEmployeeId(authentication);
+
+        if (!isSalaryVisibleToEmployee()) {
+            return ResponseEntity.ok(Map.of("data", Collections.emptyMap()));
+        }
+
+        Map<String, Object> data = paySlipRepository.findFirstByEmployeeIdOrderByPeriodEndDesc(employeeId)
+                .map(p -> {
+                    Map<String, Object> m = new LinkedHashMap<>();
+                    m.put("id", p.getId());
+                    m.put("periodLabel", p.getPeriodLabel());
+                    m.put("netPay", p.getNetPay());
+                    m.put("paidAt", p.getPaidAt() != null ? p.getPaidAt().toString() : null);
+                    m.put("currency", p.getCurrency());
+                    return m;
+                })
+                .orElse(null);
+
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("data", data);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Full payslip detail with line items.
+     *
+     * Returns 404 if the payslip does not belong to the authenticated employee
+     * (prevents ID enumeration — never returns 403 for a foreign payslip).
+     */
+    @GetMapping("/payslips/{id}")
+    @Operation(summary = "Get payslip detail with breakdown")
+    public ResponseEntity<Map<String, Object>> getPayslipDetail(
+            Authentication authentication,
+            @PathVariable String id) {
+
+        String employeeId = resolveEmployeeId(authentication);
+
+        if (!isSalaryVisibleToEmployee()) {
+            return ResponseEntity.ok(Map.of(
+                    "data", Collections.emptyMap(),
+                    "restricted", true
+            ));
+        }
+
+        PaySlip p = paySlipRepository.findByIdAndEmployeeId(id, employeeId)
+                .orElseThrow(() -> new ResourceNotFoundException("PaySlip", id));
+
+        Map<String, Object> detail = new LinkedHashMap<>();
+        detail.put("id", p.getId());
+        detail.put("periodStart", p.getPeriodStart().toString());
+        detail.put("periodEnd", p.getPeriodEnd().toString());
+        detail.put("periodLabel", p.getPeriodLabel());
+        detail.put("workedHours", p.getWorkedHours());
+        detail.put("grossPay", p.getGrossPay());
+        detail.put("totalDeductions", p.getTotalDeductions());
+        detail.put("netPay", p.getNetPay());
+        detail.put("employerContributions", p.getEmployerContributions());
+        detail.put("status", p.getStatus());
+        detail.put("paidAt", p.getPaidAt() != null ? p.getPaidAt().toString() : null);
+        detail.put("paymentMethod", p.getPaymentMethod());
+        detail.put("currency", p.getCurrency());
+        detail.put("employeeName", p.getEmployeeName());
+
+        // Parse lines JSON
+        if (p.getLinesJson() != null && !p.getLinesJson().isBlank()) {
+            try {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> lines = new com.fasterxml.jackson.databind.ObjectMapper()
+                        .readValue(p.getLinesJson(), Map.class);
+                detail.put("lines", lines);
+            } catch (Exception e) {
+                detail.put("lines", Map.of("earnings", List.of(), "deductions", List.of()));
+            }
+        } else {
+            detail.put("lines", Map.of("earnings", List.of(), "deductions", List.of()));
+        }
+
+        // Compute totals from lines if not already set
+        detail.put("totalEarnings", p.getGrossPay());
+
+        return ResponseEntity.ok(Map.of("data", detail));
+    }
+
+    // ─── Setting gate ───────────────────────────────────────────
+
+    /**
+     * Checks the `show_salary_to_employee` app setting.
+     * Defaults to true if the setting does not exist.
+     */
+    private boolean isSalaryVisibleToEmployee() {
+        return appSettingRepository.findByCategoryAndSettingKey("payroll", "showSalaryToEmployee")
+                .map(s -> "true".equalsIgnoreCase(s.getSettingValue()))
+                .orElse(true);
+    }
+
+    private Map<String, Object> toListItem(PaySlip p) {
+        Map<String, Object> m = new LinkedHashMap<>();
+        m.put("id", p.getId());
+        m.put("periodStart", p.getPeriodStart().toString());
+        m.put("periodEnd", p.getPeriodEnd().toString());
+        m.put("periodLabel", p.getPeriodLabel());
+        m.put("grossPay", p.getGrossPay());
+        m.put("totalDeductions", p.getTotalDeductions());
+        m.put("netPay", p.getNetPay());
+        m.put("status", p.getStatus());
+        m.put("paidAt", p.getPaidAt() != null ? p.getPaidAt().toString() : null);
+        m.put("currency", p.getCurrency());
+        return m;
     }
 
     // ─── Own-data scoping ───────────────────────────────────────

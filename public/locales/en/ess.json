@@ -39,11 +39,40 @@
   },
   "payslips": {
     "title": "My Payslips",
-    "noPayslips": "No payslips found",
+    "noPayslips": "No payslips found.",
+    "empty": "No payslips have been generated yet.",
+    "restricted": "Payslip access is currently disabled by your organisation.",
     "period": "Period",
     "grossPay": "Gross Pay",
     "netPay": "Net Pay",
-    "download": "Download"
+    "workedHours": "Worked Hours",
+    "earnings": "Earnings",
+    "deductions": "Deductions",
+    "totalEarnings": "Total Earnings",
+    "totalDeductions": "Total Deductions",
+    "employerContributions": "Employer Contributions",
+    "paidOn": "Paid on {{date}}",
+    "download": "Download PDF",
+    "backToList": "Back to payslips",
+    "yearFilter": "Filter by year",
+    "allYears": "All years",
+    "viewDetails": "View details",
+    "paymentMethod": {
+      "direct_deposit": "Direct Deposit",
+      "cheque": "Cheque",
+      "cash": "Cash"
+    },
+    "status": {
+      "paid": "Paid",
+      "processing": "Processing",
+      "draft": "Draft"
+    },
+    "detail": "Payslip Detail",
+    "periodRange": "{{start}} – {{end}}",
+    "breakdown": "Pay Breakdown",
+    "summary": "Summary",
+    "loadMore": "Load more",
+    "loading": "Loading payslips…"
   },
   "attendance": {
     "title": "My Attendance",

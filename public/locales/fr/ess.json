@@ -30,11 +30,40 @@
   },
   "payslips": {
     "title": "Mes fiches de paie",
-    "noPayslips": "Aucune fiche de paie trouvée",
+    "noPayslips": "Aucune fiche de paie trouvée.",
+    "empty": "Aucune fiche de paie n'a encore été générée.",
+    "restricted": "L'accès aux fiches de paie est actuellement désactivé par votre organisation.",
     "period": "Période",
     "grossPay": "Salaire brut",
     "netPay": "Salaire net",
-    "download": "Télécharger"
+    "workedHours": "Heures travaillées",
+    "earnings": "Gains",
+    "deductions": "Retenues",
+    "totalEarnings": "Total des gains",
+    "totalDeductions": "Total des retenues",
+    "employerContributions": "Cotisations patronales",
+    "paidOn": "Payé le {{date}}",
+    "download": "Télécharger PDF",
+    "backToList": "Retour aux fiches de paie",
+    "yearFilter": "Filtrer par année",
+    "allYears": "Toutes les années",
+    "viewDetails": "Voir le détail",
+    "paymentMethod": {
+      "direct_deposit": "Virement bancaire",
+      "cheque": "Chèque",
+      "cash": "Espèces"
+    },
+    "status": {
+      "paid": "Payé",
+      "processing": "En traitement",
+      "draft": "Brouillon"
+    },
+    "detail": "Détail de la fiche de paie",
+    "periodRange": "{{start}} – {{end}}",
+    "breakdown": "Détail de la paie",
+    "summary": "Résumé",
+    "loadMore": "Charger plus",
+    "loading": "Chargement des fiches de paie…"
   },
   "attendance": {
     "title": "Mes présences",

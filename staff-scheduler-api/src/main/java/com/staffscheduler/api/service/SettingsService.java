@@ -61,7 +61,8 @@ public class SettingsService {
             dto("doubleTimeMultiplier", "2.0", "number"),
             dto("holidayMultiplier", "1.5", "number"),
             dto("defaultHourlyRate", "15.00", "number"),
-            dto("minWageEnforcement", "true", "boolean")
+            dto("minWageEnforcement", "true", "boolean"),
+            dto("showSalaryToEmployee", "true", "boolean")
         ));
         map.put("timeOff", List.of(
             dto("accrualRate", "1.25", "number"),
@@ -162,7 +163,7 @@ public class SettingsService {
     private static final Set<String> PUBLIC_SETTING_KEYS = Set.of(
         "companyName", "timezone", "workWeekStart", "dateFormat", "timeFormat", "currency",
         "defaultShiftDuration", "maxShiftDuration", "defaultView", "payPeriodType",
-        "enableDragDrop"
+        "enableDragDrop", "showSalaryToEmployee"
     );
 
     // Default nav items ordering

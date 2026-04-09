@@ -469,3 +469,31 @@ INSERT INTO leave_requests (id, employee_id, start_date, end_date, total_days, l
 ('leave4',  'emp3',  '2026-05-04', '2026-05-08', 5, 'Annual Leave',  '#3B82F6', 'approved', NULL,             NOW()),
 ('leave5',  'emp4',  '2026-04-15', '2026-04-15', 1, 'Sick Leave',    '#EF4444', 'pending',  NULL,             NOW())
 ON CONFLICT DO NOTHING;
+
+-- ══════════════════════════════════════════════════════
+-- Pay Slips (seed data for task 50 — Employee Payslip Viewer)
+-- emp1 (Sarah Johnson, $15.50/h) — 3 months
+-- emp2 (Michael Chen, $16.00/h)  — 3 months
+-- emp3 (Emily Rodriguez, $14.50/h) — 2 months
+-- emp4 (David Wilson, $17.00/h)  — 1 month
+-- ══════════════════════════════════════════════════════
+INSERT INTO pay_slips (id, employee_id, employee_name, period_start, period_end, period_label, period_year, worked_hours, gross_pay, total_deductions, net_pay, employer_contributions, lines_json, status, paid_at, payment_method, currency, created_at) VALUES
+-- emp1 January
+('ps-emp1-2026-01', 'emp1', 'Sarah Johnson', '2026-01-01', '2026-01-31', 'January 2026', 2026, 160.00, 2480.00, 595.20, 1884.80, 310.00, '{"earnings":[{"label":"Base Pay (160h × $15.50)","amount":2480.00}],"deductions":[{"label":"Federal Income Tax","amount":297.60},{"label":"State Tax","amount":124.00},{"label":"Social Security (6.2%)","amount":153.76},{"label":"Medicare (1.45%)","amount":19.84}]}', 'paid', '2026-02-05T09:00:00', 'direct_deposit', 'USD', '2026-02-01T00:00:00'),
+-- emp1 February
+('ps-emp1-2026-02', 'emp1', 'Sarah Johnson', '2026-02-01', '2026-02-28', 'February 2026', 2026, 152.00, 2356.00, 565.44, 1790.56, 294.50, '{"earnings":[{"label":"Base Pay (152h × $15.50)","amount":2356.00}],"deductions":[{"label":"Federal Income Tax","amount":282.72},{"label":"State Tax","amount":117.80},{"label":"Social Security (6.2%)","amount":146.07},{"label":"Medicare (1.45%)","amount":18.85}]}', 'paid', '2026-03-05T09:00:00', 'direct_deposit', 'USD', '2026-03-01T00:00:00'),
+-- emp1 March
+('ps-emp1-2026-03', 'emp1', 'Sarah Johnson', '2026-03-01', '2026-03-31', 'March 2026', 2026, 168.00, 2604.00, 624.96, 1979.04, 325.50, '{"earnings":[{"label":"Base Pay (160h × $15.50)","amount":2480.00},{"label":"Overtime (8h × $23.25)","amount":124.00}],"deductions":[{"label":"Federal Income Tax","amount":312.48},{"label":"State Tax","amount":130.20},{"label":"Social Security (6.2%)","amount":161.45},{"label":"Medicare (1.45%)","amount":20.83}]}', 'paid', '2026-04-05T09:00:00', 'direct_deposit', 'USD', '2026-04-01T00:00:00'),
+-- emp2 January
+('ps-emp2-2026-01', 'emp2', 'Michael Chen', '2026-01-01', '2026-01-31', 'January 2026', 2026, 176.00, 2816.00, 675.84, 2140.16, 352.00, '{"earnings":[{"label":"Base Pay (160h × $16.00)","amount":2560.00},{"label":"Overtime (16h × $16.00)","amount":256.00}],"deductions":[{"label":"Federal Income Tax","amount":337.92},{"label":"State Tax","amount":140.80},{"label":"Social Security (6.2%)","amount":174.59},{"label":"Medicare (1.45%)","amount":22.53}]}', 'paid', '2026-02-05T09:00:00', 'direct_deposit', 'USD', '2026-02-01T00:00:00'),
+-- emp2 February
+('ps-emp2-2026-02', 'emp2', 'Michael Chen', '2026-02-01', '2026-02-28', 'February 2026', 2026, 160.00, 2560.00, 614.40, 1945.60, 320.00, '{"earnings":[{"label":"Base Pay (160h × $16.00)","amount":2560.00}],"deductions":[{"label":"Federal Income Tax","amount":307.20},{"label":"State Tax","amount":128.00},{"label":"Social Security (6.2%)","amount":158.72},{"label":"Medicare (1.45%)","amount":20.48}]}', 'paid', '2026-03-05T09:00:00', 'direct_deposit', 'USD', '2026-03-01T00:00:00'),
+-- emp2 March
+('ps-emp2-2026-03', 'emp2', 'Michael Chen', '2026-03-01', '2026-03-31', 'March 2026', 2026, 160.00, 2560.00, 614.40, 1945.60, 320.00, '{"earnings":[{"label":"Base Pay (160h × $16.00)","amount":2560.00}],"deductions":[{"label":"Federal Income Tax","amount":307.20},{"label":"State Tax","amount":128.00},{"label":"Social Security (6.2%)","amount":158.72},{"label":"Medicare (1.45%)","amount":20.48}]}', 'paid', '2026-04-05T09:00:00', 'direct_deposit', 'USD', '2026-04-01T00:00:00'),
+-- emp3 February
+('ps-emp3-2026-02', 'emp3', 'Emily Rodriguez', '2026-02-01', '2026-02-28', 'February 2026', 2026, 140.00, 2030.00, 487.20, 1542.80, 253.75, '{"earnings":[{"label":"Base Pay (140h × $14.50)","amount":2030.00}],"deductions":[{"label":"Federal Income Tax","amount":243.60},{"label":"State Tax","amount":101.50},{"label":"Social Security (6.2%)","amount":125.86},{"label":"Medicare (1.45%)","amount":16.24}]}', 'paid', '2026-03-05T09:00:00', 'direct_deposit', 'USD', '2026-03-01T00:00:00'),
+-- emp3 March
+('ps-emp3-2026-03', 'emp3', 'Emily Rodriguez', '2026-03-01', '2026-03-31', 'March 2026', 2026, 144.00, 2088.00, 501.12, 1586.88, 261.00, '{"earnings":[{"label":"Base Pay (144h × $14.50)","amount":2088.00}],"deductions":[{"label":"Federal Income Tax","amount":250.56},{"label":"State Tax","amount":104.40},{"label":"Social Security (6.2%)","amount":129.46},{"label":"Medicare (1.45%)","amount":16.70}]}', 'paid', '2026-04-05T09:00:00', 'direct_deposit', 'USD', '2026-04-01T00:00:00'),
+-- emp4 March
+('ps-emp4-2026-03', 'emp4', 'David Wilson', '2026-03-01', '2026-03-31', 'March 2026', 2026, 168.00, 2856.00, 685.44, 2170.56, 357.00, '{"earnings":[{"label":"Base Pay (160h × $17.00)","amount":2720.00},{"label":"Overtime (8h × $17.00)","amount":136.00}],"deductions":[{"label":"Federal Income Tax","amount":342.72},{"label":"State Tax","amount":142.80},{"label":"Social Security (6.2%)","amount":177.07},{"label":"Medicare (1.45%)","amount":22.85}]}', 'paid', '2026-04-05T09:00:00', 'direct_deposit', 'USD', '2026-04-01T00:00:00')
+ON CONFLICT DO NOTHING;
