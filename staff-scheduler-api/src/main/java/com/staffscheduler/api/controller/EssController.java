@@ -1,10 +1,12 @@
 package com.staffscheduler.api.controller;
 
 import com.staffscheduler.api.exception.ResourceNotFoundException;
+import com.staffscheduler.api.model.AttendanceRecord;
 import com.staffscheduler.api.model.Employee;
 import com.staffscheduler.api.model.LeaveRequest;
 import com.staffscheduler.api.model.PaySlip;
 import com.staffscheduler.api.repository.AppSettingRepository;
+import com.staffscheduler.api.repository.AttendanceRecordRepository;
 import com.staffscheduler.api.repository.EmployeeRepository;
 import com.staffscheduler.api.repository.LeaveRequestRepository;
 import com.staffscheduler.api.repository.PaySlipRepository;
@@ -13,6 +15,7 @@ import com.staffscheduler.api.repository.UserRepository;
 import com.staffscheduler.api.service.EmployeeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,8 +24,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.PrintWriter;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -49,6 +55,7 @@ public class EssController {
     private final ShiftRepository shiftRepository;
     private final LeaveRequestRepository leaveRequestRepository;
     private final PaySlipRepository paySlipRepository;
+    private final AttendanceRecordRepository attendanceRecordRepository;
     private final AppSettingRepository appSettingRepository;
     private final EmployeeService employeeService;
 
@@ -341,6 +348,189 @@ public class EssController {
         detail.put("totalEarnings", p.getGrossPay());
 
         return ResponseEntity.ok(Map.of("data", detail));
+    }
+
+    // ─── /api/ess/attendance ────────────────────────────────────
+
+    /**
+     * List own attendance records for a date range (defaults to current month).
+     * Optionally filter by status (present, absent, late, half_day, on_leave, holiday).
+     */
+    @GetMapping("/attendance")
+    @Operation(summary = "List own attendance records for a date range")
+    public ResponseEntity<Map<String, Object>> getMyAttendance(
+            Authentication authentication,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+            @RequestParam(required = false) String status) {
+
+        String employeeId = resolveEmployeeId(authentication);
+
+        if (from == null) {
+            YearMonth current = YearMonth.now();
+            from = current.atDay(1);
+        }
+        if (to == null) {
+            to = YearMonth.from(from).atEndOfMonth();
+        }
+
+        List<AttendanceRecord> records;
+        if (status != null && !status.isBlank()) {
+            records = attendanceRecordRepository
+                    .findByEmployeeIdAndDateBetweenAndStatusOrderByDateDesc(employeeId, from, to, status);
+        } else {
+            records = attendanceRecordRepository
+                    .findByEmployeeIdAndDateBetweenOrderByDateDesc(employeeId, from, to);
+        }
+
+        List<Map<String, Object>> data = records.stream()
+                .map(this::toAttendanceItem)
+                .collect(Collectors.toList());
+
+        Map<String, Object> period = Map.of("from", from.toString(), "to", to.toString());
+        return ResponseEntity.ok(Map.of("data", data, "period", period));
+    }
+
+    /**
+     * Aggregate attendance summary for a date range.
+     * Returns counts by status, total hours, overtime, and attendance rate.
+     */
+    @GetMapping("/attendance/summary")
+    @Operation(summary = "Get attendance summary stats for a date range")
+    public ResponseEntity<Map<String, Object>> getAttendanceSummary(
+            Authentication authentication,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+
+        String employeeId = resolveEmployeeId(authentication);
+
+        if (from == null) {
+            YearMonth current = YearMonth.now();
+            from = current.atDay(1);
+        }
+        if (to == null) {
+            to = YearMonth.from(from).atEndOfMonth();
+        }
+
+        // Status counts
+        List<Object[]> statusCounts = attendanceRecordRepository.countByStatusForEmployee(employeeId, from, to);
+        Map<String, Long> breakdown = new LinkedHashMap<>();
+        long totalRecords = 0;
+        for (Object[] row : statusCounts) {
+            String s = (String) row[0];
+            Long count = (Long) row[1];
+            breakdown.put(s, count);
+            totalRecords += count;
+        }
+
+        long daysPresent = breakdown.getOrDefault("present", 0L);
+        long daysLate = breakdown.getOrDefault("late", 0L);
+        long daysAbsent = breakdown.getOrDefault("absent", 0L);
+        long daysHalfDay = breakdown.getOrDefault("half_day", 0L);
+        long daysOnLeave = breakdown.getOrDefault("on_leave", 0L);
+        long daysHoliday = breakdown.getOrDefault("holiday", 0L);
+
+        // Hours
+        Object[] hours = attendanceRecordRepository.sumHoursForEmployee(employeeId, from, to);
+        double totalActualHours = hours[0] != null ? ((Number) hours[0]).doubleValue() : 0;
+        double totalOvertimeHours = hours[1] != null ? ((Number) hours[1]).doubleValue() : 0;
+
+        // Attendance rate: (present + late) / (total - on_leave - holiday) × 100
+        long effectiveWorkdays = totalRecords - daysOnLeave - daysHoliday;
+        double attendanceRate = effectiveWorkdays > 0
+                ? Math.round(((daysPresent + daysLate) * 10000.0) / effectiveWorkdays) / 100.0
+                : 0;
+
+        Map<String, Object> summary = new LinkedHashMap<>();
+        summary.put("totalRecords", totalRecords);
+        summary.put("daysPresent", daysPresent);
+        summary.put("daysLate", daysLate);
+        summary.put("daysAbsent", daysAbsent);
+        summary.put("daysHalfDay", daysHalfDay);
+        summary.put("daysOnLeave", daysOnLeave);
+        summary.put("daysHoliday", daysHoliday);
+        summary.put("totalHours", totalActualHours);
+        summary.put("overtimeHours", totalOvertimeHours);
+        summary.put("attendanceRate", attendanceRate);
+        summary.put("breakdown", breakdown);
+
+        Map<String, Object> period = Map.of("from", from.toString(), "to", to.toString());
+        return ResponseEntity.ok(Map.of("data", summary, "period", period));
+    }
+
+    /**
+     * Export own attendance records as CSV for a date range.
+     */
+    @GetMapping("/attendance/export")
+    @Operation(summary = "Export own attendance as CSV")
+    public void exportAttendanceCsv(
+            Authentication authentication,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+            HttpServletResponse response) throws Exception {
+
+        String employeeId = resolveEmployeeId(authentication);
+        Employee emp = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee", employeeId));
+
+        if (from == null) {
+            YearMonth current = YearMonth.now();
+            from = current.atDay(1);
+        }
+        if (to == null) {
+            to = YearMonth.from(from).atEndOfMonth();
+        }
+
+        List<AttendanceRecord> records = attendanceRecordRepository
+                .findByEmployeeIdAndDateBetweenOrderByDateDesc(employeeId, from, to);
+
+        String safeName = emp.getName().replaceAll("[^a-zA-Z0-9]", "").toLowerCase();
+        String filename = "attendance-" + from.format(DateTimeFormatter.ofPattern("yyyy-MM"))
+                        + "-" + safeName + ".csv";
+
+        response.setContentType("text/csv");
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"");
+
+        PrintWriter writer = response.getWriter();
+        writer.println("Date,Status,Scheduled Start,Scheduled End,Actual Start,Actual End,Scheduled Hours,Actual Hours,Overtime,Notes");
+        for (AttendanceRecord r : records) {
+            writer.printf("%s,%s,%s,%s,%s,%s,%.1f,%.1f,%.1f,%s%n",
+                    r.getDate(),
+                    r.getStatus(),
+                    r.getScheduledStart() != null ? r.getScheduledStart() : "",
+                    r.getScheduledEnd() != null ? r.getScheduledEnd() : "",
+                    r.getActualStart() != null ? r.getActualStart() : "",
+                    r.getActualEnd() != null ? r.getActualEnd() : "",
+                    r.getScheduledHours() != null ? r.getScheduledHours() : 0,
+                    r.getActualHours() != null ? r.getActualHours() : 0,
+                    r.getOvertimeHours() != null ? r.getOvertimeHours() : 0,
+                    csvEscape(r.getNotes()));
+        }
+        writer.flush();
+    }
+
+    private Map<String, Object> toAttendanceItem(AttendanceRecord r) {
+        Map<String, Object> m = new LinkedHashMap<>();
+        m.put("id", r.getId());
+        m.put("date", r.getDate().toString());
+        m.put("status", r.getStatus());
+        m.put("scheduledStart", r.getScheduledStart() != null ? r.getScheduledStart().toString() : null);
+        m.put("scheduledEnd", r.getScheduledEnd() != null ? r.getScheduledEnd().toString() : null);
+        m.put("actualStart", r.getActualStart() != null ? r.getActualStart().toString() : null);
+        m.put("actualEnd", r.getActualEnd() != null ? r.getActualEnd().toString() : null);
+        m.put("scheduledHours", r.getScheduledHours());
+        m.put("actualHours", r.getActualHours());
+        m.put("overtimeHours", r.getOvertimeHours());
+        m.put("notes", r.getNotes());
+        return m;
+    }
+
+    private static String csvEscape(String value) {
+        if (value == null || value.isEmpty()) return "";
+        if (value.contains(",") || value.contains("\"") || value.contains("\n")) {
+            return "\"" + value.replace("\"", "\"\"") + "\"";
+        }
+        return value;
     }
 
     // ─── Setting gate ───────────────────────────────────────────
