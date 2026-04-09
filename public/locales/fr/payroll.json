@@ -30,11 +30,14 @@
     "period": "Période",
     "grossPay": "Brut",
     "netPay": "Net",
+    "gross": "Brut",
+    "net": "Net",
     "hours": "Heures",
     "employees": "Employés",
     "employee": "Employé",
     "overtime": "Heures sup.",
     "rate": "Taux",
+    "status": "Statut",
     "actions": "Actions"
   },
   "period": {
@@ -216,5 +219,129 @@
     "medicareEmployee": "Assurance maladie (salarié)",
     "medicareEmployer": "Assurance maladie (employeur)",
     "totalTaxLiability": "Total des obligations fiscales"
+  },
+  "status": {
+    "draft": "Brouillon",
+    "approved": "Approuvé",
+    "paid": "Payé",
+    "voided": "Annulé"
+  },
+  "overview": {
+    "title": "Aperçu de la paie",
+    "subtitle": "Indicateurs clés de la paie et actions rapides",
+    "lastPayRun": "Dernière exécution de paie",
+    "nextPayRun": "Prochaine exécution",
+    "ytdPayroll": "Paie cumulée annuelle",
+    "pendingApprovals": "Approbations en attente",
+    "activeEmployees": "Employés actifs",
+    "noRunYet": "Aucune exécution de paie",
+    "basedOnFrequency": "Basé sur la fréquence de paie",
+    "startNewPayRun": "Démarrer une nouvelle exécution",
+    "viewLastPaySlips": "Voir les derniers bulletins",
+    "recentPayPeriods": "Périodes de paie récentes"
+  },
+  "payRuns": {
+    "title": "Exécutions de paie",
+    "startNew": "Nouvelle exécution",
+    "view": "Voir",
+    "empty": "Aucune exécution de paie trouvée."
+  },
+  "payRun": {
+    "newTitle": "Nouvelle exécution de paie",
+    "editTitle": "Exécution de paie {{id}}",
+    "step1Title": "Étape 1 — Sélection de la période",
+    "step2Title": "Étape 2 — Révision des heures",
+    "step3Title": "Étape 3 — Déductions et ajustements",
+    "step4Title": "Étape 4 — Résumé et approbation",
+    "stepPeriod": "Période",
+    "stepHours": "Heures",
+    "stepDeductions": "Déductions",
+    "stepSummary": "Résumé",
+    "payFrequency": "Fréquence de paie",
+    "startDate": "Date de début",
+    "endDate": "Date de fin",
+    "scheduledHours": "Heures prévues",
+    "actualHours": "Heures réelles",
+    "overtimeHours": "Heures supplémentaires",
+    "flag": "Alerte",
+    "hoursWarning": ">20% de variation",
+    "taxes": "Impôts et déductions",
+    "bonus": "Prime",
+    "extraDeduction": "Déduction supplémentaire",
+    "totalGross": "Brut total",
+    "totalDeductions": "Déductions totales",
+    "totalNet": "Net total",
+    "employeeCount": "Employés",
+    "status": "Statut",
+    "approve": "Approuver l'exécution",
+    "void": "Annuler l'exécution",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "frequency": {
+      "weekly": "Hebdomadaire",
+      "bi-weekly": "Bihebdomadaire",
+      "semi-monthly": "Bimensuel",
+      "monthly": "Mensuel"
+    }
+  },
+  "paySlips": {
+    "title": "Bulletins de paie",
+    "searchPlaceholder": "Rechercher par nom d'employé…",
+    "view": "Voir",
+    "empty": "Aucun bulletin de paie trouvé.",
+    "currentPeriod": "Période en cours",
+    "backToList": "Retour aux bulletins de paie"
+  },
+  "paySlip": {
+    "payPeriod": "Période de paie",
+    "earnings": "Rémunération",
+    "regularHours": "Heures régulières",
+    "overtimeHours": "Heures supplémentaires",
+    "shiftDifferentials": "Primes de quart",
+    "deductionsBreakdown": "Détail des déductions",
+    "federalTax": "Impôt fédéral",
+    "stateTax": "Impôt régional",
+    "socialSecurity": "Sécurité sociale",
+    "medicare": "Assurance maladie",
+    "healthInsurance": "Assurance santé",
+    "retirement": "Retraite 401(k)",
+    "totalDeductions": "Total des déductions",
+    "notFound": "Bulletin de paie introuvable.",
+    "print": "Imprimer",
+    "downloadPdf": "Télécharger PDF"
+  },
+  "myPaySlips": {
+    "title": "Mes bulletins de paie",
+    "empty": "Aucun bulletin de paie disponible pour votre compte."
+  },
+  "deductions": {
+    "title": "Déductions et configuration fiscale",
+    "taxRates": "Taux d'imposition",
+    "benefits": "Avantages sociaux",
+    "perEmployee": "Déductions par employé (période en cours)",
+    "totalLabel": "Total",
+    "tax": {
+      "federal": "Fédéral",
+      "state": "Régional",
+      "socialSecurity": "Sécurité sociale",
+      "medicare": "Assurance maladie",
+      "unemployment": "Assurance chômage"
+    },
+    "benefit": {
+      "healthInsurance": "Assurance santé",
+      "dentalInsurance": "Assurance dentaire",
+      "visionInsurance": "Assurance vision",
+      "retirement401k": "Retraite 401(k)",
+      "lifeInsurance": "Assurance vie"
+    }
+  },
+  "directDeposit": {
+    "title": "Dépôt direct",
+    "subtitle": "Gérer les informations bancaires des employés pour les paiements par dépôt direct",
+    "configTitle": "Configuration du dépôt direct",
+    "configDescription": "Configurer les détails de routage et de compte bancaire pour le versement automatique de la paie. Les informations bancaires des employés sont stockées de manière sécurisée.",
+    "enrolled": "Inscrits",
+    "pending": "En attente de vérification",
+    "lastBatch": "Dernier lot"
   }
 }

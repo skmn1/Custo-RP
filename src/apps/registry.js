@@ -32,7 +32,7 @@ export const APPS = [
     icon: 'BanknotesIcon',
     color: 'violet',
     route: '/app/payroll',
-    roles: ['super_admin', 'hr_manager', 'accounting_agent', 'employee'],
+    roles: ['super_admin', 'hr_manager', 'employee'],
   },
   {
     id: 'accounting',

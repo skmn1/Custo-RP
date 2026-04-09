@@ -75,7 +75,14 @@
     "timeOff": "Congés",
     "shiftSwaps": "Échanges de quarts",
     "templates": "Modèles",
-    "planningReports": "Rapports"
+    "planningReports": "Rapports",
+    "overview": "Aperçu",
+    "payRuns": "Exécutions de paie",
+    "paySlips": "Bulletins de paie",
+    "myPaySlips": "Mes bulletins de paie",
+    "deductions": "Déductions",
+    "directDeposit": "Dépôt direct",
+    "export": "Exporter"
   },
   "status": {
     "active": "Actif",

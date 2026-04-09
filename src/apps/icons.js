@@ -29,6 +29,12 @@ import {
   ClockIcon as ClockOutline,
   SunIcon as SunOutline,
   DocumentDuplicateIcon as DocumentDuplicateOutline,
+  HomeIcon as HomeOutline,
+  PlayCircleIcon as PlayCircleOutline,
+  DocumentTextIcon as DocumentTextOutline,
+  MinusCircleIcon as MinusCircleOutline,
+  BuildingLibraryIcon as BuildingLibraryOutline,
+  ArrowDownTrayIcon as ArrowDownTrayOutline,
 } from '@heroicons/react/24/outline';
 
 import {
@@ -58,6 +64,12 @@ import {
   ClockIcon as ClockSolid,
   SunIcon as SunSolid,
   DocumentDuplicateIcon as DocumentDuplicateSolid,
+  HomeIcon as HomeSolid,
+  PlayCircleIcon as PlayCircleSolid,
+  DocumentTextIcon as DocumentTextSolid,
+  MinusCircleIcon as MinusCircleSolid,
+  BuildingLibraryIcon as BuildingLibrarySolid,
+  ArrowDownTrayIcon as ArrowDownTraySolid,
 } from '@heroicons/react/24/solid';
 
 const outlineMap = {
@@ -87,6 +99,12 @@ const outlineMap = {
   ClockIcon: ClockOutline,
   SunIcon: SunOutline,
   DocumentDuplicateIcon: DocumentDuplicateOutline,
+  HomeIcon: HomeOutline,
+  PlayCircleIcon: PlayCircleOutline,
+  DocumentTextIcon: DocumentTextOutline,
+  MinusCircleIcon: MinusCircleOutline,
+  BuildingLibraryIcon: BuildingLibraryOutline,
+  ArrowDownTrayIcon: ArrowDownTrayOutline,
 };
 
 const solidMap = {
@@ -116,6 +134,12 @@ const solidMap = {
   ClockIcon: ClockSolid,
   SunIcon: SunSolid,
   DocumentDuplicateIcon: DocumentDuplicateSolid,
+  HomeIcon: HomeSolid,
+  PlayCircleIcon: PlayCircleSolid,
+  DocumentTextIcon: DocumentTextSolid,
+  MinusCircleIcon: MinusCircleSolid,
+  BuildingLibraryIcon: BuildingLibrarySolid,
+  ArrowDownTrayIcon: ArrowDownTraySolid,
 };
 
 export function getIconComponent(iconName, variant = 'outline') {

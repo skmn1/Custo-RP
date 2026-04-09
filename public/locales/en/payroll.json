@@ -30,11 +30,14 @@
     "period": "Period",
     "grossPay": "Gross Pay",
     "netPay": "Net Pay",
+    "gross": "Gross",
+    "net": "Net",
     "hours": "Hours",
     "employees": "Employees",
     "employee": "Employee",
     "overtime": "Overtime",
     "rate": "Rate",
+    "status": "Status",
     "actions": "Actions"
   },
   "period": {
@@ -216,5 +219,129 @@
     "medicareEmployee": "Medicare (Employee)",
     "medicareEmployer": "Medicare (Employer)",
     "totalTaxLiability": "Total Tax Liability"
+  },
+  "status": {
+    "draft": "Draft",
+    "approved": "Approved",
+    "paid": "Paid",
+    "voided": "Voided"
+  },
+  "overview": {
+    "title": "Payroll Overview",
+    "subtitle": "Key payroll metrics and quick actions",
+    "lastPayRun": "Last Pay Run",
+    "nextPayRun": "Next Pay Run",
+    "ytdPayroll": "YTD Payroll",
+    "pendingApprovals": "Pending Approvals",
+    "activeEmployees": "Active Employees",
+    "noRunYet": "No pay run yet",
+    "basedOnFrequency": "Based on pay frequency",
+    "startNewPayRun": "Start New Pay Run",
+    "viewLastPaySlips": "View Last Pay Slips",
+    "recentPayPeriods": "Recent Pay Periods"
+  },
+  "payRuns": {
+    "title": "Pay Runs",
+    "startNew": "Start New Pay Run",
+    "view": "View",
+    "empty": "No pay runs found."
+  },
+  "payRun": {
+    "newTitle": "New Pay Run",
+    "editTitle": "Pay Run {{id}}",
+    "step1Title": "Step 1 — Period Selection",
+    "step2Title": "Step 2 — Hours Review",
+    "step3Title": "Step 3 — Deductions & Additions",
+    "step4Title": "Step 4 — Summary & Approve",
+    "stepPeriod": "Period",
+    "stepHours": "Hours",
+    "stepDeductions": "Deductions",
+    "stepSummary": "Summary",
+    "payFrequency": "Pay Frequency",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "scheduledHours": "Scheduled Hours",
+    "actualHours": "Actual Hours",
+    "overtimeHours": "Overtime Hours",
+    "flag": "Flag",
+    "hoursWarning": ">20% change",
+    "taxes": "Taxes & Deductions",
+    "bonus": "Bonus",
+    "extraDeduction": "Extra Deduction",
+    "totalGross": "Total Gross",
+    "totalDeductions": "Total Deductions",
+    "totalNet": "Total Net",
+    "employeeCount": "Employees",
+    "status": "Status",
+    "approve": "Approve Pay Run",
+    "void": "Void Pay Run",
+    "previous": "Previous",
+    "next": "Next",
+    "frequency": {
+      "weekly": "Weekly",
+      "bi-weekly": "Bi-Weekly",
+      "semi-monthly": "Semi-Monthly",
+      "monthly": "Monthly"
+    }
+  },
+  "paySlips": {
+    "title": "Pay Slips",
+    "searchPlaceholder": "Search by employee name…",
+    "view": "View",
+    "empty": "No pay slips found.",
+    "currentPeriod": "Current Period",
+    "backToList": "Back to Pay Slips"
+  },
+  "paySlip": {
+    "payPeriod": "Pay Period",
+    "earnings": "Earnings",
+    "regularHours": "Regular Hours",
+    "overtimeHours": "Overtime Hours",
+    "shiftDifferentials": "Shift Differentials",
+    "deductionsBreakdown": "Deductions Breakdown",
+    "federalTax": "Federal Tax",
+    "stateTax": "State Tax",
+    "socialSecurity": "Social Security",
+    "medicare": "Medicare",
+    "healthInsurance": "Health Insurance",
+    "retirement": "401(k) Retirement",
+    "totalDeductions": "Total Deductions",
+    "notFound": "Pay slip not found.",
+    "print": "Print",
+    "downloadPdf": "Download PDF"
+  },
+  "myPaySlips": {
+    "title": "My Pay Slips",
+    "empty": "No pay slips available for your account."
+  },
+  "deductions": {
+    "title": "Deductions & Tax Configuration",
+    "taxRates": "Tax Rates",
+    "benefits": "Benefit Deductions",
+    "perEmployee": "Per-Employee Deductions (Current Period)",
+    "totalLabel": "Total",
+    "tax": {
+      "federal": "Federal",
+      "state": "State",
+      "socialSecurity": "Social Security",
+      "medicare": "Medicare",
+      "unemployment": "Unemployment"
+    },
+    "benefit": {
+      "healthInsurance": "Health Insurance",
+      "dentalInsurance": "Dental Insurance",
+      "visionInsurance": "Vision Insurance",
+      "retirement401k": "401(k)",
+      "lifeInsurance": "Life Insurance"
+    }
+  },
+  "directDeposit": {
+    "title": "Direct Deposit",
+    "subtitle": "Manage employee bank account information for direct deposit payments",
+    "configTitle": "Direct Deposit Configuration",
+    "configDescription": "Configure bank routing and account details for automated payroll disbursement. Employee bank information is stored securely.",
+    "enrolled": "Enrolled",
+    "pending": "Pending Verification",
+    "lastBatch": "Last Batch"
   }
 }

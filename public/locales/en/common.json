@@ -75,7 +75,14 @@
     "timeOff": "Time Off",
     "shiftSwaps": "Shift Swaps",
     "templates": "Templates",
-    "planningReports": "Reports"
+    "planningReports": "Reports",
+    "overview": "Overview",
+    "payRuns": "Pay Runs",
+    "paySlips": "Pay Slips",
+    "myPaySlips": "My Pay Slips",
+    "deductions": "Deductions",
+    "directDeposit": "Direct Deposit",
+    "export": "Export"
   },
   "status": {
     "active": "Active",

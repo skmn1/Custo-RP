@@ -57,7 +57,17 @@ import TimeOffPage from './pages/TimeOffPage';
 import ShiftSwapsPage from './pages/ShiftSwapsPage';
 import TemplatesPage from './pages/TemplatesPage';
 import PlanningReportsPage from './pages/PlanningReportsPage';
+import PayrollOverviewPage from './pages/PayrollOverviewPage';
+import PayRunListPage from './pages/PayRunListPage';
+import PayRunPage from './pages/PayRunPage';
+import PaySlipListPage from './pages/PaySlipListPage';
+import PaySlipDetailPage from './pages/PaySlipDetailPage';
+import MyPaySlipsPage from './pages/MyPaySlipsPage';
+import DeductionsPage from './pages/DeductionsPage';
+import DirectDepositPage from './pages/DirectDepositPage';
+import PayrollExportPage from './pages/PayrollExportPage';
 import { planningSidebarItems } from './apps/planning/sidebarItems';
+import { payrollSidebarItems } from './apps/payroll/sidebarItems';
 
 /* ─── Sidebar nav items per app ───────────────────────────────── */
 // Planning sidebar is imported from src/apps/planning/sidebarItems.js
@@ -70,9 +80,7 @@ const hrSidebar = [
   { label: 'common:nav.documents',   icon: 'FolderIcon',          to: '/app/hr/documents'  },
 ];
 
-const payrollSidebar = [
-  { label: 'common:nav.payroll', icon: 'BanknotesIcon', to: '/app/payroll' },
-];
+const payrollSidebar = payrollSidebarItems;
 
 const accountingSidebar = [
   { label: 'common:nav.invoices', icon: 'ReceiptPercentIcon', to: '/app/accounting/invoices' },
@@ -142,7 +150,19 @@ const App = () => {
 
           {/* ═══ Payroll app ═══ */}
           <Route path="/app/payroll" element={<AppShell appId="payroll" sidebarItems={payrollSidebar} />}>
-            <Route index element={<PayrollPage />} />
+            <Route index element={<Navigate to="/app/payroll/overview" replace />} />
+            <Route path="overview" element={<PayrollOverviewPage />} />
+            <Route path="runs" element={<PayRunListPage />} />
+            <Route path="runs/new" element={<PayRunPage />} />
+            <Route path="runs/:id" element={<PayRunPage />} />
+            <Route path="slips" element={<PaySlipListPage />} />
+            <Route path="slips/mine" element={<MyPaySlipsPage />} />
+            <Route path="slips/:id" element={<PaySlipDetailPage />} />
+            <Route path="deductions" element={<DeductionsPage />} />
+            <Route path="direct-deposit" element={<DirectDepositPage />} />
+            <Route path="export" element={<PayrollExportPage />} />
+            {/* Legacy: old single-page view */}
+            <Route path="legacy" element={<PayrollPage />} />
           </Route>
 
           {/* ═══ Accounting app ═══ */}
@@ -207,7 +227,14 @@ const App = () => {
           <Route path="/templates" element={<Navigate to="/app/planning/templates" replace />} />
           <Route path="/planning/reports" element={<Navigate to="/app/planning/reports" replace />} />
           <Route path="/employees" element={<Navigate to="/app/planning/employees" replace />} />
-          <Route path="/payroll" element={<Navigate to="/app/payroll" replace />} />
+          <Route path="/payroll" element={<Navigate to="/app/payroll/overview" replace />} />
+          <Route path="/payroll/runs" element={<Navigate to="/app/payroll/runs" replace />} />
+          <Route path="/payroll/runs/:id" element={<Navigate to="/app/payroll/runs/:id" replace />} />
+          <Route path="/payroll/slips" element={<Navigate to="/app/payroll/slips" replace />} />
+          <Route path="/payroll/slips/:id" element={<Navigate to="/app/payroll/slips/:id" replace />} />
+          <Route path="/payroll/deductions" element={<Navigate to="/app/payroll/deductions" replace />} />
+          <Route path="/payroll/direct-deposit" element={<Navigate to="/app/payroll/direct-deposit" replace />} />
+          <Route path="/payroll/export" element={<Navigate to="/app/payroll/export" replace />} />
           <Route path="/pos" element={<Navigate to="/app/pos" replace />} />
           <Route path="/pos/:id" element={<Navigate to="/app/pos" replace />} />
           <Route path="/admin/users" element={<Navigate to="/app/admin/users" replace />} />
