@@ -1,0 +1,121 @@
+{
+  "candidates": {
+    "title": "Candidats",
+    "pipeline": "Pipeline des candidats",
+    "newCandidate": "Nouveau candidat",
+    "search": "Rechercher des candidats…",
+    "empty": "Aucun candidat trouvé",
+    "status": {
+      "all": "Tous",
+      "new": "Nouveau",
+      "invited": "Invité",
+      "documents_pending": "Documents en attente",
+      "under_review": "En cours d'examen",
+      "approved": "Approuvé",
+      "activated": "Activé",
+      "rejected": "Rejeté",
+      "archived": "Archivé"
+    },
+    "fields": {
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "email": "Courriel",
+      "phone": "Téléphone",
+      "positionTitle": "Poste",
+      "department": "Département",
+      "contractType": "Type de contrat",
+      "plannedStartDate": "Date de début",
+      "grossSalary": "Salaire brut",
+      "probationEndDate": "Fin de période d'essai",
+      "notes": "Notes",
+      "createdAt": "Créé le",
+      "updatedAt": "Mis à jour"
+    },
+    "contractTypes": {
+      "CDI": "CDI",
+      "CDD": "CDD",
+      "interim": "Intérim",
+      "apprenticeship": "Apprentissage",
+      "internship": "Stage"
+    },
+    "form": {
+      "createTitle": "Nouveau candidat",
+      "personalInfo": "Informations personnelles",
+      "contractDetails": "Détails du contrat",
+      "submit": "Créer le candidat",
+      "cancel": "Annuler"
+    },
+    "detail": {
+      "info": "Info",
+      "onboarding": "Intégration",
+      "documents": "Documents",
+      "personalInfo": "Informations personnelles",
+      "contractDetails": "Détails du contrat",
+      "statusPipeline": "Pipeline de statut",
+      "onboardingProgress": "Progression de l'intégration"
+    },
+    "onboarding": {
+      "title": "Étapes d'intégration",
+      "progress": "{{completed}} sur {{total}} étapes requises complétées",
+      "categories": {
+        "identity": "Identité & antécédents",
+        "contract": "Contrat & rémunération",
+        "hr": "Politiques RH",
+        "it": "IT & accès",
+        "safety": "Santé & sécurité"
+      },
+      "stepStatus": {
+        "pending": "En attente",
+        "completed": "Complété",
+        "skipped": "Ignoré",
+        "na": "N/A"
+      },
+      "notes": "Notes"
+    },
+    "documents": {
+      "title": "Coffre-fort documentaire",
+      "upload": "Téléverser un document",
+      "types": {
+        "cv": "CV",
+        "id_card": "Carte d'identité",
+        "passport": "Passeport",
+        "social_security": "Sécurité sociale",
+        "rib": "RIB",
+        "diploma": "Diplôme",
+        "contract_signed": "Contrat signé",
+        "national_id": "Carte nationale d'identité",
+        "other": "Autre"
+      },
+      "verified": "Vérifié",
+      "unverified": "Non vérifié",
+      "verify": "Vérifier",
+      "download": "Télécharger",
+      "delete": "Supprimer",
+      "required": "Requis",
+      "maxSize": "10 Mo max"
+    },
+    "activate": {
+      "button": "Activer le compte",
+      "buttonBlocked": "Complétez d'abord toutes les étapes requises et vérifiez les documents requis",
+      "title": "Activer le compte du candidat",
+      "description": "Cela créera un dossier employé et enverra une invitation de configuration à :",
+      "steps": "Étapes d'intégration",
+      "docs": "Documents",
+      "confirm": "Confirmer et activer",
+      "success": "Compte activé ! Invitation envoyée à {{email}}."
+    },
+    "invite": {
+      "resend": "Renvoyer l'invitation",
+      "resendSuccess": "Invitation renvoyée à {{email}}"
+    },
+    "table": {
+      "name": "Nom",
+      "position": "Poste",
+      "contract": "Contrat",
+      "startDate": "Date de début",
+      "status": "Statut",
+      "progress": "Progression",
+      "updated": "Mis à jour"
+    }
+  }
+}

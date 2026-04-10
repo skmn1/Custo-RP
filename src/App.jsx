@@ -51,6 +51,9 @@ import HrPerformancePage from './pages/hr/HrPerformancePage';
 import OrgChartPage from './pages/hr/OrgChartPage';
 import HrDocumentsPage from './pages/hr/HrDocumentsPage';
 import HrEmployeeDetailPage from './pages/hr/HrEmployeeDetailPage';
+import CandidatePipelinePage from './pages/hr/CandidatePipelinePage';
+import CandidateFormPage from './pages/hr/CandidateFormPage';
+import CandidateDetailPage from './pages/hr/CandidateDetailPage';
 import MySchedulePage from './pages/MySchedulePage';
 import AvailabilityPage from './pages/AvailabilityPage';
 import TimeOffPage from './pages/TimeOffPage';
@@ -101,6 +104,7 @@ const hrSidebar = [
   { label: 'common:nav.performance', icon: 'StarIcon',            to: '/app/hr/performance' },
   { label: 'common:nav.orgChart',    icon: 'RectangleGroupIcon',  to: '/app/hr/org-chart'  },
   { label: 'common:nav.documents',   icon: 'FolderIcon',          to: '/app/hr/documents'  },
+  { label: 'common:nav.candidates',  icon: 'UserPlusIcon',        to: '/app/hr/candidates' },
 ];
 
 const payrollSidebar = payrollSidebarItems;
@@ -163,6 +167,9 @@ const App = () => {
             <Route path="performance" element={<HrPerformancePage />} />
             <Route path="org-chart" element={<OrgChartPage />} />
             <Route path="documents" element={<HrDocumentsPage />} />
+            <Route path="candidates" element={<CandidatePipelinePage />} />
+            <Route path="candidates/new" element={<CandidateFormPage />} />
+            <Route path="candidates/:id" element={<CandidateDetailPage />} />
           </Route>
 
           {/* ═══ Payroll app ═══ */}

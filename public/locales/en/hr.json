@@ -1,0 +1,121 @@
+{
+  "candidates": {
+    "title": "Candidates",
+    "pipeline": "Candidate Pipeline",
+    "newCandidate": "New Candidate",
+    "search": "Search candidates…",
+    "empty": "No candidates found",
+    "status": {
+      "all": "All",
+      "new": "New",
+      "invited": "Invited",
+      "documents_pending": "Documents Pending",
+      "under_review": "Under Review",
+      "approved": "Approved",
+      "activated": "Activated",
+      "rejected": "Rejected",
+      "archived": "Archived"
+    },
+    "fields": {
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "phone": "Phone",
+      "positionTitle": "Position",
+      "department": "Department",
+      "contractType": "Contract Type",
+      "plannedStartDate": "Start Date",
+      "grossSalary": "Gross Salary",
+      "probationEndDate": "Probation End",
+      "notes": "Notes",
+      "createdAt": "Created",
+      "updatedAt": "Updated"
+    },
+    "contractTypes": {
+      "CDI": "Permanent (CDI)",
+      "CDD": "Fixed-term (CDD)",
+      "interim": "Interim",
+      "apprenticeship": "Apprenticeship",
+      "internship": "Internship"
+    },
+    "form": {
+      "createTitle": "New Candidate",
+      "personalInfo": "Personal Information",
+      "contractDetails": "Contract Details",
+      "submit": "Create Candidate",
+      "cancel": "Cancel"
+    },
+    "detail": {
+      "info": "Info",
+      "onboarding": "Onboarding",
+      "documents": "Documents",
+      "personalInfo": "Personal Information",
+      "contractDetails": "Contract Details",
+      "statusPipeline": "Status Pipeline",
+      "onboardingProgress": "Onboarding Progress"
+    },
+    "onboarding": {
+      "title": "Onboarding Steps",
+      "progress": "{{completed}} of {{total}} required steps completed",
+      "categories": {
+        "identity": "Identity & Background",
+        "contract": "Contract & Compensation",
+        "hr": "HR Policies",
+        "it": "IT & Access",
+        "safety": "Health & Safety"
+      },
+      "stepStatus": {
+        "pending": "Pending",
+        "completed": "Completed",
+        "skipped": "Skipped",
+        "na": "N/A"
+      },
+      "notes": "Notes"
+    },
+    "documents": {
+      "title": "Document Vault",
+      "upload": "Upload Document",
+      "types": {
+        "cv": "CV / Resume",
+        "id_card": "ID Card",
+        "passport": "Passport",
+        "social_security": "Social Security",
+        "rib": "Bank Details (RIB)",
+        "diploma": "Diploma",
+        "contract_signed": "Signed Contract",
+        "national_id": "National ID",
+        "other": "Other"
+      },
+      "verified": "Verified",
+      "unverified": "Unverified",
+      "verify": "Verify",
+      "download": "Download",
+      "delete": "Delete",
+      "required": "Required",
+      "maxSize": "Max 10 MB"
+    },
+    "activate": {
+      "button": "Activate Account",
+      "buttonBlocked": "Complete all required steps and verify required documents first",
+      "title": "Activate Candidate Account",
+      "description": "This will create an employee record and send a setup invitation to:",
+      "steps": "Onboarding Steps",
+      "docs": "Documents",
+      "confirm": "Confirm & Activate",
+      "success": "Account activated! Invitation sent to {{email}}."
+    },
+    "invite": {
+      "resend": "Resend Invite",
+      "resendSuccess": "Invitation re-sent to {{email}}"
+    },
+    "table": {
+      "name": "Name",
+      "position": "Position",
+      "contract": "Contract",
+      "startDate": "Start Date",
+      "status": "Status",
+      "progress": "Progress",
+      "updated": "Updated"
+    }
+  }
+}

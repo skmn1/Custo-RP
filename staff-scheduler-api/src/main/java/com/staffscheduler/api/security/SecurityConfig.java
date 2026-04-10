@@ -38,6 +38,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 // Document file download uses HMAC-signed URL as auth — no JWT required
                 .requestMatchers(HttpMethod.GET, "/api/hr/documents/*/file").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/hr/candidates/*/documents/*/file").permitAll()
                 // Admin-only endpoints
                 .requestMatchers("/api/admin/**").hasRole("SUPER_ADMIN")
                 .requestMatchers("/api/**").authenticated()

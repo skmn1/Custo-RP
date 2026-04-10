@@ -34,4 +34,6 @@ public interface EmployeeRepository extends JpaRepository<Employee, String> {
             @Param("role") String role);
 
     boolean existsByEmailAndIdNot(String email, String id);
+
+    boolean existsByEmail(String email);
 }
