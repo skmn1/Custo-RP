@@ -49,7 +49,7 @@ public class AccountingController {
             final LocalDate ws = weekStart;
             final LocalDate we = weekEnd;
 
-            // All invoices in this system are AP (supplier/expense) → outflows.
+            // All invoices in this system are AP (supplier/expense) -> outflows.
             // Inflow (AR) is reserved for future invoice types.
             BigDecimal inflow = BigDecimal.ZERO;
 

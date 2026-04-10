@@ -460,7 +460,7 @@ public class CandidateService {
         c.setReviewedBy(activatedBy);
         candidateRepository.save(c);
 
-        log.info("Candidate {} activated → employee={}, user={}, invite={}",
+        log.info("Candidate {} activated -> employee={}, user={}, invite={}",
                 candidateId, employeeId, user.getId(), invitation.getId());
 
         // Email dispatch would happen here (non-transactional, logged only)

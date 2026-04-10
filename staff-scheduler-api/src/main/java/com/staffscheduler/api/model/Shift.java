@@ -79,7 +79,7 @@ public class Shift {
 
     private void computeDerivedFields() {
         if (date != null) {
-            // java.time DayOfWeek: MONDAY=1 ... SUNDAY=7  →  our 0=Mon .. 6=Sun
+            // java.time DayOfWeek: MONDAY=1 ... SUNDAY=7  ->  our 0=Mon .. 6=Sun
             this.dayIndex = date.getDayOfWeek().getValue() - 1;
         }
         if (startTime != null && endTime != null && duration == null) {

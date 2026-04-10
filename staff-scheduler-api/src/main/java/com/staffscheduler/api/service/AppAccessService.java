@@ -55,6 +55,6 @@ public class AppAccessService {
     private boolean meetsLevel(String actual, String required) {
         if ("none".equals(actual)) return false;
         if ("read".equals(required)) return true; // full or read both satisfy read
-        return "full".equals(actual); // full required → only full satisfies
+        return "full".equals(actual); // full required -> only full satisfies
     }
 }

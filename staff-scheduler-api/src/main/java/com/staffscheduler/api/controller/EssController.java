@@ -1113,7 +1113,7 @@ public class EssController {
 
     /**
      * Resolves the employee_id for the authenticated user from the user store.
-     * Throws 403 (via ResourceNotFoundException → 404 is rethrown as 403 for
+     * Throws 403 (via ResourceNotFoundException -> 404 is rethrown as 403 for
      * HR-safe messaging) if no employee record is linked to this user account.
      *
      * This is the single point of own-data enforcement — all ESS handlers must
@@ -1147,7 +1147,9 @@ public class EssController {
                           String action, String resourceType, String resourceId, String changes) {
         try {
             AuditLog log = new AuditLog();
-            log.setActorId(auth != null ? auth.getName() : "unknown");
+            if (auth != null) {
+                try { log.setActorId(UUID.fromString(auth.getName())); } catch (IllegalArgumentException ignored) {}
+            }
             log.setApp("ess");
             log.setAction(action);
             log.setResourceType(resourceType);

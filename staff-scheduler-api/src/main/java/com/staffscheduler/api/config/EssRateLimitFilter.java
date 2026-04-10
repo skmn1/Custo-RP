@@ -19,16 +19,16 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Returns HTTP 429 Too Many Requests with a Retry-After header when exceeded.
  *
  * Rate limits:
- *   POST /api/ess/profile/photo             → 5 / hour
- *   POST /api/ess/profile/qualifications/*/document → 10 / hour
- *   POST /api/ess/profile/change-request     → 20 / hour
- *   GET  /api/ess/payslips/*/download        → 30 / hour
- *   PUT  /api/ess/notifications/read-all     → 10 / minute
+ *   POST /api/ess/profile/photo             -> 5 / hour
+ *   POST /api/ess/profile/qualifications/{id}/document -> 10 / hour
+ *   POST /api/ess/profile/change-request     -> 20 / hour
+ *   GET  /api/ess/payslips/{id}/download        -> 30 / hour
+ *   PUT  /api/ess/notifications/read-all     -> 10 / minute
  */
 @Component
 public class EssRateLimitFilter implements Filter {
 
-    /** Rate limit definitions: pathPattern → { maxRequests, windowMs } */
+    /** Rate limit definitions: pathPattern -> { maxRequests, windowMs } */
     private static final Map<String, int[]> RATE_LIMITS = Map.of(
         "POST:/api/ess/profile/photo",               new int[]{5,   3600_000},  // 5 / hour
         "POST:/api/ess/profile/qualifications/document", new int[]{10, 3600_000},  // 10 / hour
@@ -37,7 +37,7 @@ public class EssRateLimitFilter implements Filter {
         "PUT:/api/ess/notifications/read-all",        new int[]{10,  60_000}     // 10 / minute
     );
 
-    /** Sliding window buckets: key → { count, windowStart } */
+    /** Sliding window buckets: key -> { count, windowStart } */
     private final ConcurrentHashMap<String, long[]> buckets = new ConcurrentHashMap<>();
 
     @Override
