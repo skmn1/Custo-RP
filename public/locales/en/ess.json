@@ -402,6 +402,21 @@
       "attendanceThisMonth": "Attendance this month",
       "hoursWorked": "{{hours}}h worked",
       "attendanceRate": "{{rate}}% rate"
+    },
+    "payslips": {
+      "title": "Payslips",
+      "net": "net",
+      "paidOn": "Paid {{date}}",
+      "netPay": "Net pay",
+      "gross": "Gross",
+      "deductions": "Deductions",
+      "earnings": "Earnings",
+      "summary": "Summary",
+      "grossPay": "Gross pay",
+      "totalDeductions": "Total deductions",
+      "downloadPdf": "Download PDF",
+      "noPayslips": "No payslips yet",
+      "paid": "Paid on {{date}}"
     }
   }
 }

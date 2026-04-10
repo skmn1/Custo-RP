@@ -3,8 +3,10 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useEssPayslips } from '../../hooks/useEssPayslips';
 import { useEssConnectivity } from '../../contexts/EssConnectivityContext';
+import { useMobileLayout } from '../../hooks/useMobileLayout';
 import EssOfflineFallback from '../../components/ess/EssOfflineFallback';
 import StaleDataIndicator from '../../components/ess/StaleDataIndicator';
+import MobilePayslipList from '../../components/ess/payslips/MobilePayslipList';
 
 /* ─── Helpers ─────────────────────────────────────────────── */
 
@@ -81,6 +83,7 @@ function YearFilter({ year, setYear, t }) {
 /* ─── Page ────────────────────────────────────────────────── */
 
 const EssPayslipsPage = () => {
+  const isMobile = useMobileLayout();
   const { t } = useTranslation('ess');
   const { isOnline } = useEssConnectivity();
   const {
@@ -95,6 +98,8 @@ const EssPayslipsPage = () => {
     isCached,
     fetchedAt,
   } = useEssPayslips();
+
+  if (isMobile) return <MobilePayslipList />;
 
   if (!isOnline && payslips.length === 0 && !isLoading && !restricted) {
     return <EssOfflineFallback />;

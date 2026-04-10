@@ -395,6 +395,21 @@
       "attendanceThisMonth": "Présence ce mois",
       "hoursWorked": "{{hours}}h travaillées",
       "attendanceRate": "Taux de {{rate}}%"
+    },
+    "payslips": {
+      "title": "Fiches de paie",
+      "net": "net",
+      "paidOn": "Payé le {{date}}",
+      "netPay": "Salaire net",
+      "gross": "Brut",
+      "deductions": "Retenues",
+      "earnings": "Revenus",
+      "summary": "Résumé",
+      "grossPay": "Salaire brut",
+      "totalDeductions": "Total des retenues",
+      "downloadPdf": "Télécharger le PDF",
+      "noPayslips": "Aucune fiche de paie",
+      "paid": "Payé le {{date}}"
     }
   }
 }

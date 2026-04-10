@@ -4,8 +4,10 @@ import { useTranslation } from 'react-i18next';
 import { useEssPayslips } from '../../hooks/useEssPayslips';
 import PayslipPdf from '../../components/ess/PayslipPdf';
 import { useEssConnectivity } from '../../contexts/EssConnectivityContext';
+import { useMobileLayout } from '../../hooks/useMobileLayout';
 import EssOfflineFallback from '../../components/ess/EssOfflineFallback';
 import StaleDataIndicator from '../../components/ess/StaleDataIndicator';
+import MobilePayslipDetail from '../../components/ess/payslips/MobilePayslipDetail';
 
 /* ─── Helpers ─────────────────────────────────────────────── */
 
@@ -23,6 +25,7 @@ const statusColors = {
 /* ─── Page ────────────────────────────────────────────────── */
 
 const EssPayslipDetailPage = () => {
+  const isMobile = useMobileLayout();
   const { id } = useParams();
   const { t } = useTranslation('ess');
   const { isOnline } = useEssConnectivity();
@@ -31,6 +34,8 @@ const EssPayslipDetailPage = () => {
   useEffect(() => {
     if (id) fetchDetail(id);
   }, [id, fetchDetail]);
+
+  if (isMobile) return <MobilePayslipDetail />;
 
   if (detailLoading) {
     return (
