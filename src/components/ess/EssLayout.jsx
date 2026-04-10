@@ -94,8 +94,8 @@ export default function EssLayout() {
         <AppShell appId="ess" sidebarItems={essSidebarItems} />
       )}
 
-      {/* PWA install prompt (Android banner / iOS bottom sheet) */}
-      <EssInstallPrompt />
+      {/* PWA install prompt — desktop only; MobileInstallPrompt handles mobile */}
+      {!isMobile && <EssInstallPrompt />}
     </EssConnectivityProvider>
   );
 }
