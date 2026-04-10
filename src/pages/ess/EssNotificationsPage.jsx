@@ -4,7 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { useNotifications } from '../../hooks/useNotifications';
 import { formatTimeAgo, TYPE_ICONS } from '../../components/ess/NotificationBell';
 import { useEssConnectivity } from '../../contexts/EssConnectivityContext';
+import { useMobileLayout } from '../../hooks/useMobileLayout';
 import EssOfflineFallback from '../../components/ess/EssOfflineFallback';
+import MobileNotifications from '../../components/ess/notifications/MobileNotifications';
 import { apiFetch } from '../../api/config';
 import { subscribeToPush, unsubscribeFromPush } from '../../lib/essPushSubscription';
 
@@ -65,9 +67,12 @@ function getDateLabel(dateStr) {
 // ─── Main Component ─────────────────────────────────────────
 
 const EssNotificationsPage = () => {
+  const isMobile = useMobileLayout();
   const { t } = useTranslation('ess');
   const navigate = useNavigate();
   const { isOnline } = useEssConnectivity();
+
+  if (isMobile) return <MobileNotifications />;
   const [typeFilter, setTypeFilter] = useState('all');
   const [unreadOnly, setUnreadOnly] = useState(false);
 

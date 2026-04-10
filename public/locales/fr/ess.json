@@ -473,6 +473,19 @@
       "validationPhone": "Numéro de téléphone invalide",
       "validationShort": "La valeur est trop courte",
       "validationError": "Une erreur est survenue"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "markAllRead": "Tout marquer comme lu",
+      "today": "Aujourd'hui",
+      "yesterday": "Hier",
+      "earlier": "Plus ancien",
+      "emptyTitle": "Tout est à jour !",
+      "emptyBody": "Aucune nouvelle notification.",
+      "hoursAgo": "il y a {{count}}h",
+      "minutesAgo": "il y a {{count}}min",
+      "justNow": "À l'instant",
+      "unread": "non lu"
     }
   }
 }

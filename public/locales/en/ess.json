@@ -480,6 +480,19 @@
       "validationPhone": "Invalid phone number",
       "validationShort": "Value is too short",
       "validationError": "Something went wrong"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "markAllRead": "Mark all read",
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "earlier": "Earlier",
+      "emptyTitle": "All caught up!",
+      "emptyBody": "No new notifications.",
+      "hoursAgo": "{{count}}h ago",
+      "minutesAgo": "{{count}}m ago",
+      "justNow": "Just now",
+      "unread": "unread"
     }
   }
 }
