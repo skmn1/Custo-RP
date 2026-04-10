@@ -7,6 +7,8 @@ export default defineConfig({
     viewportHeight: 720,
     video: false,
     screenshotOnRunFailure: true,
+    // Allow Cypress to instrument service worker responses for testing
+    experimentalServiceWorker: true,
     setupNodeEvents(on, config) {
       // implement node event listeners here
     },

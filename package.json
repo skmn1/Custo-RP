@@ -16,7 +16,15 @@
     "cy:run": "cypress run",
     "cy:dev": "start-server-and-test dev http://localhost:5173 cy:open",
     "cy:ci": "start-server-and-test dev http://localhost:5173 cy:run",
-    "i18n:check": "node scripts/check-translations.js"
+    "i18n:check": "node scripts/check-translations.js",
+    "test:unit": "vitest run",
+    "test:unit:watch": "vitest",
+    "test:pw": "playwright test",
+    "test:pw:webkit": "playwright test --project=webkit",
+    "test:pw:chrome": "playwright test --project=chromium",
+    "lighthouse": "lhci autorun",
+    "lighthouse:collect": "lhci collect",
+    "lighthouse:assert": "lhci assert"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -41,6 +49,8 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.29.0",
+    "@lhci/cli": "^0.15.1",
+    "@playwright/test": "^1.59.1",
     "@tailwindcss/postcss": "^4.1.11",
     "@tailwindcss/vite": "^4.1.11",
     "@types/react": "^19.1.8",
@@ -52,11 +62,13 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.2.0",
+    "jsdom": "^27.0.1",
     "postcss": "^8.5.6",
     "start-server-and-test": "^2.0.12",
     "tailwindcss": "^4.1.11",
     "vite": "^7.0.0",
     "vite-plugin-pwa": "^1.2.0",
+    "vitest": "^4.1.4",
     "web-push": "^3.6.7"
   }
 }

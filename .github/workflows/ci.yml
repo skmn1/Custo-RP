@@ -1,0 +1,195 @@
+name: ESS PWA CI
+
+on:
+  push:
+    branches: [master, main, 'feature/**', 'fix/**']
+  pull_request:
+    branches: [master, main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  # ─────────────────────────────────────────────────────────────
+  # 1. Lint & Unit Tests (Vitest)
+  # ─────────────────────────────────────────────────────────────
+  lint-and-unit:
+    name: Lint & Vitest unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit tests (Vitest)
+        run: npm run test:unit
+
+  # ─────────────────────────────────────────────────────────────
+  # 2. Cypress E2E — Chrome (main browser matrix)
+  # ─────────────────────────────────────────────────────────────
+  cypress-chrome:
+    name: Cypress E2E (Chrome)
+    runs-on: ubuntu-latest
+    needs: lint-and-unit
+    strategy:
+      fail-fast: false
+      matrix:
+        # Split test suite into parallel containers
+        containers: [1, 2, 3]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build frontend
+        run: npm run build
+
+      - name: Run Cypress (Chrome) — container ${{ matrix.containers }}
+        uses: cypress-io/github-action@v6
+        with:
+          start: npm run preview
+          wait-on: 'http://localhost:4173'
+          wait-on-timeout: 60
+          browser: chrome
+          record: false
+          parallel: false
+          spec: |
+            cypress/e2e/ess-pwa/**/*.cy.js,cypress/e2e/ess-offline.cy.js,cypress/e2e/ess-sync.cy.js,cypress/e2e/ess-pwa.cy.js,cypress/e2e/ess-service-worker.cy.js
+        env:
+          CYPRESS_BASE_URL: http://localhost:4173
+
+      - name: Upload Cypress screenshots on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-screenshots-chrome-${{ matrix.containers }}
+          path: cypress/screenshots
+          retention-days: 7
+
+  # ─────────────────────────────────────────────────────────────
+  # 3. Playwright cross-browser (WebKit + Firefox)
+  # ─────────────────────────────────────────────────────────────
+  playwright-cross-browser:
+    name: Playwright (WebKit + Firefox)
+    runs-on: ubuntu-latest
+    needs: lint-and-unit
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps webkit firefox chromium
+
+      - name: Build frontend
+        run: npm run build
+
+      - name: Start preview server
+        run: npm run preview &
+        shell: bash
+
+      - name: Wait for preview server
+        run: npx wait-on http://localhost:4173 --timeout 60000
+
+      - name: Run Playwright tests
+        run: npm run test:pw
+        env:
+          BASE_URL: http://localhost:4173
+          CI: true
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
+  # ─────────────────────────────────────────────────────────────
+  # 4. Lighthouse PWA Audit (on preview build)
+  # ─────────────────────────────────────────────────────────────
+  lighthouse:
+    name: Lighthouse PWA Audit
+    runs-on: ubuntu-latest
+    needs: lint-and-unit
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build frontend
+        run: npm run build
+
+      - name: Run Lighthouse CI
+        run: npm run lighthouse
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+      - name: Upload Lighthouse results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-results
+          path: .lighthouseci/
+          retention-days: 14
+
+  # ─────────────────────────────────────────────────────────────
+  # 5. Build verification — ensure the frontend compiles cleanly
+  # ─────────────────────────────────────────────────────────────
+  build-verify:
+    name: Build verification
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build frontend
+        run: npm run build
+
+      - name: Verify dist output
+        run: |
+          test -d dist && echo "dist/ exists" || (echo "dist/ missing!" && exit 1)
+          test -f dist/index.html && echo "index.html present" || (echo "index.html missing!" && exit 1)
