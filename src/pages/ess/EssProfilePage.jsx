@@ -5,8 +5,10 @@ import BankDetailsTab from '../../components/ess/BankDetailsTab';
 import ExperienceTab from '../../components/ess/ExperienceTab';
 import QualificationsTab from '../../components/ess/QualificationsTab';
 import { useEssConnectivity } from '../../contexts/EssConnectivityContext';
+import { useMobileLayout } from '../../hooks/useMobileLayout';
 import EssOfflineFallback from '../../components/ess/EssOfflineFallback';
 import StaleDataIndicator from '../../components/ess/StaleDataIndicator';
+import MobileProfile from '../../components/ess/profile/MobileProfile';
 
 // ─── Tab definitions ────────────────────────────────────────
 
@@ -15,6 +17,7 @@ const TABS = ['overview', 'personal', 'contract', 'bank', 'experience', 'qualifi
 // ─── Main component ─────────────────────────────────────────
 
 const EssProfilePage = () => {
+  const isMobile = useMobileLayout();
   const { t } = useTranslation('ess');
   const [activeTab, setActiveTab] = useState('overview');
   const { isOnline } = useEssConnectivity();
@@ -34,6 +37,8 @@ const EssProfilePage = () => {
     updateQualification,
     deleteQualification,
   } = useEssProfile();
+
+  if (isMobile) return <MobileProfile />;
 
   if (isLoading && !profile) {
     return (
