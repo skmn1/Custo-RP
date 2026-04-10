@@ -327,6 +327,18 @@
       "downloadDisabled": "Téléchargement indisponible hors ligne",
       "editDisabled": "Modification indisponible hors ligne",
       "willSyncWhenOnline": "Synchronisation à la reconnexion"
+    },
+    "sync": {
+      "pending": "{{count}} modification(s) en attente — synchronisation au retour en ligne",
+      "syncing": "Synchronisation de {{count}} modification(s) en cours…",
+      "synced": "{{count}} modification(s) synchronisée(s)",
+      "conflict": "{{synced}} synchronisée(s), {{conflicts}} conflit(s) — déjà traité(s) par les RH",
+      "failed": "{{count}} modification(s) échouée(s)",
+      "retryBtn": "Réessayer",
+      "discardBtn": "Abandonner",
+      "confirmDiscard": "Confirmer ?",
+      "queued": "En file d'attente",
+      "conflictBadge": "Conflit"
     }
   }
 }

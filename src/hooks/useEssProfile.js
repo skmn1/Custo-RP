@@ -1,5 +1,20 @@
 import { useState, useCallback, useEffect } from 'react';
 import { apiFetch } from '../api/config';
+import { enqueueMutation } from '../lib/essOfflineQueue';
+
+// Helper: get employee ID from the profile or localStorage user cache
+function getEmployeeId(profile) {
+  if (profile?.id) return profile.id;
+  if (profile?.employeeId) return profile.employeeId;
+  try {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+      return payload.employee_id ?? payload.sub ?? null;
+    }
+  } catch { /* ignore */ }
+  return null;
+}
 
 /**
  * useEssProfile — data-fetching hook for the ESS profile page.
@@ -12,6 +27,8 @@ export function useEssProfile() {
   const [changeRequests, setChangeRequests] = useState([]);
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  // Local optimistic queue entries (queued offline change requests)
+  const [queuedRequests, setQueuedRequests] = useState([]);
 
   // ── Fetch full profile ───────────────────────────────────
 
@@ -40,6 +57,31 @@ export function useEssProfile() {
   }, []);
 
   const submitChangeRequest = useCallback(async ({ fieldName, fieldLabel, oldValue, newValue }) => {
+    if (!navigator.onLine) {
+      // Queue offline — add an optimistic entry immediately
+      const employeeId = getEmployeeId(profile);
+      const mutationId = await enqueueMutation({
+        employeeId,
+        type:   'profile-change-request',
+        url:    '/api/ess/profile/change-request',
+        method: 'POST',
+        body:   { fieldName, fieldLabel, oldValue, newValue },
+      });
+      const optimistic = {
+        id:         `queued-${mutationId}`,
+        mutationId,
+        fieldName,
+        fieldLabel,
+        oldValue:   oldValue ?? '',
+        newValue,
+        status:     'queued',
+        isQueued:   true,
+        createdAt:  new Date().toISOString(),
+      };
+      setQueuedRequests((prev) => [...prev, optimistic]);
+      return optimistic;
+    }
+
     const res = await apiFetch('/ess/profile/change-request', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -48,7 +90,7 @@ export function useEssProfile() {
     await fetchChangeRequests();
     await fetchProfile();
     return res;
-  }, [fetchChangeRequests, fetchProfile]);
+  }, [fetchChangeRequests, fetchProfile, profile]);
 
   const cancelChangeRequest = useCallback(async (id) => {
     await apiFetch(`/ess/profile/change-requests/${id}`, { method: 'DELETE' });
@@ -120,6 +162,7 @@ export function useEssProfile() {
   return {
     profile,
     changeRequests,
+    queuedRequests,
     isLoading,
     error,
     fetchProfile,

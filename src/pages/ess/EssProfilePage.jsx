@@ -22,6 +22,7 @@ const EssProfilePage = () => {
   const {
     profile,
     changeRequests,
+    queuedRequests,
     isLoading,
     error,
     submitChangeRequest,
@@ -143,6 +144,7 @@ const EssProfilePage = () => {
         {activeTab === 'changeRequests' && (
           <ChangeRequestsTab
             requests={changeRequests}
+            queuedRequests={queuedRequests}
             onCancel={cancelChangeRequest}
             t={t}
           />
@@ -238,8 +240,14 @@ const ContractTab = ({ contract, t }) => (
 
 // ─── Change Requests Tab ────────────────────────────────────
 
-const ChangeRequestsTab = ({ requests, onCancel, t }) => {
-  if (!requests || requests.length === 0) {
+const ChangeRequestsTab = ({ requests, queuedRequests = [], onCancel, t }) => {
+  // Merge server-side requests with locally queued (optimistic) entries
+  const allRequests = [
+    ...requests,
+    ...queuedRequests.filter((q) => !requests.some((r) => r.fieldName === q.fieldName && r.status === 'pending')),
+  ];
+
+  if (allRequests.length === 0) {
     return (
       <Card>
         <p className="text-sm text-gray-500 dark:text-gray-400">{t('profile.changeRequests.noRequests')}</p>
@@ -273,15 +281,25 @@ const ChangeRequestsTab = ({ requests, onCancel, t }) => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-            {requests.map((r) => (
+            {allRequests.map((r) => (
               <tr key={r.id}>
                 <td className="py-2 pr-4 font-medium text-gray-900 dark:text-gray-100">{r.fieldLabel || r.fieldName}</td>
-                <td className="py-2 pr-4 text-gray-500 dark:text-gray-400">{r.oldValue || '—'}</td>
+                <td className="py-2 pr-4 text-gray-500 dark:text-gray-400">{r.oldValue || '\u2014'}</td>
                 <td className="py-2 pr-4 text-gray-900 dark:text-gray-100">{r.newValue}</td>
                 <td className="py-2 pr-4">
-                  <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${statusColor(r.status)}`}>
-                    {t(`profile.changeRequests.statusLabels.${r.status}`)}
-                  </span>
+                  {r.isQueued ? (
+                    <span className="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">
+                      {t('pwa.sync.queued')}
+                    </span>
+                  ) : r.status === 'conflict' ? (
+                    <span className="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">
+                      {t('pwa.sync.conflictBadge')}
+                    </span>
+                  ) : (
+                    <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${statusColor(r.status)}`}>
+                      {t(`profile.changeRequests.statusLabels.${r.status}`)}
+                    </span>
+                  )}
                 </td>
                 <td className="py-2 pr-4 text-gray-500 dark:text-gray-400 text-xs">
                   {r.createdAt ? new Date(r.createdAt).toLocaleDateString() : '—'}

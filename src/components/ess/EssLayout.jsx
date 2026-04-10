@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import EssInstallPrompt from './EssInstallPrompt';
 import EssUpdateBanner from './EssUpdateBanner';
 import EssOfflineBanner from './EssOfflineBanner';
+import EssSyncStatusBanner from './EssSyncStatusBanner';
 import { registerEssServiceWorker } from '../../lib/essServiceWorker';
 import { EssConnectivityProvider } from '../../contexts/EssConnectivityContext';
 
@@ -43,8 +44,11 @@ export default function EssLayout({ children }) {
         <meta name="msapplication-TileColor" content="#3B82F6" />
       </Helmet>
 
-      {/* Offline status banner (amber, above update banner) */}
+      {/* Offline status banner (amber, above sync banner) */}
       <EssOfflineBanner />
+
+      {/* Background sync status (pending count, syncing, results) */}
+      <EssSyncStatusBanner />
 
       {/* SW update notification (shown above the app shell content) */}
       <EssUpdateBanner />

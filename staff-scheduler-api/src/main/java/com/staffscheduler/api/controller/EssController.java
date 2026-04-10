@@ -9,6 +9,7 @@ import com.staffscheduler.api.model.EmployeeExperience;
 import com.staffscheduler.api.model.EmployeeQualification;
 import com.staffscheduler.api.model.LeaveRequest;
 import com.staffscheduler.api.model.Notification;
+import com.staffscheduler.api.model.OfflineSyncLog;
 import com.staffscheduler.api.model.PaySlip;
 import com.staffscheduler.api.model.ProfileEditRequest;
 import com.staffscheduler.api.repository.AppSettingRepository;
@@ -20,6 +21,7 @@ import com.staffscheduler.api.repository.EmployeeQualificationRepository;
 import com.staffscheduler.api.repository.EmployeeRepository;
 import com.staffscheduler.api.repository.LeaveRequestRepository;
 import com.staffscheduler.api.repository.NotificationRepository;
+import com.staffscheduler.api.repository.OfflineSyncLogRepository;
 import com.staffscheduler.api.repository.PaySlipRepository;
 import com.staffscheduler.api.repository.ProfileEditRequestRepository;
 import com.staffscheduler.api.repository.ShiftRepository;
@@ -79,6 +81,7 @@ public class EssController {
     private final EmployeeExperienceRepository experienceRepository;
     private final EmployeeQualificationRepository qualificationRepository;
     private final ProfileEditRequestRepository profileEditRequestRepository;
+    private final OfflineSyncLogRepository offlineSyncLogRepository;
     private final NotificationRepository notificationRepository;
     private final NotificationService notificationService;
     private final AuditLogRepository auditLogRepository;
@@ -708,6 +711,24 @@ public class EssController {
             }
         }
 
+        // For non-bank fields: reject if a pending request for the same field already exists (409)
+        if (!fieldName.startsWith("bank_")) {
+            boolean hasPending = !profileEditRequestRepository
+                    .findByEmployeeIdAndFieldNameAndStatus(employeeId, fieldName, "pending")
+                    .isEmpty();
+            if (hasPending) {
+                return ResponseEntity.status(409).body(Map.of(
+                        "error", Map.of(
+                                "code", "CHANGE_REQUEST_CONFLICT",
+                                "field", fieldName,
+                                "message", "A pending change request for \"" +
+                                        (fieldLabel != null ? fieldLabel : fieldName) +
+                                        "\" already exists."
+                        )
+                ));
+            }
+        }
+
         // Cancel existing pending requests for same bank_ field group
         if (fieldName.startsWith("bank_")) {
             List<ProfileEditRequest> existing = profileEditRequestRepository
@@ -739,6 +760,150 @@ public class EssController {
         result.put("status", req.getStatus());
         result.put("message", "Change request submitted for approval");
         return ResponseEntity.ok(result);
+    }
+
+    // ─── /api/ess/sync ──────────────────────────────────────────
+
+    @GetMapping("/sync/status")
+    @Operation(summary = "Get offline sync status — pending change-request count and recent sync log")
+    public ResponseEntity<Map<String, Object>> getSyncStatus(Authentication authentication) {
+        String employeeId = resolveEmployeeId(authentication);
+
+        long pendingChangeRequests = profileEditRequestRepository
+                .countByEmployeeIdAndStatus(employeeId, "pending");
+
+        List<Map<String, Object>> recentSync = offlineSyncLogRepository
+                .findByEmployeeIdOrderBySyncedAtDesc(employeeId, PageRequest.of(0, 20))
+                .stream()
+                .map(l -> {
+                    Map<String, Object> m = new LinkedHashMap<>();
+                    m.put("id", l.getId());
+                    m.put("operationType", l.getOperationType());
+                    m.put("status", l.getStatus());
+                    m.put("queuedAt", l.getQueuedAt() != null ? l.getQueuedAt().toString() : null);
+                    m.put("syncedAt", l.getSyncedAt() != null ? l.getSyncedAt().toString() : null);
+                    m.put("errorDetail", l.getErrorDetail());
+                    return m;
+                }).collect(Collectors.toList());
+
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("pendingChangeRequests", pendingChangeRequests);
+        data.put("recentSync", recentSync);
+        return ResponseEntity.ok(Map.of("data", data));
+    }
+
+    @PostMapping("/sync/replay")
+    @Operation(summary = "Batch replay of queued offline mutations (profile change requests)")
+    public ResponseEntity<Map<String, Object>> replaySync(
+            Authentication authentication,
+            @RequestBody Map<String, Object> body,
+            HttpServletRequest httpRequest) {
+
+        String employeeId = resolveEmployeeId(authentication);
+
+        @SuppressWarnings("unchecked")
+        List<Map<String, Object>> mutations =
+                body.get("mutations") instanceof List<?>
+                        ? (List<Map<String, Object>>) body.get("mutations")
+                        : List.of();
+
+        List<Map<String, Object>> results = new ArrayList<>();
+        int syncedCount = 0, conflictCount = 0, failedCount = 0;
+
+        for (Map<String, Object> mutation : mutations) {
+            String type       = mutation.get("type") != null ? mutation.get("type").toString() : null;
+            String mutationId = mutation.get("id")  != null ? mutation.get("id").toString()   : null;
+
+            Map<String, Object> result = new LinkedHashMap<>();
+            result.put("id",   mutationId);
+            result.put("type", type);
+
+            try {
+                if ("profile-change-request".equals(type)) {
+                    String fieldName  = (String) mutation.get("fieldName");
+                    String fieldLabel = (String) mutation.get("fieldLabel");
+                    String oldValue   = mutation.get("oldValue") != null ? mutation.get("oldValue").toString() : "";
+                    String newValue   = mutation.get("newValue") != null ? mutation.get("newValue").toString() : "";
+
+                    if (fieldName == null || fieldName.isBlank() || newValue.isBlank() ||
+                            (!ALLOWED_EMPLOYEE_FIELDS.contains(fieldName) && !ALLOWED_BANK_FIELDS.contains(fieldName))) {
+                        result.put("status", "failed");
+                        result.put("error", "Invalid fieldName or missing newValue");
+                        failedCount++;
+                        logSync(employeeId, "PROFILE_CHANGE_REQUEST",
+                                "/api/ess/profile/change-request", "POST",
+                                "failed", mutation.get("timestamp"), "Invalid field");
+
+                    } else if (!fieldName.startsWith("bank_") && !profileEditRequestRepository
+                            .findByEmployeeIdAndFieldNameAndStatus(employeeId, fieldName, "pending")
+                            .isEmpty()) {
+                        result.put("status", "conflict");
+                        result.put("error", "A pending change request for this field already exists.");
+                        conflictCount++;
+                        logSync(employeeId, "PROFILE_CHANGE_REQUEST",
+                                "/api/ess/profile/change-request", "POST",
+                                "conflict", mutation.get("timestamp"), "Duplicate pending: " + fieldName);
+
+                    } else {
+                        if (fieldName.startsWith("bank_")) {
+                            List<ProfileEditRequest> existing = profileEditRequestRepository
+                                    .findByEmployeeIdAndFieldNameStartingWithAndStatus(
+                                            employeeId, "bank_", "pending");
+                            for (ProfileEditRequest p : existing) {
+                                p.setStatus("cancelled");
+                                profileEditRequestRepository.save(p);
+                            }
+                        }
+                        ProfileEditRequest req = new ProfileEditRequest();
+                        req.setEmployeeId(employeeId);
+                        req.setFieldName(fieldName);
+                        req.setFieldLabel(fieldLabel != null ? fieldLabel : fieldName);
+                        req.setOldValue(oldValue);
+                        req.setNewValue(newValue);
+                        req.setStatus("pending");
+                        profileEditRequestRepository.save(req);
+
+                        logAudit(authentication, httpRequest,
+                                "profile_change_request_submitted",
+                                "profile_edit_request", req.getId(),
+                                "{\"fieldName\":\"" + fieldName + "\",\"source\":\"offline_sync\"}");
+
+                        result.put("status",    "synced");
+                        result.put("requestId", req.getId());
+                        syncedCount++;
+                        logSync(employeeId, "PROFILE_CHANGE_REQUEST",
+                                "/api/ess/profile/change-request", "POST",
+                                "synced", mutation.get("timestamp"), null);
+                    }
+
+                } else {
+                    result.put("status", "failed");
+                    result.put("error",  "Unknown mutation type: " + type);
+                    failedCount++;
+                    logSync(employeeId,
+                            type != null ? type.toUpperCase() : "UNKNOWN",
+                            "/api/ess/sync/replay", "POST",
+                            "failed", mutation.get("timestamp"), "Unknown type");
+                }
+
+            } catch (Exception e) {
+                result.put("status", "failed");
+                result.put("error",  "Server error during replay");
+                failedCount++;
+                logSync(employeeId,
+                        type != null ? type.toUpperCase() : "UNKNOWN",
+                        "/api/ess/sync/replay", "POST",
+                        "failed", mutation.get("timestamp"), e.getMessage());
+            }
+            results.add(result);
+        }
+
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("results",       results);
+        data.put("syncedCount",   syncedCount);
+        data.put("conflictCount", conflictCount);
+        data.put("failedCount",   failedCount);
+        return ResponseEntity.ok(Map.of("data", data));
     }
 
     @GetMapping("/profile/change-requests")
@@ -1165,6 +1330,32 @@ public class EssController {
     private static String truncate(String s, int maxLen) {
         if (s == null) return null;
         return s.length() > maxLen ? s.substring(0, maxLen) + "…" : s;
+    }
+
+    /** Write a row to offline_sync_log; never throws. */
+    private void logSync(String employeeId, String operationType, String endpoint,
+                         String method, String status, Object timestampRaw, String errorDetail) {
+        try {
+            OfflineSyncLog log = new OfflineSyncLog();
+            log.setEmployeeId(employeeId);
+            log.setOperationType(operationType);
+            log.setEndpoint(endpoint);
+            log.setMethod(method);
+            log.setStatus(status);
+            if (timestampRaw instanceof Number) {
+                long epochMs = ((Number) timestampRaw).longValue();
+                log.setQueuedAt(java.time.Instant.ofEpochMilli(epochMs)
+                        .atZone(java.time.ZoneOffset.UTC).toLocalDateTime());
+            } else if (timestampRaw != null) {
+                try {
+                    log.setQueuedAt(java.time.LocalDateTime.parse(timestampRaw.toString()));
+                } catch (Exception ignored) { /* unparsable timestamp — leave null */ }
+            }
+            log.setErrorDetail(errorDetail);
+            offlineSyncLogRepository.save(log);
+        } catch (Exception e) {
+            // Sync logging must never break the main request
+        }
     }
 
     @org.springframework.web.bind.annotation.ExceptionHandler(EssNoEmployeeRecordException.class)

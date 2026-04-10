@@ -20,4 +20,8 @@ public interface ProfileEditRequestRepository extends JpaRepository<ProfileEditR
     /** Cancel pending bank requests when employee submits new ones */
     List<ProfileEditRequest> findByEmployeeIdAndFieldNameStartingWithAndStatus(
             String employeeId, String fieldPrefix, String status);
+
+    /** Duplicate-pending check for non-bank fields (used for 409 conflict detection) */
+    List<ProfileEditRequest> findByEmployeeIdAndFieldNameAndStatus(
+            String employeeId, String fieldName, String status);
 }

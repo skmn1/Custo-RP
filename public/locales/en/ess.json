@@ -335,7 +335,17 @@
       "requiresInternet": "Requires internet connection",
       "downloadDisabled": "Download is unavailable offline",
       "editDisabled": "Editing is unavailable offline",
-      "willSyncWhenOnline": "Will sync when back online"
-    }
+      "willSyncWhenOnline": "Will sync when back online"    },
+    "sync": {
+      "pending": "{{count}} pending change(s) \u2014 will sync when back online",
+      "syncing": "Syncing {{count}} pending change(s)\u2026",
+      "synced": "{{count}} change(s) synced",
+      "conflict": "{{synced}} synced, {{conflicts}} conflict(s) \u2014 already processed by HR",
+      "failed": "{{count}} change(s) failed to sync",
+      "retryBtn": "Retry",
+      "discardBtn": "Discard",
+      "confirmDiscard": "Sure?",
+      "queued": "Queued",
+      "conflictBadge": "Conflict"    }
   }
 }

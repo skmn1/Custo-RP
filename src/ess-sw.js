@@ -19,6 +19,7 @@ import {
 } from 'workbox-strategies';
 import { ExpirationPlugin } from 'workbox-expiration';
 import { CacheableResponsePlugin } from 'workbox-cacheable-response';
+import { BackgroundSyncPlugin } from 'workbox-background-sync';
 
 // ─── Precache (injected by vite-plugin-pwa at build time) ──────────────────
 precacheAndRoute(self.__WB_MANIFEST);
@@ -69,9 +70,81 @@ registerRoute(
 );
 
 // ─── Security: block notification endpoints (always fresh) ─────────────────
+// NOTE: Read GETs are blocked via NetworkOnly for security.
+// Write operations (PUT/DELETE) are handled below with BackgroundSyncPlugin.
 registerRoute(
-  ({ url }) => url.pathname.startsWith('/api/ess/notifications'),
+  ({ url, request }) =>
+    url.pathname.startsWith('/api/ess/notifications') &&
+    request.method === 'GET',
   new NetworkOnly()
+);
+
+// ─── Background sync: notification writes (PUT/DELETE) ─────────────────────
+// Queues notification mark-as-read and delete operations made while offline.
+// The Workbox BackgroundSyncPlugin retries them automatically via the
+// Background Sync API when connectivity is restored.
+const notificationSyncPlugin = new BackgroundSyncPlugin('ess-notification-sync', {
+  maxRetentionTime: 24 * 60, // 24 hours in minutes
+  async onSync({ queue }) {
+    let entry;
+    while ((entry = await queue.shiftRequest())) {
+      try {
+        await fetch(entry.request);
+      } catch (error) {
+        await queue.unshiftRequest(entry);
+        throw error; // retry later
+      }
+    }
+    // Notify all clients that notification sync completed
+    const clients = await self.clients.matchAll();
+    for (const client of clients) {
+      client.postMessage({ type: 'ESS_SYNC_COMPLETE', queue: 'notifications' });
+    }
+  },
+});
+
+registerRoute(
+  ({ url, request }) =>
+    url.pathname.startsWith('/api/ess/notifications') &&
+    ['PUT', 'DELETE'].includes(request.method),
+  new NetworkOnly({ plugins: [notificationSyncPlugin] }),
+  'PUT'
+);
+
+registerRoute(
+  ({ url, request }) =>
+    url.pathname.startsWith('/api/ess/notifications') &&
+    request.method === 'DELETE',
+  new NetworkOnly({ plugins: [notificationSyncPlugin] }),
+  'DELETE'
+);
+
+// ─── Background sync: profile change-request cancellation (DELETE) ──────────
+const profileCancelSyncPlugin = new BackgroundSyncPlugin('ess-profile-cancel-sync', {
+  maxRetentionTime: 24 * 60,
+  async onSync({ queue }) {
+    let entry;
+    while ((entry = await queue.shiftRequest())) {
+      try {
+        await fetch(entry.request);
+      } catch (error) {
+        await queue.unshiftRequest(entry);
+        throw error;
+      }
+    }
+    const clients = await self.clients.matchAll();
+    for (const client of clients) {
+      client.postMessage({ type: 'ESS_SYNC_COMPLETE', queue: 'profile-cancel' });
+    }
+  },
+});
+
+registerRoute(
+  ({ url, request }) =>
+    /\/api\/ess\/profile\/change-requests\//.test(url.pathname) &&
+    request.method === 'DELETE',
+  new NetworkOnly({ plugins: [profileCancelSyncPlugin] }),
+  'DELETE'
 );
 
 // ─── Security: block push + sync endpoints ────────────────────────────────
