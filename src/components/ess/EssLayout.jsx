@@ -3,14 +3,16 @@ import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
 import EssInstallPrompt from './EssInstallPrompt';
 import EssUpdateBanner from './EssUpdateBanner';
+import EssOfflineBanner from './EssOfflineBanner';
 import { registerEssServiceWorker } from '../../lib/essServiceWorker';
+import { EssConnectivityProvider } from '../../contexts/EssConnectivityContext';
 
 /**
- * EssLayout — Task 56 / 57
+ * EssLayout — Task 56 / 57 / 58
  *
  * Injects PWA manifest link and Apple-specific meta tags, registers the ESS
- * service worker (scoped to /app/ess/), and mounts the update banner and
- * install prompt.
+ * service worker (scoped to /app/ess/), provides the connectivity context,
+ * and mounts the offline banner, update banner, and install prompt.
  */
 export default function EssLayout({ children }) {
   const { t } = useTranslation('ess');
@@ -20,7 +22,7 @@ export default function EssLayout({ children }) {
   }, []);
 
   return (
-    <>
+    <EssConnectivityProvider>
       <Helmet>
         {/* PWA manifest scoped to /app/ess/ */}
         <link rel="manifest" href="/ess-manifest.json" />
@@ -41,6 +43,9 @@ export default function EssLayout({ children }) {
         <meta name="msapplication-TileColor" content="#3B82F6" />
       </Helmet>
 
+      {/* Offline status banner (amber, above update banner) */}
+      <EssOfflineBanner />
+
       {/* SW update notification (shown above the app shell content) */}
       <EssUpdateBanner />
 
@@ -48,6 +53,6 @@ export default function EssLayout({ children }) {
 
       {/* PWA install prompt (Android banner / iOS bottom sheet) */}
       <EssInstallPrompt />
-    </>
+    </EssConnectivityProvider>
   );
 }

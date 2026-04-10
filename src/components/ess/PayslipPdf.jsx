@@ -1,5 +1,7 @@
 import React from 'react';
 import { pdf, Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
+import { useTranslation } from 'react-i18next';
+import OfflineDisabled from './OfflineDisabled';
 
 /* ─── Styles ──────────────────────────────────────────────── */
 
@@ -119,7 +121,9 @@ function PayslipDocument({ detail }) {
 
 /* ─── Download button ─────────────────────────────────────── */
 
-export default function PayslipPdf({ detail, t }) {
+export default function PayslipPdf({ detail, t: tProp }) {
+  const { t: tHook } = useTranslation('ess');
+  const t = tProp ?? tHook;
   const [generating, setGenerating] = React.useState(false);
 
   const handleDownload = async () => {
@@ -142,15 +146,17 @@ export default function PayslipPdf({ detail, t }) {
   };
 
   return (
-    <button
-      onClick={handleDownload}
-      disabled={generating}
-      className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50 transition-colors"
-    >
-      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
-      </svg>
-      {generating ? '…' : t('payslips.download')}
-    </button>
+    <OfflineDisabled fallbackTooltip={t('pwa.offline.downloadDisabled', 'Download is unavailable offline')}>
+      <button
+        onClick={handleDownload}
+        disabled={generating}
+        className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+      >
+        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+        </svg>
+        {generating ? '…' : t('payslips.download')}
+      </button>
+    </OfflineDisabled>
   );
 }

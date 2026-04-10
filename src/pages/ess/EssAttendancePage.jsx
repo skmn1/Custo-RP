@@ -1,6 +1,10 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useEssAttendance } from '../../hooks/useEssAttendance';
+import { useEssConnectivity } from '../../contexts/EssConnectivityContext';
+import StaleDataIndicator from '../../components/ess/StaleDataIndicator';
+import EssOfflineFallback from '../../components/ess/EssOfflineFallback';
+import OfflineDisabled from '../../components/ess/OfflineDisabled';
 
 // ─── Status badge colors ────────────────────────────────────
 
@@ -48,6 +52,10 @@ const EssAttendancePage = () => {
     fetchAll,
     exportCsv,
   } = useEssAttendance();
+  const { isOnline } = useEssConnectivity();
+
+  const isCached = records?.__swCacheHit === true || summary?.__swCacheHit === true;
+  const fetchedAt = records?.__swFetchedAt ?? summary?.__swFetchedAt ?? null;
 
   const [monthOffset, setMonthOffset] = useState(0);
   const [statusFilter, setStatusFilter] = useState('');
@@ -83,6 +91,10 @@ const EssAttendancePage = () => {
     );
   }
 
+  if (!isOnline && !records?.length && !isLoading) {
+    return <EssOfflineFallback />;
+  }
+
   return (
     <div>
       {/* Header */}
@@ -90,15 +102,18 @@ const EssAttendancePage = () => {
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
           {t('attendance.title')}
         </h1>
-        <button
-          onClick={handleExport}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 transition-colors"
+        <StaleDataIndicator isCached={isCached} fetchedAt={fetchedAt} />
+        <OfflineDisabled fallbackTooltip={t('pwa.offline.downloadDisabled', 'Download is unavailable offline')}>
+          <button
+            onClick={handleExport}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 transition-colors"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
-          {t('attendance.exportCsv')}
-        </button>
+            {t('attendance.exportCsv')}
+          </button>
+        </OfflineDisabled>
       </div>
 
       {/* Period navigation */}

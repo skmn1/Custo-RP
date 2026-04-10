@@ -73,6 +73,8 @@ export function useEssSchedule() {
   const [upcoming, setUpcoming] = useState([]);
   const [isLoading, setLoading] = useState(false);
   const [error, setError]     = useState(null);
+  const [isCached, setCached] = useState(false);
+  const [fetchedAt, setFetchedAt] = useState(null);
 
   // Compute the date range to fetch based on current view + anchor
   const dateRange = (() => {
@@ -95,6 +97,8 @@ export function useEssSchedule() {
       ]);
       setShifts(schedRes?.data?.shifts ?? []);
       setLeave(leaveRes?.data ?? []);
+      setCached(schedRes?.__swCacheHit === true || leaveRes?.__swCacheHit === true);
+      setFetchedAt((schedRes?.__swCacheHit || leaveRes?.__swCacheHit) ? new Date() : null);
     } catch (e) {
       setError(e);
       setShifts([]);
@@ -165,6 +169,8 @@ export function useEssSchedule() {
     upcoming,
     isLoading,
     error,
+    isCached,
+    fetchedAt,
     viewMode,
     setViewMode: handleSetViewMode,
     dateRange,

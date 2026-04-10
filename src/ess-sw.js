@@ -46,6 +46,22 @@ const noSetCookiePlugin = {
   },
 };
 
+// ─── Cache-hit header plugin (Task 58) ─────────────────────────────────────
+// Adds `x-sw-cache-hit: true` to responses served from cache so the React UI
+// can detect them and show a StaleDataIndicator / data-freshness timestamp.
+const cacheHitPlugin = {
+  cachedResponseWillBeUsed: async ({ cachedResponse }) => {
+    if (!cachedResponse) return cachedResponse;
+    const headers = new Headers(cachedResponse.headers);
+    headers.set('x-sw-cache-hit', 'true');
+    return new Response(cachedResponse.body, {
+      status: cachedResponse.status,
+      statusText: cachedResponse.statusText,
+      headers,
+    });
+  },
+};
+
 // ─── Security: block auth endpoints entirely ───────────────────────────────
 registerRoute(
   ({ url }) => url.pathname.startsWith('/api/auth'),
@@ -80,6 +96,7 @@ registerRoute(
     networkTimeoutSeconds: 3,
     plugins: [
       noSetCookiePlugin,
+      cacheHitPlugin,
       new ExpirationPlugin({ maxEntries: 5, maxAgeSeconds: 60 * 60 }),
       new CacheableResponsePlugin({ statuses: [200] }),
     ],
@@ -94,6 +111,7 @@ registerRoute(
     networkTimeoutSeconds: 3,
     plugins: [
       noSetCookiePlugin,
+      cacheHitPlugin,
       new ExpirationPlugin({ maxEntries: 20, maxAgeSeconds: 60 * 60 }),
       new CacheableResponsePlugin({ statuses: [200] }),
     ],
@@ -108,6 +126,7 @@ registerRoute(
     networkTimeoutSeconds: 3,
     plugins: [
       noSetCookiePlugin,
+      cacheHitPlugin,
       new ExpirationPlugin({ maxEntries: 30, maxAgeSeconds: 2 * 60 * 60 }),
       new CacheableResponsePlugin({ statuses: [200] }),
     ],
@@ -122,6 +141,7 @@ registerRoute(
     networkTimeoutSeconds: 3,
     plugins: [
       noSetCookiePlugin,
+      cacheHitPlugin,
       new ExpirationPlugin({ maxEntries: 20, maxAgeSeconds: 60 * 60 }),
       new CacheableResponsePlugin({ statuses: [200] }),
     ],
@@ -136,6 +156,7 @@ registerRoute(
     networkTimeoutSeconds: 3,
     plugins: [
       noSetCookiePlugin,
+      cacheHitPlugin,
       new ExpirationPlugin({ maxEntries: 5, maxAgeSeconds: 24 * 60 * 60 }),
       new CacheableResponsePlugin({ statuses: [200] }),
     ],
@@ -149,6 +170,7 @@ registerRoute(
     cacheName: 'ess-i18n',
     plugins: [
       noSetCookiePlugin,
+      cacheHitPlugin,
       new ExpirationPlugin({ maxEntries: 20, maxAgeSeconds: 7 * 24 * 60 * 60 }),
       new CacheableResponsePlugin({ statuses: [200] }),
     ],
@@ -162,6 +184,7 @@ registerRoute(
     cacheName: 'ess-images',
     plugins: [
       noSetCookiePlugin,
+      cacheHitPlugin,
       new ExpirationPlugin({ maxEntries: 50, maxAgeSeconds: 30 * 24 * 60 * 60 }),
       new CacheableResponsePlugin({ statuses: [200] }),
     ],

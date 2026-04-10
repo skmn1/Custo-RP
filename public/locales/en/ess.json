@@ -324,6 +324,18 @@
       "available": "A new version is available",
       "updateBtn": "Update",
       "dismiss": "Later"
+    },
+    "offline": {
+      "banner": "You're offline — showing cached data",
+      "backOnline": "Back online — data refreshed",
+      "lastUpdated": "Last updated {{time}}",
+      "fallbackTitle": "No cached data available",
+      "fallbackBody": "This page requires an internet connection. Please reconnect and try again.",
+      "retryBtn": "Retry",
+      "requiresInternet": "Requires internet connection",
+      "downloadDisabled": "Download is unavailable offline",
+      "editDisabled": "Editing is unavailable offline",
+      "willSyncWhenOnline": "Will sync when back online"
     }
   }
 }

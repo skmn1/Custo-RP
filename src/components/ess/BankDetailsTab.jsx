@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
+import OfflineDisabled from './OfflineDisabled';
+import { useTranslation } from 'react-i18next';
 
 /**
  * BankDetailsTab — displays masked bank details and allows
  * submitting a change request for bank information updates.
  */
-const BankDetailsTab = ({ bankDetails, pendingRequests, onSubmitChange, t }) => {
+const BankDetailsTab = ({ bankDetails, pendingRequests, onSubmitChange, t: tProp }) => {
+  const { t: tHook } = useTranslation('ess');
+  const t = tProp ?? tHook;
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ bankName: '', iban: '', bic: '', accountHolder: '' });
   const [submitting, setSubmitting] = useState(false);
@@ -69,13 +73,15 @@ const BankDetailsTab = ({ bankDetails, pendingRequests, onSubmitChange, t }) => 
       <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">{t('profile.bank.maskedNotice')}</p>
 
       {!showForm ? (
-        <button
-          onClick={() => setShowForm(true)}
-          className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors"
-          data-cy="request-bank-change"
-        >
-          {t('profile.bank.requestChange')}
-        </button>
+        <OfflineDisabled fallbackTooltip={t('pwa.offline.editDisabled', { defaultValue: 'Editing is unavailable offline' })}>
+          <button
+            onClick={() => setShowForm(true)}
+            className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors"
+            data-cy="request-bank-change"
+          >
+            {t('profile.bank.requestChange')}
+          </button>
+        </OfflineDisabled>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4 mt-4 border-t border-gray-200 dark:border-gray-700 pt-4" data-cy="bank-change-form">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -85,13 +91,15 @@ const BankDetailsTab = ({ bankDetails, pendingRequests, onSubmitChange, t }) => 
             <FormInput label={t('profile.bank.accountHolder')} value={form.accountHolder} onChange={(v) => setForm(f => ({ ...f, accountHolder: v }))} />
           </div>
           <div className="flex gap-2">
-            <button
-              type="submit"
-              disabled={submitting}
-              className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 rounded-lg transition-colors"
-            >
-              {t('profile.actions.submit')}
-            </button>
+            <OfflineDisabled fallbackTooltip={t('pwa.offline.editDisabled', { defaultValue: 'Editing is unavailable offline' })}>
+              <button
+                type="submit"
+                disabled={submitting}
+                className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 rounded-lg transition-colors"
+              >
+                {t('profile.actions.submit')}
+              </button>
+            </OfflineDisabled>
             <button
               type="button"
               onClick={() => setShowForm(false)}

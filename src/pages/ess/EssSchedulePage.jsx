@@ -21,8 +21,12 @@ import WeekView from '../../components/ess/schedule/WeekView';
 import MonthView from '../../components/ess/schedule/MonthView';
 import UpcomingShiftsList from '../../components/ess/schedule/UpcomingShiftsList';
 import ReadOnlyBanner from '../../components/ess/schedule/ReadOnlyBanner';
+import { useEssConnectivity } from '../../contexts/EssConnectivityContext';
+import EssOfflineFallback from '../../components/ess/EssOfflineFallback';
+import StaleDataIndicator from '../../components/ess/StaleDataIndicator';
 
 const EssSchedulePage = () => {
+  const { isOnline } = useEssConnectivity();
   const {
     shifts,
     leave,
@@ -34,6 +38,8 @@ const EssSchedulePage = () => {
     navigatePrev,
     navigateNext,
     goToday,
+    isCached,
+    fetchedAt,
   } = useEssSchedule();
 
   return (
@@ -48,8 +54,12 @@ const EssSchedulePage = () => {
         onToday={goToday}
       />
 
-      {/* Calendar grid — week or month */}
-      {viewMode === 'week' ? (
+      <StaleDataIndicator isCached={isCached} fetchedAt={fetchedAt} />
+
+      {/* Offline fallback for uncached date range */}
+      {!isOnline && !isLoading && shifts.length === 0 ? (
+        <EssOfflineFallback />
+      ) : viewMode === 'week' ? (
         <WeekView
           anchor={anchor}
           shifts={shifts}

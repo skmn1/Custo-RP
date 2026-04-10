@@ -15,11 +15,15 @@ export function useEssPayslips() {
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [restricted, setRestricted] = useState(false);
+  const [isCached, setCached] = useState(false);
+  const [fetchedAt, setFetchedAt] = useState(null);
 
   // Detail state (for individual payslip page)
   const [detail, setDetail] = useState(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [detailError, setDetailError] = useState(null);
+  const [detailCached, setDetailCached] = useState(false);
+  const [detailFetchedAt, setDetailFetchedAt] = useState(null);
 
   // Latest payslip summary (for dashboard widget)
   const [latest, setLatest] = useState(null);
@@ -44,6 +48,8 @@ export function useEssPayslips() {
       setRestricted(false);
       setPayslips(res.data || []);
       setPagination(res.pagination || { page, pageSize, total: 0, hasNextPage: false });
+      setCached(res.__swCacheHit === true);
+      setFetchedAt(res.__swCacheHit ? new Date() : null);
     } catch (err) {
       setError(err.message || 'Failed to load payslips');
     } finally {
@@ -66,6 +72,8 @@ export function useEssPayslips() {
       }
 
       setDetail(res.data || null);
+      setDetailCached(res.__swCacheHit === true);
+      setDetailFetchedAt(res.__swCacheHit ? new Date() : null);
     } catch (err) {
       setDetailError(err.message || 'Failed to load payslip detail');
     } finally {
@@ -107,10 +115,16 @@ export function useEssPayslips() {
     setYear: handleYearChange,
     fetchPayslips,
 
+    // Cache metadata
+    isCached,
+    fetchedAt,
+
     // Detail
     detail,
     detailLoading,
     detailError,
+    detailCached,
+    detailFetchedAt,
     fetchDetail,
 
     // Latest

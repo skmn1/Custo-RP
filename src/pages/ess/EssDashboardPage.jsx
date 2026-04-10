@@ -2,6 +2,9 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
 import { useEssDashboard } from '../../hooks/useEssDashboard';
+import { useEssConnectivity } from '../../contexts/EssConnectivityContext';
+import StaleDataIndicator from '../../components/ess/StaleDataIndicator';
+import EssOfflineFallback from '../../components/ess/EssOfflineFallback';
 import WelcomeHeader from '../../components/ess/dashboard/WelcomeHeader';
 import QuickStats from '../../components/ess/dashboard/QuickStats';
 import UpcomingShiftsWidget from '../../components/ess/dashboard/UpcomingShiftsWidget';
@@ -15,9 +18,17 @@ const EssDashboardPage = () => {
   const { t } = useTranslation('ess');
   const { user } = useAuth();
   const { dashboard, notifications, isLoading, error, refetch } = useEssDashboard();
+  const { isOnline } = useEssConnectivity();
 
   const firstName = dashboard?.greeting?.firstName || user?.firstName || '';
   const photoUrl = dashboard?.greeting?.photoUrl || null;
+  const isCached = dashboard?.__swCacheHit === true;
+  const fetchedAt = dashboard?.__swFetchedAt ?? null;
+
+  // No data and offline — show fallback
+  if (!isOnline && !dashboard && !isLoading) {
+    return <EssOfflineFallback />;
+  }
 
   // Full error — retry page
   if (error && !dashboard) {
@@ -65,6 +76,7 @@ const EssDashboardPage = () => {
   return (
     <div className="space-y-6">
       <WelcomeHeader firstName={firstName} photoUrl={photoUrl} />
+      <StaleDataIndicator isCached={isCached} fetchedAt={fetchedAt} />
 
       <QuickStats
         shifts={d.upcomingShifts}

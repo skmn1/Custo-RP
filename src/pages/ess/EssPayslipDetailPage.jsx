@@ -3,6 +3,9 @@ import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useEssPayslips } from '../../hooks/useEssPayslips';
 import PayslipPdf from '../../components/ess/PayslipPdf';
+import { useEssConnectivity } from '../../contexts/EssConnectivityContext';
+import EssOfflineFallback from '../../components/ess/EssOfflineFallback';
+import StaleDataIndicator from '../../components/ess/StaleDataIndicator';
 
 /* ─── Helpers ─────────────────────────────────────────────── */
 
@@ -22,7 +25,8 @@ const statusColors = {
 const EssPayslipDetailPage = () => {
   const { id } = useParams();
   const { t } = useTranslation('ess');
-  const { detail, detailLoading, detailError, restricted, fetchDetail } = useEssPayslips();
+  const { isOnline } = useEssConnectivity();
+  const { detail, detailLoading, detailError, restricted, fetchDetail, detailCached, detailFetchedAt } = useEssPayslips();
 
   useEffect(() => {
     if (id) fetchDetail(id);
@@ -62,7 +66,19 @@ const EssPayslipDetailPage = () => {
     );
   }
 
-  if (!detail) return null;
+  if (!detail) {
+    if (!isOnline && !detailLoading) {
+      return (
+        <div className="max-w-2xl mx-auto">
+          <Link to="/app/ess/payslips" className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 text-sm mb-4 inline-block">
+            ← {t('payslips.backToList')}
+          </Link>
+          <EssOfflineFallback />
+        </div>
+      );
+    }
+    return null;
+  }
 
   const lines = detail.lines || { earnings: [], deductions: [] };
 
@@ -87,6 +103,7 @@ const EssPayslipDetailPage = () => {
             {detail.employeeName && (
               <p className="text-sm text-gray-500 dark:text-gray-400">{detail.employeeName}</p>
             )}
+            <StaleDataIndicator isCached={detailCached} fetchedAt={detailFetchedAt} />
           </div>
           <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${statusColors[detail.status] || statusColors.draft}`}>
             {t(`payslips.status.${detail.status}`)}

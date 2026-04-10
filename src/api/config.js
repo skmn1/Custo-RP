@@ -128,6 +128,13 @@ export async function apiFetch(path, options = {}) {
     throw err;
   }
 
+  // Surface SW cache-hit metadata alongside the response data (Task 58)
+  const isCached = res.headers.get('x-sw-cache-hit') === 'true';
+  if (isCached && data !== null && typeof data === 'object') {
+    data.__swCacheHit = true;
+    data.__swFetchedAt = new Date().toISOString();
+  }
+
   return data;
 }
 

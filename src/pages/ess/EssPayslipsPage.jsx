@@ -2,6 +2,9 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useEssPayslips } from '../../hooks/useEssPayslips';
+import { useEssConnectivity } from '../../contexts/EssConnectivityContext';
+import EssOfflineFallback from '../../components/ess/EssOfflineFallback';
+import StaleDataIndicator from '../../components/ess/StaleDataIndicator';
 
 /* ─── Helpers ─────────────────────────────────────────────── */
 
@@ -79,6 +82,7 @@ function YearFilter({ year, setYear, t }) {
 
 const EssPayslipsPage = () => {
   const { t } = useTranslation('ess');
+  const { isOnline } = useEssConnectivity();
   const {
     payslips,
     pagination,
@@ -88,7 +92,13 @@ const EssPayslipsPage = () => {
     year,
     setYear,
     fetchPayslips,
+    isCached,
+    fetchedAt,
   } = useEssPayslips();
+
+  if (!isOnline && payslips.length === 0 && !isLoading && !restricted) {
+    return <EssOfflineFallback />;
+  }
 
   const handleLoadMore = () => {
     if (pagination.hasNextPage) {
@@ -105,6 +115,7 @@ const EssPayslipsPage = () => {
         </h1>
         <YearFilter year={year} setYear={setYear} t={t} />
       </div>
+      <StaleDataIndicator isCached={isCached} fetchedAt={fetchedAt} />
 
       {/* Error */}
       {error && (

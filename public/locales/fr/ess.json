@@ -315,6 +315,18 @@
       "available": "Une nouvelle version est disponible",
       "updateBtn": "Mettre à jour",
       "dismiss": "Plus tard"
+    },
+    "offline": {
+      "banner": "Vous êtes hors ligne — affichage des données en cache",
+      "backOnline": "Connexion rétablie — données actualisées",
+      "lastUpdated": "Dernière mise à jour {{time}}",
+      "fallbackTitle": "Aucune donnée en cache disponible",
+      "fallbackBody": "Cette page nécessite une connexion internet. Veuillez vous reconnecter et réessayer.",
+      "retryBtn": "Réessayer",
+      "requiresInternet": "Connexion internet requise",
+      "downloadDisabled": "Téléchargement indisponible hors ligne",
+      "editDisabled": "Modification indisponible hors ligne",
+      "willSyncWhenOnline": "Synchronisation à la reconnexion"
     }
   }
 }

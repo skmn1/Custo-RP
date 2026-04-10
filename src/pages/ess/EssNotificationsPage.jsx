@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useNotifications } from '../../hooks/useNotifications';
 import { formatTimeAgo, TYPE_ICONS } from '../../components/ess/NotificationBell';
+import { useEssConnectivity } from '../../contexts/EssConnectivityContext';
+import EssOfflineFallback from '../../components/ess/EssOfflineFallback';
 
 // ─── Filter type-to-notification-type mapping ───────────────
 
@@ -54,6 +56,7 @@ function getDateLabel(dateStr) {
 const EssNotificationsPage = () => {
   const { t } = useTranslation('ess');
   const navigate = useNavigate();
+  const { isOnline } = useEssConnectivity();
   const [typeFilter, setTypeFilter] = useState('all');
   const [unreadOnly, setUnreadOnly] = useState(false);
 
@@ -141,7 +144,9 @@ const EssNotificationsPage = () => {
       </div>
 
       {/* Notification list */}
-      {isLoading && notifications.length === 0 ? (
+      {!isOnline && notifications.length === 0 && !isLoading ? (
+        <EssOfflineFallback />
+      ) : isLoading && notifications.length === 0 ? (
         <div className="flex justify-center py-16">
           <div className="w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />
         </div>

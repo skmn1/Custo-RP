@@ -4,6 +4,9 @@ import { useEssProfile } from '../../hooks/useEssProfile';
 import BankDetailsTab from '../../components/ess/BankDetailsTab';
 import ExperienceTab from '../../components/ess/ExperienceTab';
 import QualificationsTab from '../../components/ess/QualificationsTab';
+import { useEssConnectivity } from '../../contexts/EssConnectivityContext';
+import EssOfflineFallback from '../../components/ess/EssOfflineFallback';
+import StaleDataIndicator from '../../components/ess/StaleDataIndicator';
 
 // ─── Tab definitions ────────────────────────────────────────
 
@@ -14,6 +17,7 @@ const TABS = ['overview', 'personal', 'contract', 'bank', 'experience', 'qualifi
 const EssProfilePage = () => {
   const { t } = useTranslation('ess');
   const [activeTab, setActiveTab] = useState('overview');
+  const { isOnline } = useEssConnectivity();
 
   const {
     profile,
@@ -46,7 +50,10 @@ const EssProfilePage = () => {
     );
   }
 
-  if (!profile) return null;
+  if (!profile) {
+    if (!isOnline) return <EssOfflineFallback />;
+    return null;
+  }
 
   const { personal, contract, bankDetails, experience, qualifications, pendingRequests, completeness } = profile;
 
@@ -79,8 +86,7 @@ const EssProfilePage = () => {
           )}
         </div>
       </div>
-
-      {/* Tabs */}
+      <StaleDataIndicator isCached={profile.__swCacheHit === true} fetchedAt={profile.__swFetchedAt} />
       <div className="border-b border-gray-200 dark:border-gray-700 mb-6 overflow-x-auto">
         <nav className="flex gap-1 -mb-px" data-cy="profile-tabs">
           {TABS.map((tab) => (
