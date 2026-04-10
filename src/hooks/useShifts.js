@@ -48,7 +48,7 @@ function mergeWithOffline(serverShifts) {
   return [...serverShifts, ...newPending];
 }
 
-export const useShifts = () => {
+export const useShifts = (startDate = null, endDate = null) => {
   const [shifts, setShifts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -81,8 +81,14 @@ export const useShifts = () => {
   }, []);
 
   useEffect(() => {
-    fetchShifts();
-  }, [fetchShifts]);
+    const filters = {};
+    if (startDate) filters.startDate = startDate;
+    if (endDate)   filters.endDate   = endDate;
+    fetchShifts(filters);
+  // fetchShifts is stable (useCallback with no deps); startDate/endDate change
+  // when the user navigates weeks, triggering a re-fetch for the new week.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fetchShifts, startDate, endDate]);
 
   // Helper function to get color based on shift type
   const getShiftColor = (shiftType) => {
@@ -125,11 +131,11 @@ export const useShifts = () => {
 
     try {
       const created = await shiftsApi.create(payload);
-      setShifts(prev => {
-        const next = [...prev, created];
-        saveServerCache(next);
-        return next;
-      });
+      // Append only the server-confirmed shift to the server cache –
+      // do NOT save the full prev state which may include offline-pending shifts.
+      const serverCache = loadServerCache() ?? [];
+      saveServerCache([...serverCache, created]);
+      setShifts(prev => [...prev, created]);
       log.info(`shift/create id=${created.id} type=${created.type}`);
       return created;
     } catch (err) {

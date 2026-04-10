@@ -38,12 +38,18 @@ const StaffScheduler = () => {
   const employees = fetchedEmployees.length > 0 ? fetchedEmployees : initialEmployees;
   const [showAddShiftModal, setShowAddShiftModal] = useState(false);
 
-  const { shifts, addShift, deleteShift, updateShift, moveShift } = useShifts();
+  // Week navigation comes first so we can pass date bounds to useShifts
   const { currentWeek, navigateWeek, goToCurrentWeek } = useWeekNavigation();
-  const { sensors, activeShift, dragOverDropZone, handleDragStart, handleDragOver, handleDragEnd } = useDragAndDrop(shifts, moveShift);
-
   const weekDays = generateWeekDays(currentWeek, settings?.general?.workWeekStart);
   const weekStart = weekDays[0];
+
+  // Scope the shift fetch to the visible week — prevents shifts from other
+  // weeks appearing in the current week's columns (duplication bug fix).
+  const weekStartStr = format(weekDays[0], 'yyyy-MM-dd');
+  const weekEndStr   = format(weekDays[weekDays.length - 1], 'yyyy-MM-dd');
+  const { shifts, addShift, deleteShift, updateShift, moveShift } = useShifts(weekStartStr, weekEndStr);
+
+  const { sensors, activeShift, dragOverDropZone, handleDragStart, handleDragOver, handleDragEnd } = useDragAndDrop(shifts, moveShift);
 
   // Custom collision detection for better drop zone targeting
   const customCollisionDetection = (args) => {

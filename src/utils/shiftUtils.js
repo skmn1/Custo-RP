@@ -50,16 +50,24 @@ export const getEmployeeTotalHours = (shifts, employeeId) => {
 };
 
 /**
- * Get shifts for a specific employee and day
- * @param {Array} shifts - Array of shifts
+ * Get shifts for a specific employee and day.
+ * Prefers exact date matching (YYYY-MM-DD) when both the shift and the
+ * caller provide a date string; falls back to day-index matching for
+ * legacy/seed data that has no date field.
+ *
+ * @param {Array}  shifts     - Array of shifts
  * @param {string} employeeId - Employee ID
- * @param {number} day - Day index (0-6)
+ * @param {number} day        - Day index (0-6)
+ * @param {string} [dateStr]  - ISO date string for the column being rendered (yyyy-MM-dd)
  * @returns {Array} Filtered shifts
  */
-export const getShiftsForEmployeeAndDay = (shifts, employeeId, day) => {
-  return shifts.filter(shift => 
-    shift.employeeId === employeeId && shift.day === day
-  );
+export const getShiftsForEmployeeAndDay = (shifts, employeeId, day, dateStr = null) => {
+  return shifts.filter(shift => {
+    if (shift.employeeId !== employeeId) return false;
+    // Prefer exact date match to avoid showing shifts from other weeks
+    if (dateStr && shift.date) return shift.date === dateStr;
+    return shift.day === day;
+  });
 };
 
 /**

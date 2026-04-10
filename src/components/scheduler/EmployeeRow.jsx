@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDroppable } from '@dnd-kit/core';
-import { isToday } from 'date-fns';
+import { isToday, format } from 'date-fns';
 import DraggableShift from './DraggableShift';
 import { getShiftsForEmployeeAndDay, isEmployeeOvertime, getEmployeeTotalHours } from '../../utils/shiftUtils';
 
@@ -126,7 +126,8 @@ const EmployeeRow = ({ employee, shifts, weekDays, onDeleteShift, onAddShift, on
 
         {/* Enhanced Day Columns with Droppable Zones */}
         {weekDays.map((day, dayIndex) => {
-          const dayShifts = getShiftsForEmployeeAndDay(shifts, employee.id, dayIndex);
+          const dateStr = format(day, 'yyyy-MM-dd');
+          const dayShifts = getShiftsForEmployeeAndDay(shifts, employee.id, dayIndex, dateStr);
           const isTodayCheck = isToday(day);
 
           return (
