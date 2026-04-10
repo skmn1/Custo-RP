@@ -381,6 +381,27 @@
       "attendance": "Time",
       "profile": "Profile",
       "notifications": "Alerts"
+    },
+    "dashboard": {
+      "goodMorning": "Good morning",
+      "goodAfternoon": "Good afternoon",
+      "goodEvening": "Good evening",
+      "tomorrow": "Tomorrow",
+      "nextShift": "Next shift",
+      "noUpcomingShifts": "No upcoming shifts scheduled",
+      "viewSchedule": "View schedule",
+      "shifts": "shifts",
+      "lastPay": "last pay",
+      "hours": "hours",
+      "attendance": "attend.",
+      "latestPayslip": "Latest Payslip",
+      "paidOn": "Paid {{date}}",
+      "profile": "Profile",
+      "complete": "{{percent}}% complete",
+      "pendingRequests": "{{count}} pending",
+      "attendanceThisMonth": "Attendance this month",
+      "hoursWorked": "{{hours}}h worked",
+      "attendanceRate": "{{rate}}% rate"
     }
   }
 }

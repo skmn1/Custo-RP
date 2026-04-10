@@ -374,6 +374,27 @@
       "attendance": "Temps",
       "profile": "Profil",
       "notifications": "Alertes"
+    },
+    "dashboard": {
+      "goodMorning": "Bonjour",
+      "goodAfternoon": "Bon après-midi",
+      "goodEvening": "Bonsoir",
+      "tomorrow": "Demain",
+      "nextShift": "Prochain quart",
+      "noUpcomingShifts": "Aucun quart à venir",
+      "viewSchedule": "Voir le planning",
+      "shifts": "quarts",
+      "lastPay": "dernier salaire",
+      "hours": "heures",
+      "attendance": "prés.",
+      "latestPayslip": "Dernière fiche de paie",
+      "paidOn": "Payé le {{date}}",
+      "profile": "Profil",
+      "complete": "{{percent}}% complet",
+      "pendingRequests": "{{count}} en attente",
+      "attendanceThisMonth": "Présence ce mois",
+      "hoursWorked": "{{hours}}h travaillées",
+      "attendanceRate": "Taux de {{rate}}%"
     }
   }
 }

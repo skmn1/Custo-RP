@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
 import { useEssDashboard } from '../../hooks/useEssDashboard';
 import { useEssConnectivity } from '../../contexts/EssConnectivityContext';
+import { useMobileLayout } from '../../hooks/useMobileLayout';
 import StaleDataIndicator from '../../components/ess/StaleDataIndicator';
 import EssOfflineFallback from '../../components/ess/EssOfflineFallback';
 import WelcomeHeader from '../../components/ess/dashboard/WelcomeHeader';
@@ -12,6 +13,7 @@ import NotificationsWidget from '../../components/ess/dashboard/NotificationsWid
 import LatestPayslipWidget from '../../components/ess/dashboard/LatestPayslipWidget';
 import ProfileWidget from '../../components/ess/dashboard/ProfileWidget';
 import QuickAccessBar from '../../components/ess/dashboard/QuickAccessBar';
+import MobileDashboard from '../../components/ess/dashboard/MobileDashboard';
 import { ArrowPathIcon } from '@heroicons/react/24/outline';
 
 const EssDashboardPage = () => {
@@ -19,6 +21,10 @@ const EssDashboardPage = () => {
   const { user } = useAuth();
   const { dashboard, notifications, isLoading, error, refetch } = useEssDashboard();
   const { isOnline } = useEssConnectivity();
+  const isMobile = useMobileLayout();
+
+  // Task 65: Mobile layout gets its own component
+  if (isMobile) return <MobileDashboard />;
 
   const firstName = dashboard?.greeting?.firstName || user?.firstName || '';
   const photoUrl = dashboard?.greeting?.photoUrl || null;
