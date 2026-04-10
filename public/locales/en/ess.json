@@ -319,6 +319,11 @@
       "step2": "Select",
       "addToHomeScreen": "Add to Home Screen",
       "step3": "Tap Add to confirm"
+    },
+    "update": {
+      "available": "A new version is available",
+      "updateBtn": "Update",
+      "dismiss": "Later"
     }
   }
 }

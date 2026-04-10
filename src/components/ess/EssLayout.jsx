@@ -1,13 +1,23 @@
+import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
 import EssInstallPrompt from './EssInstallPrompt';
+import EssUpdateBanner from './EssUpdateBanner';
+import { registerEssServiceWorker } from '../../lib/essServiceWorker';
 
 /**
- * EssLayout — Injects PWA manifest link and Apple-specific meta tags
- * for the ESS (Employee Self-Service) section, and mounts the install prompt.
+ * EssLayout — Task 56 / 57
+ *
+ * Injects PWA manifest link and Apple-specific meta tags, registers the ESS
+ * service worker (scoped to /app/ess/), and mounts the update banner and
+ * install prompt.
  */
 export default function EssLayout({ children }) {
   const { t } = useTranslation('ess');
+
+  useEffect(() => {
+    registerEssServiceWorker();
+  }, []);
 
   return (
     <>
@@ -30,7 +40,13 @@ export default function EssLayout({ children }) {
         <meta name="msapplication-TileImage" content="/icons/ess/icon-144.png" />
         <meta name="msapplication-TileColor" content="#3B82F6" />
       </Helmet>
+
+      {/* SW update notification (shown above the app shell content) */}
+      <EssUpdateBanner />
+
       {children}
+
+      {/* PWA install prompt (Android banner / iOS bottom sheet) */}
       <EssInstallPrompt />
     </>
   );

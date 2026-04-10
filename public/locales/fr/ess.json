@@ -310,6 +310,11 @@
       "step2": "Sélectionnez",
       "addToHomeScreen": "Sur l'écran d'accueil",
       "step3": "Appuyez sur Ajouter pour confirmer"
+    },
+    "update": {
+      "available": "Une nouvelle version est disponible",
+      "updateBtn": "Mettre à jour",
+      "dismiss": "Plus tard"
     }
   }
 }
