@@ -372,6 +372,15 @@
     "cancel": "Cancel",
     "sheet": {
       "dragHint": "Swipe down to close"
+    },
+    "nav": {
+      "label": "Main navigation",
+      "dashboard": "Home",
+      "schedule": "Schedule",
+      "payslips": "Pay",
+      "attendance": "Time",
+      "profile": "Profile",
+      "notifications": "Alerts"
     }
   }
 }

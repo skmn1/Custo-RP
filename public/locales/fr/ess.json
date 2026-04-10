@@ -365,6 +365,15 @@
     "cancel": "Annuler",
     "sheet": {
       "dragHint": "Glissez vers le bas pour fermer"
+    },
+    "nav": {
+      "label": "Navigation principale",
+      "dashboard": "Accueil",
+      "schedule": "Planning",
+      "payslips": "Paie",
+      "attendance": "Temps",
+      "profile": "Profil",
+      "notifications": "Alertes"
     }
   }
 }
