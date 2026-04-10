@@ -34,6 +34,7 @@ import java.util.UUID;
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
+    private final WebPushService webPushService;
 
     private static final java.util.Set<String> ALLOWED_TYPES = java.util.Set.of(
             "payslip_available",
@@ -50,19 +51,22 @@ public class NotificationService {
     );
 
     /**
-     * Creates a persistent in-app notification for a user.
+     * Creates a persistent in-app notification for a user and optionally
+     * dispatches a web push notification to the employee's active devices.
      *
-     * @param userId   target user UUID
-     * @param type     notification type (must be one of ALLOWED_TYPES)
-     * @param title    pre-translated short title
-     * @param body     optional body text
-     * @param link     optional deep-link URL (e.g. /app/ess/payslips/uuid)
-     * @param metadata optional JSON string with type-specific data
+     * @param userId     target user UUID
+     * @param type       notification type (must be one of ALLOWED_TYPES)
+     * @param title      pre-translated short title
+     * @param body       optional body text
+     * @param link       optional deep-link URL (e.g. /app/ess/payslips/uuid)
+     * @param metadata   optional JSON string with type-specific data
+     * @param employeeId optional employee UUID string — required for web push dispatch
      * @return the created Notification entity
      * @throws IllegalArgumentException if type is not in the allowed set
      */
     public Notification createNotification(UUID userId, String type, String title,
-                                           String body, String link, String metadata) {
+                                           String body, String link, String metadata,
+                                           String employeeId) {
         if (!ALLOWED_TYPES.contains(type)) {
             throw new IllegalArgumentException("Invalid notification type: " + type);
         }
@@ -77,20 +81,35 @@ public class NotificationService {
                 .build();
         notificationRepository.save(n);
         log.debug("Notification created: type={}, userId={}, id={}", type, userId, n.getId());
+
+        // Dispatch web push (async — never blocks this call)
+        if (employeeId != null && !employeeId.isBlank()) {
+            String tag = type + "-" + n.getId();
+            webPushService.sendPushToEmployee(employeeId, type, title, body, link, tag);
+        }
+
         return n;
     }
 
     /**
-     * Convenience overload without body, link, or metadata.
+     * Convenience overload without body, link, metadata, or employeeId.
      */
     public Notification createNotification(UUID userId, String type, String title) {
-        return createNotification(userId, type, title, null, null, null);
+        return createNotification(userId, type, title, null, null, null, null);
     }
 
     /**
-     * Convenience overload with link but no body or metadata.
+     * Convenience overload with link but no body, metadata, or employeeId.
      */
     public Notification createNotification(UUID userId, String type, String title, String link) {
-        return createNotification(userId, type, title, null, link, null);
+        return createNotification(userId, type, title, null, link, null, null);
+    }
+
+    /**
+     * Full overload without employeeId (legacy callers that pass all fields).
+     */
+    public Notification createNotification(UUID userId, String type, String title,
+                                           String body, String link, String metadata) {
+        return createNotification(userId, type, title, body, link, metadata, null);
     }
 }

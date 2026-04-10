@@ -303,3 +303,63 @@ self.addEventListener('message', (event) => {
     self.skipWaiting();
   }
 });
+
+// ─── Web Push: receive push event and show OS notification (Task 60) ────────
+self.addEventListener('push', (event) => {
+  if (!event.data) return;
+
+  let payload;
+  try {
+    payload = event.data.json();
+  } catch {
+    payload = { title: 'Employee Portal', body: event.data.text() };
+  }
+
+  const options = {
+    body:      payload.body      || '',
+    icon:      payload.icon      || '/icons/ess/icon-192.png',
+    badge:     payload.badge     || '/icons/ess/badge-72.png',
+    tag:       payload.tag       || payload.category || 'ess-general',
+    renotify:  true,
+    data: {
+      url:      payload.url      || '/app/ess/notifications',
+      category: payload.category || 'general',
+    },
+    actions: getActionsForCategory(payload.category),
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(payload.title || 'Employee Portal', options)
+  );
+});
+
+function getActionsForCategory(category) {
+  switch (category) {
+    case 'schedule': return [{ action: 'view', title: 'View Schedule' }];
+    case 'payslip':  return [{ action: 'view', title: 'View Payslip' }];
+    case 'leave':    return [{ action: 'view', title: 'View Leave' }];
+    case 'profile':  return [{ action: 'view', title: 'View Profile' }];
+    default:         return [];
+  }
+}
+
+// ─── Web Push: click handler — focus or open ESS window (Task 60) ───────────
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+
+  const targetUrl = event.notification.data?.url || '/app/ess/notifications';
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      // Focus an existing ESS window and navigate it
+      for (const client of clientList) {
+        if (client.url.includes('/app/ess') && 'focus' in client) {
+          client.navigate(targetUrl);
+          return client.focus();
+        }
+      }
+      // No ESS window open — open a new one
+      return clients.openWindow(targetUrl);
+    })
+  );
+});

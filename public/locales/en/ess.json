@@ -267,7 +267,13 @@
       "payslips": "Payslips",
       "schedule": "Schedule",
       "profile": "Profile",
-      "leave": "Leave"
+      "leave": "Leave",
+      "general": "General"
+    },
+    "preferences": {
+      "title": "Notification Preferences",
+      "category": "Category",
+      "inApp": "In-app"
     },
     "timeAgo": {
       "justNow": "Just now",
@@ -346,6 +352,17 @@
       "discardBtn": "Discard",
       "confirmDiscard": "Sure?",
       "queued": "Queued",
-      "conflictBadge": "Conflict"    }
+      "conflictBadge": "Conflict"    },
+    "push": {
+      "title": "Stay updated",
+      "body": "Get notified about schedule changes, payslip availability, leave approvals, and shift swap updates — even when the app is closed",
+      "enableBtn": "Enable notifications",
+      "dismissBtn": "Not now",
+      "subscribed": "Push notifications enabled",
+      "unsubscribed": "Push notifications disabled",
+      "denied": "Notifications are blocked. Enable them in your browser settings.",
+      "settingsLabel": "Push",
+      "settingsBlocked": "Push notifications blocked in browser"
+    }
   }
 }

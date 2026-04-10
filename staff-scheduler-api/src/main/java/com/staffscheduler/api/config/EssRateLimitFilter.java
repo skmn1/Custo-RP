@@ -34,7 +34,8 @@ public class EssRateLimitFilter implements Filter {
         "POST:/api/ess/profile/qualifications/document", new int[]{10, 3600_000},  // 10 / hour
         "POST:/api/ess/profile/change-request",       new int[]{20,  3600_000},  // 20 / hour
         "GET:/api/ess/payslips/download",             new int[]{30,  3600_000},  // 30 / hour
-        "PUT:/api/ess/notifications/read-all",        new int[]{10,  60_000}     // 10 / minute
+        "PUT:/api/ess/notifications/read-all",        new int[]{10,  60_000},    // 10 / minute
+        "POST:/api/ess/push/subscribe",               new int[]{10,  3600_000}   // 10 / hour (Task 60)
     );
 
     /** Sliding window buckets: key -> { count, windowStart } */

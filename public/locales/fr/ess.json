@@ -258,7 +258,13 @@
       "payslips": "Fiches de paie",
       "schedule": "Planning",
       "profile": "Profil",
-      "leave": "Congés"
+      "leave": "Congés",
+      "general": "Général"
+    },
+    "preferences": {
+      "title": "Préférences de notifications",
+      "category": "Catégorie",
+      "inApp": "Dans l'app"
     },
     "timeAgo": {
       "justNow": "À l'instant",
@@ -339,6 +345,17 @@
       "confirmDiscard": "Confirmer ?",
       "queued": "En file d'attente",
       "conflictBadge": "Conflit"
+    },
+    "push": {
+      "title": "Restez informé",
+      "body": "Recevez des notifications sur les changements de planning, la disponibilité des fiches de paie, les approbations de congés et les mises à jour d'échange de quarts — même lorsque l'application est fermée",
+      "enableBtn": "Activer les notifications",
+      "dismissBtn": "Pas maintenant",
+      "subscribed": "Notifications push activées",
+      "unsubscribed": "Notifications push désactivées",
+      "denied": "Les notifications sont bloquées. Activez-les dans les paramètres de votre navigateur.",
+      "settingsLabel": "Push",
+      "settingsBlocked": "Notifications push bloquées dans le navigateur"
     }
   }
 }

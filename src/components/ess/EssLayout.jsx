@@ -1,10 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
 import EssInstallPrompt from './EssInstallPrompt';
 import EssUpdateBanner from './EssUpdateBanner';
 import EssOfflineBanner from './EssOfflineBanner';
 import EssSyncStatusBanner from './EssSyncStatusBanner';
+import EssPushPermissionPrompt from './EssPushPermissionPrompt';
 import { registerEssServiceWorker } from '../../lib/essServiceWorker';
 import { EssConnectivityProvider } from '../../contexts/EssConnectivityContext';
 
@@ -17,9 +18,14 @@ import { EssConnectivityProvider } from '../../contexts/EssConnectivityContext';
  */
 export default function EssLayout({ children }) {
   const { t } = useTranslation('ess');
+  const [pushSubscribed, setPushSubscribed] = useState(false);
 
   useEffect(() => {
     registerEssServiceWorker();
+
+    // Increment visit counter for push permission prompt gating
+    const count = parseInt(localStorage.getItem('ess-visit-count') || '0', 10);
+    localStorage.setItem('ess-visit-count', String(count + 1));
   }, []);
 
   return (
@@ -52,6 +58,11 @@ export default function EssLayout({ children }) {
 
       {/* SW update notification (shown above the app shell content) */}
       <EssUpdateBanner />
+
+      {/* Push permission prompt (shown after 3 visits, not dismissed) */}
+      {!pushSubscribed && (
+        <EssPushPermissionPrompt onSubscribed={() => setPushSubscribed(true)} />
+      )}
 
       {children}
 

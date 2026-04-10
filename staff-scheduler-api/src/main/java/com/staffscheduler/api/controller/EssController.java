@@ -20,14 +20,19 @@ import com.staffscheduler.api.repository.EmployeeExperienceRepository;
 import com.staffscheduler.api.repository.EmployeeQualificationRepository;
 import com.staffscheduler.api.repository.EmployeeRepository;
 import com.staffscheduler.api.repository.LeaveRequestRepository;
+import com.staffscheduler.api.model.NotificationPreference;
+import com.staffscheduler.api.model.PushSubscription;
+import com.staffscheduler.api.repository.NotificationPreferenceRepository;
 import com.staffscheduler.api.repository.NotificationRepository;
 import com.staffscheduler.api.repository.OfflineSyncLogRepository;
 import com.staffscheduler.api.repository.PaySlipRepository;
 import com.staffscheduler.api.repository.ProfileEditRequestRepository;
+import com.staffscheduler.api.repository.PushSubscriptionRepository;
 import com.staffscheduler.api.repository.ShiftRepository;
 import com.staffscheduler.api.repository.UserRepository;
 import com.staffscheduler.api.service.EmployeeService;
 import com.staffscheduler.api.service.NotificationService;
+import com.staffscheduler.api.service.WebPushService;
 import jakarta.servlet.http.HttpServletRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -45,6 +50,7 @@ import java.io.PrintWriter;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -85,6 +91,9 @@ public class EssController {
     private final NotificationRepository notificationRepository;
     private final NotificationService notificationService;
     private final AuditLogRepository auditLogRepository;
+    private final PushSubscriptionRepository pushSubscriptionRepository;
+    private final NotificationPreferenceRepository notificationPreferenceRepository;
+    private final WebPushService webPushService;
 
     // ─── Profile field allowlists (SQL injection prevention) ────────────────
     private static final Set<String> ALLOWED_EMPLOYEE_FIELDS = Set.of(
@@ -904,6 +913,157 @@ public class EssController {
         data.put("conflictCount", conflictCount);
         data.put("failedCount",   failedCount);
         return ResponseEntity.ok(Map.of("data", data));
+    }
+
+    // ─── /api/ess/push ──────────────────────────────────────────────────────
+
+    @GetMapping("/push/vapid-key")
+    @Operation(summary = "Return the VAPID public key for push subscription setup")
+    public ResponseEntity<Map<String, Object>> getVapidKey(Authentication authentication) {
+        resolveEmployeeId(authentication); // enforce auth scope
+        String key = webPushService.getVapidPublicKey();
+        if (key == null || key.isBlank()) {
+            return ResponseEntity.status(503).body(Map.of(
+                    "error", Map.of("code", "PUSH_NOT_CONFIGURED",
+                                   "message", "Web push is not configured on this server.")));
+        }
+        return ResponseEntity.ok(Map.of("data", Map.of("publicKey", key)));
+    }
+
+    @PostMapping("/push/subscribe")
+    @Operation(summary = "Register or update a browser push subscription")
+    public ResponseEntity<Map<String, Object>> subscribePush(
+            Authentication authentication,
+            @RequestBody Map<String, Object> body,
+            HttpServletRequest httpRequest) {
+
+        String employeeId = resolveEmployeeId(authentication);
+        UUID userId = resolveUserId(authentication);
+
+        String endpoint = (String) body.get("endpoint");
+        @SuppressWarnings("unchecked")
+        Map<String, String> keys = body.get("keys") instanceof Map<?, ?>
+                ? (Map<String, String>) body.get("keys") : null;
+
+        if (endpoint == null || endpoint.isBlank() || keys == null
+                || keys.get("p256dh") == null || keys.get("auth") == null) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", Map.of("code", "INVALID_SUBSCRIPTION",
+                                   "message", "endpoint and keys.p256dh / keys.auth are required")));
+        }
+
+        // Upsert — if the same endpoint already exists for this employee, update keys
+        PushSubscription sub = pushSubscriptionRepository.findByEndpoint(endpoint)
+                .orElseGet(PushSubscription::new);
+
+        if (sub.getId() != null && !employeeId.equals(sub.getEmployeeId())) {
+            // Endpoint belonged to a different employee — reject
+            return ResponseEntity.status(403).body(Map.of(
+                    "error", Map.of("code", "FORBIDDEN", "message", "Subscription endpoint mismatch")));
+        }
+
+        sub.setUserId(userId);
+        sub.setEmployeeId(employeeId);
+        sub.setEndpoint(endpoint);
+        sub.setP256dhKey(keys.get("p256dh"));
+        sub.setAuthKey(keys.get("auth"));
+        sub.setActive(true);
+        sub.setLastUsedAt(java.time.OffsetDateTime.now());
+        String ua = httpRequest.getHeader("User-Agent");
+        if (ua != null) sub.setUserAgent(ua.length() > 500 ? ua.substring(0, 500) : ua);
+
+        pushSubscriptionRepository.save(sub);
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("id", sub.getId().toString());
+        result.put("subscribed", true);
+        return ResponseEntity.status(201).body(Map.of("data", result));
+    }
+
+    @DeleteMapping("/push/subscribe")
+    @Operation(summary = "Soft-delete own push subscription (set is_active = false)")
+    public ResponseEntity<Void> unsubscribePush(
+            Authentication authentication,
+            @RequestBody Map<String, Object> body) {
+
+        String employeeId = resolveEmployeeId(authentication);
+        String endpoint = (String) body.get("endpoint");
+
+        if (endpoint == null || endpoint.isBlank()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        // Only deactivate if the subscription belongs to this employee (prevent IDOR)
+        pushSubscriptionRepository.findByEndpointAndEmployeeId(endpoint, employeeId)
+                .ifPresent(sub -> {
+                    sub.setActive(false);
+                    pushSubscriptionRepository.save(sub);
+                });
+
+        return ResponseEntity.noContent().build();
+    }
+
+    // ─── /api/ess/notifications/preferences ────────────────────────────────
+
+    @GetMapping("/notifications/preferences")
+    @Operation(summary = "Get own notification preferences per category")
+    public ResponseEntity<Map<String, Object>> getNotificationPreferences(
+            Authentication authentication) {
+        String employeeId = resolveEmployeeId(authentication);
+        List<NotificationPreference> prefs =
+                notificationPreferenceRepository.findByEmployeeIdOrderByCategoryAsc(employeeId);
+
+        // Return as a map keyed by category for easy frontend consumption
+        Map<String, Map<String, Object>> result = new LinkedHashMap<>();
+        for (NotificationPreference p : prefs) {
+            Map<String, Object> m = new LinkedHashMap<>();
+            m.put("inAppEnabled", p.isInAppEnabled());
+            m.put("pushEnabled", p.isPushEnabled());
+            result.put(p.getCategory(), m);
+        }
+        return ResponseEntity.ok(Map.of("data", result));
+    }
+
+    @PutMapping("/notifications/preferences/{category}")
+    @Operation(summary = "Update own notification preference for a category")
+    public ResponseEntity<Map<String, Object>> updateNotificationPreference(
+            Authentication authentication,
+            @PathVariable String category,
+            @RequestBody Map<String, Object> body) {
+
+        String employeeId = resolveEmployeeId(authentication);
+
+        // Validate category against known set
+        Set<String> validCategories = Set.of(
+                "payslip", "schedule", "leave", "profile", "general");
+        if (!validCategories.contains(category)) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", Map.of("code", "INVALID_CATEGORY",
+                                   "message", "Unknown notification category: " + category)));
+        }
+
+        NotificationPreference pref = notificationPreferenceRepository
+                .findByEmployeeIdAndCategory(employeeId, category)
+                .orElseGet(() -> {
+                    NotificationPreference p = new NotificationPreference();
+                    p.setEmployeeId(employeeId);
+                    p.setCategory(category);
+                    return p;
+                });
+
+        if (body.containsKey("inAppEnabled")) {
+            pref.setInAppEnabled(Boolean.TRUE.equals(body.get("inAppEnabled")));
+        }
+        if (body.containsKey("pushEnabled")) {
+            pref.setPushEnabled(Boolean.TRUE.equals(body.get("pushEnabled")));
+        }
+        notificationPreferenceRepository.save(pref);
+
+        return ResponseEntity.ok(Map.of(
+                "data", Map.of(
+                        "category",      category,
+                        "inAppEnabled",  pref.isInAppEnabled(),
+                        "pushEnabled",   pref.isPushEnabled())));
     }
 
     @GetMapping("/profile/change-requests")
