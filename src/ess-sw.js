@@ -25,6 +25,11 @@ import { BackgroundSyncPlugin } from 'workbox-background-sync';
 precacheAndRoute(self.__WB_MANIFEST);
 cleanupOutdatedCaches();
 
+// ─── Per-employee context ─────────────────────────────────────────────────
+// Set via ESS_SET_EMPLOYEE message from the main thread on login.
+// Cleared via ESS_CLEAR_EMPLOYEE message on logout.
+self.__essEmployeeId = null;
+
 // ─── Cache bucket names ─────────────────────────────────────────────────────
 const CACHE_NAMES = [
   'ess-precache',
@@ -60,6 +65,34 @@ const cacheHitPlugin = {
       statusText: cachedResponse.statusText,
       headers,
     });
+  },
+};
+
+// ─── Per-employee cache isolation plugin (Task 61) ───────────────────────────
+// Stamps cached responses with the current employee ID on write, and rejects
+// any cached response that belongs to a different employee on read.
+// This prevents cross-employee data leakage on shared devices.
+const employeeCachePlugin = {
+  // On cache write: embed the current employee ID as a response header
+  cacheWillUpdate: async ({ response }) => {
+    if (!response) return response;
+    const headers = new Headers(response.headers);
+    headers.set('x-ess-employee-id', self.__essEmployeeId || '');
+    return new Response(response.clone().body, {
+      status: response.status,
+      statusText: response.statusText,
+      headers,
+    });
+  },
+  // On cache read: reject responses tagged with a different employee ID
+  cachedResponseWillBeUsed: async ({ cachedResponse }) => {
+    if (!cachedResponse) return cachedResponse;
+    const cachedEmployeeId = cachedResponse.headers.get('x-ess-employee-id');
+    // Only reject if the header is non-empty and mismatches the current employee
+    if (cachedEmployeeId && self.__essEmployeeId && cachedEmployeeId !== self.__essEmployeeId) {
+      return null; // Force cache miss — go to network
+    }
+    return cachedResponse;
   },
 };
 
@@ -169,6 +202,7 @@ registerRoute(
     networkTimeoutSeconds: 3,
     plugins: [
       noSetCookiePlugin,
+      employeeCachePlugin,
       cacheHitPlugin,
       new ExpirationPlugin({ maxEntries: 5, maxAgeSeconds: 60 * 60 }),
       new CacheableResponsePlugin({ statuses: [200] }),
@@ -184,6 +218,7 @@ registerRoute(
     networkTimeoutSeconds: 3,
     plugins: [
       noSetCookiePlugin,
+      employeeCachePlugin,
       cacheHitPlugin,
       new ExpirationPlugin({ maxEntries: 20, maxAgeSeconds: 60 * 60 }),
       new CacheableResponsePlugin({ statuses: [200] }),
@@ -199,6 +234,7 @@ registerRoute(
     networkTimeoutSeconds: 3,
     plugins: [
       noSetCookiePlugin,
+      employeeCachePlugin,
       cacheHitPlugin,
       new ExpirationPlugin({ maxEntries: 30, maxAgeSeconds: 2 * 60 * 60 }),
       new CacheableResponsePlugin({ statuses: [200] }),
@@ -214,6 +250,7 @@ registerRoute(
     networkTimeoutSeconds: 3,
     plugins: [
       noSetCookiePlugin,
+      employeeCachePlugin,
       cacheHitPlugin,
       new ExpirationPlugin({ maxEntries: 20, maxAgeSeconds: 60 * 60 }),
       new CacheableResponsePlugin({ statuses: [200] }),
@@ -229,6 +266,7 @@ registerRoute(
     networkTimeoutSeconds: 3,
     plugins: [
       noSetCookiePlugin,
+      employeeCachePlugin,
       cacheHitPlugin,
       new ExpirationPlugin({ maxEntries: 5, maxAgeSeconds: 24 * 60 * 60 }),
       new CacheableResponsePlugin({ statuses: [200] }),
@@ -236,7 +274,7 @@ registerRoute(
   })
 );
 
-// ─── i18n locale files (ESS namespace) ──────────────────────────────────────
+// ─── i18n locale files (ESS namespace — not employee-specific) ──────────────
 registerRoute(
   ({ url }) => /\/locales\/.+\/ess\.json$/.test(url.pathname),
   new CacheFirst({
@@ -297,10 +335,39 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// ─── Message: allow EssUpdateBanner to trigger skipWaiting ──────────────────
+// ─── Message handler ────────────────────────────────────────────────────────
 self.addEventListener('message', (event) => {
+  // Allow EssUpdateBanner to trigger skipWaiting
   if (event.data?.type === 'SKIP_WAITING') {
     self.skipWaiting();
+    return;
+  }
+
+  // Part A (Task 61): Client sets employee context on login
+  if (event.data?.type === 'ESS_SET_EMPLOYEE') {
+    self.__essEmployeeId = event.data.employeeId || null;
+    return;
+  }
+
+  // Part B (Task 61): Client clears employee context on logout + purge caches
+  if (event.data?.type === 'ESS_CLEAR_EMPLOYEE') {
+    self.__essEmployeeId = null;
+    // Aggressively purge all runtime (employee-data) caches.
+    // ess-precache is NOT deleted — it contains static build assets only.
+    event.waitUntil(
+      caches.keys().then((names) =>
+        Promise.all(
+          names
+            .filter((n) =>
+              n.startsWith('ess-api-') ||
+              n === 'ess-i18n' ||
+              n === 'ess-images'
+            )
+            .map((n) => caches.delete(n))
+        )
+      )
+    );
+    return;
   }
 });
 

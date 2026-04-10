@@ -31,6 +31,26 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            // Task 61: Security headers — CSP allows SW registration and push services
+            .headers(headers -> headers
+                .contentSecurityPolicy(csp -> csp.policyDirectives(
+                    "default-src 'self'; " +
+                    "script-src 'self' 'unsafe-inline'; " +
+                    "style-src 'self' 'unsafe-inline'; " +
+                    "img-src 'self' data: blob:; " +
+                    "font-src 'self'; " +
+                    "worker-src 'self'; " +
+                    "manifest-src 'self'; " +
+                    "connect-src 'self' " +
+                    "https://fcm.googleapis.com " +
+                    "https://*.push.services.mozilla.com " +
+                    "https://*.notify.windows.com " +
+                    "wss://localhost:*; " +
+                    "frame-ancestors 'none'"
+                ))
+                .frameOptions(frame -> frame.deny())
+                .contentTypeOptions(contentType -> {})
+            )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/refresh").permitAll()
                 .requestMatchers("/api/settings/public").permitAll()

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
 import EssInstallPrompt from './EssInstallPrompt';
@@ -7,7 +8,9 @@ import EssOfflineBanner from './EssOfflineBanner';
 import EssSyncStatusBanner from './EssSyncStatusBanner';
 import EssPushPermissionPrompt from './EssPushPermissionPrompt';
 import { registerEssServiceWorker } from '../../lib/essServiceWorker';
+import { essLogoutCleanup } from '../../lib/essLogoutCleanup';
 import { EssConnectivityProvider } from '../../contexts/EssConnectivityContext';
+import { api } from '../../api/config';
 
 /**
  * EssLayout — Task 56 / 57 / 58
@@ -18,6 +21,7 @@ import { EssConnectivityProvider } from '../../contexts/EssConnectivityContext';
  */
 export default function EssLayout({ children }) {
   const { t } = useTranslation('ess');
+  const navigate = useNavigate();
   const [pushSubscribed, setPushSubscribed] = useState(false);
 
   useEffect(() => {
@@ -26,7 +30,19 @@ export default function EssLayout({ children }) {
     // Increment visit counter for push permission prompt gating
     const count = parseInt(localStorage.getItem('ess-visit-count') || '0', 10);
     localStorage.setItem('ess-visit-count', String(count + 1));
-  }, []);
+
+    // Part C (Task 61): In standalone mode (installed PWA), validate the session
+    // on every app launch. If the token is expired/invalid, wipe caches and
+    // redirect to login to prevent stale auth state.
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      api.get('/auth/me').catch(async (error) => {
+        if (error?.status === 401) {
+          await essLogoutCleanup(null);
+          navigate('/login', { replace: true });
+        }
+      });
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <EssConnectivityProvider>
