@@ -69,9 +69,11 @@ const WeekView = ({ anchor, shifts, leave, isLoading }) => {
               <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{dayName}</p>
               <p className={`text-sm font-semibold mt-0.5 ${
                 isToday
-                  ? 'w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center mx-auto'
-                  : 'text-gray-800 dark:text-gray-100'
-              }`}>
+                  ? 'w-6 h-6 rounded-xl flex items-center justify-center mx-auto text-white'
+                  : 'text-gray-800'
+              }`}
+              style={isToday ? { backgroundColor: 'var(--mobile-tint)' } : undefined}
+              >
                 {dayNum}
               </p>
             </div>

@@ -42,9 +42,10 @@ export const MobileOfflineBanner = () => {
 
   return (
     <div
-      className={`fixed bottom-[calc(env(safe-area-inset-bottom,0px)+4rem)] left-0 right-0 z-[45] bg-amber-500/90 backdrop-blur-sm px-4 py-2 text-center transition-transform duration-150 ${
+      className={`fixed bottom-[calc(env(safe-area-inset-bottom,0px)+4rem)] left-0 right-0 z-[45] backdrop-blur-sm px-4 py-2 text-center transition-transform duration-150 ${
         animating ? 'translate-y-0' : 'translate-y-full'
       }`}
+      style={{ backgroundColor: 'rgba(196,163,90,0.92)' }}
       role="status"
       aria-live="polite"
       data-testid="mobile-offline-banner"
@@ -67,10 +68,11 @@ export const QueuedActionsNotice = () => {
 
   return (
     <div
-      className="mx-4 mt-2 px-3 py-2 bg-amber-50 dark:bg-amber-900/20 rounded-xl"
+      className="mx-4 mt-2 px-3 py-2 rounded-xl"
+      style={{ backgroundColor: 'var(--mobile-bg-grouped)' }}
       data-testid="queued-actions-notice"
     >
-      <span className="text-mobile-footnote text-amber-700 dark:text-amber-300 flex items-center gap-1.5">
+      <span className="text-mobile-footnote flex items-center gap-1.5" style={{ color: 'var(--mobile-warning)' }}>
         <ArrowUpTrayIcon className="h-4 w-4" />
         {t('mobile.offline.queuedActions', { count: pendingCount })}
       </span>

@@ -42,10 +42,14 @@ export const BottomNav = () => {
     <nav
       role="navigation"
       aria-label={t('mobile.nav.label')}
-      className="fixed bottom-0 left-0 right-0 z-50 bg-[var(--mobile-bg)]/80 backdrop-blur-lg border-t border-[var(--mobile-separator)] pb-safe"
+      className="fixed bottom-0 left-0 right-0 z-50 pb-safe"
+      style={{
+        backgroundColor: 'var(--mobile-tab-bg)',
+        borderTop: '1px solid var(--mobile-tab-border)',
+      }}
       data-testid="mobile-tab-bar"
     >
-      <div className="flex justify-around items-center h-12 max-w-lg mx-auto">
+      <div className="flex justify-around items-center h-14 max-w-lg mx-auto">
         {TAB_ITEMS.map(({ id, label, icon: Icon, to }) => {
           const isActive = location.pathname.startsWith(to);
           return (
@@ -53,27 +57,36 @@ export const BottomNav = () => {
               key={id}
               to={to}
               onClick={(e) => handleTabClick(to, e)}
-              className="relative flex flex-col items-center justify-center gap-0.5 w-full h-full"
+              className="relative flex flex-col items-center justify-center flex-1 min-h-[44px]"
+              aria-label={t(label)}
               aria-current={isActive ? 'page' : undefined}
               data-testid={`mobile-tab-${id}`}
             >
               {id === 'profile' && <QueuedBadge />}
+              {/* Soft pill behind the active icon */}
+              {isActive && (
+                <span
+                  className="absolute top-1 h-9 w-11 rounded-full"
+                  style={{ backgroundColor: 'var(--mobile-tab-active-pill)' }}
+                />
+              )}
               <Icon
-                className={`h-6 w-6 transition-colors duration-200 ${
-                  isActive
-                    ? 'text-[var(--mobile-tint)]'
-                    : 'text-[var(--mobile-label-tertiary)]'
-                }`}
+                className="h-6 w-6 relative z-10 transition-colors duration-150"
+                style={{
+                  color: isActive
+                    ? 'var(--mobile-tab-active-icon)'
+                    : 'var(--mobile-tab-inactive)',
+                }}
               />
-              <span
-                className={`text-[10px] font-medium transition-colors duration-200 ${
-                  isActive
-                    ? 'text-[var(--mobile-tint)]'
-                    : 'text-[var(--mobile-label-tertiary)]'
-                }`}
-              >
-                {t(label)}
-              </span>
+              {/* Label visible only for active tab */}
+              {isActive && (
+                <span
+                  className="text-[11px] font-semibold mt-0.5 leading-none"
+                  style={{ color: 'var(--mobile-tab-active-label)' }}
+                >
+                  {t(label)}
+                </span>
+              )}
             </NavLink>
           );
         })}

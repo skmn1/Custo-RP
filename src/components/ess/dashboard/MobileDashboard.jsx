@@ -41,17 +41,29 @@ function formatRelativeDay(dateStr, t, formatDate) {
 
 // ── Greeting Header ──────────────────────────────────────────────
 
-const MobileDashboardGreeting = ({ firstName, currentDate, t, formatDate }) => {
+const MobileDashboardGreeting = ({ firstName, currentDate, t, formatDate, nextShift }) => {
   const greeting = getTimeBasedGreeting(t);
 
   return (
-    <div className="px-4 pt-4 pb-2" data-testid="mobile-dashboard-greeting">
-      <h1 className="text-mobile-largeTitle text-[var(--mobile-label-primary)]">
+    <div
+      className="mx-4 mt-4 rounded-2xl px-4 py-5"
+      style={{
+        background: 'linear-gradient(160deg, #EDE8DF 0%, #E5DDD0 100%)',
+        boxShadow: 'var(--mobile-shadow-inner), var(--mobile-shadow-card)',
+      }}
+      data-testid="mobile-dashboard-greeting"
+    >
+      <h1 className="text-mobile-largeTitle font-bold text-[var(--mobile-label-primary)]">
         {greeting}, {firstName} 👋
       </h1>
       <p className="text-mobile-subheadline text-[var(--mobile-label-secondary)] mt-1">
         {formatDate(currentDate || new Date(), 'EEEE, d MMMM yyyy')}
       </p>
+      {nextShift && (
+        <p className="text-mobile-title3 font-bold mt-3" style={{ color: 'var(--mobile-tint)' }}>
+          {nextShift.startTime} – {nextShift.endTime}
+        </p>
+      )}
     </div>
   );
 };
@@ -139,7 +151,7 @@ const QuickStatsRow = ({ dashboard, t, formatCurrency }) => {
         .map(({ value, label, link }) => (
           <NavLink key={label} to={link} className="flex-shrink-0">
             <div className="bg-[var(--mobile-bg-grouped)] rounded-2xl px-4 py-3 min-w-[80px] text-center">
-              <span className="text-mobile-title3 text-[var(--mobile-label-primary)] block">
+              <span className="text-mobile-title3 font-bold block" style={{ color: 'var(--mobile-tint)' }}>
                 {value}
               </span>
               <span className="text-mobile-caption text-[var(--mobile-label-secondary)]">
@@ -317,6 +329,7 @@ const MobileDashboard = () => {
       <MobileDashboardGreeting
         firstName={firstName}
         currentDate={d.greeting?.currentDate}
+        nextShift={nextShift}
         t={t}
         formatDate={formatDate}
       />

@@ -116,7 +116,7 @@ function groupNotifications(notifications, t) {
 
 const NotificationRow = ({ notification, onTap, t }) => (
   <li
-    className={`flex gap-3 px-4 py-3 min-h-[44px] active:bg-gray-50 dark:active:bg-gray-800/50 transition-colors duration-150 cursor-pointer ${
+    className={`flex gap-3 px-4 py-3 min-h-[44px] active:bg-[var(--mobile-bg-grouped)] transition-colors duration-150 cursor-pointer ${
       notification.isRead ? 'opacity-75' : ''
     }`}
     onClick={() => onTap(notification)}

@@ -76,19 +76,19 @@ function getWeekDays(from) {
 // ── Status dot colours ───────────────────────────────────────
 
 const STATUS_DOT_COLORS = {
-  present: 'bg-green-500',
-  late: 'bg-amber-500',
-  absent: 'bg-red-500',
-  leave: 'bg-blue-500',
-  on_leave: 'bg-blue-500',
-  half_day: 'bg-amber-500',
-  holiday: 'bg-purple-500',
+  present:  'bg-[var(--mobile-success)]',
+  late:     'bg-[var(--mobile-warning)]',
+  absent:   'bg-[var(--mobile-destructive)]',
+  leave:    'bg-[var(--mobile-info)]',
+  on_leave: 'bg-[var(--mobile-info)]',
+  half_day: 'bg-[var(--mobile-warning)]',
+  holiday:  'bg-[var(--mobile-info)]',
 };
 
 const StatusDot = ({ status, className = '' }) => (
   <span
     className={`inline-block w-2.5 h-2.5 rounded-full flex-shrink-0 ${
-      STATUS_DOT_COLORS[status] || 'bg-gray-300 dark:bg-gray-600'
+      STATUS_DOT_COLORS[status] || 'bg-[var(--mobile-label-tertiary)]'
     } ${className}`}
     aria-hidden="true"
   />
@@ -465,28 +465,37 @@ const MobileAttendance = () => {
       />
 
       {/* Weekly summary card */}
-      <MobileCard className="mx-4 mt-2" testId="weekly-summary-card">
-        <p className="text-mobile-footnote font-semibold text-[var(--mobile-label-secondary)] text-center uppercase tracking-wide">
-          {t('mobile.attendance.thisWeek')}
-        </p>
-
-        <AttendanceRing
-          worked={weeklyStats.hoursWorked}
-          expected={weeklyStats.expectedHours}
-        />
-
-        <div className="text-center space-y-1 pb-2">
-          <p className="text-mobile-subheadline text-[var(--mobile-label-secondary)]">
-            {t('mobile.attendance.attendanceRate', { rate: weeklyStats.attendanceRate })}
+      <div
+        className="mx-4 mt-2 rounded-2xl overflow-hidden"
+        style={{ boxShadow: 'var(--mobile-shadow-inner), var(--mobile-shadow-card)' }}
+        data-testid="weekly-summary-card"
+      >
+        <div
+          className="flex flex-col items-center px-4 py-5"
+          style={{ background: 'linear-gradient(160deg, #EDE8DF 0%, #E5DDD0 100%)' }}
+        >
+          <p className="text-mobile-footnote font-semibold text-[var(--mobile-label-secondary)] text-center uppercase tracking-wide mb-3">
+            {t('mobile.attendance.thisWeek')}
           </p>
-          <p className="text-mobile-footnote text-[var(--mobile-label-tertiary)]">
-            {t('mobile.attendance.daysPresent', {
-              count: weeklyStats.daysPresent,
-              total: weeklyStats.totalWorkDays,
-            })}
-          </p>
+
+          <AttendanceRing
+            worked={weeklyStats.hoursWorked}
+            expected={weeklyStats.expectedHours}
+          />
+
+          <div className="text-center space-y-1 mt-2">
+            <p className="text-mobile-subheadline text-[var(--mobile-label-secondary)]">
+              {t('mobile.attendance.attendanceRate', { rate: weeklyStats.attendanceRate })}
+            </p>
+            <p className="text-mobile-footnote text-[var(--mobile-label-tertiary)]">
+              {t('mobile.attendance.daysPresent', {
+                count: weeklyStats.daysPresent,
+                total: weeklyStats.totalWorkDays,
+              })}
+            </p>
+          </div>
         </div>
-      </MobileCard>
+      </div>
 
       {/* Day-by-day list */}
       <ol className="mt-4" data-testid="day-list" aria-label={t('attendance.dailyLog')}>

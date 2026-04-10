@@ -8,7 +8,7 @@ import { ChevronRightIcon } from '@heroicons/react/24/outline';
 
 const ActionRow = ({ icon: Icon, label, value, detail, onPress, chevron = true }) => (
   <div
-    className="flex items-center gap-3 px-4 py-3 min-h-[44px] active:bg-gray-50 dark:active:bg-gray-800/50 transition-colors duration-150 cursor-pointer"
+    className="flex items-center gap-3 px-4 py-3 min-h-[44px] active:bg-[var(--mobile-bg-grouped)] transition-colors duration-150 cursor-pointer"
     onClick={onPress}
     onKeyDown={onPress ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onPress(e); } } : undefined}
     role="button"

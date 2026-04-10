@@ -20,10 +20,10 @@ const ShiftCard = ({ shift }) => {
       style={{ cursor: 'default' }}
       data-testid="shift-card"
     >
-      {/* Left colour bar */}
+      {/* Left colour bar — terracotta brand accent */}
       <div
         className="absolute left-0 top-0 bottom-0 w-1 rounded-l-md"
-        style={{ backgroundColor: colors.bar }}
+        style={{ backgroundColor: 'var(--mobile-tint)' }}
       />
 
       <div className="pl-3 pr-2 py-2">

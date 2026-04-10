@@ -43,17 +43,22 @@ const ProfileHeader = ({ profile, t }) => {
 
   return (
     <div className="flex flex-col items-center px-4 pt-4 pb-6" data-testid="profile-header">
-      <div className="relative">
+      <div
+        className="h-[86px] w-[86px] rounded-full p-[3px]"
+        style={{ background: 'var(--mobile-tint)' }}
+        data-testid="profile-avatar-ring"
+      >
         {personal.avatar ? (
           <img
             src={personal.avatar}
             alt={fullName}
-            className="h-20 w-20 rounded-full object-cover"
+            className="h-full w-full rounded-full object-cover"
             data-testid="profile-avatar"
           />
         ) : (
           <div
-            className="h-20 w-20 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 text-2xl font-bold"
+            className="h-full w-full rounded-full flex items-center justify-center text-2xl font-bold"
+            style={{ backgroundColor: 'var(--mobile-bg-grouped)', color: 'var(--mobile-tint)' }}
             data-testid="profile-avatar-fallback"
           >
             {(personal.firstName?.[0] || '').toUpperCase()}{(personal.lastName?.[0] || '').toUpperCase()}
@@ -89,7 +94,7 @@ const ProfileHeader = ({ profile, t }) => {
 
 const ProfileSection = ({ title, children }) => (
   <div className="mt-6" data-testid="profile-section">
-    <h3 className="text-mobile-caption font-semibold text-[var(--mobile-label-secondary)] uppercase tracking-wide px-4 mb-2">
+    <h3 className="mobile-section-header mobile-grain text-mobile-caption font-semibold text-[var(--mobile-label-secondary)] uppercase tracking-wide">
       {title}
     </h3>
     <div className="bg-[var(--mobile-bg-elevated)] rounded-xl mx-4 divide-y divide-[var(--mobile-separator)]">
@@ -103,7 +108,7 @@ const ProfileSection = ({ title, children }) => (
 const ProfileFieldRow = ({ label, value, editable, pending, onPress }) => (
   <div
     className={`flex items-center justify-between px-4 py-3 min-h-[44px] ${
-      editable ? 'active:bg-gray-50 dark:active:bg-gray-800/50 cursor-pointer transition-colors duration-150' : ''
+      editable ? 'active:bg-[var(--mobile-bg-grouped)] cursor-pointer transition-colors duration-150' : ''
     }`}
     onClick={editable ? onPress : undefined}
     onKeyDown={editable ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onPress(); } } : undefined}
@@ -130,7 +135,7 @@ const ProfileFieldRow = ({ label, value, editable, pending, onPress }) => (
 
 const DocumentRow = ({ doc, t, onPress }) => (
   <div
-    className="flex items-center justify-between px-4 py-3 min-h-[44px] active:bg-gray-50 dark:active:bg-gray-800/50 cursor-pointer transition-colors duration-150"
+    className="flex items-center justify-between px-4 py-3 min-h-[44px] active:bg-[var(--mobile-bg-grouped)] cursor-pointer transition-colors duration-150"
     onClick={() => onPress(doc)}
     onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onPress(doc); } }}
     role="button"

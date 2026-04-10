@@ -24,20 +24,28 @@ const PayBreakdownBar = ({ gross, deductions, net, t }) => {
 
   return (
     <div className="mx-4 mt-4" aria-hidden="true" data-testid="pay-breakdown-bar">
-      <div className="h-3 rounded-full overflow-hidden flex bg-[var(--mobile-bg-grouped)]">
+      <div className="h-3 rounded-full overflow-hidden flex gap-px bg-[var(--mobile-bg-grouped)]">
+        {/* Net segment — sage green */}
         <div
-          className="bg-[var(--mobile-tint)]"
-          style={{ width: `${netPct}%` }}
+          className="transition-[width] duration-700 ease-out"
+          style={{
+            width: `${netPct}%`,
+            backgroundColor: 'var(--mobile-success)',
+          }}
         />
+        {/* Deductions segment — dusty rose */}
         <div
-          className="bg-[var(--mobile-destructive)] opacity-60"
-          style={{ width: `${deductionPct}%` }}
+          className="transition-[width] duration-700 ease-out"
+          style={{
+            width: `${deductionPct}%`,
+            backgroundColor: 'var(--mobile-destructive)',
+          }}
         />
       </div>
       <div className="flex justify-between mt-2 text-mobile-caption text-[var(--mobile-label-secondary)]">
-        <span>● {t('mobile.payslips.netPay')}</span>
-        <span>● {t('mobile.payslips.deductions')}</span>
-        <span>● {t('mobile.payslips.gross')}</span>
+        <span style={{ color: 'var(--mobile-success)' }}>● {t('mobile.payslips.netPay')}</span>
+        <span style={{ color: 'var(--mobile-destructive)' }}>● {t('mobile.payslips.deductions')}</span>
+        <span className="text-[var(--mobile-label-tertiary)]">● {t('mobile.payslips.gross')}</span>
       </div>
     </div>
   );
@@ -176,7 +184,10 @@ const MobilePayslipDetail = () => {
 
       {/* Net pay — prominent */}
       <div className="text-center px-4 py-4" data-testid="payslip-net-hero">
-        <p className="text-mobile-largeTitle text-[var(--mobile-label-primary)] font-bold">
+        <p
+          className="text-mobile-largeTitle font-bold"
+          style={{ color: 'var(--mobile-tint)' }}
+        >
           {formatCurrency(detail.netPay)}
         </p>
         <p className="text-mobile-subheadline text-[var(--mobile-label-secondary)] mt-1">
