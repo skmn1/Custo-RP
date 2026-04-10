@@ -283,6 +283,13 @@
   },
   "errors": {
     "noEmployeeRecord": "Votre compte n'est pas lié à un dossier employé. Veuillez contacter les RH.",
-    "accessDenied": "Vous n'avez pas accès à cette section."
+    "accessDenied": "Vous n'avez pas accès à cette section.",
+    "notFound": "La ressource demandée est introuvable.",
+    "forbidden": "Vous n'avez pas la permission d'accéder à cette ressource.",
+    "rateLimited": "Trop de requêtes. Veuillez réessayer plus tard.",
+    "invalidIban": "Le format IBAN est invalide. Veuillez vérifier et réessayer.",
+    "uploadFailed": "Échec du téléchargement. Formats acceptés : PDF, JPEG, PNG.",
+    "fileTooLarge": "Le fichier dépasse la taille maximale autorisée.",
+    "invalidFieldName": "Le champ spécifié n'est pas modifiable."
   }
 }

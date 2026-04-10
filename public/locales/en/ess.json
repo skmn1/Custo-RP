@@ -292,6 +292,13 @@
   },
   "errors": {
     "noEmployeeRecord": "Your account is not linked to an employee record. Please contact HR.",
-    "accessDenied": "You do not have access to this section."
+    "accessDenied": "You do not have access to this section.",
+    "notFound": "The requested resource was not found.",
+    "forbidden": "You do not have permission to access this resource.",
+    "rateLimited": "Too many requests. Please try again later.",
+    "invalidIban": "The IBAN format is invalid. Please check and try again.",
+    "uploadFailed": "File upload failed. Accepted formats: PDF, JPEG, PNG.",
+    "fileTooLarge": "File exceeds the maximum allowed size.",
+    "invalidFieldName": "The specified field is not editable."
   }
 }

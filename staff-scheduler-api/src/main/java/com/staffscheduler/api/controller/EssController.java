@@ -2,6 +2,7 @@ package com.staffscheduler.api.controller;
 
 import com.staffscheduler.api.exception.ResourceNotFoundException;
 import com.staffscheduler.api.model.AttendanceRecord;
+import com.staffscheduler.api.model.AuditLog;
 import com.staffscheduler.api.model.Employee;
 import com.staffscheduler.api.model.EmployeeBankDetails;
 import com.staffscheduler.api.model.EmployeeExperience;
@@ -12,6 +13,7 @@ import com.staffscheduler.api.model.PaySlip;
 import com.staffscheduler.api.model.ProfileEditRequest;
 import com.staffscheduler.api.repository.AppSettingRepository;
 import com.staffscheduler.api.repository.AttendanceRecordRepository;
+import com.staffscheduler.api.repository.AuditLogRepository;
 import com.staffscheduler.api.repository.EmployeeBankDetailsRepository;
 import com.staffscheduler.api.repository.EmployeeExperienceRepository;
 import com.staffscheduler.api.repository.EmployeeQualificationRepository;
@@ -24,6 +26,7 @@ import com.staffscheduler.api.repository.ShiftRepository;
 import com.staffscheduler.api.repository.UserRepository;
 import com.staffscheduler.api.service.EmployeeService;
 import com.staffscheduler.api.service.NotificationService;
+import jakarta.servlet.http.HttpServletRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
@@ -78,6 +81,17 @@ public class EssController {
     private final ProfileEditRequestRepository profileEditRequestRepository;
     private final NotificationRepository notificationRepository;
     private final NotificationService notificationService;
+    private final AuditLogRepository auditLogRepository;
+
+    // ─── Profile field allowlists (SQL injection prevention) ────────────────
+    private static final Set<String> ALLOWED_EMPLOYEE_FIELDS = Set.of(
+            "address_line1", "address_line2", "city", "postal_code", "country",
+            "phone", "nationality", "birth_date", "national_id_type", "national_id_number",
+            "profile_photo_key"
+    );
+    private static final Set<String> ALLOWED_BANK_FIELDS = Set.of(
+            "bank_iban", "bank_bic", "bank_name", "bank_account_holder"
+    );
 
     // ─── /api/ess/me ────────────────────────────────────────────
 
@@ -636,7 +650,8 @@ public class EssController {
     @Operation(summary = "Submit a profile change request")
     public ResponseEntity<Map<String, Object>> submitChangeRequest(
             Authentication authentication,
-            @RequestBody Map<String, Object> body) {
+            @RequestBody Map<String, Object> body,
+            HttpServletRequest httpRequest) {
 
         String employeeId = resolveEmployeeId(authentication);
         String fieldName = (String) body.get("fieldName");
@@ -646,6 +661,51 @@ public class EssController {
 
         if (fieldName == null || fieldName.isBlank() || newValue.isBlank()) {
             return ResponseEntity.badRequest().body(Map.of("error", "fieldName and newValue are required"));
+        }
+
+        // Validate field name against strict allowlist (prevents SQL injection via dynamic field names)
+        if (!ALLOWED_EMPLOYEE_FIELDS.contains(fieldName) && !ALLOWED_BANK_FIELDS.contains(fieldName)) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", Map.of(
+                            "code", "VALIDATION_ERROR",
+                            "message", "Field \"" + fieldName + "\" is not an editable profile field."
+                    )
+            ));
+        }
+
+        // Validate IBAN format if it's a bank IBAN change
+        if ("bank_iban".equals(fieldName)) {
+            String cleaned = newValue.replaceAll("\\s+", "").toUpperCase();
+            if (cleaned.length() < 15 || cleaned.length() > 34 || !cleaned.matches("^[A-Z]{2}\\d{2}[A-Z0-9]+$")) {
+                return ResponseEntity.badRequest().body(Map.of(
+                        "error", Map.of(
+                                "code", "VALIDATION_ERROR",
+                                "message", "The IBAN format is invalid. Please check and try again."
+                        )
+                ));
+            }
+            // ISO 13616 mod-97 check
+            String rearranged = cleaned.substring(4) + cleaned.substring(0, 4);
+            StringBuilder numeric = new StringBuilder();
+            for (char c : rearranged.toCharArray()) {
+                if (Character.isLetter(c)) {
+                    numeric.append(c - 'A' + 10);
+                } else {
+                    numeric.append(c);
+                }
+            }
+            int remainder = 0;
+            for (int i = 0; i < numeric.length(); i++) {
+                remainder = (remainder * 10 + (numeric.charAt(i) - '0')) % 97;
+            }
+            if (remainder != 1) {
+                return ResponseEntity.badRequest().body(Map.of(
+                        "error", Map.of(
+                                "code", "VALIDATION_ERROR",
+                                "message", "The IBAN format is invalid. Please check and try again."
+                        )
+                ));
+            }
         }
 
         // Cancel existing pending requests for same bank_ field group
@@ -666,6 +726,13 @@ public class EssController {
         req.setNewValue(newValue);
         req.setStatus("pending");
         profileEditRequestRepository.save(req);
+
+        // Audit log
+        logAudit(authentication, httpRequest, "profile_change_request_submitted",
+                "profile_edit_request", req.getId(),
+                fieldName.startsWith("bank_")
+                        ? "{\"fieldName\":\"" + fieldName + "\"}"
+                        : "{\"fieldName\":\"" + fieldName + "\",\"newValue\":\"" + truncate(newValue, 100) + "\"}");
 
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("id", req.getId());
@@ -705,12 +772,10 @@ public class EssController {
             Authentication authentication,
             @PathVariable String id) {
         String employeeId = resolveEmployeeId(authentication);
+        // Use employee-scoped lookup to prevent IDOR — returns 404 for non-owned resources
         ProfileEditRequest req = profileEditRequestRepository.findById(id)
+                .filter(r -> r.getEmployeeId().equals(employeeId))
                 .orElseThrow(() -> new ResourceNotFoundException("ProfileEditRequest", id));
-
-        if (!req.getEmployeeId().equals(employeeId)) {
-            return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
-        }
         if (!"pending".equals(req.getStatus())) {
             return ResponseEntity.badRequest().body(Map.of("error", "Only pending requests can be cancelled"));
         }
@@ -877,7 +942,8 @@ public class EssController {
         m.put("dateObtained", q.getDateObtained() != null ? q.getDateObtained().toString() : null);
         m.put("expiryDate", q.getExpiryDate() != null ? q.getExpiryDate().toString() : null);
         m.put("credentialNumber", q.getCredentialNumber());
-        m.put("documentKey", q.getDocumentKey());
+        // documentKey is stripped — internal storage path never exposed in response
+        m.put("hasDocument", q.getDocumentKey() != null && !q.getDocumentKey().isBlank());
 
         // Expiry flags
         if (q.getExpiryDate() != null) {
@@ -1075,6 +1141,29 @@ public class EssController {
     }
 
     // ─── Inner exception ────────────────────────────────────────
+
+    /** Audit-log a sensitive ESS action. */
+    private void logAudit(Authentication auth, HttpServletRequest httpRequest,
+                          String action, String resourceType, String resourceId, String changes) {
+        try {
+            AuditLog log = new AuditLog();
+            log.setActorId(auth != null ? auth.getName() : "unknown");
+            log.setApp("ess");
+            log.setAction(action);
+            log.setResourceType(resourceType);
+            log.setResourceId(resourceId);
+            log.setChanges(changes);
+            log.setIpAddress(httpRequest != null ? httpRequest.getRemoteAddr() : null);
+            auditLogRepository.save(log);
+        } catch (Exception e) {
+            // Audit logging must never break the main request
+        }
+    }
+
+    private static String truncate(String s, int maxLen) {
+        if (s == null) return null;
+        return s.length() > maxLen ? s.substring(0, maxLen) + "…" : s;
+    }
 
     @org.springframework.web.bind.annotation.ExceptionHandler(EssNoEmployeeRecordException.class)
     public ResponseEntity<Map<String, Object>> handleNoEmployeeRecord(EssNoEmployeeRecordException ex) {
