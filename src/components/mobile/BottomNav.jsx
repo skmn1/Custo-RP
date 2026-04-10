@@ -14,6 +14,7 @@ import {
   ClockIcon,
   UserCircleIcon,
 } from '@heroicons/react/24/outline';
+import { QueuedBadge } from './MobileOfflineIndicators';
 
 const TAB_ITEMS = [
   { id: 'dashboard',  label: 'mobile.nav.dashboard',  icon: HomeIcon,          to: '/app/ess/dashboard' },
@@ -52,10 +53,11 @@ export const BottomNav = () => {
               key={id}
               to={to}
               onClick={(e) => handleTabClick(to, e)}
-              className="flex flex-col items-center justify-center gap-0.5 w-full h-full"
+              className="relative flex flex-col items-center justify-center gap-0.5 w-full h-full"
               aria-current={isActive ? 'page' : undefined}
               data-testid={`mobile-tab-${id}`}
             >
+              {id === 'profile' && <QueuedBadge />}
               <Icon
                 className={`h-6 w-6 transition-colors duration-200 ${
                   isActive

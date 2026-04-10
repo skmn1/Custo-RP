@@ -486,6 +486,15 @@
       "minutesAgo": "il y a {{count}}min",
       "justNow": "À l'instant",
       "unread": "non lu"
+    },
+    "offline": {
+      "youAreOffline": "Vous êtes hors ligne",
+      "queuedActions": "{{count}} modification en file — synchronisation au retour en ligne",
+      "queuedActions_plural": "{{count}} modifications en file — synchronisation au retour en ligne",
+      "syncSuccess": "{{count}} modification synchronisée",
+      "syncSuccess_plural": "{{count}} modifications synchronisées",
+      "syncFailed": "{{count}} modification non synchronisée. Appuyez pour réessayer.",
+      "syncFailed_plural": "{{count}} modifications non synchronisées. Appuyez pour réessayer."
     }
   }
 }

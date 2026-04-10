@@ -493,6 +493,15 @@
       "minutesAgo": "{{count}}m ago",
       "justNow": "Just now",
       "unread": "unread"
+    },
+    "offline": {
+      "youAreOffline": "You're offline",
+      "queuedActions": "{{count}} change queued — will sync when back online",
+      "queuedActions_plural": "{{count}} changes queued — will sync when back online",
+      "syncSuccess": "{{count}} change synced successfully",
+      "syncSuccess_plural": "{{count}} changes synced successfully",
+      "syncFailed": "{{count}} change failed to sync. Tap to retry.",
+      "syncFailed_plural": "{{count}} changes failed to sync. Tap to retry."
     }
   }
 }

@@ -9,21 +9,28 @@ import { Outlet } from 'react-router-dom';
 import { BottomNav } from './BottomNav';
 import { MobileTopBar } from './MobileTopBar';
 import ScreenTransition from './ScreenTransition';
+import { MobileOfflineBanner, useSyncToast } from './MobileOfflineIndicators';
 import '../../styles/mobile.css';
 
-const MobileShell = () => (
-  <div
-    className="flex flex-col h-screen h-[100dvh] bg-[var(--mobile-bg)] font-system"
-    data-testid="mobile-shell"
-  >
-    <MobileTopBar />
-    <main className="flex-1 overflow-y-auto pb-20" data-testid="mobile-content">
-      <ScreenTransition>
-        <Outlet />
-      </ScreenTransition>
-    </main>
-    <BottomNav />
-  </div>
-);
+const MobileShell = () => {
+  const { toastElement } = useSyncToast();
+
+  return (
+    <div
+      className="flex flex-col h-screen h-[100dvh] bg-[var(--mobile-bg)] font-system"
+      data-testid="mobile-shell"
+    >
+      <MobileTopBar />
+      <main className="flex-1 overflow-y-auto pb-20" data-testid="mobile-content">
+        <ScreenTransition>
+          <Outlet />
+        </ScreenTransition>
+      </main>
+      <MobileOfflineBanner />
+      <BottomNav />
+      {toastElement}
+    </div>
+  );
+};
 
 export default MobileShell;

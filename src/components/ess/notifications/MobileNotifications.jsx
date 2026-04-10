@@ -20,6 +20,7 @@ import {
 import { useNotifications } from '../../../hooks/useNotifications';
 import { useEssConnectivity } from '../../../contexts/EssConnectivityContext';
 import MobileHeader from '../../mobile/MobileHeader';
+import { QueuedActionsNotice } from '../../mobile/MobileOfflineIndicators';
 import EssOfflineFallback from '../EssOfflineFallback';
 
 // ── Notification type → icon mapping ─────────────────────────
@@ -333,6 +334,8 @@ const MobileNotifications = () => {
   return (
     <div data-testid="mobile-notifications">
       <MobileHeader title={t('mobile.notifications.title')} action={markAllReadAction} />
+
+      <QueuedActionsNotice />
 
       <div ref={scrollRef} className="overflow-y-auto" style={{ maxHeight: 'calc(100dvh - 140px)' }}>
         {groups.length === 1 && groups[0].key === 'today' ? (

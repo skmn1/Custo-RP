@@ -16,6 +16,7 @@ import MobileHeader from '../../mobile/MobileHeader';
 import MobileCard from '../../mobile/MobileCard';
 import StatusChip from '../../mobile/StatusChip';
 import BottomSheet from '../../mobile/BottomSheet';
+import { QueuedActionsNotice } from '../../mobile/MobileOfflineIndicators';
 import EssOfflineFallback from '../EssOfflineFallback';
 
 // ── Validation helpers ───────────────────────────────────────
@@ -462,6 +463,8 @@ const MobileProfile = () => {
   return (
     <div className="pb-24" data-testid="mobile-profile">
       <MobileHeader title={t('mobile.profile.title')} />
+
+      <QueuedActionsNotice />
 
       {/* Hero header */}
       <ProfileHeader profile={profile} t={t} />
