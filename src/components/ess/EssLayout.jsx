@@ -11,18 +11,25 @@ import { registerEssServiceWorker } from '../../lib/essServiceWorker';
 import { essLogoutCleanup } from '../../lib/essLogoutCleanup';
 import { EssConnectivityProvider } from '../../contexts/EssConnectivityContext';
 import { api } from '../../api/config';
+import { useMobileLayout } from '../../hooks/useMobileLayout';
+import MobileShell from '../mobile/MobileShell';
+import AppShell from '../shell/AppShell';
+import { essSidebarItems } from '../../apps/ess/sidebarItems';
 
 /**
- * EssLayout — Task 56 / 57 / 58
+ * EssLayout — Task 56 / 57 / 58 / 63
  *
  * Injects PWA manifest link and Apple-specific meta tags, registers the ESS
  * service worker (scoped to /app/ess/), provides the connectivity context,
  * and mounts the offline banner, update banner, and install prompt.
+ *
+ * Task 63: Conditionally renders MobileShell (<1024px) or AppShell (≥1024px).
  */
-export default function EssLayout({ children }) {
+export default function EssLayout() {
   const { t } = useTranslation('ess');
   const navigate = useNavigate();
   const [pushSubscribed, setPushSubscribed] = useState(false);
+  const isMobile = useMobileLayout();
 
   useEffect(() => {
     registerEssServiceWorker();
@@ -80,7 +87,12 @@ export default function EssLayout({ children }) {
         <EssPushPermissionPrompt onSubscribed={() => setPushSubscribed(true)} />
       )}
 
-      {children}
+      {/* Task 63: Swap shells based on viewport width */}
+      {isMobile ? (
+        <MobileShell />
+      ) : (
+        <AppShell appId="ess" sidebarItems={essSidebarItems} />
+      )}
 
       {/* PWA install prompt (Android banner / iOS bottom sheet) */}
       <EssInstallPrompt />

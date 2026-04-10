@@ -73,7 +73,7 @@ import { planningSidebarItems } from './apps/planning/sidebarItems';
 import { payrollSidebarItems } from './apps/payroll/sidebarItems';
 import { accountingSidebarItems } from './apps/accounting/sidebarItems';
 import { adminSidebarItems } from './apps/admin/sidebarItems';
-import { essSidebarItems } from './apps/ess/sidebarItems';
+// essSidebarItems moved to EssLayout.jsx (Task 63 — mobile shell swap)
 import EmployeeRoleGuard from './components/shell/EmployeeRoleGuard';
 import EssLayout from './components/ess/EssLayout';
 import EssInstallPrompt from './components/ess/EssInstallPrompt';
@@ -254,7 +254,7 @@ const App = () => {
           </Route>
 
           {/* ═══ ESS (Employee Self-Service) app ═══ */}
-          <Route path="/app/ess" element={<EssLayout><AppShell appId="ess" sidebarItems={essSidebarItems} /></EssLayout>}>
+          <Route path="/app/ess" element={<EssLayout />}>
             <Route index element={<Navigate to="/app/ess/dashboard" replace />} />
             <Route path="dashboard" element={<EssDashboardPage />} />
             <Route path="schedule" element={<EssSchedulePage />} />

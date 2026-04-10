@@ -357,5 +357,14 @@
       "settingsLabel": "Push",
       "settingsBlocked": "Notifications push bloquées dans le navigateur"
     }
+  },
+  "mobile": {
+    "back": "Retour",
+    "close": "Fermer",
+    "done": "Terminé",
+    "cancel": "Annuler",
+    "sheet": {
+      "dragHint": "Glissez vers le bas pour fermer"
+    }
   }
 }

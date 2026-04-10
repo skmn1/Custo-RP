@@ -364,5 +364,14 @@
       "settingsLabel": "Push",
       "settingsBlocked": "Push notifications blocked in browser"
     }
+  },
+  "mobile": {
+    "back": "Back",
+    "close": "Close",
+    "done": "Done",
+    "cancel": "Cancel",
+    "sheet": {
+      "dragHint": "Swipe down to close"
+    }
   }
 }
