@@ -2,9 +2,11 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useEssAttendance } from '../../hooks/useEssAttendance';
 import { useEssConnectivity } from '../../contexts/EssConnectivityContext';
+import { useMobileLayout } from '../../hooks/useMobileLayout';
 import StaleDataIndicator from '../../components/ess/StaleDataIndicator';
 import EssOfflineFallback from '../../components/ess/EssOfflineFallback';
 import OfflineDisabled from '../../components/ess/OfflineDisabled';
+import MobileAttendance from '../../components/ess/attendance/MobileAttendance';
 
 // ─── Status badge colors ────────────────────────────────────
 
@@ -42,6 +44,7 @@ function formatMonthLabel(dateStr) {
 // ─── Main component ─────────────────────────────────────────
 
 const EssAttendancePage = () => {
+  const isMobile = useMobileLayout();
   const { t } = useTranslation('ess');
   const {
     records,
@@ -53,6 +56,8 @@ const EssAttendancePage = () => {
     exportCsv,
   } = useEssAttendance();
   const { isOnline } = useEssConnectivity();
+
+  if (isMobile) return <MobileAttendance />;
 
   const isCached = records?.__swCacheHit === true || summary?.__swCacheHit === true;
   const fetchedAt = records?.__swFetchedAt ?? summary?.__swFetchedAt ?? null;

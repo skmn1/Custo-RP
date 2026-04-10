@@ -417,6 +417,27 @@
       "downloadPdf": "Download PDF",
       "noPayslips": "No payslips yet",
       "paid": "Paid on {{date}}"
+    },
+    "attendance": {
+      "title": "Time",
+      "thisWeek": "This week",
+      "attendanceRate": "Attendance rate: {{rate}}%",
+      "daysPresent": "{{count}}/{{total}} days present",
+      "previousWeek": "Previous week",
+      "nextWeek": "Next week",
+      "present": "Present",
+      "late": "Late arrival",
+      "absent": "Absent",
+      "leave": "Leave",
+      "noRecord": "No record",
+      "approved": "approved",
+      "monthlySummary": "{{month}} summary",
+      "totalHours": "Total hours",
+      "lateArrivals": "Late arrivals",
+      "absences": "Absences",
+      "leaveTaken": "Leave taken",
+      "day": "{{count}} day",
+      "days": "{{count}} days"
     }
   }
 }

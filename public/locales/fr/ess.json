@@ -410,6 +410,27 @@
       "downloadPdf": "Télécharger le PDF",
       "noPayslips": "Aucune fiche de paie",
       "paid": "Payé le {{date}}"
+    },
+    "attendance": {
+      "title": "Temps",
+      "thisWeek": "Cette semaine",
+      "attendanceRate": "Taux de présence : {{rate}}%",
+      "daysPresent": "{{count}}/{{total}} jours présent",
+      "previousWeek": "Semaine précédente",
+      "nextWeek": "Semaine suivante",
+      "present": "Présent",
+      "late": "Arrivée tardive",
+      "absent": "Absent",
+      "leave": "Congé",
+      "noRecord": "Aucun enregistrement",
+      "approved": "approuvé",
+      "monthlySummary": "Résumé de {{month}}",
+      "totalHours": "Heures totales",
+      "lateArrivals": "Arrivées tardives",
+      "absences": "Absences",
+      "leaveTaken": "Congés pris",
+      "day": "{{count}} jour",
+      "days": "{{count}} jours"
     }
   }
 }
