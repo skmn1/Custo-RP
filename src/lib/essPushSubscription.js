@@ -91,7 +91,10 @@ export async function subscribeToPush() {
 export async function unsubscribeFromPush() {
   if (!('serviceWorker' in navigator)) return;
 
-  const registration = await navigator.serviceWorker.ready;
+  // Use getRegistration instead of .ready — .ready never resolves when the
+  // current page is outside the ESS SW scope (/app/ess/), which hangs logout.
+  const registration = await navigator.serviceWorker.getRegistration('/app/ess/');
+  if (!registration) return;
   const subscription = await registration.pushManager.getSubscription();
 
   if (subscription) {
@@ -116,7 +119,8 @@ export async function unsubscribeFromPush() {
 export async function getCurrentPushSubscription() {
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) return null;
   try {
-    const registration = await navigator.serviceWorker.ready;
+    const registration = await navigator.serviceWorker.getRegistration('/app/ess/');
+    if (!registration) return null;
     return registration.pushManager.getSubscription();
   } catch {
     return null;

@@ -165,8 +165,16 @@ export function AuthProvider({ children }) {
   const logout = useCallback(async () => {
     // Step 1: Wipe ESS PWA storage BEFORE clearing tokens so push unsubscribe
     // API call still has a valid auth token (Task 61)
-    const employeeId = user?.employee_id || null;
-    await essLogoutCleanup(employeeId);
+    // Wrapped in try/catch so a cleanup failure never blocks token removal.
+    try {
+      const employeeId = user?.employee_id || null;
+      await Promise.race([
+        essLogoutCleanup(employeeId),
+        new Promise((resolve) => setTimeout(resolve, 3000)),
+      ]);
+    } catch {
+      // Non-fatal — ensure logout always completes
+    }
 
     // Step 2: Invalidate the refresh token on the server
     const rt = localStorage.getItem('refreshToken');
