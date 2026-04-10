@@ -502,6 +502,16 @@
       "syncSuccess_plural": "{{count}} changes synced successfully",
       "syncFailed": "{{count}} change failed to sync. Tap to retry.",
       "syncFailed_plural": "{{count}} changes failed to sync. Tap to retry."
+    },
+    "install": {
+      "title": "Install Employee Portal",
+      "valueProp": "Access your schedule, payslips, and profile — even offline.",
+      "addToHomeScreen": "Add to Home Screen",
+      "notNow": "Not now",
+      "iosStep1": "Tap the share button",
+      "iosStep2": "Scroll down",
+      "iosStep3": "Tap \"Add to Home Screen\"",
+      "gotIt": "Got it"
     }
   }
 }

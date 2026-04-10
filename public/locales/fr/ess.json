@@ -495,6 +495,16 @@
       "syncSuccess_plural": "{{count}} modifications synchronisées",
       "syncFailed": "{{count}} modification non synchronisée. Appuyez pour réessayer.",
       "syncFailed_plural": "{{count}} modifications non synchronisées. Appuyez pour réessayer."
+    },
+    "install": {
+      "title": "Installer le Portail Employé",
+      "valueProp": "Consultez votre planning, vos fiches de paie et votre profil — même hors ligne.",
+      "addToHomeScreen": "Ajouter à l'écran d'accueil",
+      "notNow": "Pas maintenant",
+      "iosStep1": "Appuyez sur le bouton de partage",
+      "iosStep2": "Faites défiler vers le bas",
+      "iosStep3": "Appuyez sur « Sur l'écran d'accueil »",
+      "gotIt": "Compris"
     }
   }
 }

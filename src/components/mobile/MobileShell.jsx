@@ -5,15 +5,22 @@
  * Provides a sticky top bar, scrollable content area, and fixed bottom nav.
  * Uses CSS dvh for full viewport height, with vh fallback.
  */
+import { useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import { BottomNav } from './BottomNav';
 import { MobileTopBar } from './MobileTopBar';
 import ScreenTransition from './ScreenTransition';
 import { MobileOfflineBanner, useSyncToast } from './MobileOfflineIndicators';
+import MobileInstallPrompt from './MobileInstallPrompt';
+import { incrementVisitCount } from './MobileInstallPrompt';
 import '../../styles/mobile.css';
 
 const MobileShell = () => {
   const { toastElement } = useSyncToast();
+
+  useEffect(() => {
+    incrementVisitCount();
+  }, []);
 
   return (
     <div
@@ -29,6 +36,7 @@ const MobileShell = () => {
       <MobileOfflineBanner />
       <BottomNav />
       {toastElement}
+      <MobileInstallPrompt />
     </div>
   );
 };
