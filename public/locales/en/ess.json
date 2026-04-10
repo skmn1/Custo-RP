@@ -11,13 +11,44 @@
   },
   "dashboard": {
     "title": "My Dashboard",
+    "welcome": "Welcome back, {{firstName}}",
     "nextShift": "Next Shift",
     "hoursThisWeek": "Hours This Week",
     "pendingRequests": "Pending Requests",
     "latestPayslip": "Latest Payslip",
     "noUpcomingShift": "No upcoming shifts",
     "viewSchedule": "View schedule",
-    "viewPayslips": "View payslips"
+    "viewPayslips": "View payslips",
+    "stats": {
+      "shiftsThisWeek": "this week",
+      "lastPay": "last pay",
+      "hoursThisMonth": "this month",
+      "attendance": "attendance"
+    },
+    "upcomingShifts": {
+      "title": "Upcoming Shifts",
+      "empty": "No upcoming shifts scheduled.",
+      "viewAll": "View full schedule"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "empty": "No new notifications.",
+      "viewAll": "View all"
+    },
+    "latestPayslip": {
+      "title": "Latest Payslip",
+      "empty": "No payslips available yet.",
+      "restricted": "Payslip access is disabled by your organisation.",
+      "viewPayslip": "View payslip"
+    },
+    "profile": {
+      "title": "Profile",
+      "pendingRequests": "{{n}} pending request(s)",
+      "viewProfile": "View profile"
+    },
+    "quickAccess": "Quick Access",
+    "unableToLoad": "Unable to load",
+    "retry": "Retry"
   },
   "schedule": {
     "title": "My Schedule",

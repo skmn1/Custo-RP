@@ -11,13 +11,44 @@
   },
   "dashboard": {
     "title": "Mon tableau de bord",
+    "welcome": "Bon retour, {{firstName}}",
     "nextShift": "Prochain quart",
     "hoursThisWeek": "Heures cette semaine",
     "pendingRequests": "Demandes en attente",
     "latestPayslip": "Dernière fiche de paie",
     "noUpcomingShift": "Aucun quart à venir",
     "viewSchedule": "Voir le planning",
-    "viewPayslips": "Voir les fiches de paie"
+    "viewPayslips": "Voir les fiches de paie",
+    "stats": {
+      "shiftsThisWeek": "cette semaine",
+      "lastPay": "dernier salaire",
+      "hoursThisMonth": "ce mois",
+      "attendance": "présence"
+    },
+    "upcomingShifts": {
+      "title": "Prochains créneaux",
+      "empty": "Aucun créneau prévu.",
+      "viewAll": "Voir le planning complet"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "empty": "Aucune nouvelle notification.",
+      "viewAll": "Voir tout"
+    },
+    "latestPayslip": {
+      "title": "Dernière fiche de paie",
+      "empty": "Aucune fiche de paie disponible.",
+      "restricted": "L'accès aux fiches de paie est désactivé par votre organisation.",
+      "viewPayslip": "Voir la fiche de paie"
+    },
+    "profile": {
+      "title": "Profil",
+      "pendingRequests": "{{n}} demande(s) en attente",
+      "viewProfile": "Voir le profil"
+    },
+    "quickAccess": "Accès rapide",
+    "unableToLoad": "Impossible de charger",
+    "retry": "Réessayer"
   },
   "schedule": {
     "title": "Mon planning",
