@@ -2,6 +2,7 @@
   "candidates": {
     "title": "Candidats",
     "pipeline": "Pipeline des candidats",
+    "new": "Nouveau candidat",
     "newCandidate": "Nouveau candidat",
     "search": "Rechercher des candidats…",
     "empty": "Aucun candidat trouvé",
@@ -43,7 +44,9 @@
       "personalInfo": "Informations personnelles",
       "contractDetails": "Détails du contrat",
       "submit": "Créer le candidat",
-      "cancel": "Annuler"
+      "cancel": "Annuler",
+      "saving": "Création…",
+      "notesPlaceholder": "Notes internes…"
     },
     "detail": {
       "info": "Info",
@@ -52,7 +55,10 @@
       "personalInfo": "Informations personnelles",
       "contractDetails": "Détails du contrat",
       "statusPipeline": "Pipeline de statut",
-      "onboardingProgress": "Progression de l'intégration"
+      "onboardingProgress": "Progression de l'intégration",
+      "reject": "Rejeter",
+      "confirmReject": "Êtes-vous sûr de vouloir rejeter ce candidat ?",
+      "notFound": "Candidat introuvable"
     },
     "onboarding": {
       "title": "Étapes d'intégration",

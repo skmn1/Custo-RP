@@ -55,7 +55,7 @@ const CandidateDetailPage = () => {
   if (error || !candidate) {
     return (
       <div className="p-6 text-center text-red-500">
-        {error || 'Candidate not found'}
+        {error || t('candidates.detail.notFound')}
       </div>
     );
   }
@@ -85,7 +85,7 @@ const CandidateDetailPage = () => {
   const handleResend = async () => {
     try {
       await resendInvite();
-      setToast('Invitation re-sent to ' + candidate.email);
+      setToast(t('candidates.invite.resendSuccess', { email: candidate.email }));
       setTimeout(() => setToast(null), 5000);
     } catch (err) {
       setToast(err.message);
@@ -103,7 +103,7 @@ const CandidateDetailPage = () => {
   };
 
   const handleReject = async () => {
-    if (!window.confirm('Are you sure you want to reject this candidate?')) return;
+    if (!window.confirm(t('candidates.detail.confirmReject'))) return;
     try {
       await rejectCandidate();
     } catch (err) {
@@ -170,7 +170,7 @@ const CandidateDetailPage = () => {
                 onClick={handleReject}
                 className="px-3 py-1.5 text-xs font-medium rounded-lg border border-red-200 dark:border-red-700 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
               >
-                Reject
+                {t('candidates.detail.reject')}
               </button>
             </>
           )}
@@ -179,20 +179,20 @@ const CandidateDetailPage = () => {
 
       {/* Tabs */}
       <div className="flex gap-1 mb-6 bg-gray-100 dark:bg-gray-800 rounded-lg p-1 w-fit">
-        {TABS.map((t) => (
+        {TABS.map((tabKey) => (
           <button
-            key={t}
-            onClick={() => setTab(t)}
-            className={`px-4 py-1.5 text-xs font-medium rounded-md transition-colors capitalize ${
-              tab === t
+            key={tabKey}
+            onClick={() => setTab(tabKey)}
+            className={`px-4 py-1.5 text-xs font-medium rounded-md transition-colors ${
+              tab === tabKey
                 ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm'
                 : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'
             }`}
           >
-            {t === 'info' && <UserCircleIcon className="w-3.5 h-3.5 inline mr-1" />}
-            {t === 'onboarding' && <ClipboardDocumentCheckIcon className="w-3.5 h-3.5 inline mr-1" />}
-            {t === 'documents' && <FolderIcon className="w-3.5 h-3.5 inline mr-1" />}
-            {t}
+            {tabKey === 'info' && <UserCircleIcon className="w-3.5 h-3.5 inline mr-1" />}
+            {tabKey === 'onboarding' && <ClipboardDocumentCheckIcon className="w-3.5 h-3.5 inline mr-1" />}
+            {tabKey === 'documents' && <FolderIcon className="w-3.5 h-3.5 inline mr-1" />}
+            {t(`candidates.detail.${tabKey}`)}
           </button>
         ))}
       </div>
@@ -235,7 +235,7 @@ function InfoTab({ candidate, onStatusAdvance, t }) {
       {/* Status pipeline */}
       <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5">
         <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
-          Status Pipeline
+          {t('candidates.detail.statusPipeline')}
         </h3>
         <div className="flex items-center gap-1 overflow-x-auto pb-2">
           {PIPELINE.map((status, idx) => (
@@ -269,7 +269,7 @@ function InfoTab({ candidate, onStatusAdvance, t }) {
         {/* Personal information */}
         <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5">
           <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
-            Personal Information
+            {t('candidates.detail.personalInfo')}
           </h3>
           <dl className="space-y-2.5 text-sm">
             <InfoRow label={t('candidates.fields.firstName')} value={candidate.firstName} />
@@ -282,7 +282,7 @@ function InfoTab({ candidate, onStatusAdvance, t }) {
         {/* Contract details */}
         <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5">
           <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
-            Contract Details
+            {t('candidates.detail.contractDetails')}
           </h3>
           <dl className="space-y-2.5 text-sm">
             <InfoRow label={t('candidates.fields.positionTitle')} value={candidate.positionTitle} />
@@ -313,7 +313,7 @@ function InfoTab({ candidate, onStatusAdvance, t }) {
       {/* Onboarding progress summary */}
       <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5">
         <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
-          Onboarding Progress
+          {t('candidates.detail.onboardingProgress')}
         </h3>
         <OnboardingProgress steps={candidate.steps || []} />
       </div>

@@ -7,14 +7,14 @@ import CandidateStatusBadge from '../../components/hr/CandidateStatusBadge';
 import OnboardingProgress from '../../components/hr/OnboardingProgress';
 
 const STATUS_TABS = [
-  { key: null,                 label: 'All' },
-  { key: 'new',               label: 'candidates.status.new' },
-  { key: 'invited',           label: 'candidates.status.invited' },
-  { key: 'documents_pending', label: 'candidates.status.documents_pending' },
-  { key: 'under_review',      label: 'candidates.status.under_review' },
-  { key: 'approved',          label: 'candidates.status.approved' },
-  { key: 'activated',         label: 'candidates.status.activated' },
-  { key: 'rejected',          label: 'candidates.status.rejected' },
+  { key: null,                 labelKey: 'candidates.status.all' },
+  { key: 'new',               labelKey: 'candidates.status.new' },
+  { key: 'invited',           labelKey: 'candidates.status.invited' },
+  { key: 'documents_pending', labelKey: 'candidates.status.documents_pending' },
+  { key: 'under_review',      labelKey: 'candidates.status.under_review' },
+  { key: 'approved',          labelKey: 'candidates.status.approved' },
+  { key: 'activated',         labelKey: 'candidates.status.activated' },
+  { key: 'rejected',          labelKey: 'candidates.status.rejected' },
 ];
 
 function formatDate(iso) {
@@ -77,7 +77,7 @@ const CandidatePipelinePage = () => {
                 : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
             }`}
           >
-            {tab.key ? t(tab.label, tab.key) : 'All'}
+            {t(tab.labelKey)}
           </button>
         ))}
       </div>
@@ -89,7 +89,7 @@ const CandidatePipelinePage = () => {
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search candidates…"
+          placeholder={t('candidates.search')}
           className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400"
         />
       </div>
@@ -103,7 +103,7 @@ const CandidatePipelinePage = () => {
         <div className="text-center py-16 text-red-500 text-sm">{error}</div>
       ) : filtered.length === 0 ? (
         <div className="text-center py-16 text-gray-400 text-sm">
-          No candidates found.
+          {t('candidates.empty')}
         </div>
       ) : (
         <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden">
@@ -112,25 +112,25 @@ const CandidatePipelinePage = () => {
               <thead>
                 <tr className="bg-gray-50 dark:bg-gray-700/50">
                   <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Name
+                    {t('candidates.table.name')}
                   </th>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden md:table-cell">
-                    Position
+                    {t('candidates.table.position')}
                   </th>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden lg:table-cell">
-                    Contract
+                    {t('candidates.table.contract')}
                   </th>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden lg:table-cell">
-                    Start Date
+                    {t('candidates.table.startDate')}
                   </th>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Status
+                    {t('candidates.table.status')}
                   </th>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden sm:table-cell">
-                    Progress
+                    {t('candidates.table.progress')}
                   </th>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider hidden xl:table-cell">
-                    Updated
+                    {t('candidates.table.updated')}
                   </th>
                 </tr>
               </thead>

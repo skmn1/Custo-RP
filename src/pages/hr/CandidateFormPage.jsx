@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { UserPlusIcon } from '@heroicons/react/24/outline';
 import { useCandidates } from '../../hooks/useCandidates';
 
-const CONTRACT_TYPES = ['cdi', 'cdd', 'interim', 'apprenticeship', 'internship'];
+const CONTRACT_TYPES = ['CDI', 'CDD', 'interim', 'apprenticeship', 'internship'];
 
 const INITIAL = {
   firstName: '',
@@ -13,7 +13,7 @@ const INITIAL = {
   phone: '',
   positionTitle: '',
   department: '',
-  contractType: 'cdi',
+  contractType: 'CDI',
   plannedStartDate: '',
   grossSalary: '',
   probationEndDate: '',
@@ -74,7 +74,7 @@ const CandidateFormPage = () => {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Personal info */}
         <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5">
-          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">Personal Information</h3>
+          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">{t('candidates.form.personalInfo')}</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field label={t('candidates.fields.firstName')} name="firstName" value={form.firstName} onChange={handleChange} required />
             <Field label={t('candidates.fields.lastName')} name="lastName" value={form.lastName} onChange={handleChange} required />
@@ -85,7 +85,7 @@ const CandidateFormPage = () => {
 
         {/* Contract info */}
         <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5">
-          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">Contract Details</h3>
+          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">{t('candidates.form.contractDetails')}</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field label={t('candidates.fields.positionTitle')} name="positionTitle" value={form.positionTitle} onChange={handleChange} required />
             <Field label={t('candidates.fields.department')} name="department" value={form.department} onChange={handleChange} />
@@ -125,7 +125,7 @@ const CandidateFormPage = () => {
             onChange={handleChange}
             rows={3}
             className="w-full text-sm px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 resize-none"
-            placeholder="Internal notes…"
+            placeholder={t('candidates.form.notesPlaceholder')}
           />
         </div>
 
@@ -136,14 +136,14 @@ const CandidateFormPage = () => {
             onClick={() => navigate('/app/hr/candidates')}
             className="px-4 py-2 text-sm font-medium rounded-lg border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
           >
-            Cancel
+            {t('candidates.form.cancel')}
           </button>
           <button
             type="submit"
             disabled={saving}
             className="px-4 py-2 text-sm font-semibold rounded-lg bg-green-600 text-white hover:bg-green-700 disabled:opacity-50 transition-colors"
           >
-            {saving ? 'Creating…' : t('candidates.new')}
+            {saving ? t('candidates.form.saving') : t('candidates.form.submit')}
           </button>
         </div>
       </form>

@@ -42,6 +42,7 @@ import {
   KeyIcon as KeyOutline,
   ServerIcon as ServerOutline,
   BellIcon as BellOutline,
+  UserPlusIcon as UserPlusOutline,
 } from '@heroicons/react/24/outline';
 
 import {
@@ -84,6 +85,7 @@ import {
   KeyIcon as KeySolid,
   ServerIcon as ServerSolid,
   BellIcon as BellSolid,
+  UserPlusIcon as UserPlusSolid,
 } from '@heroicons/react/24/solid';
 
 const outlineMap = {
@@ -126,6 +128,7 @@ const outlineMap = {
   KeyIcon: KeyOutline,
   ServerIcon: ServerOutline,
   BellIcon: BellOutline,
+  UserPlusIcon: UserPlusOutline,
 };
 
 const solidMap = {
@@ -168,6 +171,7 @@ const solidMap = {
   KeyIcon: KeySolid,
   ServerIcon: ServerSolid,
   BellIcon: BellSolid,
+  UserPlusIcon: UserPlusSolid,
 };
 
 export function getIconComponent(iconName, variant = 'outline') {

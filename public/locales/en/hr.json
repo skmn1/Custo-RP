@@ -2,6 +2,7 @@
   "candidates": {
     "title": "Candidates",
     "pipeline": "Candidate Pipeline",
+    "new": "New Candidate",
     "newCandidate": "New Candidate",
     "search": "Search candidates…",
     "empty": "No candidates found",
@@ -43,7 +44,9 @@
       "personalInfo": "Personal Information",
       "contractDetails": "Contract Details",
       "submit": "Create Candidate",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "saving": "Creating…",
+      "notesPlaceholder": "Internal notes…"
     },
     "detail": {
       "info": "Info",
@@ -52,7 +55,10 @@
       "personalInfo": "Personal Information",
       "contractDetails": "Contract Details",
       "statusPipeline": "Status Pipeline",
-      "onboardingProgress": "Onboarding Progress"
+      "onboardingProgress": "Onboarding Progress",
+      "reject": "Reject",
+      "confirmReject": "Are you sure you want to reject this candidate?",
+      "notFound": "Candidate not found"
     },
     "onboarding": {
       "title": "Onboarding Steps",
