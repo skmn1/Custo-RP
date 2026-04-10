@@ -291,5 +291,25 @@
     "uploadFailed": "Échec du téléchargement. Formats acceptés : PDF, JPEG, PNG.",
     "fileTooLarge": "Le fichier dépasse la taille maximale autorisée.",
     "invalidFieldName": "Le champ spécifié n'est pas modifiable."
+  },
+  "pwa": {
+    "installBanner": {
+      "ariaLabel": "Bannière d'installation de l'application",
+      "title": "Installer Mon Portail Employé",
+      "subtitle": "Ajoutez cette application à l'écran d'accueil",
+      "installButton": "Installer",
+      "dismissAriaLabel": "Fermer l'invite d'installation"
+    },
+    "iosSheet": {
+      "ariaLabel": "Instructions d'installation iOS",
+      "title": "Installer Mon Portail Employé",
+      "subtitle": "Ajouter à l'écran d'accueil",
+      "step1": "Appuyez sur",
+      "shareButton": "Partager",
+      "step1Suffix": "dans Safari",
+      "step2": "Sélectionnez",
+      "addToHomeScreen": "Sur l'écran d'accueil",
+      "step3": "Appuyez sur Ajouter pour confirmer"
+    }
   }
 }

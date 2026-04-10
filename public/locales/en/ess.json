@@ -300,5 +300,25 @@
     "uploadFailed": "File upload failed. Accepted formats: PDF, JPEG, PNG.",
     "fileTooLarge": "File exceeds the maximum allowed size.",
     "invalidFieldName": "The specified field is not editable."
+  },
+  "pwa": {
+    "installBanner": {
+      "ariaLabel": "Install app banner",
+      "title": "Install Employee Portal",
+      "subtitle": "Add to your home screen for quick access",
+      "installButton": "Install",
+      "dismissAriaLabel": "Dismiss install prompt"
+    },
+    "iosSheet": {
+      "ariaLabel": "iOS install instructions",
+      "title": "Install Employee Portal",
+      "subtitle": "Add to your home screen",
+      "step1": "Tap the",
+      "shareButton": "Share",
+      "step1Suffix": "button in Safari",
+      "step2": "Select",
+      "addToHomeScreen": "Add to Home Screen",
+      "step3": "Tap Add to confirm"
+    }
   }
 }
