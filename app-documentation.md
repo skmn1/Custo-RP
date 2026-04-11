@@ -1831,3 +1831,60 @@ export const Icon = ({ name, filled = false, className = '' }) => (
 ```
 
 **Key icon names:** `home`, `calendar_today`, `pending_actions`, `person`, `notifications`, `payments`, `download`, `swap_horiz`, `timer`, `calendar_month`, `health_and_safety`, `event_repeat`, `campaign`, `location_on`, `trending_up`, `arrow_forward`, `chevron_left`, `more_vert`
+
+
+---
+
+## Navigation Shell — ESS Bottom Nav (Task 78, Sprint 22)
+
+**Introduced:** April 11, 2026  
+**Component:** `src/components/mobile/BottomNav.jsx`  
+**Shell:** `src/components/mobile/MobileShell.jsx`
+
+### 4-Tab Structure
+
+| Tab | Icon (Material Symbol) | Route | Active when |
+|-----|----------------------|-------|-------------|
+| Home | `home` (filled when active) | `/app/ess/dashboard` | `pathname.startsWith('/app/ess/dashboard')` |
+| Schedule | `calendar_today` (filled when active) | `/app/ess/schedule` | `pathname.startsWith('/app/ess/schedule')` |
+| Requests | `pending_actions` (filled when active) | `/app/ess/requests` | `pathname.startsWith('/app/ess/requests')` |
+| Profile | `person` (filled when active) | `/app/ess/profile` | `pathname.startsWith('/app/ess/profile')` |
+
+Secondary routes (no tab — accessible via cards/top-bar):
+- `/app/ess/payroll` — Payroll Hub (linked from Dashboard)
+- `/app/ess/payroll/:id` — Payslip Detail
+- `/app/ess/notifications` — Notification Centre (linked from top-bar bell)
+
+### Active State Behaviour
+
+- **Active icon:** Material Symbol with `fontVariationSettings: "'FILL' 1"` — solid/filled appearance  
+- **Active colour:** `#da336b` (Magenta primary)  
+- **Active background:** `bg-[#ffdae2] rounded-xl px-3 py-1` (primary-container pill)  
+- **Inactive icon:** Material Symbol default (outlined, `'FILL' 0`)  
+- **Inactive colour:** `text-zinc-500`  
+- **Labels:** Permanent on all tabs (11px semibold uppercase)
+
+### Safe Area
+
+`pb-safe` (`env(safe-area-inset-bottom)`) is applied via the `pb-safe` utility class defined in `src/styles/mobile.css`. Main content padding uses `pb-32` to clear the frosted nav bar + safe area on all devices.
+
+### Accessibility
+
+- `role="navigation"` + `aria-label` (from `mobile.nav.label` i18n key)
+- `aria-current="page"` on the active `NavLink`
+- Each tab is a `NavLink` with visible label — no icon-only buttons
+
+### i18n Keys (`ess` namespace, `mobile.nav` section)
+
+| Key | EN | FR |
+|-----|----|----|
+| `mobile.nav.label` | "Main navigation" | "Navigation principale" |
+| `mobile.nav.dashboard` | "Home" | "Accueil" |
+| `mobile.nav.schedule` | "Schedule" | "Planning" |
+| `mobile.nav.requests` | "Requests" | "Demandes" |
+| `mobile.nav.profile` | "Profile" | "Profil" |
+| `mobile.nav.notifications` | "Alerts" | "Alertes" |
+
+### Desktop Behaviour
+
+`<BottomNav>` is rendered inside `<MobileShell>`, which is only mounted at viewports `< 1024px`. Desktop layouts use the sidebar navigation — the bottom nav is never visible at ≥ 1024px.

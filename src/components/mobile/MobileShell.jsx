@@ -28,7 +28,8 @@ const MobileShell = () => {
       data-testid="mobile-shell"
     >
       <MobileTopBar />
-      <main className="flex-1 overflow-y-auto pb-20" data-testid="mobile-content">
+      <main className="flex-1 overflow-y-auto pb-32 pt-16" data-testid="mobile-content">
+        {/* pt-16 clears the fixed top bar (h-16); pb-32 clears the bottom nav + safe area */}
         <ScreenTransition>
           <Outlet />
         </ScreenTransition>

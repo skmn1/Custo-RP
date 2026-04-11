@@ -1,27 +1,20 @@
 /**
- * BottomNav — Task 64 (B.2)
+ * BottomNav — Task 64 (B.2) / Task 78 (Nexus Kinetic, 4-tab)
  *
- * Fixed bottom tab bar with 5 primary tabs. Uses frosted-glass background,
- * brand tint for active state, and respects safe area insets via pb-safe.
+ * Fixed bottom tab bar with 4 primary tabs: Home, Schedule, Requests, Profile.
+ * Frosted-glass white background, Magenta (#da336b) active state with pill bg,
+ * outline Material Symbol for inactive / filled for active.
+ * Permanent labels on all tabs. Safe-area inset respected via pb-safe.
  * Tapping the already-active tab scrolls content to top (iOS convention).
  */
 import { NavLink, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import {
-  HomeIcon,
-  CalendarDaysIcon,
-  DocumentTextIcon,
-  ClockIcon,
-  UserCircleIcon,
-} from '@heroicons/react/24/outline';
-import { QueuedBadge } from './MobileOfflineIndicators';
 
 const TAB_ITEMS = [
-  { id: 'dashboard',  label: 'mobile.nav.dashboard',  icon: HomeIcon,          to: '/app/ess/dashboard' },
-  { id: 'schedule',   label: 'mobile.nav.schedule',   icon: CalendarDaysIcon,  to: '/app/ess/schedule' },
-  { id: 'payslips',   label: 'mobile.nav.payslips',   icon: DocumentTextIcon,  to: '/app/ess/payslips' },
-  { id: 'attendance', label: 'mobile.nav.attendance',  icon: ClockIcon,         to: '/app/ess/attendance' },
-  { id: 'profile',    label: 'mobile.nav.profile',    icon: UserCircleIcon,    to: '/app/ess/profile' },
+  { id: 'dashboard', label: 'mobile.nav.dashboard', icon: 'home',            to: '/app/ess/dashboard' },
+  { id: 'schedule',  label: 'mobile.nav.schedule',  icon: 'calendar_today',  to: '/app/ess/schedule'  },
+  { id: 'requests',  label: 'mobile.nav.requests',  icon: 'pending_actions', to: '/app/ess/requests'  },
+  { id: 'profile',   label: 'mobile.nav.profile',   icon: 'person',          to: '/app/ess/profile'   },
 ];
 
 export const BottomNav = () => {
@@ -42,55 +35,49 @@ export const BottomNav = () => {
     <nav
       role="navigation"
       aria-label={t('mobile.nav.label')}
-      className="fixed bottom-0 left-0 right-0 z-50 pb-safe"
-      style={{
-        backgroundColor: 'var(--mobile-tab-bg)',
-        borderTop: '1px solid var(--mobile-tab-border)',
-      }}
+      className="
+        fixed bottom-0 left-0 w-full z-50
+        flex justify-around items-center
+        px-4 pb-6 pt-2
+        bg-white/80 backdrop-blur-md
+        border-t border-zinc-200
+        rounded-t-xl
+        shadow-[0_-2px_10px_rgba(0,0,0,0.05)]
+        pb-safe
+      "
       data-testid="mobile-tab-bar"
     >
-      <div className="flex justify-around items-center h-14 max-w-lg mx-auto">
-        {TAB_ITEMS.map(({ id, label, icon: Icon, to }) => {
-          const isActive = location.pathname.startsWith(to);
-          return (
-            <NavLink
-              key={id}
-              to={to}
-              onClick={(e) => handleTabClick(to, e)}
-              className="relative flex flex-col items-center justify-center flex-1 min-h-[44px]"
-              aria-label={t(label)}
-              aria-current={isActive ? 'page' : undefined}
-              data-testid={`mobile-tab-${id}`}
+      {TAB_ITEMS.map(({ id, label, icon, to }) => {
+        const active = location.pathname.startsWith(to);
+        return (
+          <NavLink
+            key={id}
+            to={to}
+            onClick={(e) => handleTabClick(to, e)}
+            aria-current={active ? 'page' : undefined}
+            data-testid={`mobile-tab-${id}`}
+            className={`
+              flex flex-col items-center justify-center min-h-[44px] min-w-[44px]
+              transition-all duration-200 active:translate-y-0.5
+              ${active
+                ? 'text-[#da336b] bg-[#ffdae2] rounded-xl px-3 py-1'
+                : 'text-zinc-500 hover:text-[#da336b] px-4 py-1.5'
+              }
+            `}
+          >
+            <span
+              className="material-symbols-outlined mb-0.5"
+              style={active ? { fontVariationSettings: "'FILL' 1" } : undefined}
+              aria-hidden="true"
             >
-              {id === 'profile' && <QueuedBadge />}
-              {/* Soft pill behind the active icon */}
-              {isActive && (
-                <span
-                  className="absolute top-1 h-9 w-11 rounded-full"
-                  style={{ backgroundColor: 'var(--mobile-tab-active-pill)' }}
-                />
-              )}
-              <Icon
-                className="h-6 w-6 relative z-10 transition-colors duration-150"
-                style={{
-                  color: isActive
-                    ? 'var(--mobile-tab-active-icon)'
-                    : 'var(--mobile-tab-inactive)',
-                }}
-              />
-              {/* Label visible only for active tab */}
-              {isActive && (
-                <span
-                  className="text-[11px] font-semibold mt-0.5 leading-none"
-                  style={{ color: 'var(--mobile-tab-active-label)' }}
-                >
-                  {t(label)}
-                </span>
-              )}
-            </NavLink>
-          );
-        })}
-      </div>
+              {icon}
+            </span>
+            <span className="text-[11px] font-semibold tracking-wide uppercase leading-none">
+              {t(label)}
+            </span>
+          </NavLink>
+        );
+      })}
     </nav>
   );
 };
