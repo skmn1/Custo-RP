@@ -7,6 +7,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useSettings } from '../hooks/useSettings';
 import { useDarkMode } from '../hooks/useDarkMode';
 import NotificationBell from './ess/NotificationBell';
+import UserAvatar from './UserAvatar';
 
 // Fallback role permissions when navItems haven't loaded from API yet
 const ROLE_NAV_PERMISSIONS = {
@@ -281,9 +282,7 @@ const Navbar = () => {
                 className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 p-2 rounded-lg hover:bg-gray-50 transition-all duration-200"
                 aria-label={t('common:nav.profile')}
               >
-                <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center text-sm font-semibold text-indigo-700">
-                  {user ? `${user.firstName?.[0] || ''}${user.lastName?.[0] || ''}` : '??'}
-                </div>
+                <UserAvatar user={user} size={32} className="w-8 h-8" />
                 <span className="text-sm font-medium hidden lg:block">
                   {user ? `${user.firstName} ${user.lastName}` : ''}
                 </span>
