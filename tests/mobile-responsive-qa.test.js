@@ -499,24 +499,23 @@ describe('App.jsx — all Sprint 22 routes registered', () => {
   const routes = [
     ['dashboard', 'EssDashboardPage'],
     ['schedule', 'EssSchedulePage'],
-    ['payroll', 'MobilePayrollHubPage'],
-    ['payroll/history', 'MobilePayslipHistoryPage'],
-    ['requests', 'MobileRequestsPage'],
-    ['profile', 'MobileProfilePage'],
-    ['profile/edit', 'MobileEditProfilePage'],
-    ['notifications', 'MobileNotificationsPage'],
+    ['payslips', 'EssPayslipsPage'],
+    ['requests', 'EssRequestsPage'],
+    ['attendance', 'EssAttendancePage'],
+    ['profile', 'EssProfilePage'],
+    ['notifications', 'EssNotificationsPage'],
   ];
 
   for (const [routePath, component] of routes) {
-    it(`route "${routePath}" delivers ${component}`, () => {
+    it(`route "${routePath}" delivers ${component} (web page with mobile conditionals)`, () => {
       expect(src).toContain(`path="${routePath}"`);
-      expect(src).toContain(component);
+      expect(src).toContain(`element={<${component}`);
     });
   }
 
   it('EssDashboardPage internally uses MobileDashboardPage on mobile', () => {
     const dashSrc = readSrc('src/pages/ess/EssDashboardPage.jsx');
-    expect(dashSrc).toContain('MobileDashboardPage');
+    expect(dashSrc).toContain('MobileDashboard');
     expect(dashSrc).toContain('isMobile');
   });
 

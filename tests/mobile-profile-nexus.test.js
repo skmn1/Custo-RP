@@ -550,27 +550,36 @@ describe('App.jsx profile routes', () => {
     'utf8'
   );
 
-  it('imports MobileProfilePage', () => {
-    expect(src).toContain('MobileProfilePage');
+  it('imports EssProfilePage (web page with mobile conditionals)', () => {
+    expect(src).toContain('EssProfilePage');
   });
 
-  it('imports MobileEditProfilePage', () => {
-    expect(src).toContain('MobileEditProfilePage');
+  it('does NOT import MobileProfilePage as a direct route', () => {
+    // MobileProfilePage should not be a direct import for routes
+    // Instead, EssProfilePage has internal useMobileLayout() to render MobileProfile
+    const hasDirectMobileImport = src.match(/import.*MobileProfilePage.*from.*'\.\/.*Page'/);
+    expect(hasDirectMobileImport).toBeNull();
   });
 
-  it('has profile route pointing to MobileProfilePage', () => {
-    expect(src).toContain('element={<MobileProfilePage />}');
+  it('does NOT import MobileEditProfilePage as a direct route', () => {
+    // Edit profile handled within EssProfilePage
+    const hasDirectMobileEditImport = src.match(/import.*MobileEditProfilePage/);
+    expect(hasDirectMobileEditImport).toBeNull();
   });
 
-  it('has profile/edit route pointing to MobileEditProfilePage', () => {
-    expect(src).toContain('path="profile/edit"');
-    expect(src).toContain('element={<MobileEditProfilePage />}');
+  it('has profile route pointing to EssProfilePage', () => {
+    expect(src).toContain('element={<EssProfilePage />}');
   });
 
-  it('no longer uses EssProfilePage for profile route', () => {
-    // The profile path should now map to MobileProfilePage, not EssProfilePage
-    // EssProfilePage may still be imported for other use but not as the profile route element
+  it('does NOT have separate profile/edit route (handled by EssProfilePage)', () => {
+    // Profile edit is now handled within EssProfilePage, not as separate route
+    expect(src).not.toContain('path="profile/edit"');
+  });
+
+  it('App routing uses web pages, not mobile-only pages', () => {
+    // The profile path should map to EssProfilePage, not MobileProfilePage
+    // EssProfilePage has conditional rendering for mobile/web
     const profileRouteMatch = src.match(/path="profile"\s+element=\{<([^>]+)>/);
-    expect(profileRouteMatch?.[1]).toContain('MobileProfilePage');
+    expect(profileRouteMatch?.[1]).toContain('EssProfilePage');
   });
 });
