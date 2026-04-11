@@ -2093,3 +2093,116 @@ New keys in both `en/ess.json` and `fr/ess.json`:
 - Leave bar `%` calculation (0%, 57%, 100%, overflow cap, null/undefined)
 - EN/FR i18n key presence and interpolation placeholder checks
 - Source structural assertions: testids, aria attributes, routes, gradient colours, scroll classes
+
+---
+
+## Work Schedule — ESS Nexus Kinetic (Task 81)
+
+**Screen:** SCREEN_103  
+**Route:** `/app/ess/schedule` (inside `<EssLayout>`)  
+**File:** `src/pages/ess/mobile/MobileSchedulePage.jsx`  
+**Branch:** `feature/81-ess-mobile-schedule`
+
+### Layout
+
+Single-column scroll. Calendar picker at top, shift list below.
+
+### Components
+
+| Component | Purpose |
+|---|---|
+| `ScheduleCalendar` | Monthly grid, previous/next month nav, shift dots, selected day fill |
+| `ShiftList` | Filters `shifts[]` to `selectedDate`, renders empty state or list |
+| `ShiftCard` | Individual shift — date box, time, role, location tag, Request Swap CTA |
+| `MobileScheduleSkeleton` | Pulse placeholders while loading |
+
+### Monthly Calendar Grid
+
+Helper `buildMonthGrid(monthDate)`:
+- Returns an array padded to full ISO weeks (Mon – Sun)
+- Padding cells are `null` (rendered as empty `gridcell` with `aria-hidden`)
+- Length is always a multiple of 7
+
+Day cell states:
+
+| State | Visual |
+|---|---|
+| Selected | `bg-primary text-on-primary shadow-lg` |
+| Today (not selected) | `ring-2 ring-primary text-primary font-bold` |
+| Has shift | Magenta 4px dot at `bottom-1` (`bg-primary`, white when selected) |
+| Out-of-month | `text-outline/40` (dimmed) |
+| Default | `text-on-surface hover:bg-surface-container` |
+
+Accessibility: each day button has `aria-label` with full date string, `aria-pressed={isSelected}`, `aria-current="date"` on today.  
+Calendar container: `role="grid"` + `aria-label`. Day cells: `role="gridcell"`.
+
+### Month Navigation
+
+Delegated to `useEssSchedule()` hook:
+- `navigatePrev` / `navigateNext` change the hook's `anchor` date
+- Hook is set to `viewMode='month'` so it fetches the full calendar month range: `GET /api/ess/schedule?from=YYYY-MM-01&to=YYYY-MM-DD`
+- Month title uses `Intl.DateTimeFormat` with `aria-live="polite" aria-atomic="true"`
+
+### Shift Card
+
+| Element | Detail |
+|---|---|
+| Left accent bar | Magenta gradient for today's shifts; muted grey for future |
+| Date box | Square tile (`w-14 h-14`) with day number + month abbr in `text-primary` |
+| Time range | `startTime – endTime · duration` with `schedule` Material Symbol |
+| Role | `text-on-surface-variant` below time |
+| Location | `location_on` Material Symbol icon + `locationName ?? location` field |
+| Status badge | `confirmed` → `bg-primary-container/40 text-primary`; `pending` → `bg-primary-fixed/50`; others → error |
+| Request Swap | Magenta filled button — navigates to swap flow (placeholder, logs to console in this sprint) |
+
+### Empty State
+
+`event_available` icon + `mobile.schedule.noShifts` text, neutral card `bg-surface-container-lowest`.
+
+### Desktop Coexistence
+
+`EssSchedulePage.jsx` checks `useMobileLayout()` (1024px breakpoint):
+- Mobile → `<MobileSchedulePage />`
+- Desktop → existing `ScheduleHeader / WeekView / MonthView` (task 49, unchanged)
+
+All hooks (`useEssSchedule`, `useEssConnectivity`, `useMobileLayout`) are called at the top of `EssSchedulePage` before any conditional return to comply with React's rules of hooks.
+
+### i18n Keys Added (`mobile.schedule`)
+
+New keys in both `en/ess.json` and `fr/ess.json`:
+
+| Key | EN | FR |
+|---|---|---|
+| `title` | Work Schedule | Planning |
+| `workforceLabel` | Workforce Management | Gestion du personnel |
+| `previousMonth` | Previous month | Mois précédent |
+| `nextMonth` | Next month | Mois suivant |
+| `calendarLabel` | Monthly shift calendar | Calendrier mensuel des quarts |
+| `today` | Today | Aujourd'hui |
+| `noShifts` | No shifts scheduled for this day | Aucun quart prévu ce jour |
+| `shiftSingular` | shift | quart |
+| `shiftPlural` | shifts | quarts |
+| `requestSwap` | Request Swap | Demander un échange |
+| `statusConfirmed` | Confirmed | Confirmé |
+| `statusPending` | Pending | En attente |
+| `statusSwapRequested` | Swap Requested | Échange demandé |
+
+### Accessibility Checklist
+
+- [x] Calendar `role="grid"`, day cells `role="gridcell"`
+- [x] Selected day: `aria-pressed={isSelected}`
+- [x] Today: `aria-current="date"`
+- [x] Month heading: `aria-live="polite" aria-atomic="true"`
+- [x] Month nav buttons: `aria-label` from i18n
+- [x] Shift cards: accessible `aria-label` on Request Swap including date
+- [x] All decorative icons: `aria-hidden="true"`
+
+### Unit Tests
+
+`tests/mobile-schedule-nexus.test.js` — 62 tests:
+- `buildMonthGrid()`: cell count, Monday-first padding, April 2026 layout, Feb/Jan
+- `toDateString()`: ISO format, zero-padding, year-end
+- ShiftList filtering: multi-shift days, ISO datetime strings, null guards
+- Shift dot Set construction
+- EN/FR i18n key presence and value checks
+- Source structural assertions: testids, aria attributes, Material Symbols, hook imports

@@ -24,8 +24,11 @@ import ReadOnlyBanner from '../../components/ess/schedule/ReadOnlyBanner';
 import { useEssConnectivity } from '../../contexts/EssConnectivityContext';
 import EssOfflineFallback from '../../components/ess/EssOfflineFallback';
 import StaleDataIndicator from '../../components/ess/StaleDataIndicator';
+import { useMobileLayout } from '../../hooks/useMobileLayout';
+import { MobileSchedulePage } from './mobile/MobileSchedulePage';
 
 const EssSchedulePage = () => {
+  const isMobile = useMobileLayout();
   const { isOnline } = useEssConnectivity();
   const {
     shifts,
@@ -41,6 +44,9 @@ const EssSchedulePage = () => {
     isCached,
     fetchedAt,
   } = useEssSchedule();
+
+  // Task 81: Nexus Kinetic mobile schedule replaces the sprint-19 week strip on mobile
+  if (isMobile) return <MobileSchedulePage />;
 
   return (
     <div>

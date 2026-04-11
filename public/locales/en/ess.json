@@ -527,6 +527,21 @@
       "iosStep2": "Scroll down",
       "iosStep3": "Tap \"Add to Home Screen\"",
       "gotIt": "Got it"
+    },
+    "schedule": {
+      "title": "Work Schedule",
+      "workforceLabel": "Workforce Management",
+      "previousMonth": "Previous month",
+      "nextMonth": "Next month",
+      "calendarLabel": "Monthly shift calendar",
+      "today": "Today",
+      "noShifts": "No shifts scheduled for this day",
+      "shiftSingular": "shift",
+      "shiftPlural": "shifts",
+      "requestSwap": "Request Swap",
+      "statusConfirmed": "Confirmed",
+      "statusPending": "Pending",
+      "statusSwapRequested": "Swap Requested"
     }
   },
   "auth": {

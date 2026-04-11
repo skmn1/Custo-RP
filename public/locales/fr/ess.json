@@ -15,7 +15,12 @@
     "nextShift": "Prochain quart",
     "hoursThisWeek": "Heures cette semaine",
     "pendingRequests": "Demandes en attente",
-    "latestPayslip": "Dernière fiche de paie",
+    "latestPayslip": {
+      "title": "Dernière fiche de paie",
+      "empty": "Aucune fiche de paie disponible.",
+      "restricted": "L'accès aux fiches de paie est désactivé par votre organisation.",
+      "viewPayslip": "Voir la fiche de paie"
+    },
     "noUpcomingShift": "Aucun quart à venir",
     "viewSchedule": "Voir le planning",
     "viewPayslips": "Voir les fiches de paie",
@@ -34,12 +39,6 @@
       "title": "Notifications",
       "empty": "Aucune nouvelle notification.",
       "viewAll": "Voir tout"
-    },
-    "latestPayslip": {
-      "title": "Dernière fiche de paie",
-      "empty": "Aucune fiche de paie disponible.",
-      "restricted": "L'accès aux fiches de paie est désactivé par votre organisation.",
-      "viewPayslip": "Voir la fiche de paie"
     },
     "profile": {
       "title": "Profil",
@@ -520,7 +519,23 @@
       "iosStep2": "Faites défiler vers le bas",
       "iosStep3": "Appuyez sur « Sur l'écran d'accueil »",
       "gotIt": "Compris"
-    }  },
+    },
+    "schedule": {
+      "title": "Planning",
+      "workforceLabel": "Gestion du personnel",
+      "previousMonth": "Mois précédent",
+      "nextMonth": "Mois suivant",
+      "calendarLabel": "Calendrier mensuel des quarts",
+      "today": "Aujourd'hui",
+      "noShifts": "Aucun quart prévu ce jour",
+      "shiftSingular": "quart",
+      "shiftPlural": "quarts",
+      "requestSwap": "Demander un échange",
+      "statusConfirmed": "Confirmé",
+      "statusPending": "En attente",
+      "statusSwapRequested": "Échange demandé"
+    }
+  },
   "auth": {
     "appName": "ESS",
     "employeePortal": "Portail employé",
@@ -558,5 +573,6 @@
       "emailInvalid": "Saisissez une adresse e-mail valide.",
       "passwordRequired": "Le mot de passe est requis.",
       "passwordMinLength": "Le mot de passe doit contenir au moins 8 caractères."
-    }  }
+    }
+  }
 }
