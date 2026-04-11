@@ -111,6 +111,15 @@ export function useCancelAbsenceReport() {
   });
 }
 
+/** POST /api/ess/requests/absence/:id/certificate (multipart) */
+export function useUploadAbsenceCert() {
+  const invalidate = useInvalidateAll();
+  return useMutation({
+    mutationFn: ({ id, file }) => essRequestsApi.uploadAbsenceCert(id, file),
+    onSuccess: invalidate,
+  });
+}
+
 // ── ESS — Swap ────────────────────────────────────────────────────
 
 /** GET /api/ess/requests/swap — sent and received */

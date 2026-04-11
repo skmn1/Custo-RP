@@ -681,6 +681,51 @@
         "endDateAfterStart": "End date must be on or after start date",
         "reasonRequired": "Please provide a reason"
       }
+    },
+    "absence": {
+      "title": "Report an Absence",
+      "sectionLabel": "Absence Reports",
+      "dateLabel": "Absence Date",
+      "typeLabel": "Absence Type",
+      "expectedStart": "Expected Start",
+      "actualArrival": "Actual Arrival",
+      "reason": "Reason",
+      "reasonPlaceholder": "What happened?",
+      "submitReport": "Submit Report",
+      "submitSuccess": "Absence reported successfully",
+      "duplicateDate": "An absence report already exists for this date",
+      "certRequired": "Medical certificate required",
+      "certRequiredToast": "A medical certificate is now required. Please upload it from your absence history.",
+      "certUploadHint": "Upload a PDF or image of your certificate",
+      "certUploaded": "Certificate uploaded",
+      "upload": "Upload",
+      "cancel": "Cancel Report",
+      "cancelSuccess": "Absence report cancelled",
+      "noAbsences": "No absence reports",
+      "noAbsencesHint": "Absence reports you submit will appear here",
+      "newReportAriaLabel": "Report a new absence",
+      "type": {
+        "sick": "Sick",
+        "late_arrival": "Late Arrival",
+        "emergency": "Emergency",
+        "personal": "Personal",
+        "other": "Other"
+      },
+      "status": {
+        "reported": "Reported",
+        "acknowledged": "Acknowledged",
+        "disputed": "Disputed",
+        "cancelled": "Cancelled"
+      },
+      "validation": {
+        "dateRequired": "Date is required",
+        "dateFuture": "Absence date cannot be in the future",
+        "typeRequired": "Select an absence type",
+        "expectedStartRequired": "Expected start time is required",
+        "actualArrivalRequired": "Actual arrival time is required",
+        "actualAfterExpected": "Actual arrival must be after expected start",
+        "reasonRequired": "Please provide a reason"
+      }
     }
   },
   "auth": {

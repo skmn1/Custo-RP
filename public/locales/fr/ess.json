@@ -672,6 +672,51 @@
         "endDateAfterStart": "La date de fin doit être postérieure ou égale à la date de début",
         "reasonRequired": "Veuillez indiquer un motif"
       }
+    },
+    "absence": {
+      "title": "Signaler une absence",
+      "sectionLabel": "Signalements d'absence",
+      "dateLabel": "Date d'absence",
+      "typeLabel": "Type d'absence",
+      "expectedStart": "Heure prévue",
+      "actualArrival": "Heure d'arrivée réelle",
+      "reason": "Motif",
+      "reasonPlaceholder": "Que s'est-il passé ?",
+      "submitReport": "Envoyer le signalement",
+      "submitSuccess": "Absence signalée avec succès",
+      "duplicateDate": "Un signalement existe déjà pour cette date",
+      "certRequired": "Certificat médical requis",
+      "certRequiredToast": "Un certificat médical est désormais requis. Veuillez le téléverser depuis votre historique.",
+      "certUploadHint": "Téléversez un PDF ou une image de votre certificat",
+      "certUploaded": "Certificat téléversé",
+      "upload": "Téléverser",
+      "cancel": "Annuler le signalement",
+      "cancelSuccess": "Signalement d'absence annulé",
+      "noAbsences": "Aucun signalement d'absence",
+      "noAbsencesHint": "Les absences que vous signalez apparaîtront ici",
+      "newReportAriaLabel": "Signaler une nouvelle absence",
+      "type": {
+        "sick": "Maladie",
+        "late_arrival": "Retard",
+        "emergency": "Urgence",
+        "personal": "Personnel",
+        "other": "Autre"
+      },
+      "status": {
+        "reported": "Signalée",
+        "acknowledged": "Reconnue",
+        "disputed": "Contestée",
+        "cancelled": "Annulée"
+      },
+      "validation": {
+        "dateRequired": "La date est obligatoire",
+        "dateFuture": "La date d'absence ne peut pas être dans le futur",
+        "typeRequired": "Sélectionnez un type d'absence",
+        "expectedStartRequired": "L'heure prévue est obligatoire",
+        "actualArrivalRequired": "L'heure d'arrivée est obligatoire",
+        "actualAfterExpected": "L'heure d'arrivée doit être après l'heure prévue",
+        "reasonRequired": "Veuillez indiquer un motif"
+      }
     }
   },
   "auth": {

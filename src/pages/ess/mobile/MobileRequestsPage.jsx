@@ -16,7 +16,7 @@
  *   useSubmitLeaveRequest  → POST /api/ess/requests/leave
  *   useCancelLeaveRequest  → DELETE /api/ess/requests/leave/:id
  */
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet-async';
 import {
@@ -25,6 +25,10 @@ import {
   useEssLeaveRequests,
   useSubmitLeaveRequest,
   useCancelLeaveRequest,
+  useEssAbsenceReports,
+  useReportAbsence,
+  useCancelAbsenceReport,
+  useUploadAbsenceCert,
 } from '../../../hooks/useEssRequests';
 import { calculateWorkingDays } from '../../../utils/dateUtils';
 
@@ -593,22 +597,449 @@ const NewRequestSheet = ({
 
 // ── Page ──────────────────────────────────────────────────────────
 
-export const MobileRequestsPage = () => {
-  const { t } = useTranslation('ess');
+/** Sub-tab definitions */
+const REQUEST_TABS = [
+  { key: 'leave',   icon: 'beach_access' },
+  { key: 'absence', icon: 'sick' },
+  { key: 'swap',    icon: 'swap_horiz' },
+];
+
+/** Absence type → icon mapping */
+const ABSENCE_TYPE_ICONS = {
+  sick: 'sick',
+  late_arrival: 'schedule',
+  emergency: 'emergency',
+  personal: 'person',
+  other: 'help',
+};
+
+/** Absence status → Tailwind colour classes */
+function absenceStatusChipClass(status) {
+  switch (status) {
+    case 'acknowledged': return 'bg-primary-container/40 text-primary';
+    case 'disputed':     return 'bg-error-container/40 text-error';
+    case 'cancelled':    return 'bg-surface-container text-outline';
+    case 'reported':
+    default:             return 'bg-secondary-container/40 text-secondary';
+  }
+}
+
+// ── AbsenceList ───────────────────────────────────────────────────
+
+const AbsenceList = ({ absences, onCancel, isCancelling, onUploadCert, t }) => {
+  if (!absences || absences.length === 0) {
+    return (
+      <div
+        className="bg-surface-container-lowest rounded-2xl text-center py-12 shadow-[0_8px_24px_rgba(25,28,30,0.06)]"
+        data-testid="absences-empty"
+      >
+        <span className="material-symbols-outlined text-4xl text-outline block mb-2" aria-hidden="true">sick</span>
+        <p className="text-on-surface-variant font-medium font-body">{t('mobile.absence.noAbsences')}</p>
+        <p className="text-outline text-xs mt-1 font-body">{t('mobile.absence.noAbsencesHint')}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3" data-testid="absences-list">
+      {absences.map(ab => {
+        const canCancel = ab.status === 'reported' && ab.absenceDate === todayString();
+        const icon = ABSENCE_TYPE_ICONS[ab.absenceType] || 'help';
+        const needsCert = ab.certRequired && !ab.certUploaded;
+        const hasCert   = ab.certRequired && ab.certUploaded;
+
+        return (
+          <div
+            key={ab.id}
+            className="bg-surface-container-lowest rounded-2xl p-5 shadow-[0_4px_12px_rgba(25,28,30,0.04)] hover:shadow-md transition-all"
+            data-testid="absence-row"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4 min-w-0">
+                <div className="w-11 h-11 rounded-xl bg-surface-container flex items-center justify-center flex-shrink-0">
+                  <span className="material-symbols-outlined text-primary text-xl" aria-hidden="true" style={{ fontVariationSettings: "'FILL' 1" }}>
+                    {icon}
+                  </span>
+                </div>
+                <div className="min-w-0">
+                  <p className="font-headline text-sm font-bold text-on-surface">
+                    {t(`mobile.absence.type.${ab.absenceType}`, { defaultValue: ab.absenceType })}
+                  </p>
+                  <p className="text-on-surface-variant text-xs mt-0.5 font-body">
+                    {new Intl.DateTimeFormat(undefined, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(ab.absenceDate))}
+                  </p>
+                  {ab.reason && (
+                    <p className="text-outline text-xs mt-0.5 font-body truncate">{ab.reason}</p>
+                  )}
+                </div>
+              </div>
+              <span
+                className={`px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wide font-label flex-shrink-0 ml-3 ${absenceStatusChipClass(ab.status)}`}
+                data-testid="absence-status-chip"
+              >
+                {t(`mobile.absence.status.${ab.status}`, { defaultValue: ab.status })}
+              </span>
+            </div>
+
+            {/* Certificate required badge */}
+            {needsCert && (
+              <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 mt-3 flex items-center justify-between" data-testid="cert-required-badge">
+                <div>
+                  <p className="text-red-800 text-sm font-bold font-body">{t('mobile.absence.certRequired')}</p>
+                  <p className="text-red-600 text-xs font-body">{t('mobile.absence.certUploadHint')}</p>
+                </div>
+                <button
+                  onClick={() => onUploadCert(ab.id)}
+                  className="px-4 py-2 rounded-lg text-xs font-bold font-label text-on-primary"
+                  style={{ background: 'linear-gradient(135deg, #da336b 0%, #8b2044 100%)' }}
+                  aria-label={t('mobile.absence.upload')}
+                  data-testid="cert-upload-btn"
+                >
+                  {t('mobile.absence.upload')}
+                </button>
+              </div>
+            )}
+
+            {/* Certificate uploaded badge */}
+            {hasCert && (
+              <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 mt-3 flex items-center gap-2" data-testid="cert-uploaded-badge">
+                <span className="material-symbols-outlined text-green-700 text-lg" aria-hidden="true">check_circle</span>
+                <p className="text-green-800 text-sm font-bold font-body">{t('mobile.absence.certUploaded')}</p>
+              </div>
+            )}
+
+            {/* Cancel action */}
+            {canCancel && (
+              <div className="mt-3 pt-3 border-t border-outline-variant/20 flex justify-end">
+                <button
+                  onClick={() => onCancel(ab.id)}
+                  disabled={isCancelling}
+                  className="text-error text-xs font-bold uppercase tracking-wide font-label px-3 py-1.5 rounded-lg hover:bg-error-container/20 transition-colors disabled:opacity-50"
+                  data-testid="cancel-absence-btn"
+                >
+                  {t('mobile.absence.cancel')}
+                </button>
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+// ── ReportAbsenceSheet ────────────────────────────────────────────
+
+const ABSENCE_TYPES = ['sick', 'late_arrival', 'emergency', 'personal', 'other'];
+
+const ReportAbsenceSheet = ({ isOpen, onClose, t }) => {
+  const [absenceDate, setAbsenceDate] = useState(todayString());
+  const [absenceType, setAbsenceType] = useState('');
+  const [expectedStart, setExpectedStart] = useState('');
+  const [actualArrival, setActualArrival] = useState('');
+  const [reason, setReason] = useState('');
+  const [errors, setErrors] = useState({});
+  const [toast, setToast] = useState(null);
+
+  const reportAbsence = useReportAbsence();
+
+  const reasonRequired = absenceType === 'other';
+  const showTimePickers = absenceType === 'late_arrival';
+
+  const validate = useCallback(() => {
+    const errs = {};
+    if (!absenceDate) errs.absenceDate = t('mobile.absence.validation.dateRequired');
+    else if (absenceDate > todayString()) errs.absenceDate = t('mobile.absence.validation.dateFuture');
+    if (!absenceType) errs.absenceType = t('mobile.absence.validation.typeRequired');
+    if (showTimePickers) {
+      if (!expectedStart) errs.expectedStart = t('mobile.absence.validation.expectedStartRequired');
+      if (!actualArrival) errs.actualArrival = t('mobile.absence.validation.actualArrivalRequired');
+      else if (expectedStart && actualArrival <= expectedStart) errs.actualArrival = t('mobile.absence.validation.actualAfterExpected');
+    }
+    if (reasonRequired && !reason.trim()) errs.reason = t('mobile.absence.validation.reasonRequired');
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
+  }, [absenceDate, absenceType, expectedStart, actualArrival, reason, reasonRequired, showTimePickers, t]);
+
+  const handleSubmit = useCallback(async (e) => {
+    e.preventDefault();
+    if (!validate()) return;
+
+    const body = { absenceDate, absenceType, reason: reason || undefined };
+    if (showTimePickers) {
+      body.expectedStart = expectedStart;
+      body.actualArrival = actualArrival;
+    }
+
+    try {
+      const result = await reportAbsence.mutateAsync(body);
+
+      if (result?.certRequired) {
+        setToast({ type: 'warning', message: t('mobile.absence.certRequiredToast') });
+      } else {
+        setToast({ type: 'success', message: t('mobile.absence.submitSuccess') });
+      }
+
+      setAbsenceDate(todayString());
+      setAbsenceType('');
+      setExpectedStart('');
+      setActualArrival('');
+      setReason('');
+      setErrors({});
+
+      setTimeout(() => { setToast(null); onClose(); }, 1500);
+    } catch (err) {
+      const msg = err?.status === 409
+        ? t('mobile.absence.duplicateDate')
+        : (err.message ?? t('errors.generic', { defaultValue: 'Something went wrong' }));
+      setToast({ type: 'error', message: msg });
+      setTimeout(() => setToast(null), 3000);
+    }
+  }, [absenceDate, absenceType, expectedStart, actualArrival, reason, showTimePickers, validate, reportAbsence, onClose, t]);
+
+  const handleClose = useCallback(() => { setErrors({}); setToast(null); onClose(); }, [onClose]);
+
+  return (
+    <NexusBottomSheet isOpen={isOpen} onClose={handleClose} title={t('mobile.absence.title')}>
+      <form onSubmit={handleSubmit} className="space-y-5 px-6 pt-4 pb-10" data-testid="report-absence-form" noValidate>
+
+        {/* Toast */}
+        {toast && (
+          <div
+            className={`rounded-xl px-4 py-3 text-sm font-body flex items-center gap-2 ${
+              toast.type === 'success' ? 'bg-primary-container/40 text-primary' :
+              toast.type === 'warning' ? 'bg-amber-50 border border-amber-200 text-amber-800' :
+              'bg-error-container/40 text-error'
+            }`}
+            role="status"
+            data-testid="absence-form-toast"
+          >
+            <span className="material-symbols-outlined text-lg" aria-hidden="true">
+              {toast.type === 'success' ? 'check_circle' : toast.type === 'warning' ? 'warning' : 'error'}
+            </span>
+            {toast.message}
+          </div>
+        )}
+
+        {/* Absence date */}
+        <div>
+          <label htmlFor="absence-date" className="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2 block font-label">
+            {t('mobile.absence.dateLabel')}
+          </label>
+          <input
+            id="absence-date"
+            type="date"
+            value={absenceDate}
+            max={todayString()}
+            onChange={e => { setAbsenceDate(e.target.value); setErrors(prev => ({ ...prev, absenceDate: undefined })); }}
+            className="w-full px-4 py-3 bg-surface-container-lowest rounded-xl outline-none border-b-2 border-transparent focus:border-primary transition-all text-on-surface font-body text-base"
+            data-testid="absence-date-input"
+          />
+          {errors.absenceDate && <p className="text-error text-xs mt-1 font-body" role="alert">{errors.absenceDate}</p>}
+        </div>
+
+        {/* Absence type selector */}
+        <div>
+          <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2 block font-label">
+            {t('mobile.absence.typeLabel')}
+          </label>
+          <div className="flex flex-wrap gap-2" role="group" aria-label={t('mobile.absence.typeLabel')}>
+            {ABSENCE_TYPES.map(at => (
+              <button
+                key={at}
+                type="button"
+                onClick={() => { setAbsenceType(at); setErrors(prev => ({ ...prev, absenceType: undefined })); }}
+                aria-pressed={absenceType === at}
+                className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wide font-label transition-all flex items-center gap-1.5 ${
+                  absenceType === at
+                    ? 'text-on-primary shadow-lg shadow-primary/20'
+                    : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'
+                }`}
+                style={absenceType === at ? { background: 'linear-gradient(135deg, #da336b 0%, #8b2044 100%)' } : {}}
+                data-testid={`absence-type-${at}`}
+              >
+                <span className="material-symbols-outlined text-sm" aria-hidden="true">{ABSENCE_TYPE_ICONS[at]}</span>
+                {t(`mobile.absence.type.${at}`)}
+              </button>
+            ))}
+          </div>
+          {errors.absenceType && <p className="text-error text-xs mt-1 font-body" role="alert">{errors.absenceType}</p>}
+        </div>
+
+        {/* Late arrival time pickers */}
+        {showTimePickers && (
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label htmlFor="expected-start" className="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2 block font-label">
+                {t('mobile.absence.expectedStart')}
+              </label>
+              <input
+                id="expected-start"
+                type="time"
+                value={expectedStart}
+                onChange={e => { setExpectedStart(e.target.value); setErrors(prev => ({ ...prev, expectedStart: undefined })); }}
+                className="w-full px-4 py-3 bg-surface-container-lowest rounded-xl outline-none border-b-2 border-transparent focus:border-primary transition-all text-on-surface font-body text-base"
+                data-testid="expected-start-input"
+              />
+              {errors.expectedStart && <p className="text-error text-xs mt-1 font-body" role="alert">{errors.expectedStart}</p>}
+            </div>
+            <div>
+              <label htmlFor="actual-arrival" className="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2 block font-label">
+                {t('mobile.absence.actualArrival')}
+              </label>
+              <input
+                id="actual-arrival"
+                type="time"
+                value={actualArrival}
+                onChange={e => { setActualArrival(e.target.value); setErrors(prev => ({ ...prev, actualArrival: undefined })); }}
+                className="w-full px-4 py-3 bg-surface-container-lowest rounded-xl outline-none border-b-2 border-transparent focus:border-primary transition-all text-on-surface font-body text-base"
+                data-testid="actual-arrival-input"
+              />
+              {errors.actualArrival && <p className="text-error text-xs mt-1 font-body" role="alert">{errors.actualArrival}</p>}
+            </div>
+          </div>
+        )}
+
+        {/* Reason */}
+        <div>
+          <label htmlFor="absence-reason" className="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2 block font-label">
+            {t('mobile.absence.reason')}
+            {!reasonRequired && <span className="text-outline font-normal normal-case tracking-normal ml-1">({t('requests.reasonOptional', { defaultValue: 'optional' })})</span>}
+          </label>
+          <textarea
+            id="absence-reason"
+            value={reason}
+            onChange={e => { setReason(e.target.value); setErrors(prev => ({ ...prev, reason: undefined })); }}
+            placeholder={t('mobile.absence.reasonPlaceholder')}
+            rows={3}
+            className="w-full px-4 py-3 bg-surface-container-lowest rounded-xl outline-none border-b-2 border-transparent focus:border-primary transition-all text-on-surface font-body text-base resize-none"
+            data-testid="absence-reason-input"
+          />
+          {errors.reason && <p className="text-error text-xs mt-1 font-body" role="alert">{errors.reason}</p>}
+        </div>
+
+        <button
+          type="submit"
+          disabled={reportAbsence.isPending}
+          className="w-full py-4 rounded-xl text-on-primary font-bold text-base font-headline flex items-center justify-center gap-2 active:scale-[0.97] transition-all disabled:opacity-60"
+          style={{ background: 'linear-gradient(135deg, #da336b 0%, #8b2044 100%)' }}
+          data-testid="submit-absence-btn"
+        >
+          {reportAbsence.isPending ? (
+            <span className="material-symbols-outlined text-xl animate-spin" aria-hidden="true">progress_activity</span>
+          ) : (
+            <span className="material-symbols-outlined text-xl" aria-hidden="true">send</span>
+          )}
+          {t('mobile.absence.submitReport')}
+        </button>
+      </form>
+    </NexusBottomSheet>
+  );
+};
+
+// ── AbsenceTab ────────────────────────────────────────────────────
+
+const AbsenceTab = ({ t }) => {
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const fileInputRef = useRef(null);
+  const [uploadTargetId, setUploadTargetId] = useState(null);
+
+  const { data: absencesRes, isLoading } = useEssAbsenceReports();
+  const cancelAbsence = useCancelAbsenceReport();
+  const uploadCert = useUploadAbsenceCert();
+
+  const absences = absencesRes?.data ?? absencesRes ?? [];
+  const sortedAbsences = useMemo(
+    () => [...absences].sort((a, b) => (b.absenceDate || '').localeCompare(a.absenceDate || '')),
+    [absences]
+  );
+
+  const handleCancel = useCallback((id) => {
+    cancelAbsence.mutate(id);
+  }, [cancelAbsence]);
+
+  const handleUploadCert = useCallback((id) => {
+    setUploadTargetId(id);
+    fileInputRef.current?.click();
+  }, []);
+
+  const handleFileSelected = useCallback((e) => {
+    const file = e.target.files?.[0];
+    if (!file || !uploadTargetId) return;
+    // Validate file size and type
+    const validTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+    if (!validTypes.includes(file.type)) return;
+    if (file.size > 5 * 1024 * 1024) return; // 5 MB max
+    uploadCert.mutate({ id: uploadTargetId, file });
+    setUploadTargetId(null);
+    e.target.value = '';
+  }, [uploadTargetId, uploadCert]);
+
+  if (isLoading) {
+    return (
+      <div className="px-6 mt-4 space-y-3 animate-pulse" data-testid="absences-skeleton">
+        {[0, 1, 2].map(i => <div key={i} className="h-24 bg-surface-variant rounded-2xl" />)}
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <div className="mt-4 px-6">
+        <AbsenceList
+          absences={sortedAbsences}
+          onCancel={handleCancel}
+          isCancelling={cancelAbsence.isPending}
+          onUploadCert={handleUploadCert}
+          t={t}
+        />
+      </div>
+
+      {/* Hidden file input for cert upload */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".pdf,.jpg,.jpeg,.png"
+        className="hidden"
+        onChange={handleFileSelected}
+        data-testid="cert-file-input"
+      />
+
+      {/* Report absence FAB */}
+      <button
+        onClick={() => setSheetOpen(true)}
+        className="fixed bottom-24 right-6 text-on-primary p-4 rounded-full shadow-2xl flex items-center gap-3 font-bold text-sm font-label hover:opacity-90 active:scale-[0.97] transition-all"
+        style={{ background: 'linear-gradient(135deg, #da336b 0%, #8b2044 100%)' }}
+        aria-label={t('mobile.absence.newReportAriaLabel')}
+        data-testid="report-absence-fab"
+      >
+        <span className="material-symbols-outlined text-xl" aria-hidden="true" style={{ fontVariationSettings: "'FILL' 1" }}>add</span>
+        <span className="hidden md:inline">{t('mobile.absence.title')}</span>
+      </button>
+
+      <ReportAbsenceSheet
+        isOpen={sheetOpen}
+        onClose={() => setSheetOpen(false)}
+        t={t}
+      />
+    </>
+  );
+};
+
+// ── LeaveTab ──────────────────────────────────────────────────────
+
+const LeaveTab = ({ t }) => {
   const [sheetOpen, setSheetOpen] = useState(false);
 
-  // Task 87 React Query hooks
   const { data: balanceRes, isLoading: balLoading } = useEssLeaveBalance();
   const { data: typesRes } = useEssLeaveTypes();
   const { data: requestsRes, isLoading: reqLoading } = useEssLeaveRequests();
   const cancelLeave = useCancelLeaveRequest();
 
-  // Unwrap API response shape: { data: ... }
   const balanceData = balanceRes?.data ?? balanceRes ?? null;
   const leaveTypes  = typesRes?.data ?? typesRes ?? [];
   const requests    = requestsRes?.data ?? requestsRes ?? [];
 
-  // Sort by createdAt DESC
   const sortedRequests = useMemo(
     () => [...requests].sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || '')),
     [requests]
@@ -620,7 +1051,76 @@ export const MobileRequestsPage = () => {
     }
   }, [cancelLeave, t]);
 
-  if (balLoading || reqLoading) return <MobileRequestsSkeleton />;
+  if (balLoading || reqLoading) {
+    return (
+      <div className="px-6 mt-4 animate-pulse" data-testid="leave-skeleton">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {[0, 1].map(i => <div key={i} className="h-36 bg-surface-variant rounded-2xl" />)}
+        </div>
+        <div className="mt-4 space-y-3">
+          {[0, 1, 2].map(i => <div key={i} className="h-20 bg-surface-variant rounded-2xl" />)}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      {/* Balance cards */}
+      <LeaveBalanceCards balanceData={balanceData} t={t} />
+
+      {/* Recent requests */}
+      <div className="mt-6 px-6">
+        <h2 className="font-headline text-lg font-bold text-on-surface mb-3">
+          {t('mobile.leave.recentRequests')}
+        </h2>
+        <RecentRequests
+          requests={sortedRequests}
+          onCancel={handleCancel}
+          isCancelling={cancelLeave.isPending}
+          t={t}
+        />
+      </div>
+
+      {/* FAB */}
+      <button
+        onClick={() => setSheetOpen(true)}
+        className="fixed bottom-24 right-6 text-on-primary p-4 rounded-full shadow-2xl flex items-center gap-3 font-bold text-sm font-label hover:opacity-90 active:scale-[0.97] transition-all"
+        style={{ background: 'linear-gradient(135deg, #da336b 0%, #8b2044 100%)' }}
+        aria-label={t('mobile.leave.newRequestAriaLabel')}
+        data-testid="new-request-fab"
+      >
+        <span className="material-symbols-outlined text-xl" aria-hidden="true" style={{ fontVariationSettings: "'FILL' 1" }}>add</span>
+        <span className="hidden md:inline">{t('mobile.leave.newRequest')}</span>
+      </button>
+
+      <NewRequestSheet
+        isOpen={sheetOpen}
+        onClose={() => setSheetOpen(false)}
+        leaveTypes={leaveTypes}
+        balanceData={balanceData}
+        t={t}
+      />
+    </>
+  );
+};
+
+// ── SwapTab (placeholder) ─────────────────────────────────────────
+
+const SwapTab = ({ t }) => (
+  <div className="px-6 mt-6">
+    <div className="bg-surface-container-lowest rounded-2xl text-center py-12 shadow-[0_8px_24px_rgba(25,28,30,0.06)]" data-testid="swaps-empty">
+      <span className="material-symbols-outlined text-4xl text-outline block mb-2" aria-hidden="true">swap_horiz</span>
+      <p className="text-on-surface-variant font-medium font-body">{t('requests.noRequests')}</p>
+    </div>
+  </div>
+);
+
+// ── Main Page ─────────────────────────────────────────────────────
+
+export const MobileRequestsPage = () => {
+  const { t } = useTranslation('ess');
+  const [activeTab, setActiveTab] = useState('leave');
 
   return (
     <>
@@ -637,43 +1137,35 @@ export const MobileRequestsPage = () => {
           </h1>
         </div>
 
-        {/* Balance cards */}
-        <LeaveBalanceCards balanceData={balanceData} t={t} />
+        {/* Sub-tab pills */}
+        <div className="flex gap-2 px-6 mt-4" role="tablist" data-testid="request-tabs">
+          {REQUEST_TABS.map(tab => (
+            <button
+              key={tab.key}
+              role="tab"
+              aria-selected={activeTab === tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wide font-label transition-all flex items-center gap-1.5 ${
+                activeTab === tab.key
+                  ? 'text-on-primary shadow-lg shadow-primary/20'
+                  : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'
+              }`}
+              style={activeTab === tab.key ? { background: 'linear-gradient(135deg, #da336b 0%, #8b2044 100%)' } : {}}
+              data-testid={`tab-${tab.key}`}
+            >
+              <span className="material-symbols-outlined text-sm" aria-hidden="true">{tab.icon}</span>
+              {t(`requests.tab${tab.key.charAt(0).toUpperCase() + tab.key.slice(1)}`)}
+            </button>
+          ))}
+        </div>
 
-        {/* Recent requests */}
-        <div className="mt-6 px-6">
-          <h2 className="font-headline text-lg font-bold text-on-surface mb-3">
-            {t('mobile.leave.recentRequests')}
-          </h2>
-          <RecentRequests
-            requests={sortedRequests}
-            onCancel={handleCancel}
-            isCancelling={cancelLeave.isPending}
-            t={t}
-          />
+        {/* Tab content */}
+        <div role="tabpanel" data-testid={`panel-${activeTab}`}>
+          {activeTab === 'leave' && <LeaveTab t={t} />}
+          {activeTab === 'absence' && <AbsenceTab t={t} />}
+          {activeTab === 'swap' && <SwapTab t={t} />}
         </div>
       </div>
-
-      {/* Floating Action Button */}
-      <button
-        onClick={() => setSheetOpen(true)}
-        className="fixed bottom-24 right-6 text-on-primary p-4 rounded-full shadow-2xl flex items-center gap-3 font-bold text-sm font-label hover:opacity-90 active:scale-[0.97] transition-all"
-        style={{ background: 'linear-gradient(135deg, #da336b 0%, #8b2044 100%)' }}
-        aria-label={t('mobile.leave.newRequestAriaLabel')}
-        data-testid="new-request-fab"
-      >
-        <span className="material-symbols-outlined text-xl" aria-hidden="true" style={{ fontVariationSettings: "'FILL' 1" }}>add</span>
-        <span className="hidden md:inline">{t('mobile.leave.newRequest')}</span>
-      </button>
-
-      {/* New Request bottom sheet */}
-      <NewRequestSheet
-        isOpen={sheetOpen}
-        onClose={() => setSheetOpen(false)}
-        leaveTypes={leaveTypes}
-        balanceData={balanceData}
-        t={t}
-      />
     </>
   );
 };

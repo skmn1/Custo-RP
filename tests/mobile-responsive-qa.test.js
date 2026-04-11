@@ -50,12 +50,12 @@ const frMobile = flattenMobile(frJson);
 // ── i18n completeness ─────────────────────────────────────────────────────────
 
 describe('i18n completeness — mobile.* keys', () => {
-  it('EN has 264 mobile keys', () => {
-    expect(Object.keys(enMobile).length).toBe(264);
+  it('EN has 319 mobile keys', () => {
+    expect(Object.keys(enMobile).length).toBe(319);
   });
 
-  it('FR has 264 mobile keys', () => {
-    expect(Object.keys(frMobile).length).toBe(264);
+  it('FR has 319 mobile keys', () => {
+    expect(Object.keys(frMobile).length).toBe(319);
   });
 
   it('every EN mobile key is present in FR (no missing translations)', () => {

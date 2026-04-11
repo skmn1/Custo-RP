@@ -3088,3 +3088,75 @@ Two exported objects:
 4. **Swap conflict check**: 409 if active swap exists for either shift
 5. **Swap approval**: Atomically swaps `employee_id` on both shifts
 6. **Cancellation rules**: Leave — only submitted/pending. Absence — only reported + same day. Swap — only pending_peer by requester.
+
+---
+
+## Task 89 — ESS Absence Reporting (Mobile)
+
+### Overview
+
+Wires the Task 87 absence API endpoints into the existing MobileRequestsPage UI, adding:
+- Sub-tab navigation (Leave / Absences / Swaps pills)
+- Report Absence bottom sheet form
+- Absence history list with status chips
+- Medical certificate upload flow (red → green badge)
+- Same-day cancel for reported absences
+
+### Architecture
+
+The MobileRequestsPage now has three sub-tabs rendered conditionally:
+- **LeaveTab** — extracted from existing code (balance cards, request list, new request FAB/sheet)
+- **AbsenceTab** — new: absence list, report FAB, report sheet, cert upload
+- **SwapTab** — placeholder empty state (future task)
+
+### Key Components (in MobileRequestsPage.jsx)
+
+| Component | Purpose |
+|-----------|---------|
+| `LeaveTab` | Existing leave balance/request UI, now inside a tab |
+| `AbsenceTab` | Absence history + FAB + cert upload |
+| `AbsenceList` | Renders absence cards with status chip, cert badge, cancel |
+| `ReportAbsenceSheet` | Bottom sheet form: date, type, times (late_arrival), reason |
+| `SwapTab` | Empty state placeholder |
+
+### Form Validation (ReportAbsenceSheet)
+
+- Date: required, cannot be future (max = today)
+- Absence type: required (5 types: sick, late_arrival, emergency, personal, other)
+- Time pickers: shown only for `late_arrival`; expectedStart & actualArrival required, actual must be after expected
+- Reason: required only for `other` type; optional for all else
+
+### Certificate Upload
+
+- **Trigger**: Red badge appears on absence row when `certRequired && !certUploaded`
+- **Flow**: User taps Upload → native file picker (pdf/jpg/jpeg/png, ≤5 MB) → `POST /ess/requests/absence/:id/certificate` (multipart/form-data)
+- **Result**: Badge turns green when upload succeeds
+- **API**: Uses raw `fetch` (not `apiFetch`) to avoid JSON Content-Type header
+
+### Cancel Logic
+
+- Button shown only when `status === 'reported' && absenceDate === today`
+- Calls `PATCH /ess/requests/absence/:id/cancel`
+
+### i18n
+
+37 keys added under `mobile.absence.*` in both EN and FR `ess.json`:
+- Labels (title, dateLabel, typeLabel, expectedStart, actualArrival, reason)
+- Actions (submitReport, upload, cancel)
+- Feedback (submitSuccess, duplicateDate, certRequired, certRequiredToast, certUploaded, cancelSuccess)
+- Empty states (noAbsences, noAbsencesHint)
+- Types: sick, late_arrival, emergency, personal, other
+- Statuses: reported, acknowledged, disputed, cancelled
+- Validations: 7 client-side error messages
+
+### Files Modified
+
+| File | Change |
+|------|--------|
+| `src/pages/ess/mobile/MobileRequestsPage.jsx` | Added sub-tabs, LeaveTab, AbsenceTab, AbsenceList, ReportAbsenceSheet, SwapTab |
+| `src/api/requestsApi.js` | Added `uploadAbsenceCert()` — raw fetch + FormData |
+| `src/hooks/useEssRequests.js` | Added `useUploadAbsenceCert()` mutation hook |
+| `public/locales/en/ess.json` | Added `mobile.absence.*` (37 keys) |
+| `public/locales/fr/ess.json` | Added `mobile.absence.*` (37 keys, French) |
+| `tests/mobile-responsive-qa.test.js` | Updated mobile key count from 264 → 319 |
+| `tests/ess-absence-reporting.test.js` | New — 86 tests covering i18n, sub-tabs, components, API, hooks |

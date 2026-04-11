@@ -1,4 +1,4 @@
-import { apiFetch } from './config';
+import { apiFetch, API_BASE_URL } from './config';
 
 /**
  * Request Workflows API — Task 87
@@ -37,6 +37,17 @@ export const essRequestsApi = {
     body: JSON.stringify(body),
   }),
   cancelAbsenceReport: (id)         => apiFetch(`/ess/requests/absence/${id}/cancel`, { method: 'PATCH' }),
+  uploadAbsenceCert: (id, file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const url = `${API_BASE_URL}/ess/requests/absence/${id}/certificate`;
+    const accessToken = localStorage.getItem('accessToken');
+    return fetch(url, {
+      method: 'POST',
+      headers: accessToken ? { 'Authorization': `Bearer ${accessToken}` } : {},
+      body: formData,
+    }).then(res => { if (!res.ok) throw new Error(`Upload failed: ${res.status}`); return res.json(); });
+  },
 
   // Swap
   getSwapRequests:   ()             => apiFetch('/ess/requests/swap'),
