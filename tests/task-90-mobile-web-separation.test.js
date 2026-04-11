@@ -59,7 +59,7 @@ describe('Task 90 — Mobile/Web Separation & Avatars', () => {
     });
 
     it('imports MobileProfilePage component', () => {
-      expect(profileSrc).toContain("import MobileProfilePage from './mobile/MobileProfilePage'");
+      expect(profileSrc).toContain("import { MobileProfilePage } from './mobile/MobileProfilePage'");
     });
 
     it('checks useMobileLayout() and returns <MobileProfilePage /> with Nexus Kinetic styling', () => {

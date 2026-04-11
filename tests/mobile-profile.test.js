@@ -319,7 +319,7 @@ describe('EssProfilePage mobile conditional', () => {
   });
 
   it('imports MobileProfilePage with Nexus Kinetic styling', () => {
-    expect(pageSrc).toContain("import MobileProfilePage from './mobile/MobileProfilePage'");
+    expect(pageSrc).toContain("import { MobileProfilePage } from './mobile/MobileProfilePage'");
   });
 
   it('calls useMobileLayout()', () => {

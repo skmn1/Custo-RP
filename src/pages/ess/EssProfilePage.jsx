@@ -8,7 +8,7 @@ import { useEssConnectivity } from '../../contexts/EssConnectivityContext';
 import { useMobileLayout } from '../../hooks/useMobileLayout';
 import EssOfflineFallback from '../../components/ess/EssOfflineFallback';
 import StaleDataIndicator from '../../components/ess/StaleDataIndicator';
-import MobileProfilePage from './mobile/MobileProfilePage';
+import { MobileProfilePage } from './mobile/MobileProfilePage';
 
 // ─── Tab definitions ────────────────────────────────────────
 
