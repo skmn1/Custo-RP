@@ -2572,3 +2572,233 @@ Each field rendered from the `contactFields` config array with `<label htmlFor={
 - MobileEditProfilePage source: 30+ assertions covering form config, labels, testids, aria-pressed, save/cancel flow
 - `useEssUpdateProfile`: PATCH endpoint, JSON body, return shape, useCallback, error tracking
 - App.jsx: MobileProfilePage + MobileEditProfilePage imports, both routes, profile path now uses MobileProfilePage
+
+---
+
+## Task 85 — ESS Notification Feed & Inline Actions (SCREEN_2 + SCREEN_95)
+
+**Branch:** `feature/85-ess-notification-feed`  
+**Route:** `/app/ess/notifications` → `MobileNotificationsPage`  
+**Files added/modified:**
+
+| File | Type | Description |
+|------|------|-------------|
+| `src/hooks/useEssNotifications.js` | New hook | GET /api/ess/notifications |
+| `src/hooks/useEssMarkRead.js` | New hook | PATCH single + bulk mark-as-read |
+| `src/pages/ess/mobile/MobileNotificationsPage.jsx` | New page | Categorised feed, inline swap actions, push toast |
+| `src/App.jsx` | Modified | Route `notifications` → `MobileNotificationsPage` |
+| `public/locales/en/ess.json` | Modified | `mobile.notifications.*` keys added |
+| `public/locales/fr/ess.json` | Modified | FR translations added |
+| `tests/mobile-notifications-nexus.test.js` | New tests | 119 tests, all passing |
+
+---
+
+### Hooks
+
+#### `useEssNotifications`
+
+```js
+import { useEssNotifications } from '@/hooks/useEssNotifications';
+const { data, isLoading, error, refetch } = useEssNotifications();
+```
+
+- Calls `GET /api/ess/notifications` on mount via `apiFetch`
+- Returns `{ data: Notification[], isLoading: boolean, error: Error|null, refetch: fn }`
+- Exposes `refetch` (wrapped in `useCallback`) for manual refresh after optimistic updates revert
+
+#### `useEssMarkRead`
+
+```js
+import { useEssMarkRead } from '@/hooks/useEssMarkRead';
+const { markRead, markAllRead } = useEssMarkRead();
+```
+
+- `markRead(id)` → `PATCH /api/ess/notifications/${id}/read`
+- `markAllRead()` → `PATCH /api/ess/notifications/mark-all-read`
+- Both are `useCallback`-wrapped; neither manages local state (caller holds optimistic state)
+
+---
+
+### Components
+
+#### `formatRelativeTime(isoString)`
+
+Exported pure helper. Converts ISO timestamp to human label:
+
+| Delta | Output |
+|-------|--------|
+| < 60 s | `"Just now"` |
+| < 60 min | `"Xm ago"` |
+| < 24 h | `"Xh ago"` |
+| 1 day | `"1 day ago"` |
+| > 1 day | `"X days ago"` |
+
+#### `groupByDate(notifications)`
+
+Exported pure helper. Groups a flat `Notification[]` into a `{ [dateLabel]: Notification[] }` object. Date labels: `"Today"`, `"Yesterday"`, or `Intl.DateTimeFormat('en-US', { weekday:'short', month:'short', day:'numeric' })` for older dates.
+
+#### `MobileNotificationsSkeleton`
+
+- `data-testid="notifications-skeleton"`
+- Renders 5 animated pulse cards (Magenta tint `bg-[#da336b]/5`)
+
+#### `NotificationItem`
+
+- `data-testid="notification-item"`, `data-unread={isUnread}`
+- `role="button"`, `tabIndex={0}`, keyboard-accessible (`onKeyDown` Enter triggers tap)
+- `aria-label` composed from category + title
+- Unread left accent bar: `data-testid="unread-accent"`, `bg-[#da336b]` (disappears on tap — optimistic)
+- Icon badge: Material Symbol icon per `CATEGORY_ICONS` map, Magenta gradient circle
+
+**Category icon map:**
+
+| category | icon |
+|----------|------|
+| `shift` | `swap_horiz` |
+| `payroll` | `payments` |
+| `news` | `campaign` |
+| `schedule` | `event` |
+| *(default)* | `notifications` |
+
+**Swap actions** (shown when `type === 'swap'`):
+- Container: `data-testid="swap-actions"`
+- Accept: `data-testid="accept-btn"`, `aria-label="Accept shift swap"`
+- Decline: `data-testid="decline-btn"`, `aria-label="Decline shift swap"`
+- POSTs to `/ess/notifications/:id/swap-accept` or `swap-decline` via `apiFetch`
+- Both buttons call `e.stopPropagation()` to prevent row-level tap
+
+**Navigate action** (shown for other notification types):
+- `data-testid="view-action-btn"`, `aria-label="View details"`
+
+#### `EssNotificationToast` (SCREEN_95)
+
+```jsx
+<EssNotificationToast notification={notif} onDismiss={fn} onView={fn} />
+```
+
+- Glassmorphism pill: `bg-white/80 backdrop-blur-[20px] rounded-[2rem] border border-white/30`
+- `role="alert"`, `aria-live="assertive"`
+- `data-testid="notification-toast"`
+- View button: `data-testid="toast-view-btn"`
+- Dismiss button: `data-testid="toast-dismiss-btn"`, `aria-label="Dismiss notification"`
+
+**Push payload shape (for backend/FCM integration):**
+
+```json
+{
+  "id": "notif-uuid",
+  "type": "shift|payroll|news|schedule",
+  "category": "shift|payroll|news|schedule",
+  "title": "Notif title",
+  "body": "Short body text",
+  "timestamp": "2025-01-15T10:30:00Z",
+  "read": false,
+  "actionUrl": "/app/ess/schedule"
+}
+```
+
+#### `MobileNotificationsPage`
+
+**Filter tabs:**
+
+- Container: `data-testid="filter-tabs"`, `role="tablist"`
+- Each tab: `role="tab"`, `aria-selected={active}`, `data-testid="filter-tab-{key}"`
+- Keys: `all`, `shift`, `payroll`, `news`
+
+**Mark-all-read button:**
+
+- `data-testid="mark-all-read-btn"`, `aria-label={t('mobile.notifications.markAllRead')}`
+- Fires `markAllRead()` from `useEssMarkRead`, then clears `localRead` set
+
+**Date-grouped feed:**
+
+- Each group header: `data-testid="date-group"` with date label text
+- Renders `<NotificationItem>` per grouped notification
+
+**Optimistic mark-as-read:**
+
+- `localRead` set (React state) tracks IDs marked read during session
+- On tap: ID added to `localRead` (instant visual revert of accent bar)
+- `markRead(id)` called; on PATCH failure → ID removed from `localRead` to revert
+
+**Empty state:** `data-testid="notifications-empty"`
+
+**Sidebar (md+ only):**
+
+- `hidden md:block md:col-span-4`, `data-testid="notifications-sidebar"`
+
+**Weekly Pulse card:**
+
+- `data-testid="weekly-pulse"`, Magenta gradient (`from-[#da336b] to-[#8b2044]`)
+- Read Digest button: `data-testid="read-digest-btn"`
+
+**Feed Preferences toggles:**
+
+- Container: `data-testid="feed-preferences"`
+- Each toggle: `role="switch"`, `aria-checked={active}`
+- Preferences: `prefShiftAlerts`, `prefPayrollUpdates`, `prefTeamNews`, `prefHrAnnouncements`
+
+---
+
+### i18n Namespace: `ess` → `mobile.notifications.*`
+
+**New keys added (EN + FR):**
+
+| Key | EN | FR |
+|-----|----|----|
+| `stayInformed` | Stay Informed | Restez informé |
+| `empty` | No notifications | Aucune notification |
+| `filterLabel` | Filter by | Filtrer par |
+| `filterAll` | All | Tout |
+| `filterShifts` | Shifts | Quarts |
+| `filterPayroll` | Payroll | Paie |
+| `filterNews` | News | Nouvelles |
+| `shiftChanges` | Shift Changes | Changements de quart |
+| `news` | Announcements | Annonces |
+| `accept` | Accept | Accepter |
+| `decline` | Decline | Refuser |
+| `viewAction` | View | Voir |
+| `weeklyPulse` | Weekly Pulse | Pulse de la semaine |
+| `weeklyPulseBody` | Your team's highlights... | Les points forts... |
+| `readDigest` | Read Digest | Lire le résumé |
+| `feedPreferences` | Feed Preferences | Préférences de fil |
+| `prefShiftAlerts` | Shift Alerts | Alertes de quart |
+| `prefPayrollUpdates` | Payroll Updates | Mises à jour paie |
+| `prefTeamNews` | Team News | Nouvelles d'équipe |
+| `prefHrAnnouncements` | HR Announcements | Annonces RH |
+
+**Preserved existing keys:** `title`, `markAllRead`, `today`, `yesterday`, `earlier`, `emptyTitle`, `emptyBody`, `hoursAgo`, `minutesAgo`, `justNow`, `unread`
+
+---
+
+### Accessibility
+
+| Element | Role / Attribute |
+|---------|-----------------|
+| Filter bar | `role="tablist"` |
+| Each filter pill | `role="tab"`, `aria-selected` |
+| Notification rows | `role="button"`, `tabIndex={0}`, `aria-label` |
+| Toast | `role="alert"`, `aria-live="assertive"` |
+| Dismiss toast btn | `aria-label="Dismiss notification"` |
+| Accept/Decline btns | `aria-label` descriptive |
+| Feed preference toggles | `role="switch"`, `aria-checked` |
+| Material Symbol spans | `aria-hidden="true"` |
+
+---
+
+### Unit Tests
+
+`tests/mobile-notifications-nexus.test.js` — **119 tests, all passing**
+
+- `formatRelativeTime` — 9 tests: just now, minutes, hours, 1 day, multi-day, boundary cases
+- `groupByDate` — 5 tests: today/yesterday, older dates, mixed groups, empty array
+- Filter logic — 5 tests: all/shift/payroll/news filtering, unread count
+- Optimistic read — 2 tests: immediate visual update, revert on failure
+- EN i18n — 25 assertions: all new + preserved keys, exact values
+- FR i18n — 9 assertions: accept/decline/markAllRead, filter keys, shiftChanges, weeklyPulse
+- MobileNotificationsPage source — 21 assertions: testids, aria, hooks, filter tabs, sidebar
+- NotificationItem source — 15 assertions: testids, aria, swap actions, keyboard handler
+- EssNotificationToast source — 8 assertions: glassmorphism CSS, role, aria-live, testids
+- `useEssNotifications` — 5 assertions: endpoint, useState, useEffect, useCallback, return shape
+- `useEssMarkRead` — 6 assertions: single+bulk endpoints, useCallback, both keys returned
+- App.jsx route — 3 assertions: MobileNotificationsPage import, notifications path, element

@@ -93,6 +93,7 @@ import { MobilePayslipHistoryPage } from './pages/ess/mobile/MobilePayslipHistor
 import { MobileRequestsPage } from './pages/ess/mobile/MobileRequestsPage';
 import { MobileProfilePage } from './pages/ess/mobile/MobileProfilePage';
 import { MobileEditProfilePage } from './pages/ess/mobile/MobileEditProfilePage';
+import { MobileNotificationsPage } from './pages/ess/mobile/MobileNotificationsPage';
 import AccountingDashboardPage from './pages/accounting/AccountingDashboardPage';
 import PaymentsPage from './pages/accounting/PaymentsPage';
 import AgingPage from './pages/accounting/AgingPage';
@@ -287,7 +288,7 @@ const App = () => {
             <Route path="attendance" element={<EssAttendancePage />} />
             <Route path="profile" element={<MobileProfilePage />} />
             <Route path="profile/edit" element={<MobileEditProfilePage />} />
-            <Route path="notifications" element={<EssNotificationsPage />} />
+            <Route path="notifications" element={<MobileNotificationsPage />} />
           </Route>
 
           {/* ─── Legacy route redirects ─── */}
