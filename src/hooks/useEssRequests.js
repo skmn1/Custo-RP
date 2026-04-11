@@ -10,7 +10,7 @@
  *   ['hr', 'requests']       — HR inbox
  */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { essRequestsApi, hrRequestsApi } from '../../api/requestsApi';
+import { essRequestsApi, hrRequestsApi } from '../api/requestsApi';
 
 // ── Query key factory ─────────────────────────────────────────────
 
