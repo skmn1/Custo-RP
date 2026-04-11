@@ -2453,3 +2453,122 @@ All strings live under `mobile.payroll.*` in `public/locales/{en,fr}/ess.json`.
 - Source structural assertions: testids, aria attrs, Magenta gradient (`#da336b`/`#8b2044`), hooks imports, FAB position, form validation, named export
 - Hook assertions: endpoints, POST method, `fetchRequests()` re-fetch, exported function names
 - App.jsx: `MobileRequestsPage` import + `path="requests"` route
+
+---
+
+## Task 84 — ESS Employee Profile & Edit (SCREEN_67 + SCREEN_97)
+
+### Overview
+
+Two views forming the ESS "Profile" bottom-navigation tab. `MobileProfilePage` presents a read-only hero view; `MobileEditProfilePage` provides an inline edit form.
+
+**Routes:**
+- `/app/ess/profile` → `MobileProfilePage`
+- `/app/ess/profile/edit` → `MobileEditProfilePage`
+
+### Hook
+
+| Hook | Endpoint | Returns |
+|---|---|---|
+| `useEssProfile` *(existing)* | `GET /api/ess/profile` | `{ profile, isLoading, error, ... }` |
+| `useEssUpdateProfile` *(new)* | `PATCH /api/ess/profile` | `{ updateProfile, isLoading, error }` |
+
+`useEssUpdateProfile` sends partial fields (`phone`, `email`, `emergencyContact`, `workPreferences`, `preferredLocation`) as JSON; triggers re-navigation on success.
+
+### MobileProfilePage (SCREEN_67)
+
+#### Sections
+
+| Section | Component | testid |
+|---|---|---|
+| Hero header | `ProfileHeader` | `profile-header` |
+| Avatar image | *(img)* | `profile-avatar` |
+| Name heading | *(h1)* | `profile-name` |
+| Active score badge | *(div)* | `cert-badge` |
+| SVG ring card | *(div)* | `cert-ring-card` |
+| SVG ring element | *(svg)* | `cert-ring-svg` |
+| Ring progress arc | *(circle)* | `cert-ring-progress` |
+| Personal info card | `InfoSection` | `info-section` / `info-row` |
+| Work preference chips | `WorkPreferenceTags` | `work-preferences` / `preference-chip` |
+| Location history | `LocationHistory` | `location-history` / `location-row` |
+| Edit CTA | *(button)* | `edit-profile-btn` |
+| Loading skeleton | `MobileProfileSkeleton` | `profile-skeleton` |
+
+#### SVG Certification Ring Geometry
+
+- Viewport: `0 0 96 96`, centre `cx=48 cy=48`, radius `r=45`
+- Circumference: $2\pi \times 45 \approx 282.74$
+- `strokeDashoffset = 282.74 \times (1 - \text{score}/100)`
+- Ring starts from top (12 o'clock) via `transform: rotate(-90deg)` on `<svg>`
+- Stroke: `#da336b` (Nexus Magenta); track: `stroke-surface-container`
+- Default score when API returns `null`: **85**
+
+#### PREF_ICONS mapping
+
+| Key | Material Symbol |
+|---|---|
+| `fastFood` | `lunch_dining` |
+| `grocery` | `shopping_cart` |
+| `butcher` | `kitchen` |
+| `bakery` | `bakery_dining` |
+| `cafe` | `coffee` |
+
+### MobileEditProfilePage (SCREEN_97)
+
+#### Form Fields
+
+| Field | Input type | testid |
+|---|---|---|
+| Phone Number | `tel` | `input-phone` *(via config)* |
+| Email | `email` | `input-email` *(via config)* |
+| Emergency Contact | `text` | `input-emergency` *(via config)* |
+
+Each field rendered from the `contactFields` config array with `<label htmlFor={field.testid}>` and `<input id={field.testid} data-testid={field.testid}>` for full ARIA association.
+
+#### Work Preferences Edit
+
+- Active chips: `pref-chip-{pref}` with remove button `remove-pref-{pref}` (`aria-label="Remove {label}"`)
+- Add buttons: `add-pref-{pref}` with `aria-label="Add Preference {label}"`
+- Available preferences: `fastFood`, `grocery`, `butcher`, `bakery`, `cafe`
+
+#### Location Selector
+
+3-button toggle: Downtown / Westside / Northgate. Selected state uses Magenta gradient; `aria-pressed={selected}`. `data-testid="location-btn-{loc.toLowerCase()}"`.
+
+#### Save / Cancel
+
+- **Save**: calls `updateProfile(fields)` → navigates back (-1) on success; error shown in `role="alert" data-testid="save-error"`
+- **Cancel**: calls `navigate(-1)` with no API call
+
+### i18n Namespace: `ess` → `mobile.profile.*`
+
+**New keys added (flat):** `employeeProfile`, `activeScore`, `profileCompleteness`, `completeHint`, `started`, `workPreferences`, `workLocations`, `present`, `editProfile`, `editTitle`, `save`, `contactDetails`, `addPreference`, `remove`, `noPreferences`, `noLocations`, `preferredLocation`, `avatarAlt`, `avatarHint`
+
+**Preserved existing keys:** `personalInfo`, `email`, `phone`, `cancel`, `emergencyContact`, `department`, `title`, `firstName`, `lastName`, `startDate`, and change-request keys.
+
+**Nested:** `pref.{fastFood, grocery, butcher, bakery, cafe}`
+
+### Accessibility
+
+- SVG certification ring: `aria-hidden="true"` (decorative)
+- Edit CTA: `aria-label={t('mobile.profile.editProfile')}`
+- All Material Symbol `<span>`: `aria-hidden="true"`
+- Location toggle buttons: `aria-pressed={selected}`
+- Save error: `role="alert"`
+- Form inputs: associated `<label htmlFor>` for screen readers
+- Remove preference buttons: `aria-label="Remove {preferenceName}"`
+- Touch targets: all interactive elements use `py-3`/`py-4` padding (≥ 44px)
+
+### Unit Tests
+
+`tests/mobile-profile-nexus.test.js` — **137 tests, all passing**
+
+- `certRingOffset()` — score 0/50/80/98/100, clamped above 100, clamped below 0, null input
+- `removePreference()` — present / absent / last-element edge cases
+- `addPreference()` — new / duplicate / empty-array cases
+- EN i18n: 23 flat keys + 5 `pref.*` nested values; exact values for editProfile, save, present
+- FR i18n: personalInfo, editProfile, save, cancel, workPreferences, workLocations, present, pref keys
+- MobileProfilePage source: 30+ assertions covering testids, aria, ring SVG, Magenta gradient, hooks, navigation, null guards
+- MobileEditProfilePage source: 30+ assertions covering form config, labels, testids, aria-pressed, save/cancel flow
+- `useEssUpdateProfile`: PATCH endpoint, JSON body, return shape, useCallback, error tracking
+- App.jsx: MobileProfilePage + MobileEditProfilePage imports, both routes, profile path now uses MobileProfilePage
