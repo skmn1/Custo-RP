@@ -15,7 +15,12 @@
     "nextShift": "Next Shift",
     "hoursThisWeek": "Hours This Week",
     "pendingRequests": "Pending Requests",
-    "latestPayslip": "Latest Payslip",
+    "latestPayslip": {
+      "title": "Latest Payslip",
+      "empty": "No payslips available yet.",
+      "restricted": "Payslip access is disabled by your organisation.",
+      "viewPayslip": "View payslip"
+    },
     "noUpcomingShift": "No upcoming shifts",
     "viewSchedule": "View schedule",
     "viewPayslips": "View payslips",
@@ -34,12 +39,6 @@
       "title": "Notifications",
       "empty": "No new notifications.",
       "viewAll": "View all"
-    },
-    "latestPayslip": {
-      "title": "Latest Payslip",
-      "empty": "No payslips available yet.",
-      "restricted": "Payslip access is disabled by your organisation.",
-      "viewPayslip": "View payslip"
     },
     "profile": {
       "title": "Profile",
@@ -341,18 +340,20 @@
       "requiresInternet": "Requires internet connection",
       "downloadDisabled": "Download is unavailable offline",
       "editDisabled": "Editing is unavailable offline",
-      "willSyncWhenOnline": "Will sync when back online"    },
+      "willSyncWhenOnline": "Will sync when back online"
+    },
     "sync": {
-      "pending": "{{count}} pending change(s) \u2014 will sync when back online",
-      "syncing": "Syncing {{count}} pending change(s)\u2026",
+      "pending": "{{count}} pending change(s) — will sync when back online",
+      "syncing": "Syncing {{count}} pending change(s)…",
       "synced": "{{count}} change(s) synced",
-      "conflict": "{{synced}} synced, {{conflicts}} conflict(s) \u2014 already processed by HR",
+      "conflict": "{{synced}} synced, {{conflicts}} conflict(s) — already processed by HR",
       "failed": "{{count}} change(s) failed to sync",
       "retryBtn": "Retry",
       "discardBtn": "Discard",
       "confirmDiscard": "Sure?",
       "queued": "Queued",
-      "conflictBadge": "Conflict"    },
+      "conflictBadge": "Conflict"
+    },
     "push": {
       "title": "Stay updated",
       "body": "Get notified about schedule changes, payslip availability, leave approvals, and shift swap updates — even when the app is closed",
@@ -542,6 +543,44 @@
       "statusConfirmed": "Confirmed",
       "statusPending": "Pending",
       "statusSwapRequested": "Swap Requested"
+    },
+    "payroll": {
+      "title": "Payroll Hub",
+      "financialOverview": "Financial Overview",
+      "ytdEarnings": "Year-to-Date Earnings",
+      "ytdProgress": "Year-to-date payroll progress",
+      "payslipsProcessed": "{{count}} of 12 payslips processed",
+      "currentPeriod": "Current Period",
+      "netPay": "Net Pay",
+      "grossPay": "Gross Pay",
+      "viewPayslip": "View Payslip",
+      "financialTools": "Financial Tools",
+      "taxDocs": "Tax Documents",
+      "banking": "Banking Info",
+      "history": "Pay History",
+      "analytics": "Analytics",
+      "open": "Open",
+      "recentActivity": "Recent Activity",
+      "payslip": "Payslip",
+      "paid": "Paid",
+      "earnings": "Earnings",
+      "baseSalary": "Base Salary",
+      "overtime": "Overtime",
+      "deductions": "Deductions",
+      "totalDeductions": "Total Deductions",
+      "employerContributions": "Employer Contributions",
+      "downloadPdf": "Download PDF",
+      "downloadPdfLabel": "Download payslip for {{period}}",
+      "historyTitle": "Payslip History",
+      "records": "Records",
+      "searchPayslips": "Search payslips...",
+      "filterByYear": "Filter by year",
+      "allYears": "All years",
+      "noResults": "No payslips found",
+      "back": "Back",
+      "retry": "Try again",
+      "restricted": "Payslip access is restricted",
+      "notFound": "Payslip not found"
     }
   },
   "auth": {

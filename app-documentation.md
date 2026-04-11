@@ -2206,3 +2206,167 @@ New keys in both `en/ess.json` and `fr/ess.json`:
 - Shift dot Set construction
 - EN/FR i18n key presence and value checks
 - Source structural assertions: testids, aria attributes, Material Symbols, hook imports
+
+---
+
+## Payroll Hub — ESS Nexus Kinetic (Task 82)
+
+**Branch:** `feature/82-ess-payroll-hub`
+**Screens:** SCREEN_7 (Payroll Hub), SCREEN_89 (Payslip Detail), SCREEN_45 (Payslip History)
+
+### Components
+
+| Component | File | Purpose |
+|---|---|---|
+| `MobilePayrollHubPage` | `src/pages/ess/mobile/MobilePayrollHubPage.jsx` | YTD earnings overview, current period summary, quick-link bento grid, recent activity list |
+| `MobilePayslipDetailPage` | `src/pages/ess/mobile/MobilePayslipDetailPage.jsx` | Full payslip breakdown: earnings, deductions, employer contributions, PDF download |
+| `MobilePayslipHistoryPage` | `src/pages/ess/mobile/MobilePayslipHistoryPage.jsx` | Searchable, year-grouped payslip list with inline download buttons |
+| `MobilePayrollSkeleton` | — (inline in Hub) | Pulse skeleton for hub loading state |
+| `MobilePayslipSkeleton` | — (inline in Detail) | Pulse skeleton for detail loading state |
+| `MobileHistorySkeleton` | — (inline in History) | Pulse skeleton for history loading state |
+| `PayslipSection` | — (inline in Detail) | Reusable earnings/deductions card with subtotal row |
+
+### Routes
+
+```
+/app/ess/payroll           → MobilePayrollHubPage
+/app/ess/payroll/history   → MobilePayslipHistoryPage  (static, before :id)
+/app/ess/payroll/:id       → MobilePayslipDetailPage
+```
+
+### Data Model
+
+**`useEssPayrollSummary()`** — `GET /api/ess/payslips/summary`
+
+| Field | Type | Description |
+|---|---|---|
+| `ytdGross` | number | Year-to-date gross earnings |
+| `ytdPeriod` | string | Human-readable period, e.g. "Jan – Apr 2026" |
+| `ytdPaidMonths` | number | Payslips processed this year (0–12) |
+| `currentPayslip.id` | string | ID for View Payslip navigation |
+| `currentPayslip.period` | string | e.g. "March 2026" |
+| `currentPayslip.netPay` | number | |
+| `currentPayslip.grossPay` | number | |
+| `currentPayslip.status` | string | e.g. "Processed" |
+| `recentActivity[]` | array | Optional; each: `{ icon, label, date, amount }` |
+
+**`useEssPayslipDetail(id)`** — `GET /api/ess/payslips/:id`
+
+| Field | Type | Description |
+|---|---|---|
+| `period` / `payPeriod` | string | e.g. "March 2026" |
+| `payDate` | string | Pay date string |
+| `netPay` | number | |
+| `grossPay` | number | |
+| `baseSalary` | number | |
+| `overtime` | number? | Optional; `overtimeHours` gives the label |
+| `bonuses[]` | array? | `{ name, amount }` |
+| `deductions[]` | array | `{ name, amount }` |
+| `totalDeductions` | number | |
+| `employerContributions[]` | array | `{ name, amount }` |
+
+### Payroll Hub Layout
+
+```
+Editorial header (Financial Overview / Payroll Hub)
+├── YTD hero card (Magenta gradient, lg:col-span-2)
+│   ├── YTD earnings figure
+│   ├── Period label
+│   └── Progress bar (role=progressbar, paid months / 12)
+└── Current period card (border-l-4 border-primary, lg:col-span-1)
+    ├── Net pay + gross pay
+    └── View Payslip button → /app/ess/payroll/:id
+
+Financial Tools (2-col / 4-col grid)
+  receipt_long → Tax Documents
+  account_balance → Banking Info
+  history → Pay History (/app/ess/payroll/history)
+  bar_chart → Analytics
+
+Recent Activity (conditional — only when data.recentActivity is non-empty)
+```
+
+### Payslip Detail Layout
+
+```
+Back button (navigate(-1))
+Payslip title + pay date
+Net pay hero (Magenta gradient, mx-6)
+  ├── Net Pay figure (5xl)
+  └── Gross / Deductions summary line
+
+md+ bento: earnings (col-8) | deductions (col-4)
+PayslipSection — Earnings
+  base salary, overtime (with hours), bonuses[]
+  subtotal row: Gross Pay
+
+PayslipSection — Deductions (negative=true → text-error, '−' prefix)
+  deductions[]
+  subtotal row: Total Deductions
+
+Employer Contributions (bg-primary-container/30 tinted card)
+  employerContributions[] (conditional — only if non-empty)
+
+PDF download: <a href="/api/ess/payslips/:id/pdf" download>
+  aria-label uses t('mobile.payroll.downloadPdfLabel', { period })
+```
+
+### History Search & Filter
+
+- Search input filters `period` (or `periodLabel`) case-insensitively via `String.includes`
+- Year dropdown: derived from unique years across the **full unfiltered** payslip list
+- `selectedYear=null` shows all years; selecting a year hides other groups
+- Groups rendered newest year first (sorted descending)
+- Each row: period label + status chip + net pay → tap to navigate to detail
+- Inline download: `<a href="/api/ess/payslips/:id/pdf" download>` per row
+
+### Desktop Coexistence
+
+Routes at `/app/ess/payroll/*` are new and do not replace the existing `/app/ess/payslips` and `/app/ess/payslips/:id` desktop routes. The quick-link on the Dashboard page already links to `/app/ess/payslips`; the payroll hub is accessible via the quick-links icon `payrollHub` on the dashboard or direct navigation.
+
+### i18n (36 keys)
+
+All strings live under `mobile.payroll.*` in `public/locales/{en,fr}/ess.json`.
+
+| Key | EN | FR |
+|---|---|---|
+| `title` | Payroll Hub | Tableau de paie |
+| `ytdEarnings` | Year-to-Date Earnings | Salaire cumulé (YTD) |
+| `netPay` | Net Pay | Salaire net |
+| `grossPay` | Gross Pay | Salaire brut |
+| `downloadPdf` | Download PDF | Télécharger PDF |
+| `historyTitle` | Payslip History | Historique des fiches |
+| `employerContributions` | Employer Contributions | Cotisations patronales |
+| `downloadPdfLabel` | Download payslip for {{period}} | Télécharger la fiche de paie pour {{period}} |
+
+### Accessibility
+
+- YTD progress bar: `role="progressbar"`, `aria-valuenow`, `aria-valuemin=0`, `aria-valuemax=100`, `aria-label`
+- PDF download anchor: `aria-label={t('mobile.payroll.downloadPdfLabel', { period })}` (on both Detail and History pages)
+- All Material Symbol `<span>` elements: `aria-hidden="true"`
+- Section headings: `h1` (page title), `h2` (section titles)
+- Touch targets: all interactive elements use `p-5` or `py-3/py-4` padding (≥ 44px)
+
+### Loading & Error States
+
+| View | State | Behaviour |
+|---|---|---|
+| Payroll Hub | `isLoading` | `MobilePayrollSkeleton` (animate-pulse) |
+| Payroll Hub | `error` | `MobilePayrollError` with retry button |
+| Payroll Hub | `!data` | Falls through to skeleton |
+| Payslip Detail | `isLoading` | `MobilePayslipSkeleton` |
+| Payslip Detail | `error=restricted` | `t('mobile.payroll.restricted')` |
+| Payslip Detail | other error | Error message + retry |
+| History | `isLoading` | `MobileHistorySkeleton` |
+| History | no results after filter | Empty state with `receipt_long` icon |
+
+### Unit Tests
+
+`tests/mobile-payroll-nexus.test.js` — **156 tests, all passing**
+
+- `getPayYear()` — extracts year from `payDate`, `paidAt`, fallback to current year
+- `filterPayslips()` — case-insensitive search on `period`/`periodLabel`
+- `groupByYear()` — groups payslips by integer year, handles edge cases
+- `ytdProgress()` — percentage clamped at 100, null/undefined safe
+- EN + FR i18n key presence and value assertions (36 + 20 keys)
+- Source structural assertions: testids, aria attrs, Magenta gradients, anchor download, hooks imports, route ordering
