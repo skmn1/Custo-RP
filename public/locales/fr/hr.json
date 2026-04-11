@@ -123,5 +123,21 @@
       "progress": "Progression",
       "updated": "Mis à jour"
     }
+  },
+  "requests": {
+    "title": "Boîte de réception",
+    "filterAll": "Toutes",
+    "filterLeave": "Congés",
+    "filterAbsence": "Absences",
+    "filterSwap": "Échanges",
+    "approve": "Approuver",
+    "reject": "Refuser",
+    "acknowledge": "Confirmer",
+    "dispute": "Contester",
+    "rejectReason": "Motif du refus",
+    "disputeReason": "Motif de contestation",
+    "exportCsv": "Exporter CSV",
+    "noRequests": "Aucune demande ne correspond au filtre",
+    "urgentBadge": "Urgent"
   }
 }

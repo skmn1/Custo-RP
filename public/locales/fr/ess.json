@@ -730,5 +730,26 @@
       "swap": "Échange de quart",
       "personal": "Personnel"
     }
+  },
+  "requests": {
+    "title": "Mes demandes",
+    "tabAll": "Toutes",
+    "tabLeave": "Congés",
+    "tabAbsence": "Absences",
+    "tabSwap": "Échanges",
+    "noRequests": "Aucune demande pour l'instant",
+    "statusSubmitted": "Soumis",
+    "statusApproved": "Approuvé",
+    "statusRejected": "Refusé",
+    "statusCancelled": "Annulé",
+    "statusReported": "Signalé",
+    "statusAcknowledged": "Pris en charge",
+    "statusDisputed": "Contesté",
+    "statusPendingPeer": "En attente du collègue",
+    "statusPendingManager": "En attente du responsable",
+    "statusPeerDeclined": "Refusé par le collègue",
+    "balanceWarning": "Cette demande dépasse votre solde disponible. Votre responsable peut quand même l'approuver.",
+    "certRequired": "Un certificat médical sera requis pour cette absence.",
+    "cancelConfirm": "Annuler cette demande ?"
   }
 }

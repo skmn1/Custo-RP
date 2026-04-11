@@ -12,6 +12,12 @@ import java.util.List;
 @Repository
 public interface LeaveRequestRepository extends JpaRepository<LeaveRequest, String> {
 
+    List<LeaveRequest> findByEmployeeIdOrderByStartDateDesc(String employeeId);
+
+    List<LeaveRequest> findByStatusInOrderByCreatedAtDesc(List<String> statuses);
+
+    List<LeaveRequest> findAllByOrderByCreatedAtDesc();
+
     /** Returns all approved leave entries that overlap the given date range. */
     @Query("SELECT l FROM LeaveRequest l WHERE l.employeeId = :employeeId " +
            "AND l.status = 'approved' " +

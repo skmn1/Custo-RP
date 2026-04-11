@@ -2931,3 +2931,123 @@ Test categories:
 **Known Remaining Items (tracked, P3 — non-blocking):**
 - `html[lang="fr"]` in `index.html` should be dynamic (set by i18next on mount). Tracked as separate cleanup task.
 - Desktop payslips route (`/app/ess/payslips`) still uses the desktop `EssPayslipsPage` with `MobilePayslipList` delegation rather than the Sprint 22 `MobilePayslipDetailPage`. Separate migration task planned.
+
+---
+
+## Task 87 — Request Workflows: Database Schema & ESS/HR API Endpoints (Sprint 23)
+
+### Overview
+
+Full-stack request workflow infrastructure covering three request types:
+- **Leave Requests** — submit, cancel, approve/reject (uses existing `leave_requests` table)
+- **Absence Reports** — report, cancel, acknowledge/dispute (new `absence_reports` table via V45 migration)
+- **Shift Swap Requests** — initiate, peer accept/decline, manager approve/reject (new `shift_swap_requests` JPA entity)
+
+### Database — V45 Migration (`absence_reports`)
+
+| Column | Type | Notes |
+|--------|------|-------|
+| id | UUID PK | Generated |
+| employee_id | UUID NOT NULL | FK concept (not enforced) |
+| absence_date | DATE NOT NULL | |
+| absence_type | VARCHAR(30) | CHECK: sick, late_arrival, emergency, personal, other |
+| expected_start / actual_start | TIME | For late_arrival tracking |
+| reason | TEXT | Optional |
+| cert_required / cert_uploaded | BOOLEAN | Auto-set by rolling 30-day sick threshold |
+| cert_file_key | VARCHAR(255) | S3/storage key |
+| status | VARCHAR(20) | CHECK: reported, acknowledged, disputed, cancelled |
+| acknowledged_by / acknowledged_at | UUID / TIMESTAMPTZ | |
+| disputed_by / disputed_at / dispute_reason | UUID / TIMESTAMPTZ / TEXT | |
+| created_at / updated_at | TIMESTAMPTZ | Auto-managed |
+
+Indexes: `(employee_id, absence_date DESC)`, partial on `status IN ('reported','disputed')`, unique on `(employee_id, absence_date)`.
+
+### Backend Models
+
+- **`AbsenceReport.java`** — JPA entity with @PrePersist/@PreUpdate lifecycle hooks
+- **`ShiftSwapRequest.java`** — JPA entity for 1-to-1 direct shift swaps (requesterId/recipientId as String, matching employee ID format)
+
+### Repositories
+
+- **`AbsenceReportRepository`** — `countSickInWindow()`, `existsByEmployeeIdAndAbsenceDate()`, `findOpenReports()`
+- **`ShiftSwapRequestRepository`** — `findByRequesterOrRecipient()`, `existsActiveSwapForShift()`, peer/requester auth lookups, `findOpenSwaps()`
+- **`LeaveRequestRepository`** — added `findByEmployeeIdOrderByStartDateDesc()`, `findByStatusInOrderByCreatedAtDesc()`, `findAllByOrderByCreatedAtDesc()`
+
+### ESS API Endpoints (`EssRequestController` — `/api/ess/requests/**`)
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/leave/balance` | Own leave balances (annual/sick) for current year |
+| GET | `/leave/types` | Active leave types with colours |
+| GET | `/leave?year=&status=` | List own leave requests |
+| POST | `/leave` | Submit leave request (validates dates, calculates working days, balance warning) |
+| DELETE | `/leave/{id}` | Cancel own submitted leave request |
+| POST | `/absence` | Report unplanned absence (duplicate check, cert_required policy) |
+| GET | `/absence?year=` | List own absence reports |
+| PATCH | `/absence/{id}/cancel` | Cancel same-day absence report |
+| GET | `/swap` | List own swap requests (sent + received) |
+| POST | `/swap` | Initiate shift swap (validates ownership, no active swap conflict) |
+| PATCH | `/swap/{id}/peer-accept` | Recipient accepts proposed swap |
+| PATCH | `/swap/{id}/peer-decline` | Recipient declines proposed swap |
+| PATCH | `/swap/{id}/cancel` | Requester cancels pending_peer swap |
+| GET | `/summary` | Badge counts (pending leave, reported absence, pending swaps) |
+
+### HR API Endpoints (`HrRequestController` — `/api/hr/requests/**`)
+
+All endpoints require `SUPER_ADMIN` or `HR_MANAGER` role via `@PreAuthorize`.
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/?type=&status=` | Unified list of all request types with filters |
+| GET | `/export?type=&status=` | CSV export of requests |
+| PUT | `/leave/{id}/approve` | Approve a leave request |
+| PUT | `/leave/{id}/reject` | Reject with optional reason |
+| PATCH | `/absence/{id}/acknowledge` | Acknowledge absence report |
+| PATCH | `/absence/{id}/dispute` | Dispute with required reason |
+| PATCH | `/absence/{id}/cert-required` | Toggle cert_required flag |
+| PUT | `/swap/{id}/approve` | Approve swap — atomically reassigns shift employee_ids |
+| PUT | `/swap/{id}/reject` | Reject with optional reason |
+
+### Frontend API Layer (`src/api/requestsApi.js`)
+
+Two exported objects:
+- **`essRequestsApi`** — 15 methods mapping to ESS endpoints
+- **`hrRequestsApi`** — 9 methods mapping to HR endpoints
+
+### React Query Hooks (`src/hooks/useEssRequests.js`)
+
+17 hooks exported:
+
+| Hook | Type | Key Details |
+|------|------|-------------|
+| `useEssLeaveBalance` | query | staleTime 2min |
+| `useEssLeaveTypes` | query | staleTime 10min |
+| `useEssLeaveRequests` | query | staleTime 2min, year/status filters |
+| `useEssSubmitLeave` | mutation | invalidates all |
+| `useEssCancelLeave` | mutation | invalidates all |
+| `useEssAbsenceReports` | query | staleTime 2min |
+| `useEssReportAbsence` | mutation | invalidates all |
+| `useEssCancelAbsence` | mutation | invalidates all |
+| `useEssSwapRequests` | query | staleTime 2min |
+| `useEssSubmitSwap` | mutation | invalidates all |
+| `useEssPeerAcceptSwap` | mutation | invalidates all |
+| `useEssPeerDeclineSwap` | mutation | invalidates all |
+| `useEssCancelSwap` | mutation | invalidates all |
+| `useEssRequestsSummary` | query | 60s polling |
+| `useHrRequests` | query | staleTime 30s, type/status filters |
+| `useHrExportCsv` | query | disabled by default (manual) |
+| `getRequestStatusLabel` | fn | i18n helper for status display |
+
+### i18n Keys
+
+**`ess.json` → `requests.*`** (17 keys): title, tab labels, status labels, balanceWarning, certRequired, cancelConfirm
+**`hr.json` → `requests.*`** (14 keys): title, filter labels, action verbs, rejectReason, disputeReason, exportCsv, urgentBadge
+
+### Business Rules
+
+1. **cert_required policy**: Auto-set when rolling 30-day sick absence count ≥ `hr.sickCertThreshold` setting (default: 3)
+2. **Leave balance**: Non-blocking warning when submission would exceed annual allowance
+3. **Absence duplicate check**: 409 if employee already has a report for the same date
+4. **Swap conflict check**: 409 if active swap exists for either shift
+5. **Swap approval**: Atomically swaps `employee_id` on both shifts
+6. **Cancellation rules**: Leave — only submitted/pending. Absence — only reported + same day. Swap — only pending_peer by requester.

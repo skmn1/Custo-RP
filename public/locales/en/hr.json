@@ -123,5 +123,21 @@
       "progress": "Progress",
       "updated": "Updated"
     }
+  },
+  "requests": {
+    "title": "Request Inbox",
+    "filterAll": "All",
+    "filterLeave": "Leave",
+    "filterAbsence": "Absences",
+    "filterSwap": "Swaps",
+    "approve": "Approve",
+    "reject": "Reject",
+    "acknowledge": "Acknowledge",
+    "dispute": "Dispute",
+    "rejectReason": "Reason for rejection",
+    "disputeReason": "Reason for dispute",
+    "exportCsv": "Export CSV",
+    "noRequests": "No requests match the current filter",
+    "urgentBadge": "Urgent"
   }
 }

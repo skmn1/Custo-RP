@@ -739,5 +739,26 @@
       "swap": "Shift Swap",
       "personal": "Personal"
     }
+  },
+  "requests": {
+    "title": "My Requests",
+    "tabAll": "All",
+    "tabLeave": "Leave",
+    "tabAbsence": "Absences",
+    "tabSwap": "Swaps",
+    "noRequests": "No requests yet",
+    "statusSubmitted": "Submitted",
+    "statusApproved": "Approved",
+    "statusRejected": "Rejected",
+    "statusCancelled": "Cancelled",
+    "statusReported": "Reported",
+    "statusAcknowledged": "Acknowledged",
+    "statusDisputed": "Disputed",
+    "statusPendingPeer": "Awaiting colleague",
+    "statusPendingManager": "Awaiting manager",
+    "statusPeerDeclined": "Declined by colleague",
+    "balanceWarning": "This request exceeds your available balance. Your manager may still approve it.",
+    "certRequired": "A medical certificate will be required for this absence.",
+    "cancelConfirm": "Cancel this request?"
   }
 }
