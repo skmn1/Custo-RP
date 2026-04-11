@@ -506,6 +506,43 @@
       "iosStep2": "Faites défiler vers le bas",
       "iosStep3": "Appuyez sur « Sur l'écran d'accueil »",
       "gotIt": "Compris"
-    }
-  }
+    }  },
+  "auth": {
+    "appName": "ESS",
+    "employeePortal": "Portail employé",
+    "heroTagline": "Votre accès aux plannings, fiches de paie et gestion d'équipe — tout en un.",
+    "welcomeBack": "Bon retour",
+    "loginSubtitle": "Connectez-vous à votre portail employé.",
+    "email": "Adresse e-mail",
+    "password": "Mot de passe",
+    "forgotPassword": "Mot de passe oublié ?",
+    "signIn": "Se connecter",
+    "biometricLogin": "Connexion biométrique",
+    "newToTeam": "Nouveau dans l'équipe ?",
+    "requestAccessLink": "Demander un lien d'accès",
+    "showPassword": "Afficher le mot de passe",
+    "hidePassword": "Masquer le mot de passe",
+    "backToLogin": "Retour à la connexion",
+    "resetTitle": "Réinitialiser le mot de passe",
+    "resetDescription": "Pas de panique ! Saisissez l'e-mail lié à votre compte et nous vous enverrons un lien de réinitialisation.",
+    "sendResetLink": "Envoyer le lien de réinitialisation",
+    "resetSuccess": "Lien de réinitialisation envoyé ! Vérifiez votre messagerie.",
+    "securityTitle": "Sécurité du compte",
+    "securityDescription": "Les liens expirent après 30 minutes pour votre protection.",
+    "supportTitle": "Besoin d'aide ?",
+    "supportDescription": "Contactez le support informatique pour la récupération du compte.",
+    "callUs": "Appeler",
+    "chat": "Chat",
+    "faq": "FAQ",
+    "error": {
+      "invalid": "E-mail ou mot de passe invalide.",
+      "deactivated": "Votre compte a été désactivé. Veuillez contacter votre administrateur.",
+      "unavailable": "Service indisponible. Veuillez réessayer plus tard."
+    },
+    "validation": {
+      "emailRequired": "L'e-mail est requis.",
+      "emailInvalid": "Saisissez une adresse e-mail valide.",
+      "passwordRequired": "Le mot de passe est requis.",
+      "passwordMinLength": "Le mot de passe doit contenir au moins 8 caractères."
+    }  }
 }

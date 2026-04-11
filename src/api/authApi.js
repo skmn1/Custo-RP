@@ -99,6 +99,14 @@ export async function getMeApi() {
   });
 }
 
+export async function forgotPasswordApi(email) {
+  return authFetch('/auth/forgot-password', {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify({ email }),
+  });
+}
+
 export async function updateProfileApi(firstName, lastName) {
   return authFetch('/auth/me', {
     method: 'PUT',

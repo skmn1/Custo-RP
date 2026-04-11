@@ -514,5 +514,44 @@
       "iosStep3": "Tap \"Add to Home Screen\"",
       "gotIt": "Got it"
     }
+  },
+  "auth": {
+    "appName": "ESS",
+    "employeePortal": "Employee Portal",
+    "heroTagline": "Your gateway to schedules, payslips, and team management — all in one place.",
+    "welcomeBack": "Welcome Back",
+    "loginSubtitle": "Sign in to your employee portal.",
+    "email": "Email address",
+    "password": "Password",
+    "forgotPassword": "Forgot Password?",
+    "signIn": "Sign In",
+    "biometricLogin": "Use Biometric Login",
+    "newToTeam": "New to the team?",
+    "requestAccessLink": "Request Access Link",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "backToLogin": "Back to Login",
+    "resetTitle": "Reset Password",
+    "resetDescription": "No worries! Enter the email linked to your account and we'll send you a reset link.",
+    "sendResetLink": "Send Reset Link",
+    "resetSuccess": "Reset link sent! Please check your inbox.",
+    "securityTitle": "Account Security",
+    "securityDescription": "Links expire in 30 minutes for your protection.",
+    "supportTitle": "Need Help?",
+    "supportDescription": "Contact IT support for account recovery.",
+    "callUs": "Call Us",
+    "chat": "Chat",
+    "faq": "FAQ",
+    "error": {
+      "invalid": "Invalid email or password.",
+      "deactivated": "Your account has been deactivated. Please contact your administrator.",
+      "unavailable": "Service unavailable. Please try again later."
+    },
+    "validation": {
+      "emailRequired": "Email is required.",
+      "emailInvalid": "Enter a valid email address.",
+      "passwordRequired": "Password is required.",
+      "passwordMinLength": "Password must be at least 8 characters."
+    }
   }
 }

@@ -25,6 +25,9 @@ import AccessDeniedPage from './pages/AccessDeniedPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DevLoginPage from './pages/DevLoginPage';
+import MobileLoginPage from './pages/ess/mobile/MobileLoginPage';
+import MobileResetPasswordPage from './pages/ess/mobile/MobileResetPasswordPage';
+import { useMobileLayout } from './hooks/useMobileLayout';
 import AccessibilityEffects from './components/AccessibilityEffects';
 import StockDashboardPage from './pages/stock/StockDashboardPage';
 import StockItemListPage from './pages/stock/StockItemListPage';
@@ -130,6 +133,16 @@ const posSidebar = []; // PoS uses PosAppShell with dynamic sidebar
 
 const adminSidebar = adminSidebarItems;
 
+const MobileAwareLogin = () => {
+  const isMobile = useMobileLayout();
+  return isMobile ? <MobileLoginPage /> : <DevLoginPage />;
+};
+
+const MobileAwareResetPassword = () => {
+  const isMobile = useMobileLayout();
+  return isMobile ? <MobileResetPasswordPage /> : <MobileResetPasswordPage />;
+};
+
 const App = () => {
   return (
     <DarkModeProvider>
@@ -139,8 +152,9 @@ const App = () => {
         <AccessibilityEffects />
         <Routes>
           {/* Public routes */}
-          <Route path="/login" element={<DevLoginPage />} />
+          <Route path="/login" element={<MobileAwareLogin />} />
           <Route path="/login/classic" element={<LoginPage />} />
+          <Route path="/forgot-password" element={<MobileAwareResetPassword />} />
           <Route path="/register" element={<RegisterPage />} />
 
           {/* App Launcher (home) */}

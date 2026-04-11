@@ -1888,3 +1888,89 @@ Secondary routes (no tab — accessible via cards/top-bar):
 ### Desktop Behaviour
 
 `<BottomNav>` is rendered inside `<MobileShell>`, which is only mounted at viewports `< 1024px`. Desktop layouts use the sidebar navigation — the bottom nav is never visible at ≥ 1024px.
+
+---
+
+## Auth Screens — ESS Mobile Login & Password Reset (Task 79, Sprint 22)
+
+**Introduced:** April 11, 2026  
+**Components:**
+- `src/pages/ess/mobile/MobileLoginPage.jsx` — SCREEN_128
+- `src/pages/ess/mobile/MobileResetPasswordPage.jsx` — SCREEN_129
+
+**Design System:** Nexus Kinetic (Task 77) — Magenta primary, Plus Jakarta Sans headings, Manrope body  
+**Shell:** Standalone full-screen routes — no `<MobileShell>`, no bottom nav
+
+### Routes
+
+| Path | Desktop | Mobile (< 1024px) |
+|------|---------|-------------------|
+| `/login` | `DevLoginPage` | `MobileLoginPage` |
+| `/login/classic` | `LoginPage` | `LoginPage` |
+| `/forgot-password` | `MobileResetPasswordPage` | `MobileResetPasswordPage` |
+
+Route selection uses `useMobileLayout()` — the hook fires on breakpoint crossing (1024px threshold).
+
+### Login Screen (SCREEN_128) — MobileLoginPage
+
+**Layout:**  
+- Mobile (< 768px): Single-column centred form, warm white background
+- Tablet/Desktop (≥ 768px): Two-column split — Magenta brand panel (left) + form panel (right)
+
+**Form elements:**
+- Email input with `person` Material Symbol icon at left; `border-b-2 focus:border-[#da336b]` underline effect
+- Password input with `lock` icon + visibility toggle (`visibility`/`visibility_off` icons); `aria-label` on toggle button
+- `Forgot Password?` link → `/forgot-password`
+- **Primary CTA:** "Sign In" — Magenta gradient (`#da336b` → `#8b2044`), `rounded-2xl`, arrow icon
+- **Tonal button:** "Use Biometric Login" — `bg-[#f2dee1]`, `text-[#da336b]`, face icon filled; logs `console.warn` as placeholder
+- Footer: "Request Access Link" text link (Magenta)
+
+**Auth integration:**
+- Calls `useAuth().login(email, password)` from `src/hooks/useAuth.jsx`
+- Local `isLoading` / `error` state (the shared hook doesn't expose these)
+- Client-side validation: email regex, password ≥ 8 characters; inline `role="alert"` error messages
+- On success: navigates to `/app/ess/dashboard`
+
+### Password Reset Screen (SCREEN_129) — MobileResetPasswordPage
+
+**Layout:** Centred glass-card with ambient Magenta orbs in background; mobile quick-action bar (Call Us / Chat / FAQ) pinned to bottom.
+
+**Form elements:**
+- Back button `arrow_back` → `navigate(-1)`; `aria-label="Back to Login"`
+- `lock_reset` icon badge (filled, Magenta)
+- Email input with `mail` icon
+- **Primary CTA:** "Send Reset Link" — same Magenta gradient; `send` icon
+- Security tile: `verified_user` icon — link expiry notice
+- Support tile: `support_agent` icon — IT contact
+
+**API integration:**
+- Calls `forgotPasswordApi(email)` from `src/api/authApi.js` (POST `/auth/forgot-password`)
+- Email enumeration prevention: non-503 errors show success state
+- Success banner: `check_circle` icon, `role="status"`; submit button disabled after success
+
+**Validation:** Email required + regex format; inline `role="alert"` error.
+
+### i18n Keys (`ess` namespace, `auth` section)
+
+| Key | EN | FR |
+|-----|----|----|
+| `auth.appName` | "ESS" | "ESS" |
+| `auth.welcomeBack` | "Welcome Back" | "Bon retour" |
+| `auth.loginSubtitle` | "Sign in to your employee portal." | "Connectez-vous à votre portail employé." |
+| `auth.email` | "Email address" | "Adresse e-mail" |
+| `auth.password` | "Password" | "Mot de passe" |
+| `auth.forgotPassword` | "Forgot Password?" | "Mot de passe oublié ?" |
+| `auth.signIn` | "Sign In" | "Se connecter" |
+| `auth.biometricLogin` | "Use Biometric Login" | "Connexion biométrique" |
+| `auth.resetTitle` | "Reset Password" | "Réinitialiser le mot de passe" |
+| `auth.sendResetLink` | "Send Reset Link" | "Envoyer le lien de réinitialisation" |
+| `auth.resetSuccess` | "Reset link sent! Please check your inbox." | "Lien de réinitialisation envoyé ! Vérifiez votre messagerie." |
+
+### Accessibility
+
+- All inputs have associated `<label>` elements
+- Field errors rendered with `role="alert"` below each input
+- Global error banner has `role="alert"`
+- Reset success banner has `role="status"`
+- Biometric and visibility-toggle buttons have descriptive `aria-label`
+- All interactive elements ≥ 44×44pt (`min-h-[44px]`)
