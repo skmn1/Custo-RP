@@ -167,6 +167,25 @@ export function useCancelSwapRequest() {
   });
 }
 
+/** GET /api/planning/employees/colleagues */
+export function useColleagues() {
+  return useQuery({
+    queryKey: ['planning', 'employees', 'colleagues'],
+    queryFn:  () => essRequestsApi.getColleagues(),
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+/** GET /api/planning/schedule?month=&employeeId= — fresh each open */
+export function useColleagueSchedule(employeeId, month) {
+  return useQuery({
+    queryKey: ['planning', 'schedule', employeeId, month],
+    queryFn:  () => essRequestsApi.getColleagueSchedule(employeeId, month),
+    enabled:  !!employeeId && !!month,
+    staleTime: 0,
+  });
+}
+
 // ── ESS — Summary badge ───────────────────────────────────────────
 
 /**

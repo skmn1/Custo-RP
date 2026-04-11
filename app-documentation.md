@@ -3160,3 +3160,93 @@ The MobileRequestsPage now has three sub-tabs rendered conditionally:
 | `public/locales/fr/ess.json` | Added `mobile.absence.*` (37 keys, French) |
 | `tests/mobile-responsive-qa.test.js` | Updated mobile key count from 264 → 319 |
 | `tests/ess-absence-reporting.test.js` | New — 86 tests covering i18n, sub-tabs, components, API, hooks |
+
+---
+
+## Task 90 — ESS Shift Swap Request (Mobile)
+
+### Overview
+
+Builds the full shift-swap request flow for the ESS mobile portal:
+1. Employee taps "Request Swap" on a shift card in Schedule
+2. 2-step bottom sheet: choose a colleague → pick their shift → submit
+3. Swap requests appear in Requests > Swaps tab with sent/received sections
+4. Peer accept/decline actions; requester cancel for pending_peer swaps
+
+### Swap Request Flow (MobileSchedulePage)
+
+**Entry point:** "Request Swap" button on each `ShiftCard` (previously a placeholder) now opens `SwapRequestSheet`.
+
+**Step 1 — Colleague Picker:**
+- `GET /api/planning/employees/colleagues` via `useColleagues()` hook
+- Client-side search filter by name
+- Same-department colleagues sorted first
+- Each row shows name, department, weekly shift count
+
+**Step 2 — Shift Picker:**
+- `GET /api/planning/schedule?month=&employeeId=` via `useColleagueSchedule()` hook
+- Fresh fetch each time (staleTime: 0)
+- Shifts overlapping with requester's existing shifts show conflict warning and are disabled
+- Radio-button selection with visual check mark
+- Optional reason textarea
+
+**Submit:** `POST /api/ess/requests/swap` via `useSubmitSwapRequest()` → success toast → navigate to `/app/ess/requests?tab=swap`
+
+### Swap Requests Tab (MobileRequestsPage)
+
+**SwapTab** replaces the previous placeholder and shows:
+
+| Section | Content |
+|---------|---------|
+| Received | Swaps where `recipientId === currentEmployeeId` with Accept/Decline buttons |
+| Sent | Swaps where `requesterId === currentEmployeeId` with Cancel button (pending_peer only) |
+
+**Peer actions:**
+- Accept → `PATCH /ess/requests/swap/:id/peer-accept` → status becomes `pending_manager`
+- Decline → confirmation prompt → `PATCH /ess/requests/swap/:id/peer-decline` → terminal
+- Cancel → `PATCH /ess/requests/swap/:id/cancel` → terminal
+
+**URL param:** `?tab=swap` auto-selects the Swaps sub-tab on load.
+
+### Status Chip Mapping
+
+| Status | Colour | i18n Key |
+|--------|--------|----------|
+| pending_peer | Amber | requests.statusPendingPeer |
+| pending_manager | Blue | requests.statusPendingManager |
+| approved | Green | requests.statusApproved |
+| rejected | Red | requests.statusRejected |
+| peer_declined | Grey | requests.statusPeerDeclined |
+| cancelled | Grey | requests.statusCancelled |
+
+### Key Components
+
+| Component | File | Purpose |
+|-----------|------|---------|
+| `SwapRequestSheet` | MobileSchedulePage | 2-step bottom sheet (colleague → shift → submit) |
+| `ShiftMiniCard` | MobileSchedulePage | Compact shift display inside swap sheet |
+| `BottomSheet` | MobileSchedulePage | Reusable dialog shell |
+| `SwapTab` | MobileRequestsPage | Sent/received swap lists |
+| `SwapCard` | MobileRequestsPage | Shift ↔ shift visual layout with actions |
+| `SwapShiftMini` | MobileRequestsPage | Compact shift display inside swap card |
+
+### i18n
+
+24 keys added under `swap.*` in both EN and FR `ess.json`:
+- Flow labels (title, yourShift, step1, step2, searchColleague)
+- Actions (sendRequest, accept, decline, cancel)
+- Feedback (submitSuccess, accepted, declined, declineConfirm, approved, rejected)
+- Empty states (noSwaps, noSwapsHint, noColleagueShifts)
+- Warnings (conflictWarning)
+
+### Files Modified
+
+| File | Change |
+|------|--------|
+| `src/pages/ess/mobile/MobileSchedulePage.jsx` | Activated "Request Swap" button; added SwapRequestSheet, BottomSheet, ShiftMiniCard; wired colleague picker + shift picker + submit |
+| `src/pages/ess/mobile/MobileRequestsPage.jsx` | Replaced SwapTab placeholder with full sent/received swap lists; added SwapCard, SwapShiftMini, swapStatusChipClass; URL param `?tab=swap` support |
+| `src/api/requestsApi.js` | Added `getColleagues()`, `getColleagueSchedule()` |
+| `src/hooks/useEssRequests.js` | Added `useColleagues()`, `useColleagueSchedule()` hooks |
+| `public/locales/en/ess.json` | Added `swap.*` (24 keys) |
+| `public/locales/fr/ess.json` | Added `swap.*` (24 keys, French) |
+| `tests/ess-shift-swap.test.js` | New — 102 tests covering i18n, components, API, hooks, status mapping |

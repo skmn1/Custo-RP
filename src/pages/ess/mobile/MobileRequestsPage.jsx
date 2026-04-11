@@ -17,6 +17,7 @@
  *   useCancelLeaveRequest  → DELETE /api/ess/requests/leave/:id
  */
 import { useState, useCallback, useMemo, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet-async';
 import {
@@ -29,6 +30,10 @@ import {
   useReportAbsence,
   useCancelAbsenceReport,
   useUploadAbsenceCert,
+  useEssSwapRequests,
+  usePeerAcceptSwap,
+  usePeerDeclineSwap,
+  useCancelSwapRequest,
 } from '../../../hooks/useEssRequests';
 import { calculateWorkingDays } from '../../../utils/dateUtils';
 
@@ -1105,22 +1110,214 @@ const LeaveTab = ({ t }) => {
   );
 };
 
-// ── SwapTab (placeholder) ─────────────────────────────────────────
+// ── SwapTab ───────────────────────────────────────────────────────
 
-const SwapTab = ({ t }) => (
-  <div className="px-6 mt-6">
-    <div className="bg-surface-container-lowest rounded-2xl text-center py-12 shadow-[0_8px_24px_rgba(25,28,30,0.06)]" data-testid="swaps-empty">
-      <span className="material-symbols-outlined text-4xl text-outline block mb-2" aria-hidden="true">swap_horiz</span>
-      <p className="text-on-surface-variant font-medium font-body">{t('requests.noRequests')}</p>
+/** Swap status → Tailwind chip class */
+function swapStatusChipClass(status) {
+  switch (status) {
+    case 'pending_peer':    return 'bg-secondary-container/40 text-secondary';
+    case 'pending_manager': return 'bg-primary-container/40 text-primary';
+    case 'approved':        return 'bg-primary-container/40 text-primary';
+    case 'rejected':        return 'bg-error-container/40 text-error';
+    case 'peer_declined':
+    case 'cancelled':
+    default:                return 'bg-surface-container text-outline';
+  }
+}
+
+/** Mini card for showing a shift inside a swap card */
+const SwapShiftMini = ({ shift, label }) => {
+  const dateStr = shift?.date;
+  const d = dateStr ? new Date(dateStr.includes?.('T') ? dateStr : dateStr + 'T00:00:00') : null;
+  return (
+    <div className="bg-surface-container-low rounded-xl px-4 py-3 flex items-center gap-3" data-testid="swap-shift-mini">
+      <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center flex-shrink-0">
+        <span className="material-symbols-outlined text-primary text-lg" aria-hidden="true">event</span>
+      </div>
+      <div className="min-w-0">
+        <p className="text-xs text-on-surface-variant font-label">{label}</p>
+        <p className="text-sm font-bold text-on-surface font-body">
+          {d ? new Intl.DateTimeFormat(undefined, { weekday: 'short', day: 'numeric', month: 'short' }).format(d) : dateStr}
+          {' · '}{shift?.startTime}–{shift?.endTime}
+        </p>
+        {(shift?.locationName ?? shift?.location) && (
+          <p className="text-xs text-on-surface-variant font-body">{shift.locationName ?? shift.location}</p>
+        )}
+      </div>
+    </div>
+  );
+};
+
+/** Single swap card — sender or receiver layout */
+const SwapCard = ({ swap, isReceiver, onAccept, onDecline, onCancel, t }) => (
+  <div className="bg-surface-container-lowest rounded-2xl p-5 space-y-3 shadow-[0_4px_12px_rgba(25,28,30,0.04)]" data-testid="swap-card">
+    {/* Requester's shift */}
+    <SwapShiftMini
+      shift={swap.requesterShift}
+      label={isReceiver ? (swap.requesterName ?? '') : t('swap.yourShift')}
+    />
+
+    {/* Swap arrows */}
+    <div className="flex items-center justify-center gap-2 text-primary">
+      <span className="material-symbols-outlined text-xl" aria-hidden="true">swap_horiz</span>
+    </div>
+
+    {/* Recipient's shift */}
+    <SwapShiftMini
+      shift={swap.recipientShift}
+      label={isReceiver ? t('swap.yourShift') : (swap.recipientName ?? '')}
+    />
+
+    {/* Reason */}
+    {swap.reason && (
+      <p className="text-on-surface-variant text-xs font-body italic">{swap.reason}</p>
+    )}
+
+    {/* Status + actions */}
+    <div className="flex items-center justify-between">
+      <span
+        className={`px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wide font-label ${swapStatusChipClass(swap.status)}`}
+        data-testid="swap-status-chip"
+      >
+        {t(`requests.status${swap.status.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('')}`,
+          { defaultValue: swap.status })}
+      </span>
+      <div className="flex gap-2">
+        {isReceiver && swap.status === 'pending_peer' && (
+          <>
+            <button
+              onClick={() => onAccept(swap.id)}
+              className="px-4 py-2 rounded-lg font-bold text-xs font-label text-on-primary"
+              style={{ background: 'linear-gradient(135deg, #da336b 0%, #8b2044 100%)' }}
+              aria-label={`${t('swap.accept')} — ${swap.requesterName ?? ''}`}
+              data-testid="swap-accept-btn"
+            >
+              {t('swap.accept')}
+            </button>
+            <button
+              onClick={() => onDecline(swap.id)}
+              className="px-4 py-2 rounded-lg border-2 border-primary text-primary font-bold text-xs font-label"
+              aria-label={`${t('swap.decline')} — ${swap.requesterName ?? ''}`}
+              data-testid="swap-decline-btn"
+            >
+              {t('swap.decline')}
+            </button>
+          </>
+        )}
+        {!isReceiver && swap.status === 'pending_peer' && (
+          <button
+            onClick={() => onCancel(swap.id)}
+            className="text-error text-xs font-bold uppercase tracking-wide font-label px-3 py-1.5 rounded-lg hover:bg-error-container/20 transition-colors"
+            data-testid="swap-cancel-btn"
+          >
+            {t('swap.cancel')}
+          </button>
+        )}
+      </div>
     </div>
   </div>
 );
+
+const SwapTab = ({ t }) => {
+  const { data: swapsRes, isLoading } = useEssSwapRequests();
+  const peerAccept  = usePeerAcceptSwap();
+  const peerDecline = usePeerDeclineSwap();
+  const cancelSwap  = useCancelSwapRequest();
+
+  const swaps = swapsRes?.data ?? swapsRes ?? [];
+
+  // We use currentEmployeeId from localStorage JWT or fallback
+  const currentEmployeeId = useMemo(() => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (!token) return null;
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.employeeId ?? payload.sub ?? null;
+    } catch { return null; }
+  }, []);
+
+  const sent = useMemo(() => swaps.filter(s => s.requesterId === currentEmployeeId), [swaps, currentEmployeeId]);
+  const received = useMemo(() => swaps.filter(s => s.recipientId === currentEmployeeId), [swaps, currentEmployeeId]);
+
+  const handleAccept = useCallback((id) => {
+    peerAccept.mutate(id);
+  }, [peerAccept]);
+
+  const handleDecline = useCallback((id) => {
+    if (window.confirm(t('swap.declineConfirm'))) {
+      peerDecline.mutate(id);
+    }
+  }, [peerDecline, t]);
+
+  const handleCancel = useCallback((id) => {
+    cancelSwap.mutate(id);
+  }, [cancelSwap]);
+
+  if (isLoading) {
+    return (
+      <div className="px-6 mt-4 space-y-3 animate-pulse" data-testid="swaps-skeleton">
+        {[0, 1, 2].map(i => <div key={i} className="h-36 bg-surface-variant rounded-2xl" />)}
+      </div>
+    );
+  }
+
+  if (sent.length === 0 && received.length === 0) {
+    return (
+      <div className="px-6 mt-6">
+        <div className="bg-surface-container-lowest rounded-2xl text-center py-12 shadow-[0_8px_24px_rgba(25,28,30,0.06)]" data-testid="swaps-empty">
+          <span className="material-symbols-outlined text-4xl text-outline block mb-2" aria-hidden="true">swap_horiz</span>
+          <p className="text-on-surface-variant font-medium font-body">{t('swap.noSwaps')}</p>
+          <p className="text-outline text-xs mt-1 font-body">{t('swap.noSwapsHint')}</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="px-6 mt-4 space-y-6" data-testid="swaps-content">
+      {/* Received — action required */}
+      {received.length > 0 && (
+        <div>
+          <h3 className="font-headline text-sm font-bold text-on-surface mb-3 flex items-center gap-2">
+            <span className="material-symbols-outlined text-lg text-primary" aria-hidden="true">notifications_active</span>
+            {t('swap.receivedRequests')}
+          </h3>
+          <div className="space-y-3">
+            {received.map(sw => (
+              <SwapCard key={sw.id} swap={sw} isReceiver onAccept={handleAccept} onDecline={handleDecline} onCancel={handleCancel} t={t} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Sent */}
+      {sent.length > 0 && (
+        <div>
+          <h3 className="font-headline text-sm font-bold text-on-surface mb-3 flex items-center gap-2">
+            <span className="material-symbols-outlined text-lg text-primary" aria-hidden="true">send</span>
+            {t('swap.sentRequests')}
+          </h3>
+          <div className="space-y-3">
+            {sent.map(sw => (
+              <SwapCard key={sw.id} swap={sw} isReceiver={false} onAccept={handleAccept} onDecline={handleDecline} onCancel={handleCancel} t={t} />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 // ── Main Page ─────────────────────────────────────────────────────
 
 export const MobileRequestsPage = () => {
   const { t } = useTranslation('ess');
-  const [activeTab, setActiveTab] = useState('leave');
+  const [searchParams] = useSearchParams();
+  const initialTab = searchParams.get('tab') || 'leave';
+  const [activeTab, setActiveTab] = useState(() => {
+    const valid = ['leave', 'absence', 'swap'];
+    return valid.includes(initialTab) ? initialTab : 'leave';
+  });
 
   return (
     <>

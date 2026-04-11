@@ -812,5 +812,31 @@
     "balanceWarning": "Cette demande dépasse votre solde disponible. Votre responsable peut quand même l'approuver.",
     "certRequired": "Un certificat médical sera requis pour cette absence.",
     "cancelConfirm": "Annuler cette demande ?"
+  },
+  "swap": {
+    "title": "Échanger un quart",
+    "yourShift": "Votre quart",
+    "step1": "Étape 1 sur 2 : Choisir un collègue",
+    "step2": "Étape 2 sur 2 : Choisir son quart",
+    "searchColleague": "Rechercher par nom...",
+    "shiftsThisWeek": "{{count}} quarts cette semaine",
+    "noColleagueShifts": "Aucun quart à venir pour ce collègue",
+    "conflictWarning": "Ce quart chevauche l'un de vos quarts existants",
+    "reason": "Motif (facultatif)",
+    "reasonPlaceholder": "Pourquoi souhaitez-vous échanger ?",
+    "sendRequest": "Envoyer la demande d'échange",
+    "submitSuccess": "Demande d'échange envoyée !",
+    "sentRequests": "Demandes d'échange envoyées",
+    "receivedRequests": "Demandes d'échange reçues",
+    "accept": "Accepter",
+    "decline": "Refuser",
+    "cancel": "Annuler",
+    "accepted": "Échange accepté — en attente de l'approbation du responsable",
+    "declined": "Demande d'échange refusée",
+    "declineConfirm": "Refuser cette demande d'échange ?",
+    "noSwaps": "Aucune demande d'échange",
+    "noSwapsHint": "Les demandes d'échange apparaîtront ici lorsque vous ou un collègue en initierez une",
+    "approved": "Échange approuvé — quarts mis à jour !",
+    "rejected": "La demande d'échange a été refusée par le responsable"
   }
 }

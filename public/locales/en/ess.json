@@ -821,5 +821,31 @@
     "balanceWarning": "This request exceeds your available balance. Your manager may still approve it.",
     "certRequired": "A medical certificate will be required for this absence.",
     "cancelConfirm": "Cancel this request?"
+  },
+  "swap": {
+    "title": "Swap Shift",
+    "yourShift": "Your Shift",
+    "step1": "Step 1 of 2: Choose a Colleague",
+    "step2": "Step 2 of 2: Pick Their Shift",
+    "searchColleague": "Search by name...",
+    "shiftsThisWeek": "{{count}} shifts this week",
+    "noColleagueShifts": "No upcoming shifts for this colleague",
+    "conflictWarning": "This shift overlaps with one of your existing shifts",
+    "reason": "Reason (optional)",
+    "reasonPlaceholder": "Why do you want to swap?",
+    "sendRequest": "Send Swap Request",
+    "submitSuccess": "Swap request sent!",
+    "sentRequests": "Sent Swap Requests",
+    "receivedRequests": "Swap Requests For You",
+    "accept": "Accept",
+    "decline": "Decline",
+    "cancel": "Cancel",
+    "accepted": "Swap accepted — awaiting manager approval",
+    "declined": "Swap request declined",
+    "declineConfirm": "Decline this swap request?",
+    "noSwaps": "No swap requests",
+    "noSwapsHint": "Swap requests will appear here when you or a colleague initiate one",
+    "approved": "Swap approved — shifts updated!",
+    "rejected": "Swap request was rejected by manager"
   }
 }

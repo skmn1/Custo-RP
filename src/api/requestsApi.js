@@ -59,6 +59,11 @@ export const essRequestsApi = {
   peerDeclineSwap: (id)             => apiFetch(`/ess/requests/swap/${id}/peer-decline`, { method: 'PATCH' }),
   cancelSwapRequest: (id)           => apiFetch(`/ess/requests/swap/${id}/cancel`, { method: 'PATCH' }),
 
+  // Swap helpers — colleague list & colleague schedule
+  getColleagues: ()                 => apiFetch('/planning/employees/colleagues'),
+  getColleagueSchedule: (employeeId, month) =>
+    apiFetch(`/planning/schedule?month=${month}&employeeId=${employeeId}`),
+
   // Summary badge
   getRequestsSummary: ()            => apiFetch('/ess/requests/summary'),
 };
