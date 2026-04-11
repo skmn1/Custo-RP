@@ -318,16 +318,16 @@ describe('EssProfilePage mobile conditional', () => {
     expect(pageSrc).toContain("import { useMobileLayout } from '../../hooks/useMobileLayout'");
   });
 
-  it('imports MobileProfile', () => {
-    expect(pageSrc).toContain("import MobileProfile from '../../components/ess/profile/MobileProfile'");
+  it('imports MobileProfilePage with Nexus Kinetic styling', () => {
+    expect(pageSrc).toContain("import MobileProfilePage from './mobile/MobileProfilePage'");
   });
 
   it('calls useMobileLayout()', () => {
     expect(pageSrc).toContain('useMobileLayout()');
   });
 
-  it('returns MobileProfile when isMobile', () => {
-    expect(pageSrc).toContain('if (isMobile) return <MobileProfile />');
+  it('returns MobileProfilePage with Nexus Kinetic styling when isMobile', () => {
+    expect(pageSrc).toContain('if (isMobile) return <MobileProfilePage />');
   });
 });
 

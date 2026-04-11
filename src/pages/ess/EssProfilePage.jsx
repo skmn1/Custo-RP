@@ -8,7 +8,7 @@ import { useEssConnectivity } from '../../contexts/EssConnectivityContext';
 import { useMobileLayout } from '../../hooks/useMobileLayout';
 import EssOfflineFallback from '../../components/ess/EssOfflineFallback';
 import StaleDataIndicator from '../../components/ess/StaleDataIndicator';
-import MobileProfile from '../../components/ess/profile/MobileProfile';
+import MobileProfilePage from './mobile/MobileProfilePage';
 
 // ─── Tab definitions ────────────────────────────────────────
 
@@ -21,6 +21,10 @@ const EssProfilePage = () => {
   const { t } = useTranslation('ess');
   const [activeTab, setActiveTab] = useState('overview');
   const { isOnline } = useEssConnectivity();
+
+  const profileData = useEssProfile();
+
+  if (isMobile) return <MobileProfilePage />;
 
   const {
     profile,
@@ -36,9 +40,7 @@ const EssProfilePage = () => {
     addQualification,
     updateQualification,
     deleteQualification,
-  } = useEssProfile();
-
-  if (isMobile) return <MobileProfile />;
+  } = profileData;
 
   if (isLoading && !profile) {
     return (
