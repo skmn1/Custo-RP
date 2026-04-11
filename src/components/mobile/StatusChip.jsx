@@ -1,26 +1,42 @@
 /**
- * StatusChip — Task 63 (C.4)
+ * StatusChip — Task 63 (C.4) / Task 77 (Nexus Kinetic)
  *
  * Compact inline badge for displaying status with semantic colour variants.
+ * Updated to use Nexus Kinetic Magenta palette tokens.
  */
-const variants = {
-  success: 'bg-green-100 text-green-700',
-  warning: 'bg-amber-100 text-amber-700',
-  error:   'bg-red-100 text-red-700',
-  info:    'bg-blue-100 text-blue-700',
-  neutral: 'bg-gray-100 text-gray-600',
+
+// Primary status map (approved/pending/declined/active) for task specs
+const STATUS_STYLES = {
+  approved:  'bg-primary-fixed/30 text-primary',
+  pending:   'bg-primary-fixed/50 text-primary',
+  declined:  'bg-error-container/40 text-error',
+  active:    'bg-primary-container text-on-primary-container',
+  processed: 'bg-primary-fixed/30 text-primary',
 };
 
-const StatusChip = ({ label, variant = 'neutral', icon: Icon }) => (
-  <span
-    className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-mobile-caption font-medium ${
-      variants[variant] || variants.neutral
-    }`}
-    data-testid="status-chip"
-  >
-    {Icon && <Icon className="h-3.5 w-3.5" />}
-    {label}
-  </span>
-);
+// Semantic variant map (legacy API — maps success/warning/error/info to Nexus tokens)
+const VARIANT_STYLES = {
+  success: 'bg-[#f0fdf4] text-[#16a34a]',
+  warning: 'bg-[#fffbeb] text-[#d97706]',
+  error:   'bg-error-container/40 text-error',
+  info:    'bg-primary-container text-on-primary-container',
+  neutral: 'bg-surface-container text-on-surface-variant',
+};
+
+const StatusChip = ({ label, status, variant = 'neutral', icon: Icon }) => {
+  const styleClass = status
+    ? (STATUS_STYLES[status] || VARIANT_STYLES.neutral)
+    : (VARIANT_STYLES[variant] || VARIANT_STYLES.neutral);
+
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${styleClass}`}
+      data-testid="status-chip"
+    >
+      {Icon ? <Icon className="h-3.5 w-3.5" /> : <span className="w-1.5 h-1.5 rounded-full bg-current" />}
+      {label}
+    </span>
+  );
+};
 
 export default StatusChip;

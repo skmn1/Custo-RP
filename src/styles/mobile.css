@@ -1,105 +1,152 @@
 /*
- * ESS Mobile Design System — Task 63 / 76
+ * ESS Mobile Design System — Task 63 / 76 / 77
  *
  * Typography, colour tokens, spacing utilities, safe-area helpers,
  * and animation keyframes for the mobile ESS experience.
  *
- * Task 76: Professional blue palette, light-mode only (dark mode removed).
+ * Task 77: Nexus Kinetic design system — Magenta palette (#da336b),
+ *          Plus Jakarta Sans + Manrope, 24px card radius, 16px button radius.
+ *          Light-mode only (dark mode removed in task 76).
  *
  * Imported by MobileShell.jsx — not loaded on desktop viewports.
  */
 
-/* ───────────────────────────── Google Font ───────────────────────────── */
+/* ───────────────────────────── Google Fonts ──────────────────────────── */
 
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap');
 
-/* ───────────────── Colour Tokens (Professional Blue, Light Only) ─────── */
+/* ─────────────── Colour & Shape Tokens (Nexus Kinetic, Light Only) ───── */
 
 :root {
-  /* ── Font ────────────────────────────────────────────────────────── */
-  --mobile-font-family:
+  /* ── Primary (Brand Magenta) ─────────────────── */
+  --mobile-primary:           #da336b;
+  --mobile-on-primary:        #ffffff;
+  --mobile-primary-container: #ffdae2;
+  --mobile-on-primary-container: #3f001c;
+
+  /* ── Secondary ───────────────────────────────── */
+  --mobile-secondary:           #d30035;
+  --mobile-on-secondary:        #ffffff;
+  --mobile-secondary-container: #ffdad6;
+  --mobile-on-secondary-container: #410002;
+
+  /* ── Tertiary ────────────────────────────────── */
+  --mobile-tertiary:           #6b001f;
+  --mobile-on-tertiary:        #ffffff;
+  --mobile-tertiary-container: #ffdad6;
+  --mobile-on-tertiary-container: #260007;
+
+  /* ── Error ───────────────────────────────────── */
+  --mobile-error:           #ba1a1a;
+  --mobile-on-error:        #ffffff;
+  --mobile-error-container: #ffdad6;
+  --mobile-on-error-container: #410002;
+
+  /* ── Backgrounds & Surfaces ──────────────────── */
+  --mobile-bg:              #fffbff;   /* surface — warm near-white          */
+  --mobile-on-bg:           #201a1b;   /* on-background                      */
+  --mobile-surface:         #fffbff;   /* same as background for flat feel   */
+  --mobile-on-surface:      #201a1b;   /* primary text (Deep Slate)          */
+  --mobile-surface-variant: #f2dee1;   /* grouped sections, stat pills       */
+  --mobile-on-surface-variant: #514345; /* secondary text on variant         */
+  --mobile-bg-card:         #ffffff;   /* card fill — pure white             */
+  --mobile-bg-elevated:     #ffffff;   /* sheets, popovers                   */
+
+  /* ── Legacy aliases (consumed by sprint 19 primitives) */
+  --mobile-bg-grouped:      #f2dee1;   /* maps to surface-variant            */
+  --mobile-label-primary:   #201a1b;   /* maps to on-surface                 */
+  --mobile-label-secondary: #514345;   /* maps to on-surface-variant         */
+  --mobile-label-tertiary:  #837375;   /* maps to outline                    */
+  --mobile-label-disabled:  #d5c2c5;   /* maps to outline-variant            */
+
+  /* ── Accent (maps to primary for backwards compat) */
+  --mobile-tint:            #da336b;
+  --mobile-tint-subtle:     rgba(218, 51, 107, 0.10);
+  --mobile-tint-surface:    #ffdae2;   /* primary-container                  */
+  --mobile-tint-on:         #ffffff;
+
+  /* ── Borders & Separators ────────────────────── */
+  --mobile-outline:         #837375;
+  --mobile-outline-variant: #d5c2c5;
+  --mobile-separator:       #d5c2c5;   /* hairline dividers                  */
+  --mobile-border-card:     #d5c2c5;   /* card borders                       */
+
+  /* ── Inverse (tooltips, snackbars) ───────────── */
+  --mobile-inverse-surface:    #352f30;
+  --mobile-inverse-on-surface: #faeeef;
+  --mobile-inverse-primary:    #ffb1c8;
+
+  /* ── Utility ─────────────────────────────────── */
+  --mobile-shadow:          #000000;
+  --mobile-scrim:           #000000;
+  --mobile-surface-tint:    #b40d50;
+
+  /* ── Status ──────────────────────────────────── */
+  --mobile-success:         #16a34a;   /* approved, present                  */
+  --mobile-success-bg:      #f0fdf4;
+  --mobile-warning:         #d97706;   /* pending                            */
+  --mobile-warning-bg:      #fffbeb;
+  --mobile-destructive:     #ba1a1a;   /* declined, absent, error            */
+  --mobile-destructive-bg:  #ffdad6;
+  --mobile-info:            #da336b;   /* informational — uses primary       */
+  --mobile-info-bg:         #ffdae2;
+
+  /* ── Shadows ─────────────────────────────────── */
+  --mobile-shadow-card:       0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --mobile-shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --mobile-shadow-sheet:      0 -4px 32px rgba(0, 0, 0, 0.12);
+
+  /* ── Sheet backdrop ──────────────────────────── */
+  --mobile-backdrop:        rgba(0, 0, 0, 0.40);
+
+  /* ── Bottom tab bar ──────────────────────────── */
+  --mobile-tab-bg:          #ffffff;
+  --mobile-tab-border:      #d5c2c5;
+  --mobile-tab-active-icon: #da336b;
+  --mobile-tab-active-label:#da336b;
+  --mobile-tab-active-pill: rgba(218, 51, 107, 0.10);
+  --mobile-tab-inactive:    #837375;
+
+  /* ── Top bar ─────────────────────────────────── */
+  --mobile-topbar-bg:       #ffffff;
+  --mobile-topbar-border:   #d5c2c5;
+  --mobile-topbar-icon:     #514345;
+
+  /* ── Interaction ─────────────────────────────── */
+  --mobile-press-overlay:   rgba(218, 51, 107, 0.04);
+  --mobile-press-scale:     0.98;
+
+  /* ── Border Radius ───────────────────────────── */
+  --mobile-radius-button: 16px;
+  --mobile-radius-card:   24px;
+  --mobile-radius-input:  12px;
+  --mobile-radius-chip:   8px;
+  --mobile-radius-full:   9999px;
+
+  /* ── Font Stacks ─────────────────────────────── */
+  --mobile-font-headline:
     'Plus Jakarta Sans',
     -apple-system,
     BlinkMacSystemFont,
-    'SF Pro Text',
-    system-ui,
     'Segoe UI',
+    system-ui,
     Roboto,
     'Helvetica Neue',
     sans-serif;
 
-  /* ── Backgrounds ─────────────────────────────── */
-  --mobile-bg:              #F8FAFC;   /* slate-50 — cool off-white page bg  */
-  --mobile-bg-grouped:      #F1F5F9;   /* slate-100 — subtle grouped surface */
-  --mobile-bg-card:         #FFFFFF;   /* pure white cards on slate page     */
-  --mobile-bg-elevated:     #FFFFFF;   /* sheets, popovers                   */
+  --mobile-font-body:
+    'Manrope',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    system-ui,
+    Roboto,
+    'Helvetica Neue',
+    sans-serif;
 
-  /* ── Labels ──────────────────────────────────── */
-  --mobile-label-primary:   #0F172A;   /* slate-900 — near-black, cool edge  */
-  --mobile-label-secondary: #64748B;   /* slate-500 — calm, readable         */
-  --mobile-label-tertiary:  #94A3B8;   /* slate-400 — placeholders, hints    */
-  --mobile-label-disabled:  #CBD5E1;   /* slate-300 — disabled states        */
-
-  /* ── Accent (professional blue) ─────────────── */
-  --mobile-tint:            #2563EB;   /* blue-600 — universally trusted CTA */
-  --mobile-tint-subtle:     rgba(37, 99, 235, 0.10);  /* soft pill fill      */
-  --mobile-tint-surface:    #EFF6FF;   /* blue-50 — unread rows, highlights  */
-  --mobile-tint-border:     #BFDBFE;   /* blue-200 — accent chip borders     */
-  --mobile-tint-on:         #FFFFFF;   /* text on filled tint buttons        */
-
-  /* ── Separators & card borders ───────────────── */
-  --mobile-separator:       #E2E8F0;   /* slate-200                          */
-  --mobile-border-card:     #E2E8F0;   /* explicit card border               */
-
-  /* ── Status: success ─────────────────────────── */
-  --mobile-success:         #16A34A;   /* green-600                          */
-  --mobile-success-bg:      #F0FDF4;   /* green-50                           */
-  --mobile-success-border:  #BBF7D0;   /* green-200                          */
-
-  /* ── Status: warning / pending ───────────────── */
-  --mobile-warning:         #D97706;   /* amber-600                          */
-  --mobile-warning-bg:      #FFFBEB;   /* amber-50                           */
-  --mobile-warning-border:  #FDE68A;   /* amber-200                          */
-
-  /* ── Status: danger / error ──────────────────── */
-  --mobile-destructive:     #DC2626;   /* red-600                            */
-  --mobile-destructive-bg:  #FEF2F2;   /* red-50                             */
-  --mobile-destructive-border: #FECACA; /* red-200                           */
-
-  /* ── Status: info / neutral ──────────────────── */
-  --mobile-info:            #0369A1;   /* sky-700                            */
-  --mobile-info-bg:         #F0F9FF;   /* sky-50                             */
-  --mobile-info-border:     #BAE6FD;   /* sky-200                            */
-
-  /* ── Card shadows ────────────────────────────── */
-  --mobile-shadow-card:
-    0 1px 3px rgba(15, 23, 42, 0.06),
-    0 1px 2px rgba(15, 23, 42, 0.04);
-  --mobile-shadow-card-hover:
-    0 4px 12px rgba(15, 23, 42, 0.10),
-    0 2px 4px  rgba(15, 23, 42, 0.06);
-  --mobile-shadow-sheet:    0 -4px 32px rgba(15, 23, 42, 0.12);
-  --mobile-shadow-inner:    none;      /* no inner glow on professional cards */
-
-  /* ── Sheet backdrop ──────────────────────────── */
-  --mobile-backdrop:        rgba(15, 23, 42, 0.40);  /* slate-900 @ 40%     */
-
-  /* ── Bottom tab bar ──────────────────────────── */
-  --mobile-tab-bg:          #FFFFFF;
-  --mobile-tab-border:      #E2E8F0;
-  --mobile-tab-active-icon: #2563EB;
-  --mobile-tab-active-label:#2563EB;
-  --mobile-tab-active-pill: rgba(37, 99, 235, 0.10);
-  --mobile-tab-inactive:    #94A3B8;
-
-  /* ── Top bar ─────────────────────────────────── */
-  --mobile-topbar-bg:       #FFFFFF;
-  --mobile-topbar-border:   #E2E8F0;
-  --mobile-topbar-icon:     #64748B;
-
-  /* ── Interaction ─────────────────────────────── */
-  --mobile-press-overlay:   rgba(15, 23, 42, 0.04);
-  --mobile-press-scale:     0.98;
+  /* ── Legacy font alias ───────────────────────── */
+  --mobile-font-family: var(--mobile-font-body);
 
   /* ── Spacing (4px base-unit grid) ────────────── */
   --space-1:  4px;
@@ -114,53 +161,97 @@
   --space-safe: env(safe-area-inset-bottom);
 }
 
+.mobile-shell {
+  font-family: var(--mobile-font-body);
+}
+
 /* ───────────────────────────── Typography ───────────────────────────── */
 
 @layer utilities {
-  .text-mobile-largeTitle  {
-    font-size: 34px; font-weight: 700;
-    letter-spacing: -0.03em; line-height: 1.15;
+  /* ── Headlines (Plus Jakarta Sans) ─────────── */
+  .text-mobile-largeTitle {
+    font-family: var(--mobile-font-headline);
+    font-size: 34px;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.03em;
   }
-  .text-mobile-title1      {
-    font-size: 28px; font-weight: 700;
-    letter-spacing: -0.02em; line-height: 1.20;
+  .text-mobile-title1 {
+    font-family: var(--mobile-font-headline);
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.20;
+    letter-spacing: -0.02em;
   }
-  .text-mobile-title2      {
-    font-size: 22px; font-weight: 700;
-    letter-spacing: -0.02em; line-height: 1.25;
+  .text-mobile-title2 {
+    font-family: var(--mobile-font-headline);
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
   }
-  .text-mobile-title3      {
-    font-size: 20px; font-weight: 600;
-    letter-spacing: -0.01em; line-height: 1.30;
-  }
-  .text-mobile-headline    {
-    font-size: 17px; font-weight: 600;
-    letter-spacing: -0.01em; line-height: 1.35;
-  }
-  .text-mobile-body        {
-    font-size: 17px; font-weight: 400;
-    letter-spacing: 0;       line-height: 1.60;
-  }
-  .text-mobile-callout     {
-    font-size: 16px; font-weight: 400;
-    letter-spacing: 0;       line-height: 1.55;
-  }
-  .text-mobile-subheadline {
-    font-size: 15px; font-weight: 400;
-    letter-spacing: 0;       line-height: 1.55;
-  }
-  .text-mobile-footnote    {
-    font-size: 13px; font-weight: 400;
-    letter-spacing: 0;       line-height: 1.50;
-  }
-  .text-mobile-caption     {
-    font-size: 12px; font-weight: 400;
-    letter-spacing: 0.01em;  line-height: 1.45;
+  .text-mobile-title3 {
+    font-family: var(--mobile-font-headline);
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.30;
+    letter-spacing: -0.01em;
   }
 
-  /* Mobile shell font — references warm font stack */
+  /* ── Body & Labels (Manrope) ───────────────── */
+  .text-mobile-headline {
+    font-family: var(--mobile-font-body);
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+  }
+  .text-mobile-body {
+    font-family: var(--mobile-font-body);
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 1.60;
+    letter-spacing: 0;
+  }
+  .text-mobile-callout {
+    font-family: var(--mobile-font-body);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.55;
+    letter-spacing: 0;
+  }
+  .text-mobile-subheadline {
+    font-family: var(--mobile-font-body);
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.40;
+    letter-spacing: 0;
+  }
+  .text-mobile-footnote {
+    font-family: var(--mobile-font-body);
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.38;
+    letter-spacing: 0;
+  }
+  .text-mobile-caption {
+    font-family: var(--mobile-font-body);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.33;
+    letter-spacing: 0;
+  }
+  .text-mobile-label {
+    font-family: var(--mobile-font-body);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.40;
+    letter-spacing: 0.01em;
+  }
+
+  /* Mobile shell font — references body font stack */
   .font-system {
-    font-family: var(--mobile-font-family);
+    font-family: var(--mobile-font-body);
   }
 }
 
@@ -189,10 +280,9 @@
 @layer utilities {
   .mobile-card {
     background-color: var(--mobile-bg-card);
-    border-radius: 12px;
+    border-radius: var(--mobile-radius-card);
     border: 1px solid var(--mobile-border-card);
     box-shadow: var(--mobile-shadow-card);
-    /* Inner glow removed — --mobile-shadow-inner is now `none` */
   }
 
   .mobile-card-press {
@@ -208,12 +298,138 @@
     border-top:    1px solid var(--mobile-separator);
     border-bottom: 1px solid var(--mobile-separator);
     padding: 6px 16px;
-    /* .mobile-grain removed — grain texture dropped in task 76 */
   }
 
   .animate-fade-out {
     animation: fade-in 200ms ease-out reverse forwards;
   }
+}
+
+/* ─────────────────────────── Card Primitives ─────────────────────────── */
+
+@layer utilities {
+  .card-mobile {
+    border-radius: var(--mobile-radius-card);
+    background: var(--mobile-bg-card);
+    border: 1px solid var(--mobile-border-card);
+    box-shadow: var(--mobile-shadow-card);
+    padding: 20px;
+  }
+  .card-mobile-active {
+    border-radius: var(--mobile-radius-card);
+    background: var(--mobile-bg-card);
+    border: 1px solid var(--mobile-border-card);
+    box-shadow: var(--mobile-shadow-card);
+    padding: 20px;
+    border-left: 4px solid var(--mobile-primary);
+  }
+}
+
+/* ─────────────────────────── Button Primitives ───────────────────────── */
+
+@layer utilities {
+  .btn-mobile-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 24px;
+    border-radius: var(--mobile-radius-button);
+    background: var(--mobile-primary);
+    color: var(--mobile-on-primary);
+    font-family: var(--mobile-font-body);
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1;
+    min-height: 44px;
+    transition: background 150ms ease, transform 150ms ease;
+    cursor: pointer;
+  }
+  .btn-mobile-primary:active {
+    transform: scale(0.97);
+  }
+
+  .btn-mobile-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 24px;
+    border-radius: var(--mobile-radius-button);
+    background: transparent;
+    color: var(--mobile-primary);
+    border: 1.5px solid var(--mobile-outline-variant);
+    font-family: var(--mobile-font-body);
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1;
+    min-height: 44px;
+    transition: background 150ms ease, transform 150ms ease;
+    cursor: pointer;
+  }
+  .btn-mobile-secondary:active {
+    background: var(--mobile-tint-subtle);
+    transform: scale(0.97);
+  }
+
+  .btn-mobile-tonal {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 24px;
+    border-radius: var(--mobile-radius-button);
+    background: var(--mobile-surface-variant);
+    color: var(--mobile-on-surface-variant);
+    font-family: var(--mobile-font-body);
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1;
+    min-height: 44px;
+    transition: background 150ms ease, transform 150ms ease;
+    cursor: pointer;
+  }
+  .btn-mobile-tonal:active {
+    transform: scale(0.97);
+  }
+}
+
+/* ─────────────────────────── Input Primitives ────────────────────────── */
+
+@layer utilities {
+  .input-mobile {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: var(--mobile-radius-input);
+    border: 1.5px solid var(--mobile-outline-variant);
+    background: var(--mobile-bg-card);
+    color: var(--mobile-label-primary);
+    font-family: var(--mobile-font-body);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.5;
+    transition: border-color 150ms ease;
+  }
+  .input-mobile:focus {
+    outline: none;
+    border-color: var(--mobile-primary);
+    box-shadow: 0 0 0 3px var(--mobile-tint-subtle);
+  }
+  .input-mobile::placeholder {
+    color: var(--mobile-label-tertiary);
+  }
+}
+
+/* ─────────────────────── Material Symbols Outlined ──────────────────── */
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  display: inline-block;
+  line-height: 1;
+  vertical-align: middle;
+}
+.material-symbols-filled {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
 
 /* ───────────────────────────── Animations ────────────────────────────── */

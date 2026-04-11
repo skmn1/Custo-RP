@@ -1697,5 +1697,137 @@ src/
 
 *For questions or updates to this documentation, please refer to the comprehensive project documentation at `COMPREHENSIVE_DOCUMENTATION.md` or create an issue on GitHub.*
 
-*Last Updated: February 26, 2026*  
+*Last Updated: April 11, 2026*  
 *Status: Active Development — Frontend Functional, Backend Integration Pending*
+
+---
+
+## Design System — Nexus Kinetic (Task 77, Sprint 22)
+
+**Introduced:** April 11, 2026  
+**Scope:** ESS mobile screens only (`src/styles/mobile.css`, `tailwind.config.js`)  
+**Colour mode:** Light only (dark mode removed in Task 76)
+
+### Colour Palette
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `--mobile-primary` | `#da336b` | Brand Magenta — primary CTA, active icons |
+| `--mobile-on-primary` | `#ffffff` | Text on primary fill |
+| `--mobile-primary-container` | `#ffdae2` | Pill backgrounds, tint surfaces |
+| `--mobile-secondary` | `#d30035` | Secondary actions |
+| `--mobile-bg` | `#fffbff` | Page background (warm near-white) |
+| `--mobile-bg-card` | `#ffffff` | Card fill |
+| `--mobile-on-surface` | `#201a1b` | Primary text |
+| `--mobile-on-surface-variant` | `#514345` | Secondary text |
+| `--mobile-label-tertiary` | `#837375` | Placeholders, hints |
+| `--mobile-outline` | `#837375` | Borders |
+| `--mobile-outline-variant` | `#d5c2c5` | Subtle borders, card borders |
+| `--mobile-tint` | `#da336b` | Backwards-compat accent alias |
+| `--mobile-tint-subtle` | `rgba(218,51,107,0.10)` | Focus rings, hover fills |
+| `--mobile-success` | `#16a34a` | Approved / present |
+| `--mobile-warning` | `#d97706` | Pending |
+| `--mobile-destructive` | `#ba1a1a` | Declined / absent / error |
+
+### Tailwind Theme (tailwind.config.js)
+
+Key colour aliases available as Tailwind utilities:
+
+- `bg-primary` → `#da336b`
+- `bg-surface-container-lowest` → `#ffffff` (card fill)
+- `bg-primary-container` → `#ffdae2`
+- `bg-error-container` → `#ffdad6`
+- `shadow-editorial` → `0 8px 24px rgba(218,51,107,0.06)`
+- `shadow-card` → `0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)`
+- `shadow-nav` → `0 -2px 10px rgba(0,0,0,0.05)`
+- `font-headline` → `Plus Jakarta Sans`
+- `font-body` / `font-label` → `Manrope`
+
+### Font Stacks
+
+| Token | Font | Usage |
+|-------|------|-------|
+| `--mobile-font-headline` | Plus Jakarta Sans → system-ui fallback | `.text-mobile-largeTitle` through `.text-mobile-title3` |
+| `--mobile-font-body` | Manrope → system-ui fallback | All body, callout, footnote, caption, label classes |
+
+Fonts are loaded from Google Fonts with `display=swap`. Preconnect hints are set in `index.html`.
+
+### Border Radius Tokens
+
+| Token | Value | Tailwind equivalent |
+|-------|-------|---------------------|
+| `--mobile-radius-card` | `24px` | `rounded-3xl` / `rounded-[24px]` |
+| `--mobile-radius-button` | `16px` | `rounded-2xl` |
+| `--mobile-radius-input` | `12px` | `rounded-xl` |
+| `--mobile-radius-chip` | `8px` | `rounded-lg` |
+| `--mobile-radius-full` | `9999px` | `rounded-full` |
+
+### Primitive CSS Classes (src/styles/mobile.css)
+
+#### Buttons
+| Class | Description |
+|-------|-------------|
+| `.btn-mobile-primary` | Magenta fill, white text, 16px radius, 44px min-height |
+| `.btn-mobile-secondary` | Outlined, Magenta text/border, transparent bg |
+| `.btn-mobile-tonal` | Surface-variant fill, muted text |
+
+#### Cards
+| Class | Description |
+|-------|-------------|
+| `.card-mobile` | 24px radius, white bg, subtle shadow, 20px padding |
+| `.card-mobile-active` | Same as `.card-mobile` + 4px Magenta left border accent |
+
+#### Inputs
+| Class | Description |
+|-------|-------------|
+| `.input-mobile` | 12px radius, full-width, Magenta focus ring |
+
+#### Typography
+| Class | Font | Size | Weight |
+|-------|------|------|--------|
+| `.text-mobile-largeTitle` | Plus Jakarta Sans | 34px | 700 |
+| `.text-mobile-title1` | Plus Jakarta Sans | 28px | 700 |
+| `.text-mobile-title2` | Plus Jakarta Sans | 22px | 700 |
+| `.text-mobile-title3` | Plus Jakarta Sans | 20px | 600 |
+| `.text-mobile-headline` | Manrope | 17px | 600 |
+| `.text-mobile-body` | Manrope | 17px | 400 |
+| `.text-mobile-callout` | Manrope | 16px | 400 |
+| `.text-mobile-subheadline` | Manrope | 15px | 500 |
+| `.text-mobile-footnote` | Manrope | 13px | 400 |
+| `.text-mobile-caption` | Manrope | 12px | 500 |
+| `.text-mobile-label` | Manrope | 14px | 500 |
+
+### Primitive Components
+
+| Component | File | Task 77 Changes |
+|-----------|------|-----------------|
+| `MobileCard` | `src/components/mobile/MobileCard.jsx` | 24px radius (`rounded-3xl`), `shadow-editorial`, Magenta active accent |
+| `AccentCard` | same file | Gradient left bar `from-primary to-secondary-fixed` |
+| `StatusChip` | `src/components/mobile/StatusChip.jsx` | Magenta palette for approved/pending/active; error-container for declined |
+| `MobileTopBar` | `src/components/mobile/MobileTopBar.jsx` | Material Symbols bell icon, Magenta badge, headline font |
+| `TopAppBar` | same file | Sprint 22 standard bar — avatar + ESS brand + Material Symbols bell |
+
+### Icon Library — Material Symbols Outlined
+
+All sprint 22 screens use Google Material Symbols Outlined loaded via `index.html`.
+
+**Usage:**
+```jsx
+// Outlined (default)
+<span className="material-symbols-outlined">home</span>
+
+// Filled (active state)
+<span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>home</span>
+
+// Helper component
+export const Icon = ({ name, filled = false, className = '' }) => (
+  <span
+    className={`material-symbols-outlined ${className}`}
+    style={filled ? { fontVariationSettings: "'FILL' 1" } : undefined}
+  >
+    {name}
+  </span>
+);
+```
+
+**Key icon names:** `home`, `calendar_today`, `pending_actions`, `person`, `notifications`, `payments`, `download`, `swap_horiz`, `timer`, `calendar_month`, `health_and_safety`, `event_repeat`, `campaign`, `location_on`, `trending_up`, `arrow_forward`, `chevron_left`, `more_vert`
