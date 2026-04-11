@@ -260,10 +260,9 @@ describe('MobileRequestsPage source structure', () => {
     expect(src).toContain('data-testid="leave-balance-cards"');
   });
 
-  it('has balance cards for annual, sick, swap', () => {
+  it('has balance cards for annual, sick', () => {
     expect(src).toContain('annual');
     expect(src).toContain('sick');
-    expect(src).toContain('swap');
   });
 
   it('has progress bars with role="progressbar"', () => {
@@ -312,7 +311,7 @@ describe('MobileRequestsPage source structure', () => {
   });
 
   it('has leave-type pill testids', () => {
-    expect(src).toContain('data-testid={`leave-type-${lt.key}`}');
+    expect(src).toContain('data-testid={`leave-type-${lt.id}`}');
   });
 
   it('leave type pills have aria-pressed', () => {
@@ -335,17 +334,17 @@ describe('MobileRequestsPage source structure', () => {
     expect(src).toContain('data-testid="submit-request-btn"');
   });
 
-  it('submit button has disabled prop tied to isSubmitting', () => {
-    expect(src).toContain('disabled={isSubmitting}');
+  it('submit button has disabled prop tied to isPending', () => {
+    expect(src).toContain('disabled={submitLeave.isPending}');
   });
 
-  it('has form-error testid with role="alert"', () => {
-    expect(src).toContain('data-testid="form-error"');
+  it('has form-toast testid and role="alert" for validation', () => {
+    expect(src).toContain('data-testid="form-toast"');
     expect(src).toContain('role="alert"');
   });
 
-  it('validates endDate < startDate and sets validation error', () => {
-    expect(src).toContain('validationEndDate');
+  it('validates endDate < startDate via field-level validation', () => {
+    expect(src).toContain('endDateAfterStart');
     expect(src).toContain('endDate < startDate');
   });
 

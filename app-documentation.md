@@ -2377,7 +2377,7 @@ All strings live under `mobile.payroll.*` in `public/locales/{en,fr}/ess.json`.
 
 ### Overview
 
-`src/pages/ess/mobile/MobileRequestsPage.jsx` — Nexus Kinetic styled leave and requests hub for the ESS "Requests" bottom-navigation tab.
+`src/pages/ess/mobile/MobileRequestsPage.jsx` — Nexus Kinetic styled leave and requests hub for the ESS "Requests" bottom-navigation tab. Task 83 created the UI shell; **Task 88** wired it to the Task 87 React Query hooks and real API endpoints.
 
 **Route:** `/app/ess/requests`
 
@@ -2385,65 +2385,93 @@ All strings live under `mobile.payroll.*` in `public/locales/{en,fr}/ess.json`.
 
 | Section | Description |
 |---|---|
-| Balance dashboard | 3-card bento grid showing Annual Leave, Sick Days, and Shift Swaps with animated progress bars |
-| Recent requests list | Chronological list of leave requests with colour-coded status chips |
-| New Request sheet | `NexusBottomSheet` FAB → inline form with leave-type pills, date range, reason textarea |
-| Form validation | `endDate < startDate` triggers `role="alert"` error and blocks submission |
+| Balance dashboard | 2-card bento grid (Annual, Sick) with dual-tint progress bars (used + pending portions) and pending badge |
+| Recent requests list | Chronological list from API with colour-coded status chips and cancel action for submitted requests |
+| New Request sheet | `NexusBottomSheet` FAB → form with API-driven leave-type selector, date range with live working-day preview, balance warning, conditional reason field |
+| Form validation | Client-side: leave type required, start in future, end ≥ start, reason required for annual/unpaid/personal types |
+| Empty state | Icon + hint text when no requests exist |
+| Working day preview | `calculateWorkingDays()` shows working days (excluding weekends & public holidays) below date picker |
+| Balance warning | Inline amber alert when requested days exceed available balance |
+| Cancel requests | Cancel button on submitted/pending requests with confirmation dialog |
 
 ### Components
 
 | Component | Purpose |
 |---|---|
 | `MobileRequestsSkeleton` | `animate-pulse` skeleton for loading state (`data-testid="requests-skeleton"`) |
-| `LeaveBalanceCards` | 3-card bento with progress bars, `role="progressbar"`, `aria-valuenow/min/max`, faint bg icon overlay |
-| `RecentRequests` | Request rows with type icon, date range, reason snippet, status chip + empty state |
+| `LeaveBalanceCards` | 2-card bento with dual-tint progress bars (used solid + pending translucent), `role="progressbar"`, pending badge |
+| `RecentRequests` | Request rows with type icon, date range, total days, reason snippet, status chip, cancel action + empty state with hint |
 | `NexusBottomSheet` | Inline sheet; `role="dialog" aria-modal="true"`, `bg-surface rounded-t-3xl`, handles overlay click to close |
-| `NewRequestSheet` | Form with leave-type pills (`aria-pressed`), date inputs, reason textarea, validation error, submit CTA |
-| `MobileRequestsPage` | Named export; orchestrates state, hooks, FAB (`fixed bottom-24 right-6`) |
+| `NewRequestSheet` | Form with API-driven leave-type pills (`aria-pressed`), date inputs, working-day preview, balance warning, conditional reason, inline toast feedback |
+| `MobileRequestsPage` | Named export; orchestrates Task 87 hooks, cancel confirmation, FAB (`fixed bottom-24 right-6`) |
 
 ### Status Chips
 
 | Status | Tailwind classes |
 |---|---|
 | `approved` | `bg-primary-container/40 text-primary` |
-| `pending` | `bg-secondary-container/40 text-secondary` |
+| `pending` / `submitted` | `bg-secondary-container/40 text-secondary` |
 | `declined` / `rejected` | `bg-error-container/40 text-error` |
+| `cancelled` | `bg-surface-container text-outline` |
 
-### Hooks
+### Hooks (Task 87 React Query)
 
-| Hook | Endpoint | Returns |
+| Hook | Endpoint | Purpose |
 |---|---|---|
-| `useEssLeaveBalance` | `GET /api/ess/leave/balance` | `{ data: { annual, sick, swap }, isLoading, error, refetch }` |
-| `useEssLeaveRequests` | `GET /api/ess/leave/requests` + `POST /api/ess/leave/requests` | `{ data, isLoading, error, refetch, createRequest, isSubmitting, submitError }` |
+| `useEssLeaveBalance` | `GET /api/ess/requests/leave/balance` | Balance data with `{ total, used, pending, available }` per type |
+| `useEssLeaveTypes` | `GET /api/ess/requests/leave/types` | API-driven leave type list `[{ id, name, color }]` |
+| `useEssLeaveRequests` | `GET /api/ess/requests/leave` | Paginated leave request list |
+| `useSubmitLeaveRequest` | `POST /api/ess/requests/leave` | Mutation to submit new leave request |
+| `useCancelLeaveRequest` | `DELETE /api/ess/requests/leave/:id` | Mutation to cancel a submitted request |
 
 **Balance response shape:**
 ```json
 {
-  "annual": { "used": 12, "total": 21 },
-  "sick":   { "used": 2,  "total": 10 },
-  "swap":   { "used": 1,  "total": 5  }
+  "data": {
+    "annual": { "total": 21, "used": 12, "pending": 3, "available": 6 },
+    "sick":   { "total": 10, "used": 2,  "pending": 0, "available": 8 }
+  }
 }
 ```
 
+### Utilities
+
+| Function | Module | Purpose |
+|---|---|---|
+| `calculateWorkingDays(start, end, holidays)` | `src/utils/dateUtils.js` | Returns `{ workingDays, holidaysExcluded }` excluding weekends and public holidays |
+
+### Leave Request Flow
+
+1. Employee taps FAB → bottom sheet opens
+2. Selects leave type from API-driven pill selector
+3. Picks start/end dates → live working-day count shown
+4. If days exceed available balance → amber warning displayed
+5. Enters reason (required for annual/unpaid/personal, optional for sick, hidden for maternity/paternity)
+6. Submits → `useSubmitLeaveRequest` mutation fires → success toast → sheet closes → list auto-refreshes
+7. Submitted request appears in list with cancel button
+8. Cancel → confirmation dialog → `useCancelLeaveRequest` mutation → status updates to cancelled
+
 ### i18n Namespace: `ess` → `mobile.leave.*`
 
-**Flat keys:** `title`, `sectionLabel`, `annualLeave`, `sickDays`, `shiftSwaps`, `daysLeft`, `daysUsedOf` (`{{used}} of {{total}} used`), `noData`, `newRequest`, `newRequestAriaLabel`, `recentRequests`, `noRequests`, `leaveType`, `startDate`, `endDate`, `reason`, `reasonPlaceholder`, `submitRequest`, `validationEndDate`
+**Flat keys:** `title`, `sectionLabel`, `annualLeave`, `sickDays`, `shiftSwaps`, `daysLeft`, `daysUsedOf` (`{{used}} of {{total}} used`), `noData`, `newRequest`, `newRequestAriaLabel`, `recentRequests`, `noRequests`, `noRequestsHint`, `leaveType`, `startDate`, `endDate`, `reason`, `reasonPlaceholder`, `submitRequest`, `submitSuccess`, `cancelSuccess`, `workingDays`/`_plural`, `holidaysExcluded`/`_plural`, `pendingDays`/`_plural`
 
-**Nested:** `types.{annual, sick, swap, personal}`, `status.{approved, pending, declined, rejected}`
+**Nested:** `types.{annual, sick, swap, personal, unpaid}`, `status.{approved, pending, submitted, declined, rejected, cancelled}`, `validation.{leaveTypeRequired, startDateRequired, startDateFuture, endDateRequired, endDateAfterStart, reasonRequired}`
 
 ### Accessibility
 
 - Progress bars: `role="progressbar"`, `aria-valuenow`, `aria-valuemin=0`, `aria-valuemax`
 - Bottom sheet: `role="dialog"`, `aria-modal="true"`, `aria-label={title}`
 - Leave type pills: `aria-pressed={selected}`
-- Validation error: `role="alert"`
+- Validation errors: `role="alert"` on each field error
+- Toast feedback: `role="status"` for success/warning/error
+- Balance warning: `role="status"`
 - FAB: `aria-label={t('mobile.leave.newRequestAriaLabel')}`
 - All Material Symbol `<span>` elements: `aria-hidden="true"`
 - Touch targets ≥ 44px padding on all interactive elements
 
 ### Unit Tests
 
-`tests/mobile-leave-nexus.test.js` — **104 tests, all passing**
+`tests/mobile-leave-nexus.test.js` — **104 tests, all passing** (Task 83)
 
 - `balancePct()` — clamped at 100, zero/null-safe, decimal values
 - `statusChipClass()` — approved/pending/declined/rejected/unknown edge cases
@@ -2453,6 +2481,15 @@ All strings live under `mobile.payroll.*` in `public/locales/{en,fr}/ess.json`.
 - Source structural assertions: testids, aria attrs, Magenta gradient (`#da336b`/`#8b2044`), hooks imports, FAB position, form validation, named export
 - Hook assertions: endpoints, POST method, `fetchRequests()` re-fetch, exported function names
 - App.jsx: `MobileRequestsPage` import + `path="requests"` route
+
+`tests/ess-leave-request-logic.test.js` — Task 88 tests
+
+- `calculateWorkingDays()` — weekday-only counting, holiday exclusion, edge cases
+- `statusChipClass()` — all status values including new submitted/cancelled
+- Form validation — all 6 rules validated
+- Balance warning logic — triggered when workingDays > available
+- i18n keys — all new Task 88 keys present in EN and FR
+- Source structure — new hook imports, testids, data-testid attributes
 
 ---
 

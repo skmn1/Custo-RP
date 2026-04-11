@@ -633,24 +633,44 @@
       "newRequestAriaLabel": "Nouvelle demande de congé",
       "recentRequests": "Demandes récentes",
       "noRequests": "Aucune demande de congé",
+      "noRequestsHint": "Appuyez sur le bouton + pour soumettre votre première demande",
       "leaveType": "Type de congé",
       "startDate": "Date de début",
       "endDate": "Date de fin",
       "reason": "Motif (facultatif)",
       "reasonPlaceholder": "Brève description...",
       "submitRequest": "Soumettre la demande",
+      "submitSuccess": "Demande de congé soumise avec succès",
+      "cancelSuccess": "Demande de congé annulée",
       "validationEndDate": "La date de fin doit être identique ou postérieure à la date de début",
+      "workingDays": "{{count}} jour ouvré",
+      "workingDays_plural": "{{count}} jours ouvrés",
+      "holidaysExcluded": "{{count}} jour férié exclu",
+      "holidaysExcluded_plural": "{{count}} jours fériés exclus",
+      "pendingDays": "{{count}} jour en attente",
+      "pendingDays_plural": "{{count}} jours en attente",
       "types": {
         "annual": "Congé annuel",
         "sick": "Jour maladie",
         "swap": "Échange de quart",
-        "personal": "Personnel"
+        "personal": "Personnel",
+        "unpaid": "Congé sans solde"
       },
       "status": {
         "approved": "Approuvé",
         "pending": "En attente",
+        "submitted": "Soumis",
         "declined": "Refusé",
-        "rejected": "Rejeté"
+        "rejected": "Rejeté",
+        "cancelled": "Annulé"
+      },
+      "validation": {
+        "leaveTypeRequired": "Sélectionnez un type de congé",
+        "startDateRequired": "La date de début est obligatoire",
+        "startDateFuture": "La date de début ne peut pas être passée",
+        "endDateRequired": "La date de fin est obligatoire",
+        "endDateAfterStart": "La date de fin doit être postérieure ou égale à la date de début",
+        "reasonRequired": "Veuillez indiquer un motif"
       }
     }
   },
@@ -704,7 +724,7 @@
     "daysUsed": "{{used}} sur {{total}} utilisés",
     "noBalance": "Aucune donnée de solde disponible.",
     "recentRequests": "Vos demandes",
-    "noRequests": "Aucune demande de congés.",
+    "noRequests": "Aucune demande pour l'instant",
     "newRequest": "Nouvelle demande",
     "type": "Type",
     "dates": "Dates",
@@ -729,15 +749,11 @@
       "sick": "Jour de maladie",
       "swap": "Échange de quart",
       "personal": "Personnel"
-    }
-  },
-  "requests": {
-    "title": "Mes demandes",
+    },
     "tabAll": "Toutes",
     "tabLeave": "Congés",
     "tabAbsence": "Absences",
     "tabSwap": "Échanges",
-    "noRequests": "Aucune demande pour l'instant",
     "statusSubmitted": "Soumis",
     "statusApproved": "Approuvé",
     "statusRejected": "Refusé",

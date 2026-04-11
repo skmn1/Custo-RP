@@ -1,51 +1,74 @@
 /**
- * MobileRequestsPage — Task 83 (SCREEN_69)
+ * MobileRequestsPage — Task 83 UI shell, Task 88 API wiring
  *
  * ESS Leave & Requests screen, Nexus Kinetic styled:
- * - Balance bento cards: Annual Leave, Sick Days, Shift Swaps (with progress bars)
- * - Floating Action Button opens a bottom sheet for new leave requests
- * - Recent requests list with colour-coded status chips
- * - Form validation: endDate ≥ startDate
+ * - Balance bento cards from useEssLeaveBalance() with pending portion
+ * - FAB opens bottom sheet for new leave requests
+ * - Live working-day preview via calculateWorkingDays()
+ * - Balance warning when request exceeds available days
+ * - Request list from useEssLeaveRequests() with cancel support
+ * - Client-side form validation with inline errors
  *
  * Data:
- *   useEssLeaveBalance() → GET /api/ess/leave/balance
- *   useEssLeaveRequests() → GET /api/ess/leave/requests
- *                         + POST /api/ess/leave/requests (create)
+ *   useEssLeaveBalance()   → GET /api/ess/requests/leave/balance
+ *   useEssLeaveTypes()     → GET /api/ess/requests/leave/types
+ *   useEssLeaveRequests()  → GET /api/ess/requests/leave
+ *   useSubmitLeaveRequest  → POST /api/ess/requests/leave
+ *   useCancelLeaveRequest  → DELETE /api/ess/requests/leave/:id
  */
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet-async';
-import { useEssLeaveBalance } from '../../../hooks/useEssLeaveBalance';
-import { useEssLeaveRequests } from '../../../hooks/useEssLeaveRequests';
+import {
+  useEssLeaveBalance,
+  useEssLeaveTypes,
+  useEssLeaveRequests,
+  useSubmitLeaveRequest,
+  useCancelLeaveRequest,
+} from '../../../hooks/useEssRequests';
+import { calculateWorkingDays } from '../../../utils/dateUtils';
 
 // ── Constants ────────────────────────────────────────────────────
 
-const LEAVE_TYPES = [
+/** Leave type keys rendered as balance cards */
+const BALANCE_KEYS = [
   { key: 'annual', icon: 'beach_access', fill: true },
   { key: 'sick',   icon: 'sick',         fill: true },
-  { key: 'swap',   icon: 'swap_horiz',   fill: false },
 ];
+
+/** Types that require a reason */
+const REASON_REQUIRED_TYPES = new Set(['annual', 'unpaid', 'personal']);
+/** Types where reason field is hidden */
+const REASON_HIDDEN_TYPES = new Set(['maternity', 'paternity']);
 
 // ── Helpers ──────────────────────────────────────────────────────
 
-/** YYYY-MM-DD for today, used as min on date inputs */
+/** YYYY-MM-DD for today */
 const todayString = () => new Date().toISOString().split('T')[0];
 
-/** Leave type → icon name */
-function typeIcon(type) {
-  if (type === 'sick') return 'sick';
-  if (type === 'swap') return 'swap_horiz';
+/** Leave type key → icon name */
+function typeIcon(leaveType) {
+  const lt = (leaveType || '').toLowerCase();
+  if (lt.includes('sick')) return 'sick';
+  if (lt.includes('personal')) return 'person';
+  if (lt.includes('unpaid')) return 'money_off';
   return 'beach_access';
 }
 
-/** Status → Tailwind class string */
+/** API status → Tailwind colour classes */
 function statusChipClass(status) {
-  if (status === 'approved') return 'bg-primary-container/40 text-primary';
-  if (status === 'declined' || status === 'rejected') return 'bg-error-container/40 text-error';
-  return 'bg-secondary-container/40 text-secondary';
+  switch (status) {
+    case 'approved':  return 'bg-primary-container/40 text-primary';
+    case 'rejected':
+    case 'declined':  return 'bg-error-container/40 text-error';
+    case 'cancelled': return 'bg-surface-container text-outline';
+    case 'submitted':
+    case 'pending':
+    default:          return 'bg-secondary-container/40 text-secondary';
+  }
 }
 
-/** Format date range compactly */
+/** Format date range compactly, locale-aware */
 function formatDateRange(startDate, endDate) {
   const fmt = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' });
   const start = fmt.format(new Date(startDate));
@@ -61,8 +84,8 @@ const MobileRequestsSkeleton = () => (
       <div className="h-3 w-32 bg-surface-variant rounded mb-2" />
       <div className="h-10 w-48 bg-surface-variant rounded" />
     </div>
-    <div className="px-6 mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-      {[0, 1, 2].map(i => <div key={i} className="h-36 bg-surface-variant rounded-2xl" />)}
+    <div className="px-6 mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+      {[0, 1].map(i => <div key={i} className="h-36 bg-surface-variant rounded-2xl" />)}
     </div>
     <div className="px-6 mt-6 space-y-3">
       {[0, 1, 2].map(i => <div key={i} className="h-20 bg-surface-variant rounded-2xl" />)}
@@ -72,12 +95,16 @@ const MobileRequestsSkeleton = () => (
 
 // ── LeaveBalanceCards ─────────────────────────────────────────────
 
-const LeaveBalanceCards = ({ balances, t }) => (
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 px-6 mt-6" data-testid="leave-balance-cards">
-    {LEAVE_TYPES.map(lt => {
-      const balance = balances?.[lt.key];
-      const pct = balance ? Math.min((balance.used / balance.total) * 100, 100) : 0;
-      const remaining = balance ? balance.total - balance.used : 0;
+const LeaveBalanceCards = ({ balanceData, t }) => (
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 px-6 mt-6" data-testid="leave-balance-cards">
+    {BALANCE_KEYS.map(lt => {
+      const balance = balanceData?.[lt.key];
+      const used    = balance?.used ?? 0;
+      const pending = balance?.pending ?? 0;
+      const total   = balance?.total ?? 0;
+      const available = balance?.available ?? (total - used - pending);
+      const usedPct    = total > 0 ? Math.min((used / total) * 100, 100) : 0;
+      const pendingPct = total > 0 ? Math.min((pending / total) * 100, 100 - usedPct) : 0;
 
       return (
         <div
@@ -109,27 +136,46 @@ const LeaveBalanceCards = ({ balances, t }) => (
           {balance ? (
             <>
               <p className="font-headline text-3xl font-extrabold text-primary mt-1 relative z-10">
-                {remaining}{' '}
+                {available}{' '}
                 <span className="text-base font-medium text-on-surface-variant">
                   {t('mobile.leave.daysLeft')}
                 </span>
               </p>
               <p className="text-on-surface-variant text-xs mt-0.5 font-body relative z-10">
-                {t('mobile.leave.daysUsedOf', { used: balance.used, total: balance.total })}
+                {t('mobile.leave.daysUsedOf', { used, total })}
               </p>
-              <div
-                className="h-1.5 rounded-full bg-surface-container mt-3 overflow-hidden relative z-10"
-              >
+
+              {/* Progress bar with pending portion */}
+              <div className="h-1.5 rounded-full bg-surface-container mt-3 overflow-hidden relative z-10">
+                <div className="h-full flex">
+                  <div
+                    className="h-full bg-primary transition-[width] duration-500"
+                    style={{ width: `${usedPct}%` }}
+                  />
+                  {pendingPct > 0 && (
+                    <div
+                      className="h-full bg-primary/40 transition-[width] duration-500"
+                      style={{ width: `${pendingPct}%` }}
+                    />
+                  )}
+                </div>
+                {/* Hidden accessible progress bar */}
                 <div
-                  className="h-full rounded-full bg-primary transition-[width] duration-500"
-                  style={{ width: `${pct}%` }}
+                  className="sr-only"
                   role="progressbar"
-                  aria-valuenow={balance.used}
+                  aria-valuenow={used}
                   aria-valuemin={0}
-                  aria-valuemax={balance.total}
+                  aria-valuemax={total}
                   aria-label={t(`mobile.leave.types.${lt.key}`)}
                 />
               </div>
+
+              {/* Pending badge */}
+              {pending > 0 && (
+                <p className="text-secondary text-[11px] mt-1.5 font-body relative z-10">
+                  {t('mobile.leave.pendingDays', { count: pending })}
+                </p>
+              )}
             </>
           ) : (
             <p className="text-on-surface-variant text-sm mt-2 font-body relative z-10">
@@ -144,18 +190,21 @@ const LeaveBalanceCards = ({ balances, t }) => (
 
 // ── RecentRequests ────────────────────────────────────────────────
 
-const RecentRequests = ({ requests, t }) => {
+const RecentRequests = ({ requests, onCancel, isCancelling, t }) => {
   if (!requests || requests.length === 0) {
     return (
       <div
-        className="bg-surface-container-lowest rounded-2xl text-center py-10 shadow-[0_8px_24px_rgba(25,28,30,0.06)]"
+        className="bg-surface-container-lowest rounded-2xl text-center py-12 shadow-[0_8px_24px_rgba(25,28,30,0.06)]"
         data-testid="requests-empty"
       >
         <span className="material-symbols-outlined text-4xl text-outline block mb-2" aria-hidden="true">
-          event_available
+          beach_access
         </span>
         <p className="text-on-surface-variant font-medium font-body">
           {t('mobile.leave.noRequests')}
+        </p>
+        <p className="text-outline text-xs mt-1 font-body">
+          {t('mobile.leave.noRequestsHint')}
         </p>
       </div>
     );
@@ -163,42 +212,67 @@ const RecentRequests = ({ requests, t }) => {
 
   return (
     <div className="space-y-3" data-testid="requests-list">
-      {requests.map(req => (
-        <div
-          key={req.id}
-          className="bg-surface-container-lowest rounded-2xl p-5 flex items-center justify-between shadow-[0_4px_12px_rgba(25,28,30,0.04)] hover:shadow-md transition-all"
-          data-testid="request-row"
-        >
-          <div className="flex items-center gap-4 min-w-0">
-            <div className="w-11 h-11 rounded-xl bg-surface-container flex items-center justify-center flex-shrink-0">
+      {requests.map(req => {
+        const canCancel = req.status === 'submitted' || req.status === 'pending';
+        return (
+          <div
+            key={req.id}
+            className="bg-surface-container-lowest rounded-2xl p-5 shadow-[0_4px_12px_rgba(25,28,30,0.04)] hover:shadow-md transition-all"
+            data-testid="request-row"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4 min-w-0">
+                <div
+                  className="w-11 h-11 rounded-xl bg-surface-container flex items-center justify-center flex-shrink-0"
+                  style={req.color ? { borderLeft: `3px solid ${req.color}` } : {}}
+                >
+                  <span
+                    className="material-symbols-outlined text-primary text-xl"
+                    aria-hidden="true"
+                    style={{ fontVariationSettings: "'FILL' 1" }}
+                  >
+                    {typeIcon(req.leaveType)}
+                  </span>
+                </div>
+                <div className="min-w-0">
+                  <p className="font-headline text-sm font-bold text-on-surface">
+                    {req.leaveType || t('mobile.leave.types.annual')}
+                  </p>
+                  <p className="text-on-surface-variant text-xs mt-0.5 font-body truncate">
+                    {formatDateRange(req.startDate, req.endDate)}
+                    {req.totalDays && (
+                      <span className="text-outline"> · {req.totalDays}d</span>
+                    )}
+                  </p>
+                  {req.reason && (
+                    <p className="text-outline text-xs mt-0.5 font-body truncate">{req.reason}</p>
+                  )}
+                </div>
+              </div>
               <span
-                className="material-symbols-outlined text-primary text-xl"
-                aria-hidden="true"
-                style={{ fontVariationSettings: "'FILL' 1" }}
+                className={`px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wide font-label flex-shrink-0 ml-3 ${statusChipClass(req.status)}`}
+                data-testid="status-chip"
               >
-                {typeIcon(req.type)}
+                {t(`mobile.leave.status.${req.status}`, { defaultValue: req.status })}
               </span>
             </div>
-            <div className="min-w-0">
-              <p className="font-headline text-sm font-bold text-on-surface">
-                {t(`mobile.leave.types.${req.type}`, { defaultValue: req.type })}
-              </p>
-              <p className="text-on-surface-variant text-xs mt-0.5 font-body truncate">
-                {formatDateRange(req.startDate, req.endDate)}
-              </p>
-              {req.reason && (
-                <p className="text-outline text-xs mt-0.5 font-body truncate">{req.reason}</p>
-              )}
-            </div>
+
+            {/* Cancel action for submitted requests */}
+            {canCancel && (
+              <div className="mt-3 pt-3 border-t border-outline-variant/20 flex justify-end">
+                <button
+                  onClick={() => onCancel(req.id)}
+                  disabled={isCancelling}
+                  className="text-error text-xs font-bold uppercase tracking-wide font-label px-3 py-1.5 rounded-lg hover:bg-error-container/20 transition-colors disabled:opacity-50"
+                  data-testid="cancel-request-btn"
+                >
+                  {t('requests.cancel', { defaultValue: 'Cancel' })}
+                </button>
+              </div>
+            )}
           </div>
-          <span
-            className={`px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wide font-label flex-shrink-0 ml-3 ${statusChipClass(req.status)}`}
-            data-testid="status-chip"
-          >
-            {t(`mobile.leave.status.${req.status}`, { defaultValue: req.status })}
-          </span>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 };
@@ -249,66 +323,158 @@ const NexusBottomSheet = ({ isOpen, onClose, title, children }) => {
 
 // ── NewRequestSheet ───────────────────────────────────────────────
 
-const NewRequestSheet = ({ isOpen, onClose, onSubmit, isSubmitting, submitError, t }) => {
-  const [type, setType] = useState('annual');
+const NewRequestSheet = ({
+  isOpen,
+  onClose,
+  leaveTypes,
+  balanceData,
+  t,
+}) => {
+  const [leaveTypeId, setLeaveTypeId] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [reason, setReason] = useState('');
-  const [validationError, setValidationError] = useState('');
+  const [errors, setErrors] = useState({});
+  const [toast, setToast] = useState(null);
+
+  const submitLeave = useSubmitLeaveRequest();
+
+  // Resolve selected type metadata
+  const selectedType = useMemo(
+    () => leaveTypes?.find(lt => String(lt.id) === String(leaveTypeId)),
+    [leaveTypes, leaveTypeId]
+  );
+  const typeCode = selectedType?.name?.toLowerCase().replace(/\s+/g, '_') ?? '';
+
+  // Working days preview
+  const { workingDays, holidaysExcluded } = useMemo(
+    () => calculateWorkingDays(startDate, endDate),
+    [startDate, endDate]
+  );
+
+  // Balance warning check
+  const balanceExceeded = useMemo(() => {
+    if (!selectedType || !workingDays) return false;
+    const name = (selectedType.name || '').toLowerCase();
+    const balKey = name.includes('annual') ? 'annual' : name.includes('sick') ? 'sick' : null;
+    if (!balKey || !balanceData?.[balKey]) return false;
+    return workingDays > (balanceData[balKey].available ?? 0);
+  }, [selectedType, workingDays, balanceData]);
+
+  // Reason field behaviour
+  const reasonHidden = REASON_HIDDEN_TYPES.has(typeCode);
+  const reasonRequired = REASON_REQUIRED_TYPES.has(typeCode) ||
+    (selectedType && !REASON_HIDDEN_TYPES.has(typeCode) && !['sick', 'bereavement'].includes(typeCode));
+
+  // ── Validation ──────────────────────────────────────────
+
+  const validate = useCallback(() => {
+    const errs = {};
+    if (!leaveTypeId) errs.leaveType = t('mobile.leave.validation.leaveTypeRequired');
+    if (!startDate)   errs.startDate = t('mobile.leave.validation.startDateRequired');
+    else if (startDate < todayString()) errs.startDate = t('mobile.leave.validation.startDateFuture');
+    if (!endDate)     errs.endDate = t('mobile.leave.validation.endDateRequired');
+    else if (startDate && endDate < startDate) errs.endDate = t('mobile.leave.validation.endDateAfterStart');
+    if (reasonRequired && !reason.trim()) errs.reason = t('mobile.leave.validation.reasonRequired');
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
+  }, [leaveTypeId, startDate, endDate, reason, reasonRequired, t]);
 
   const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
-    setValidationError('');
-
-    if (endDate && startDate && endDate < startDate) {
-      setValidationError(t('mobile.leave.validationEndDate'));
-      return;
-    }
+    if (!validate()) return;
 
     try {
-      await onSubmit({ type, startDate, endDate, reason });
-      // Reset form on success
-      setType('annual');
+      const result = await submitLeave.mutateAsync({
+        leaveTypeId: Number(leaveTypeId),
+        startDate,
+        endDate,
+        reason: reasonHidden ? undefined : reason,
+      });
+
+      if (result?.balanceWarning) {
+        setToast({ type: 'warning', message: t('requests.balanceWarning') });
+      } else {
+        setToast({ type: 'success', message: t('mobile.leave.submitSuccess') });
+      }
+
+      // Reset form
+      setLeaveTypeId('');
       setStartDate('');
       setEndDate('');
       setReason('');
-    } catch {
-      // submitError shown from prop
+      setErrors({});
+
+      setTimeout(() => {
+        setToast(null);
+        onClose();
+      }, 1500);
+    } catch (err) {
+      setToast({ type: 'error', message: err.message ?? t('errors.generic', { defaultValue: 'Something went wrong' }) });
+      setTimeout(() => setToast(null), 3000);
     }
-  }, [type, startDate, endDate, reason, onSubmit, t]);
+  }, [leaveTypeId, startDate, endDate, reason, reasonHidden, validate, submitLeave, onClose, t]);
 
   const handleClose = useCallback(() => {
-    setValidationError('');
+    setErrors({});
+    setToast(null);
     onClose();
   }, [onClose]);
 
   return (
     <NexusBottomSheet isOpen={isOpen} onClose={handleClose} title={t('mobile.leave.newRequest')}>
-      <form onSubmit={handleSubmit} className="space-y-5 px-6 pt-4 pb-10" data-testid="new-request-form">
-        {/* Leave type pills */}
+      <form onSubmit={handleSubmit} className="space-y-5 px-6 pt-4 pb-10" data-testid="new-request-form" noValidate>
+
+        {/* Toast */}
+        {toast && (
+          <div
+            className={`rounded-xl px-4 py-3 text-sm font-body flex items-center gap-2 ${
+              toast.type === 'success' ? 'bg-primary-container/40 text-primary' :
+              toast.type === 'warning' ? 'bg-amber-50 border border-amber-200 text-amber-800' :
+              'bg-error-container/40 text-error'
+            }`}
+            role="status"
+            data-testid="form-toast"
+          >
+            <span className="material-symbols-outlined text-lg" aria-hidden="true">
+              {toast.type === 'success' ? 'check_circle' : toast.type === 'warning' ? 'warning' : 'error'}
+            </span>
+            {toast.message}
+          </div>
+        )}
+
+        {/* Leave type selector */}
         <div>
-          <p className="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2 font-label">
+          <label
+            htmlFor="leave-type-select"
+            className="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2 block font-label"
+          >
             {t('mobile.leave.leaveType')}
-          </p>
+          </label>
           <div className="flex flex-wrap gap-2" role="group" aria-label={t('mobile.leave.leaveType')}>
-            {LEAVE_TYPES.map(lt => (
+            {leaveTypes?.map(lt => (
               <button
-                key={lt.key}
+                key={lt.id}
                 type="button"
-                onClick={() => setType(lt.key)}
-                aria-pressed={type === lt.key}
+                onClick={() => setLeaveTypeId(String(lt.id))}
+                aria-pressed={String(lt.id) === String(leaveTypeId)}
                 className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wide font-label transition-all ${
-                  type === lt.key
+                  String(lt.id) === String(leaveTypeId)
                     ? 'text-on-primary shadow-lg shadow-primary/20'
                     : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'
                 }`}
-                style={type === lt.key ? { background: 'linear-gradient(135deg, #da336b 0%, #8b2044 100%)' } : {}}
-                data-testid={`leave-type-${lt.key}`}
+                style={String(lt.id) === String(leaveTypeId) ? {
+                  background: lt.color ? `linear-gradient(135deg, ${lt.color} 0%, ${lt.color}cc 100%)` : 'linear-gradient(135deg, #da336b 0%, #8b2044 100%)',
+                } : {}}
+                data-testid={`leave-type-${lt.id}`}
               >
-                {t(`mobile.leave.types.${lt.key}`)}
+                {lt.name}
               </button>
             ))}
           </div>
+          {errors.leaveType && (
+            <p className="text-error text-xs mt-1 font-body" role="alert">{errors.leaveType}</p>
+          )}
         </div>
 
         {/* Date range */}
@@ -325,11 +491,13 @@ const NewRequestSheet = ({ isOpen, onClose, onSubmit, isSubmitting, submitError,
               type="date"
               value={startDate}
               min={todayString()}
-              onChange={e => setStartDate(e.target.value)}
+              onChange={e => { setStartDate(e.target.value); setErrors(prev => ({ ...prev, startDate: undefined })); }}
               className="w-full px-4 py-3 bg-surface-container-lowest rounded-xl outline-none border-b-2 border-transparent focus:border-primary transition-all text-on-surface font-body text-base"
-              required
               data-testid="start-date-input"
             />
+            {errors.startDate && (
+              <p className="text-error text-xs mt-1 font-body" role="alert">{errors.startDate}</p>
+            )}
           </div>
           <div>
             <label
@@ -343,48 +511,75 @@ const NewRequestSheet = ({ isOpen, onClose, onSubmit, isSubmitting, submitError,
               type="date"
               value={endDate}
               min={startDate || todayString()}
-              onChange={e => setEndDate(e.target.value)}
+              onChange={e => { setEndDate(e.target.value); setErrors(prev => ({ ...prev, endDate: undefined })); }}
               className="w-full px-4 py-3 bg-surface-container-lowest rounded-xl outline-none border-b-2 border-transparent focus:border-primary transition-all text-on-surface font-body text-base"
-              required
               data-testid="end-date-input"
             />
+            {errors.endDate && (
+              <p className="text-error text-xs mt-1 font-body" role="alert">{errors.endDate}</p>
+            )}
           </div>
         </div>
 
-        {/* Validation error */}
-        {(validationError || submitError) && (
-          <p className="text-error text-sm font-body flex items-center gap-2" role="alert" data-testid="form-error">
-            <span className="material-symbols-outlined text-base" aria-hidden="true">error</span>
-            {validationError || submitError}
+        {/* Working days preview */}
+        {startDate && endDate && endDate >= startDate && (
+          <p className="text-on-surface-variant text-sm font-body flex items-center gap-1" data-testid="working-days-preview">
+            <span className="material-symbols-outlined text-base text-primary" aria-hidden="true">event</span>
+            {t('mobile.leave.workingDays', { count: workingDays })}
+            {holidaysExcluded > 0 && (
+              <span className="text-outline"> · {t('mobile.leave.holidaysExcluded', { count: holidaysExcluded })}</span>
+            )}
           </p>
         )}
 
-        {/* Reason */}
-        <div>
-          <label
-            htmlFor="leave-reason"
-            className="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2 block font-label"
+        {/* Balance warning */}
+        {balanceExceeded && (
+          <div
+            className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-amber-800 text-sm font-body flex items-center gap-2"
+            role="status"
+            data-testid="balance-warning"
           >
-            {t('mobile.leave.reason')}
-          </label>
-          <textarea
-            id="leave-reason"
-            value={reason}
-            onChange={e => setReason(e.target.value)}
-            placeholder={t('mobile.leave.reasonPlaceholder')}
-            className="w-full px-4 py-3 bg-surface-container-lowest rounded-xl outline-none border-b-2 border-transparent focus:border-primary transition-all text-on-surface font-body text-base min-h-[80px] resize-none"
-            data-testid="reason-input"
-          />
-        </div>
+            <span className="material-symbols-outlined text-lg" aria-hidden="true">warning</span>
+            {t('requests.balanceWarning')}
+          </div>
+        )}
+
+        {/* Reason */}
+        {!reasonHidden && (
+          <div>
+            <label
+              htmlFor="leave-reason"
+              className="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2 block font-label"
+            >
+              {t('mobile.leave.reason')}
+              {!reasonRequired && (
+                <span className="text-outline font-normal normal-case tracking-normal ml-1">
+                  ({t('requests.reasonOptional', { defaultValue: 'optional' })})
+                </span>
+              )}
+            </label>
+            <textarea
+              id="leave-reason"
+              value={reason}
+              onChange={e => { setReason(e.target.value); setErrors(prev => ({ ...prev, reason: undefined })); }}
+              placeholder={t('mobile.leave.reasonPlaceholder')}
+              className="w-full px-4 py-3 bg-surface-container-lowest rounded-xl outline-none border-b-2 border-transparent focus:border-primary transition-all text-on-surface font-body text-base min-h-[80px] resize-none"
+              data-testid="reason-input"
+            />
+            {errors.reason && (
+              <p className="text-error text-xs mt-1 font-body" role="alert">{errors.reason}</p>
+            )}
+          </div>
+        )}
 
         <button
           type="submit"
-          disabled={isSubmitting}
+          disabled={submitLeave.isPending}
           className="w-full py-4 rounded-xl text-on-primary font-bold text-base font-headline flex items-center justify-center gap-2 active:scale-[0.97] transition-all disabled:opacity-60"
           style={{ background: 'linear-gradient(135deg, #da336b 0%, #8b2044 100%)' }}
           data-testid="submit-request-btn"
         >
-          {isSubmitting ? (
+          {submitLeave.isPending ? (
             <span className="material-symbols-outlined text-xl animate-spin" aria-hidden="true">progress_activity</span>
           ) : (
             <span className="material-symbols-outlined text-xl" aria-hidden="true">send</span>
@@ -402,23 +597,30 @@ export const MobileRequestsPage = () => {
   const { t } = useTranslation('ess');
   const [sheetOpen, setSheetOpen] = useState(false);
 
-  const { data: balance, isLoading: balanceLoading } = useEssLeaveBalance();
-  const {
-    data: requests,
-    isLoading: requestsLoading,
-    createRequest,
-    isSubmitting,
-    submitError,
-    refetch,
-  } = useEssLeaveRequests();
+  // Task 87 React Query hooks
+  const { data: balanceRes, isLoading: balLoading } = useEssLeaveBalance();
+  const { data: typesRes } = useEssLeaveTypes();
+  const { data: requestsRes, isLoading: reqLoading } = useEssLeaveRequests();
+  const cancelLeave = useCancelLeaveRequest();
 
-  const handleSubmit = useCallback(async (formData) => {
-    await createRequest(formData);
-    setSheetOpen(false);
-    refetch();
-  }, [createRequest, refetch]);
+  // Unwrap API response shape: { data: ... }
+  const balanceData = balanceRes?.data ?? balanceRes ?? null;
+  const leaveTypes  = typesRes?.data ?? typesRes ?? [];
+  const requests    = requestsRes?.data ?? requestsRes ?? [];
 
-  if (balanceLoading || requestsLoading) return <MobileRequestsSkeleton />;
+  // Sort by createdAt DESC
+  const sortedRequests = useMemo(
+    () => [...requests].sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || '')),
+    [requests]
+  );
+
+  const handleCancel = useCallback((requestId) => {
+    if (window.confirm(t('requests.cancelConfirm'))) {
+      cancelLeave.mutate(requestId);
+    }
+  }, [cancelLeave, t]);
+
+  if (balLoading || reqLoading) return <MobileRequestsSkeleton />;
 
   return (
     <>
@@ -436,14 +638,19 @@ export const MobileRequestsPage = () => {
         </div>
 
         {/* Balance cards */}
-        <LeaveBalanceCards balances={balance} t={t} />
+        <LeaveBalanceCards balanceData={balanceData} t={t} />
 
         {/* Recent requests */}
         <div className="mt-6 px-6">
           <h2 className="font-headline text-lg font-bold text-on-surface mb-3">
             {t('mobile.leave.recentRequests')}
           </h2>
-          <RecentRequests requests={requests} t={t} />
+          <RecentRequests
+            requests={sortedRequests}
+            onCancel={handleCancel}
+            isCancelling={cancelLeave.isPending}
+            t={t}
+          />
         </div>
       </div>
 
@@ -463,9 +670,8 @@ export const MobileRequestsPage = () => {
       <NewRequestSheet
         isOpen={sheetOpen}
         onClose={() => setSheetOpen(false)}
-        onSubmit={handleSubmit}
-        isSubmitting={isSubmitting}
-        submitError={submitError}
+        leaveTypes={leaveTypes}
+        balanceData={balanceData}
         t={t}
       />
     </>

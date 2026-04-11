@@ -642,24 +642,44 @@
       "newRequestAriaLabel": "New leave request",
       "recentRequests": "Recent Requests",
       "noRequests": "No leave requests yet",
+      "noRequestsHint": "Tap the + button to submit your first leave request",
       "leaveType": "Leave Type",
       "startDate": "Start Date",
       "endDate": "End Date",
       "reason": "Reason (optional)",
       "reasonPlaceholder": "Brief description...",
       "submitRequest": "Submit Request",
+      "submitSuccess": "Leave request submitted successfully",
+      "cancelSuccess": "Leave request cancelled",
       "validationEndDate": "End date must be on or after the start date",
+      "workingDays": "{{count}} working day",
+      "workingDays_plural": "{{count}} working days",
+      "holidaysExcluded": "{{count}} public holiday excluded",
+      "holidaysExcluded_plural": "{{count}} public holidays excluded",
+      "pendingDays": "{{count}} day pending",
+      "pendingDays_plural": "{{count}} days pending",
       "types": {
         "annual": "Annual Leave",
         "sick": "Sick Day",
         "swap": "Shift Swap",
-        "personal": "Personal"
+        "personal": "Personal Leave",
+        "unpaid": "Unpaid Leave"
       },
       "status": {
         "approved": "Approved",
         "pending": "Pending",
+        "submitted": "Submitted",
         "declined": "Declined",
-        "rejected": "Rejected"
+        "rejected": "Rejected",
+        "cancelled": "Cancelled"
+      },
+      "validation": {
+        "leaveTypeRequired": "Select a leave type",
+        "startDateRequired": "Start date is required",
+        "startDateFuture": "Start date cannot be in the past",
+        "endDateRequired": "End date is required",
+        "endDateAfterStart": "End date must be on or after start date",
+        "reasonRequired": "Please provide a reason"
       }
     }
   },
@@ -713,7 +733,7 @@
     "daysUsed": "{{used}} of {{total}} used",
     "noBalance": "No balance data available.",
     "recentRequests": "Your Requests",
-    "noRequests": "No leave requests yet.",
+    "noRequests": "No requests yet",
     "newRequest": "New Request",
     "type": "Type",
     "dates": "Dates",
@@ -738,15 +758,11 @@
       "sick": "Sick Day",
       "swap": "Shift Swap",
       "personal": "Personal"
-    }
-  },
-  "requests": {
-    "title": "My Requests",
+    },
     "tabAll": "All",
     "tabLeave": "Leave",
     "tabAbsence": "Absences",
     "tabSwap": "Swaps",
-    "noRequests": "No requests yet",
     "statusSubmitted": "Submitted",
     "statusApproved": "Approved",
     "statusRejected": "Rejected",
