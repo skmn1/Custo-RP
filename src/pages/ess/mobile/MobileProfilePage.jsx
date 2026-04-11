@@ -45,6 +45,12 @@ const ProfileHeader = ({ profile, t }) => {
   const circumference = 2 * Math.PI * 45;
   const offset = certRingOffset(score);
 
+  // Generate initials-based SVG avatar as fallback
+  const initials = `${(profile.firstName || '')[0] || ''}${(profile.lastName || '')[0] || ''}`.toUpperCase();
+  const avatarFallback = `data:image/svg+xml,${encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128"><rect width="128" height="128" rx="32" fill="%23da336b"/><text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" fill="white" font-family="system-ui,sans-serif" font-size="48" font-weight="700">${initials}</text></svg>`
+  )}`;
+
   return (
     <div className="px-6 pt-6" data-testid="profile-header">
       {/* Avatar + rotated tile */}
@@ -55,7 +61,7 @@ const ProfileHeader = ({ profile, t }) => {
             style={{ background: 'linear-gradient(135deg, #da336b 0%, #8b2044 100%)' }}
           />
           <img
-            src={profile.avatar || '/default-avatar.png'}
+            src={profile.avatar || avatarFallback}
             alt={`${profile.firstName} ${profile.lastName}`}
             loading="lazy"
             className="relative z-10 w-full h-full rounded-[2rem] object-cover -rotate-2 shadow-lg"
@@ -250,9 +256,27 @@ const LocationHistory = ({ locations, t }) => (
 export const MobileProfilePage = () => {
   const { t } = useTranslation('ess');
   const navigate = useNavigate();
-  const { profile, isLoading } = useEssProfile();
+  const { profile: rawProfile, isLoading } = useEssProfile();
 
-  if (isLoading || !profile) return <MobileProfileSkeleton />;
+  if (isLoading || !rawProfile) return <MobileProfileSkeleton />;
+
+  // Normalise: useEssProfile returns nested {personal, contract, completeness, …}
+  const personal = rawProfile.personal || {};
+  const contract = rawProfile.contract || {};
+  const profile = {
+    firstName:          personal.firstName,
+    lastName:           personal.lastName,
+    email:              personal.email,
+    phone:              personal.phone,
+    avatar:             personal.avatar,
+    employeeId:         personal.employeeId || rawProfile.employeeId,
+    role:               contract.role || contract.jobTitle,
+    department:         contract.department,
+    startDate:          contract.hireDate,
+    certificationScore: rawProfile.completeness ?? 85,
+    workPreferences:    rawProfile.workPreferences ?? [],
+    locations:          rawProfile.locations ?? [],
+  };
 
   const startDateFormatted = profile.startDate
     ? new Intl.DateTimeFormat(undefined, { day: 'numeric', month: 'long', year: 'numeric' }).format(
@@ -272,13 +296,13 @@ export const MobileProfilePage = () => {
         <InfoSection
           title={t('mobile.profile.personalInfo')}
           items={[
-            { label: t('mobile.profile.email'), value: profile.email },
-            { label: t('mobile.profile.phone'), value: profile.phone },
+            { label: t('mobile.profile.email'), value: profile.email || '—' },
+            { label: t('mobile.profile.phone'), value: profile.phone || '—' },
             {
               label: t('mobile.profile.started'),
               value: startDateFormatted,
             },
-            { label: t('mobile.profile.department'), value: profile.department },
+            { label: t('mobile.profile.department'), value: profile.department || '—' },
           ]}
         />
 

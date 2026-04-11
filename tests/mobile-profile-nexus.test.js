@@ -568,8 +568,8 @@ describe('App.jsx profile routes', () => {
     expect(src).toContain('MobileEditProfilePage');
   });
 
-  it('has profile route pointing to MobileProfilePage', () => {
-    expect(src).toContain('element={<MobileProfilePage />}');
+  it('has profile route pointing to EssProfilePage', () => {
+    expect(src).toContain('element={<EssProfilePage />}');
   });
 
   it('has profile/edit route pointing to MobileEditProfilePage', () => {
@@ -577,10 +577,10 @@ describe('App.jsx profile routes', () => {
     expect(src).toContain('element={<MobileEditProfilePage />}');
   });
 
-  it('no longer uses EssProfilePage for profile route', () => {
-    // The profile path should now map to MobileProfilePage, not EssProfilePage
-    // EssProfilePage may still be imported for other use but not as the profile route element
+  it('uses EssProfilePage for profile route (delegates to mobile on small screens)', () => {
+    // The profile path should use EssProfilePage which conditionally renders
+    // MobileProfile on mobile via useMobileLayout()
     const profileRouteMatch = src.match(/path="profile"\s+element=\{<([^>]+)>/);
-    expect(profileRouteMatch?.[1]).toContain('MobileProfilePage');
+    expect(profileRouteMatch?.[1]).toContain('EssProfilePage');
   });
 });

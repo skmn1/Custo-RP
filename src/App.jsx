@@ -287,7 +287,7 @@ const App = () => {
             <Route path="payroll/:id" element={<MobilePayslipDetailPage />} />
             <Route path="requests" element={<EssRequestsPage />} />
             <Route path="attendance" element={<EssAttendancePage />} />
-            <Route path="profile" element={<MobileProfilePage />} />
+            <Route path="profile" element={<EssProfilePage />} />
             <Route path="profile/edit" element={<MobileEditProfilePage />} />
             <Route path="notifications" element={<MobileNotificationsPage />} />
           </Route>
