@@ -31,7 +31,7 @@ export function useEssLeaveBalance() {
     setLoading(true);
     setError(null);
     try {
-      const res = await apiFetch('/ess/leave/balance');
+      const res = await apiFetch('/ess/requests/leave/balance');
       setData(res.data ?? res ?? null);
     } catch (err) {
       // If the endpoint is not yet implemented (500) use fallback data

@@ -23,7 +23,7 @@ export function useEssLeaveRequests() {
     setLoading(true);
     setError(null);
     try {
-      const res = await apiFetch('/ess/leave/requests');
+      const res = await apiFetch('/ess/requests/leave');
       setData(res.data ?? res ?? []);
     } catch (err) {
       // If the endpoint is not yet implemented (500) silently fall back
@@ -42,7 +42,7 @@ export function useEssLeaveRequests() {
     setSubmitting(true);
     setSubmitError(null);
     try {
-      await apiFetch('/ess/leave/requests', {
+      await apiFetch('/ess/requests/leave', {
         method: 'POST',
         body: JSON.stringify({ type, startDate, endDate, reason }),
       });
