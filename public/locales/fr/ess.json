@@ -7,7 +7,8 @@
     "payslips": "Mes fiches de paie",
     "attendance": "Présences",
     "profile": "Mon profil",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "requests": "Demandes & Congés"
   },
   "dashboard": {
     "title": "Mon tableau de bord",
@@ -690,6 +691,44 @@
       "emailInvalid": "Saisissez une adresse e-mail valide.",
       "passwordRequired": "Le mot de passe est requis.",
       "passwordMinLength": "Le mot de passe doit contenir au moins 8 caractères."
+    }
+  },
+  "requests": {
+    "title": "Demandes & Congés",
+    "subtitle": "Gérez vos demandes de congés et consultez votre solde restant.",
+    "leaveBalance": "Solde de congés",
+    "annual": "Congés annuels",
+    "sick": "Jours de maladie",
+    "swap": "Échanges de quart",
+    "daysRemaining": "{{remaining}} jours restants",
+    "daysUsed": "{{used}} sur {{total}} utilisés",
+    "noBalance": "Aucune donnée de solde disponible.",
+    "recentRequests": "Vos demandes",
+    "noRequests": "Aucune demande de congés.",
+    "newRequest": "Nouvelle demande",
+    "type": "Type",
+    "dates": "Dates",
+    "status": "Statut",
+    "reason": "Motif",
+    "leaveType": "Type de congé",
+    "startDate": "Date de début",
+    "endDate": "Date de fin",
+    "reasonOptional": "Motif (optionnel)",
+    "reasonPlaceholder": "Brève description...",
+    "submit": "Soumettre la demande",
+    "cancel": "Annuler",
+    "validationEndDate": "La date de fin doit être égale ou postérieure à la date de début.",
+    "statusLabels": {
+      "approved": "Approuvé",
+      "pending": "En attente",
+      "declined": "Refusé",
+      "rejected": "Rejeté"
+    },
+    "typeLabels": {
+      "annual": "Congés annuels",
+      "sick": "Jour de maladie",
+      "swap": "Échange de quart",
+      "personal": "Personnel"
     }
   }
 }

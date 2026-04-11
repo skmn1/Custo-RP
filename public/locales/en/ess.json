@@ -7,7 +7,8 @@
     "payslips": "My Payslips",
     "attendance": "Attendance",
     "profile": "My Profile",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "requests": "Requests & Leave"
   },
   "dashboard": {
     "title": "My Dashboard",
@@ -699,6 +700,44 @@
       "emailInvalid": "Enter a valid email address.",
       "passwordRequired": "Password is required.",
       "passwordMinLength": "Password must be at least 8 characters."
+    }
+  },
+  "requests": {
+    "title": "Requests & Leave",
+    "subtitle": "Manage your leave requests and view your remaining balance.",
+    "leaveBalance": "Leave Balance",
+    "annual": "Annual Leave",
+    "sick": "Sick Days",
+    "swap": "Shift Swaps",
+    "daysRemaining": "{{remaining}} days remaining",
+    "daysUsed": "{{used}} of {{total}} used",
+    "noBalance": "No balance data available.",
+    "recentRequests": "Your Requests",
+    "noRequests": "No leave requests yet.",
+    "newRequest": "New Request",
+    "type": "Type",
+    "dates": "Dates",
+    "status": "Status",
+    "reason": "Reason",
+    "leaveType": "Leave Type",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "reasonOptional": "Reason (optional)",
+    "reasonPlaceholder": "Brief description...",
+    "submit": "Submit Request",
+    "cancel": "Cancel",
+    "validationEndDate": "End date must be on or after the start date.",
+    "statusLabels": {
+      "approved": "Approved",
+      "pending": "Pending",
+      "declined": "Declined",
+      "rejected": "Rejected"
+    },
+    "typeLabels": {
+      "annual": "Annual Leave",
+      "sick": "Sick Day",
+      "swap": "Shift Swap",
+      "personal": "Personal"
     }
   }
 }

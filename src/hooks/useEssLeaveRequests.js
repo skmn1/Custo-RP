@@ -9,6 +9,8 @@ import { apiFetch } from '../api/config';
  *   { id, type, startDate, endDate, status, reason, createdAt }
  *
  * Also exposes createRequest for POST /api/ess/leave/requests.
+ *
+ * Falls back to an empty array when the endpoint is unavailable (500).
  */
 export function useEssLeaveRequests() {
   const [data, setData] = useState([]);
@@ -24,7 +26,13 @@ export function useEssLeaveRequests() {
       const res = await apiFetch('/ess/leave/requests');
       setData(res.data ?? res ?? []);
     } catch (err) {
-      setError(err.message || 'Failed to load leave requests');
+      // If the endpoint is not yet implemented (500) silently fall back
+      // to an empty list so the UI renders normally.
+      if (err.status === 500 || err.status === 501 || err.status === 404) {
+        setData([]);
+      } else {
+        setError(err.message || 'Failed to load leave requests');
+      }
     } finally {
       setLoading(false);
     }

@@ -20,6 +20,12 @@ export async function registerEssServiceWorker() {
     return undefined;
   }
 
+  // In development, the SW file may not exist or have the wrong MIME type.
+  // Skip registration to avoid noisy console errors.
+  if (import.meta.env.DEV) {
+    return undefined;
+  }
+
   // Deduplicate simultaneous calls (e.g. React StrictMode double-invoke)
   if (registrationPromise) {
     return registrationPromise;

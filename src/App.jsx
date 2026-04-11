@@ -87,6 +87,7 @@ import EssPayslipDetailPage from './pages/ess/EssPayslipDetailPage';
 import EssAttendancePage from './pages/ess/EssAttendancePage';
 import EssProfilePage from './pages/ess/EssProfilePage';
 import EssNotificationsPage from './pages/ess/EssNotificationsPage';
+import EssRequestsPage from './pages/ess/EssRequestsPage';
 import { MobilePayrollHubPage } from './pages/ess/mobile/MobilePayrollHubPage';
 import { MobilePayslipDetailPage } from './pages/ess/mobile/MobilePayslipDetailPage';
 import { MobilePayslipHistoryPage } from './pages/ess/mobile/MobilePayslipHistoryPage';
@@ -284,7 +285,7 @@ const App = () => {
             <Route path="payroll" element={<MobilePayrollHubPage />} />
             <Route path="payroll/history" element={<MobilePayslipHistoryPage />} />
             <Route path="payroll/:id" element={<MobilePayslipDetailPage />} />
-            <Route path="requests" element={<MobileRequestsPage />} />
+            <Route path="requests" element={<EssRequestsPage />} />
             <Route path="attendance" element={<EssAttendancePage />} />
             <Route path="profile" element={<MobileProfilePage />} />
             <Route path="profile/edit" element={<MobileEditProfilePage />} />

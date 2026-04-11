@@ -447,15 +447,15 @@ describe('App.jsx ESS requests route', () => {
     'utf8'
   );
 
-  it('imports MobileRequestsPage', () => {
-    expect(src).toContain('MobileRequestsPage');
+  it('imports EssRequestsPage (desktop wrapper)', () => {
+    expect(src).toContain('EssRequestsPage');
   });
 
   it('has requests route at path="requests"', () => {
     expect(src).toContain('path="requests"');
   });
 
-  it('requests route uses MobileRequestsPage element', () => {
-    expect(src).toContain('element={<MobileRequestsPage />}');
+  it('requests route uses EssRequestsPage element', () => {
+    expect(src).toContain('element={<EssRequestsPage />}');
   });
 });
