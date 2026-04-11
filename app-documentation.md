@@ -1974,3 +1974,122 @@ Route selection uses `useMobileLayout()` — the hook fires on breakpoint crossi
 - Reset success banner has `role="status"`
 - Biometric and visibility-toggle buttons have descriptive `aria-label`
 - All interactive elements ≥ 44×44pt (`min-h-[44px]`)
+
+---
+
+## Mobile Dashboard — ESS Nexus Kinetic (Task 80)
+
+**Screen:** SCREEN_39  
+**Route:** `/app/ess/dashboard` (inside `<EssLayout>`)  
+**File:** `src/pages/ess/mobile/MobileDashboardPage.jsx`  
+**Branch:** `feature/80-ess-mobile-dashboard`
+
+### Layout
+
+Full-screen single-column scroll on mobile. At `md:` breakpoint, renders a 12-column bento grid: Shift Hero (col-span-8) | Leave Card (col-span-4) | Company Pulse (col-span-12).
+
+### Sections
+
+| Section | Component | Data source |
+|---|---|---|
+| Greeting header | `EssDashboardGreeting` | `dashboard.greeting.firstName` + `new Date()` |
+| Next Shift hero | `NextShiftHero` | `dashboard.upcomingShifts[0]` |
+| Annual Leave card | `LeaveBalanceCard` | `dashboard.leaveBalance` (defaults: used=0, total=21) |
+| Company Pulse carousel | `CompanyPulseCarousel` | `dashboard.companyNews` (defaults: []) |
+| Quick Links grid | `QuickLinks` | Static links: Payroll Hub, My Profile, Leave & Time, Schedule |
+
+### Time-Based Greeting Logic
+
+| Hour range | i18n key | EN | FR |
+|---|---|---|---|
+| 00:00–11:59 | `mobile.dashboard.goodMorning` | Good morning | Bonjour |
+| 12:00–17:59 | `mobile.dashboard.goodAfternoon` | Good afternoon | Bon après-midi |
+| 18:00–23:59 | `mobile.dashboard.goodEvening` | Good evening | Bonsoir |
+
+### Next Shift Hero Card
+
+- Magenta left accent bar (`linear-gradient(to bottom, #da336b, #8b2044)`, absolute 6px wide)
+- Date formatted using `Intl.DateTimeFormat` (weekday long, day numeric, month short)
+- Time + duration row with `schedule` Material Symbol
+- Location row with `location_on` Material Symbol
+- Footer: team avatar stack (max 4) + "Clock In" gradient CTA button
+- **Clock In CTA navigates to `/app/ess/schedule`** — actual time-tracking is a future feature
+- Empty state: `event_busy` icon + `mobile.dashboard.noUpcomingShift` text (neutral card, no accent bar)
+
+### Annual Leave Card
+
+- Full-width gradient surface: `linear-gradient(135deg, #8b003b 0%, #da336b 100%)`
+- `remaining` days computed as `total - used`
+- Progress bar: `<div role="progressbar" aria-valuenow={used} aria-valuemin={0} aria-valuemax={total}>`
+- White fill bar, `transition-all duration-700`
+- "Request Time Off" tonal button → navigates to `/app/ess/schedule` (leave request flow is future)
+- Decorative white-opacity orbs for visual depth
+
+### Company Pulse Carousel
+
+- Horizontal `overflow-x-auto` with `snap-x snap-mandatory`
+- Scrollbar hidden via `[scrollbar-width:none] [&::-webkit-scrollbar]:hidden`
+- Each card: 220px wide, `snap-center`, optional banner image (lazy loaded), category badge, title (2-line clamp), date
+- Only renders when `companyNews.length > 0` (no empty state placeholder)
+
+### Quick Links Grid
+
+2-column `grid grid-cols-2 gap-3`. Static links:
+
+| Icon | Label key | Route |
+|---|---|---|
+| `payments` (filled) | `mobile.dashboard.payrollHub` | `/app/ess/payslips` |
+| `badge` (filled) | `mobile.dashboard.myProfile` | `/app/ess/profile` |
+| `beach_access` | `mobile.dashboard.leaveTime` | `/app/ess/schedule` |
+| `calendar_today` | `mobile.nav.schedule` | `/app/ess/schedule` |
+
+### Desktop Coexistence
+
+`EssDashboardPage.jsx` checks `useMobileLayout()` (1024px breakpoint):
+- Mobile → renders `<MobileDashboardPage />` (this task)
+- Desktop → renders the original multi-column widget grid (task 54, unchanged)
+
+### i18n Keys Added (`mobile.dashboard` namespace)
+
+New keys in both `en/ess.json` and `fr/ess.json`:
+
+| Key | EN | FR |
+|---|---|---|
+| `essPortal` | Employee Self-Service | Espace Employé |
+| `noUpcomingShift` | No upcoming shifts scheduled | Aucun quart à venir |
+| `clockIn` | Clock In | Pointer |
+| `annualLeave` | Annual Leave | Congés annuels |
+| `daysLeft` | days left | jours restants |
+| `leaveProgress` | {{used}} of {{total}} days used | {{used}} sur {{total}} jours utilisés |
+| `requestTimeOff` | Request Time Off | Demander un congé |
+| `companyPulse` | Company Pulse | Actualités |
+| `seeAll` | See All | Voir tout |
+| `quickLinks` | Quick Links | Accès rapides |
+| `payrollHub` | Payroll Hub | Fiches de paie |
+| `myProfile` | My Profile | Mon profil |
+| `leaveTime` | Leave & Time | Congés & temps |
+| `view` | View | Voir |
+
+### Accessibility Checklist
+
+- [x] Leave bar: `role="progressbar"`, `aria-valuenow`, `aria-valuemin="0"`, `aria-valuemax`
+- [x] All decorative icons have `aria-hidden="true"`
+- [x] Clock In button has `aria-label` from i18n
+- [x] Quick link buttons have `aria-label` from i18n
+- [x] Company Pulse carousel has `role="list"` + `aria-label`
+- [x] Each carousel item has `role="listitem"`
+- [x] Greeting section has `data-testid="mobile-dashboard-greeting"`
+
+### Loading & Error States
+
+- **Loading:** `<MobileDashboardSkeleton />` — pulsing grey placeholders for all sections. Shown when `isLoading && !dashboard`.
+- **Error:** `<MobileDashboardError onRetry={refetch} />` — error icon, "Unable to load" text, Magenta retry button. Shown when `error && !dashboard`.
+- Stale data falls through to render dashboard with previous data.
+
+### Unit Tests
+
+`tests/mobile-dashboard-nexus.test.js` — 57 tests:
+- `getGreetingKey()` boundary checks (0, 6, 11, 12, 15, 17, 18, 21, 23)
+- Leave bar `%` calculation (0%, 57%, 100%, overflow cap, null/undefined)
+- EN/FR i18n key presence and interpolation placeholder checks
+- Source structural assertions: testids, aria attributes, routes, gradient colours, scroll classes

@@ -14,6 +14,7 @@ import LatestPayslipWidget from '../../components/ess/dashboard/LatestPayslipWid
 import ProfileWidget from '../../components/ess/dashboard/ProfileWidget';
 import QuickAccessBar from '../../components/ess/dashboard/QuickAccessBar';
 import MobileDashboard from '../../components/ess/dashboard/MobileDashboard';
+import { MobileDashboardPage } from '../ess/mobile/MobileDashboardPage';
 import { ArrowPathIcon } from '@heroicons/react/24/outline';
 
 const EssDashboardPage = () => {
@@ -23,8 +24,8 @@ const EssDashboardPage = () => {
   const { isOnline } = useEssConnectivity();
   const isMobile = useMobileLayout();
 
-  // Task 65: Mobile layout gets its own component
-  if (isMobile) return <MobileDashboard />;
+  // Task 80: Nexus Kinetic Nexus Kinetic mobile dashboard replaces task-65 cold-palette version
+  if (isMobile) return <MobileDashboardPage />;
 
   const firstName = dashboard?.greeting?.firstName || user?.firstName || '';
   const photoUrl = dashboard?.greeting?.photoUrl || null;
