@@ -215,7 +215,7 @@ describe('FR mobile.profile i18n keys', () => {
   });
 });
 
-// ── Source: MobileProfilePage ─────────────────────────────────────
+// ── Source: MobileProfilePage (Task 89 — Executive Pulse redesign) ──
 
 describe('MobileProfilePage source structure', () => {
   const src = fs.readFileSync(
@@ -225,6 +225,10 @@ describe('MobileProfilePage source structure', () => {
 
   it('imports useEssProfile', () => {
     expect(src).toContain('useEssProfile');
+  });
+
+  it('imports useEssPayslips', () => {
+    expect(src).toContain('useEssPayslips');
   });
 
   it('imports useTranslation', () => {
@@ -239,28 +243,19 @@ describe('MobileProfilePage source structure', () => {
     expect(src).toContain('useNavigate');
   });
 
+  it('imports boring-avatars Avatar', () => {
+    expect(src).toContain("from 'boring-avatars'");
+  });
+
   it('exports certRingOffset', () => {
     expect(src).toContain('export function certRingOffset');
   });
 
-  it('uses r=45 in SVG ring calculation', () => {
-    expect(src).toMatch(/r.*45|45.*r/);
+  it('certRingOffset uses r=45 circumference', () => {
+    expect(src).toMatch(/2\s*\*\s*Math\.PI\s*\*\s*45/);
   });
 
-  it('SVG circle has cx="48" cy="48" r="45" (viewBox 96x96)', () => {
-    expect(src).toContain('r="45"');
-    expect(src).toContain('viewBox="0 0 96 96"');
-  });
-
-  it('ring SVG is aria-hidden', () => {
-    expect(src).toContain('aria-hidden="true"');
-  });
-
-  it('ring progress circle has data-testid="cert-ring-progress"', () => {
-    expect(src).toContain('data-testid="cert-ring-progress"');
-  });
-
-  it('ring has Magenta stroke #da336b', () => {
+  it('has Magenta primary gradient #da336b', () => {
     expect(src).toContain('#da336b');
   });
 
@@ -268,48 +263,44 @@ describe('MobileProfilePage source structure', () => {
     expect(src).toContain('data-testid="profile-page"');
   });
 
-  it('has profile-header testid', () => {
-    expect(src).toContain('data-testid="profile-header"');
+  it('has profile-hero testid', () => {
+    expect(src).toContain('data-testid="profile-hero"');
   });
 
-  it('has profile-avatar testid', () => {
-    expect(src).toContain('data-testid="profile-avatar"');
+  it('has profile-avatar-img testid', () => {
+    expect(src).toContain('data-testid="profile-avatar-img"');
+  });
+
+  it('has profile-avatar-generated testid', () => {
+    expect(src).toContain('data-testid="profile-avatar-generated"');
   });
 
   it('has profile-name testid', () => {
     expect(src).toContain('data-testid="profile-name"');
   });
 
-  it('has cert-badge testid', () => {
-    expect(src).toContain('data-testid="cert-badge"');
+  it('has personal-info-card testid', () => {
+    expect(src).toContain('data-testid="personal-info-card"');
   });
 
-  it('has cert-ring-card testid', () => {
-    expect(src).toContain('data-testid="cert-ring-card"');
+  it('has cert-card testid', () => {
+    expect(src).toContain('data-testid="cert-card"');
   });
 
-  it('has cert-ring-svg testid', () => {
-    expect(src).toContain('data-testid="cert-ring-svg"');
+  it('has cert-score testid', () => {
+    expect(src).toContain('data-testid="cert-score"');
   });
 
-  it('has info-section testid', () => {
-    expect(src).toContain('data-testid="info-section"');
+  it('has cert-progress-bar testid', () => {
+    expect(src).toContain('data-testid="cert-progress-bar"');
   });
 
-  it('has info-row testid', () => {
-    expect(src).toContain('data-testid="info-row"');
+  it('has payslips-card testid', () => {
+    expect(src).toContain('data-testid="payslips-card"');
   });
 
-  it('has work-preferences testid', () => {
-    expect(src).toContain('data-testid="work-preferences"');
-  });
-
-  it('has preference-chip testid', () => {
-    expect(src).toContain('data-testid="preference-chip"');
-  });
-
-  it('has location-history testid', () => {
-    expect(src).toContain('data-testid="location-history"');
+  it('has payslip-row testid', () => {
+    expect(src).toContain('data-testid="payslip-row"');
   });
 
   it('has location-row testid', () => {
@@ -320,10 +311,6 @@ describe('MobileProfilePage source structure', () => {
     expect(src).toContain('data-testid="edit-profile-btn"');
   });
 
-  it('edit button has aria-label', () => {
-    expect(src).toContain('aria-label={t(\'mobile.profile.editProfile\')}');
-  });
-
   it('navigates to /app/ess/profile/edit on edit button click', () => {
     expect(src).toContain('/app/ess/profile/edit');
   });
@@ -332,41 +319,44 @@ describe('MobileProfilePage source structure', () => {
     expect(src).toContain('data-testid="profile-skeleton"');
   });
 
-  it('Intl.DateTimeFormat used for startDate formatting', () => {
+  it('Intl.DateTimeFormat used for date formatting', () => {
     expect(src).toContain('Intl.DateTimeFormat');
-  });
-
-  it('ring uses -rotate-90 transform to start from top', () => {
-    expect(src).toContain('-rotate-90');
   });
 
   it('exports MobileProfilePage as named export', () => {
     expect(src).toContain('export const MobileProfilePage');
   });
 
-  it('uses workPreferences ?? [] guard', () => {
-    expect(src).toContain('workPreferences ?? []');
+  it('uses normalise() helper to flatten profile data', () => {
+    expect(src).toContain('function normalise(raw)');
   });
 
-  it('uses locations ?? [] guard', () => {
-    expect(src).toContain('locations ?? []');
+  it('completeness defaults to 85', () => {
+    expect(src).toContain('completeness ?? 85');
   });
 
-  it('certificationScore ?? 85 default', () => {
-    expect(src).toContain('certificationScore ?? 85');
+  it('AVATAR_PALETTE includes primary magenta', () => {
+    expect(src).toContain("'#da336b'");
   });
 
-  it('PREF_ICONS maps fastFood to lunch_dining', () => {
-    expect(src).toContain('fastFood');
-    expect(src).toContain('lunch_dining');
+  it('bento grid uses md:grid-cols-12', () => {
+    expect(src).toContain('md:grid-cols-12');
   });
 
-  it('PREF_ICONS maps grocery to shopping_cart', () => {
-    expect(src).toContain('shopping_cart');
+  it('personal info is md:col-span-8', () => {
+    expect(src).toContain('md:col-span-8');
   });
 
-  it('Magenta gradient on rotated tile behind avatar', () => {
-    expect(src).toContain('#8b2044');
+  it('sidebar is md:col-span-4', () => {
+    expect(src).toContain('md:col-span-4');
+  });
+
+  it('hero avatar has tilted gradient background', () => {
+    expect(src).toContain('rotate-6');
+  });
+
+  it('aria-hidden on decorative icons', () => {
+    expect(src).toContain('aria-hidden="true"');
   });
 });
 

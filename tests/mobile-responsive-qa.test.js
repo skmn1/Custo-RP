@@ -340,7 +340,8 @@ describe('Images — loading="lazy" on non-hero images', () => {
 
   it('MobileProfilePage avatar has loading="lazy"', () => {
     const src = readSrc('src/pages/ess/mobile/MobileProfilePage.jsx');
-    expect(src).toMatch(/profile\.avatar[\s\S]{0,150}loading="lazy"|loading="lazy"[\s\S]{0,150}profile\.avatar/s);
+    expect(src).toContain('loading="lazy"');
+    expect(src).toMatch(/avatar[\s\S]{0,300}loading="lazy"|loading="lazy"[\s\S]{0,300}avatar/s);
   });
 
   it('MobileEditProfilePage avatar has loading="lazy"', () => {

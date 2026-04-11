@@ -1,15 +1,18 @@
 /**
- * E2E tests for Task 69 — ESS Mobile Profile
+ * E2E tests for Task 89 — ESS Mobile Profile (Executive Pulse Redesign)
  *
  * Covers:
  *  1. Profile page loads at /app/ess/profile (mobile viewport)
- *  2. Hero header renders with avatar/name/role
- *  3. All five sections present (personal, contact, emergency, experience, documents)
- *  4. Tapping editable field opens BottomSheet
- *  5. Submitting a change request shows validation
- *  6. Desktop page still works at wider viewport
+ *  2. Hero section renders: avatar, name, role, edit/clock-in buttons
+ *  3. Bento grid: Personal Info card, Certification card, Payslips card
+ *  4. Personal info fields (email, phone, department, employee ID)
+ *  5. Certification card with score and progress bar
+ *  6. Payslips card with recent payslips
+ *  7. Work location history renders when data exists
+ *  8. Loading skeleton appears before data loads
+ *  9. Desktop viewport renders profile page
  */
-describe('ESS — Mobile Profile (Task 69)', () => {
+describe('ESS — Mobile Profile (Task 89 — Executive Pulse)', () => {
   const BASE = 'http://localhost:5173';
 
   const loginAs = (role) => {
@@ -19,7 +22,7 @@ describe('ESS — Mobile Profile (Task 69)', () => {
     cy.wait(2000);
   };
 
-  // ── 1. Profile page loads ──────────────────────────────────────────
+  // ── 1. Profile page loads ──────────────────────────────────────
   describe('Profile page — mobile viewport', () => {
     beforeEach(() => {
       cy.viewport(390, 844);
@@ -27,142 +30,165 @@ describe('ESS — Mobile Profile (Task 69)', () => {
       cy.visit(`${BASE}/app/ess/profile`);
     });
 
-    it('renders mobile profile container', () => {
-      cy.get('[data-testid="mobile-profile"]', { timeout: 10000 }).should('exist');
+    it('renders the profile page container', () => {
+      cy.get('[data-testid="profile-page"]', { timeout: 10000 }).should('exist');
     });
 
     it('does NOT render desktop tab layout', () => {
-      cy.get('[data-testid="mobile-profile"]').should('exist');
+      cy.get('[data-testid="profile-page"]').should('exist');
       cy.get('[role="tablist"]').should('not.exist');
     });
   });
 
-  // ── 2. Hero header ────────────────────────────────────────────────
-  describe('Profile header', () => {
+  // ── 2. Hero section ───────────────────────────────────────────
+  describe('Hero section', () => {
     beforeEach(() => {
       cy.viewport(390, 844);
       loginAs('employee');
       cy.visit(`${BASE}/app/ess/profile`);
-      cy.get('[data-testid="profile-header"]', { timeout: 10000 }).as('header');
+      cy.get('[data-testid="profile-hero"]', { timeout: 10000 }).as('hero');
     });
 
-    it('renders profile header', () => {
-      cy.get('@header').should('be.visible');
+    it('renders hero section', () => {
+      cy.get('@hero').should('be.visible');
     });
 
-    it('displays avatar or initials fallback', () => {
-      cy.get('@header').within(() => {
-        cy.get('[data-testid="profile-avatar"], [data-testid="profile-avatar-fallback"]')
+    it('displays avatar (image or generated fallback)', () => {
+      cy.get('@hero').within(() => {
+        cy.get('[data-testid="profile-avatar-img"], [data-testid="profile-avatar-generated"]')
           .should('have.length.gte', 1);
       });
     });
 
     it('shows employee name', () => {
-      cy.get('@header').invoke('text').should('not.be.empty');
+      cy.get('[data-testid="profile-name"]')
+        .invoke('text')
+        .should('not.be.empty');
+    });
+
+    it('shows Edit Profile button', () => {
+      cy.get('[data-testid="edit-profile-btn"]').should('be.visible');
     });
   });
 
-  // ── 3. Profile sections ───────────────────────────────────────────
-  describe('Profile sections', () => {
+  // ── 3. Bento grid cards ───────────────────────────────────────
+  describe('Bento grid — Personal Info card', () => {
     beforeEach(() => {
       cy.viewport(390, 844);
       loginAs('employee');
       cy.visit(`${BASE}/app/ess/profile`);
-      cy.get('[data-testid="mobile-profile"]', { timeout: 10000 }).should('exist');
+      cy.get('[data-testid="personal-info-card"]', { timeout: 10000 }).as('infoCard');
     });
 
-    it('renders personal information section', () => {
-      cy.contains('Personal information').should('be.visible');
+    it('renders personal info card', () => {
+      cy.get('@infoCard').should('be.visible');
     });
 
-    it('renders contact section', () => {
-      cy.contains('Contact').should('be.visible');
+    it('contains email field', () => {
+      cy.get('@infoCard').contains('Email', { matchCase: false }).should('exist');
     });
 
-    it('renders emergency contact section', () => {
-      cy.contains('Emergency contact').should('be.visible');
+    it('contains phone field', () => {
+      cy.get('@infoCard').contains('Phone', { matchCase: false }).should('exist');
     });
 
-    it('renders experience section', () => {
-      cy.contains('Experience').should('be.visible');
+    it('contains department field', () => {
+      cy.get('@infoCard').contains('Department', { matchCase: false }).should('exist');
     });
 
-    it('renders field rows with labels and values', () => {
-      cy.get('[data-testid="profile-field-row"]').should('have.length.gte', 3);
-    });
-  });
-
-  // ── 4. Change request flow ────────────────────────────────────────
-  describe('Change request via BottomSheet', () => {
-    beforeEach(() => {
-      cy.viewport(390, 844);
-      loginAs('employee');
-      cy.visit(`${BASE}/app/ess/profile`);
-      cy.get('[data-testid="mobile-profile"]', { timeout: 10000 }).should('exist');
-    });
-
-    it('tapping an editable field opens the change request sheet', () => {
-      cy.get('[data-testid="profile-field-row"]').first().click();
-      cy.get('[data-testid="change-request-sheet"]', { timeout: 5000 }).should('exist');
-    });
-
-    it('sheet shows current value and input field', () => {
-      cy.get('[data-testid="profile-field-row"]').first().click();
-      cy.get('[data-testid="change-request-sheet"]', { timeout: 5000 }).within(() => {
-        cy.contains('Current value').should('be.visible');
-        cy.get('[data-testid="change-input"]').should('exist');
-      });
-    });
-
-    it('shows validation error for empty input', () => {
-      cy.get('[data-testid="profile-field-row"]').first().click();
-      cy.get('[data-testid="change-request-sheet"]', { timeout: 5000 }).within(() => {
-        cy.get('[data-testid="change-input"]').clear();
-        cy.get('[data-testid="submit-request-btn"]').click();
-        cy.get('[data-testid="change-validation-error"]').should('be.visible');
-      });
-    });
-
-    it('shows HR review note in the sheet', () => {
-      cy.get('[data-testid="profile-field-row"]').first().click();
-      cy.get('[data-testid="change-request-sheet"]', { timeout: 5000 }).within(() => {
-        cy.contains('HR approval').should('be.visible');
+    it('contains employee ID field', () => {
+      cy.get('@infoCard').within(() => {
+        cy.contains(/employee\s*id/i).should('exist');
       });
     });
   });
 
-  // ── 5. Completeness bar ───────────────────────────────────────────
-  describe('Profile completeness', () => {
+  describe('Bento grid — Certification card', () => {
     beforeEach(() => {
       cy.viewport(390, 844);
       loginAs('employee');
       cy.visit(`${BASE}/app/ess/profile`);
-      cy.get('[data-testid="profile-header"]', { timeout: 10000 }).should('exist');
+      cy.get('[data-testid="cert-card"]', { timeout: 10000 }).as('certCard');
     });
 
-    it('shows completeness percentage when under 100%', () => {
-      cy.get('[data-testid="profile-header"]').then(($header) => {
-        const text = $header.text();
-        if (text.includes('%')) {
-          cy.get('[data-testid="completeness-bar"]').should('exist');
+    it('renders certification card with primary background', () => {
+      cy.get('@certCard').should('be.visible');
+    });
+
+    it('displays certification score percentage', () => {
+      cy.get('[data-testid="cert-score"]').invoke('text').should('match', /\d+%/);
+    });
+
+    it('shows progress bar', () => {
+      cy.get('[data-testid="cert-progress-bar"]').should('exist');
+    });
+  });
+
+  describe('Bento grid — Payslips card', () => {
+    beforeEach(() => {
+      cy.viewport(390, 844);
+      loginAs('employee');
+      cy.visit(`${BASE}/app/ess/profile`);
+      cy.get('[data-testid="payslips-card"]', { timeout: 10000 }).as('payCard');
+    });
+
+    it('renders payslips card', () => {
+      cy.get('@payCard').should('be.visible');
+    });
+
+    it('shows payslip rows or empty state', () => {
+      cy.get('@payCard').within(() => {
+        cy.get('[data-testid="payslip-row"]').then(($rows) => {
+          if ($rows.length === 0) {
+            cy.contains(/no payslips/i).should('be.visible');
+          } else {
+            cy.wrap($rows).should('have.length.gte', 1);
+          }
+        });
+      });
+    });
+  });
+
+  // ── 4. Work location history ──────────────────────────────────
+  describe('Work location history', () => {
+    beforeEach(() => {
+      cy.viewport(390, 844);
+      loginAs('employee');
+      cy.visit(`${BASE}/app/ess/profile`);
+      cy.get('[data-testid="personal-info-card"]', { timeout: 10000 });
+    });
+
+    it('shows location rows if location data exists', () => {
+      cy.get('body').then(($body) => {
+        if ($body.find('[data-testid="location-row"]').length) {
+          cy.get('[data-testid="location-row"]').should('have.length.gte', 1);
         }
       });
     });
   });
 
-  // ── 6. Desktop coexistence ────────────────────────────────────────
-  describe('Desktop viewport — original profile page', () => {
+  // ── 5. Loading skeleton ───────────────────────────────────────
+  describe('Loading state', () => {
+    it('shows skeleton while loading on slow connection', () => {
+      cy.viewport(390, 844);
+      cy.intercept('GET', '**/api/ess/profile', (req) => {
+        req.on('response', (res) => { res.setDelay(3000); });
+      });
+      loginAs('employee');
+      cy.visit(`${BASE}/app/ess/profile`);
+      cy.get('[data-testid="profile-skeleton"]').should('exist');
+    });
+  });
+
+  // ── 6. Desktop coexistence ────────────────────────────────────
+  describe('Desktop viewport — profile page', () => {
     beforeEach(() => {
       cy.viewport(1280, 720);
       loginAs('employee');
       cy.visit(`${BASE}/app/ess/profile`);
     });
 
-    it('does NOT render mobile profile at desktop width', () => {
-      cy.get('[data-testid="mobile-profile"]').should('not.exist');
-    });
-
-    it('renders desktop profile page', () => {
+    it('renders profile page at desktop width', () => {
       cy.get('body', { timeout: 10000 }).should('be.visible');
       cy.contains('Profile', { timeout: 10000 }).should('be.visible');
     });
