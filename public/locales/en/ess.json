@@ -581,6 +581,39 @@
       "retry": "Try again",
       "restricted": "Payslip access is restricted",
       "notFound": "Payslip not found"
+    },
+    "leave": {
+      "title": "Requests & Leave",
+      "sectionLabel": "Personnel Management",
+      "annualLeave": "Annual Leave",
+      "sickDays": "Sick Days",
+      "shiftSwaps": "Shift Swaps",
+      "daysLeft": "left",
+      "daysUsedOf": "{{used}} of {{total}} used",
+      "noData": "No data",
+      "newRequest": "New Request",
+      "newRequestAriaLabel": "New leave request",
+      "recentRequests": "Recent Requests",
+      "noRequests": "No leave requests yet",
+      "leaveType": "Leave Type",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "reason": "Reason (optional)",
+      "reasonPlaceholder": "Brief description...",
+      "submitRequest": "Submit Request",
+      "validationEndDate": "End date must be on or after the start date",
+      "types": {
+        "annual": "Annual Leave",
+        "sick": "Sick Day",
+        "swap": "Shift Swap",
+        "personal": "Personal"
+      },
+      "status": {
+        "approved": "Approved",
+        "pending": "Pending",
+        "declined": "Declined",
+        "rejected": "Rejected"
+      }
     }
   },
   "auth": {

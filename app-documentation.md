@@ -2370,3 +2370,86 @@ All strings live under `mobile.payroll.*` in `public/locales/{en,fr}/ess.json`.
 - `ytdProgress()` — percentage clamped at 100, null/undefined safe
 - EN + FR i18n key presence and value assertions (36 + 20 keys)
 - Source structural assertions: testids, aria attrs, Magenta gradients, anchor download, hooks imports, route ordering
+
+---
+
+## Task 83 — ESS Requests & Leave Screen (SCREEN_69)
+
+### Overview
+
+`src/pages/ess/mobile/MobileRequestsPage.jsx` — Nexus Kinetic styled leave and requests hub for the ESS "Requests" bottom-navigation tab.
+
+**Route:** `/app/ess/requests`
+
+### Features
+
+| Section | Description |
+|---|---|
+| Balance dashboard | 3-card bento grid showing Annual Leave, Sick Days, and Shift Swaps with animated progress bars |
+| Recent requests list | Chronological list of leave requests with colour-coded status chips |
+| New Request sheet | `NexusBottomSheet` FAB → inline form with leave-type pills, date range, reason textarea |
+| Form validation | `endDate < startDate` triggers `role="alert"` error and blocks submission |
+
+### Components
+
+| Component | Purpose |
+|---|---|
+| `MobileRequestsSkeleton` | `animate-pulse` skeleton for loading state (`data-testid="requests-skeleton"`) |
+| `LeaveBalanceCards` | 3-card bento with progress bars, `role="progressbar"`, `aria-valuenow/min/max`, faint bg icon overlay |
+| `RecentRequests` | Request rows with type icon, date range, reason snippet, status chip + empty state |
+| `NexusBottomSheet` | Inline sheet; `role="dialog" aria-modal="true"`, `bg-surface rounded-t-3xl`, handles overlay click to close |
+| `NewRequestSheet` | Form with leave-type pills (`aria-pressed`), date inputs, reason textarea, validation error, submit CTA |
+| `MobileRequestsPage` | Named export; orchestrates state, hooks, FAB (`fixed bottom-24 right-6`) |
+
+### Status Chips
+
+| Status | Tailwind classes |
+|---|---|
+| `approved` | `bg-primary-container/40 text-primary` |
+| `pending` | `bg-secondary-container/40 text-secondary` |
+| `declined` / `rejected` | `bg-error-container/40 text-error` |
+
+### Hooks
+
+| Hook | Endpoint | Returns |
+|---|---|---|
+| `useEssLeaveBalance` | `GET /api/ess/leave/balance` | `{ data: { annual, sick, swap }, isLoading, error, refetch }` |
+| `useEssLeaveRequests` | `GET /api/ess/leave/requests` + `POST /api/ess/leave/requests` | `{ data, isLoading, error, refetch, createRequest, isSubmitting, submitError }` |
+
+**Balance response shape:**
+```json
+{
+  "annual": { "used": 12, "total": 21 },
+  "sick":   { "used": 2,  "total": 10 },
+  "swap":   { "used": 1,  "total": 5  }
+}
+```
+
+### i18n Namespace: `ess` → `mobile.leave.*`
+
+**Flat keys:** `title`, `sectionLabel`, `annualLeave`, `sickDays`, `shiftSwaps`, `daysLeft`, `daysUsedOf` (`{{used}} of {{total}} used`), `noData`, `newRequest`, `newRequestAriaLabel`, `recentRequests`, `noRequests`, `leaveType`, `startDate`, `endDate`, `reason`, `reasonPlaceholder`, `submitRequest`, `validationEndDate`
+
+**Nested:** `types.{annual, sick, swap, personal}`, `status.{approved, pending, declined, rejected}`
+
+### Accessibility
+
+- Progress bars: `role="progressbar"`, `aria-valuenow`, `aria-valuemin=0`, `aria-valuemax`
+- Bottom sheet: `role="dialog"`, `aria-modal="true"`, `aria-label={title}`
+- Leave type pills: `aria-pressed={selected}`
+- Validation error: `role="alert"`
+- FAB: `aria-label={t('mobile.leave.newRequestAriaLabel')}`
+- All Material Symbol `<span>` elements: `aria-hidden="true"`
+- Touch targets ≥ 44px padding on all interactive elements
+
+### Unit Tests
+
+`tests/mobile-leave-nexus.test.js` — **104 tests, all passing**
+
+- `balancePct()` — clamped at 100, zero/null-safe, decimal values
+- `statusChipClass()` — approved/pending/declined/rejected/unknown edge cases
+- `isEndDateValid()` — before/after/equal/empty combinations
+- EN i18n key presence, `{{used}}/{{total}}` interpolation, exact values for title/submitRequest/status
+- FR i18n key values: title, newRequest, submitRequest, status chips, types
+- Source structural assertions: testids, aria attrs, Magenta gradient (`#da336b`/`#8b2044`), hooks imports, FAB position, form validation, named export
+- Hook assertions: endpoints, POST method, `fetchRequests()` re-fetch, exported function names
+- App.jsx: `MobileRequestsPage` import + `path="requests"` route

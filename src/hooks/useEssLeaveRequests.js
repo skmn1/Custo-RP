@@ -1,0 +1,63 @@
+import { useState, useEffect, useCallback } from 'react';
+import { apiFetch } from '../api/config';
+
+/**
+ * useEssLeaveRequests — fetches the employee's leave request list.
+ *
+ * Calls GET /api/ess/leave/requests
+ * Each item:
+ *   { id, type, startDate, endDate, status, reason, createdAt }
+ *
+ * Also exposes createRequest for POST /api/ess/leave/requests.
+ */
+export function useEssLeaveRequests() {
+  const [data, setData] = useState([]);
+  const [isLoading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [isSubmitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
+
+  const fetchRequests = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await apiFetch('/ess/leave/requests');
+      setData(res.data ?? res ?? []);
+    } catch (err) {
+      setError(err.message || 'Failed to load leave requests');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const createRequest = useCallback(async ({ type, startDate, endDate, reason }) => {
+    setSubmitting(true);
+    setSubmitError(null);
+    try {
+      await apiFetch('/ess/leave/requests', {
+        method: 'POST',
+        body: JSON.stringify({ type, startDate, endDate, reason }),
+      });
+      await fetchRequests();
+    } catch (err) {
+      setSubmitError(err.message || 'Failed to submit request');
+      throw err;
+    } finally {
+      setSubmitting(false);
+    }
+  }, [fetchRequests]);
+
+  useEffect(() => {
+    fetchRequests();
+  }, [fetchRequests]);
+
+  return {
+    data,
+    isLoading,
+    error,
+    refetch: fetchRequests,
+    createRequest,
+    isSubmitting,
+    submitError,
+  };
+}

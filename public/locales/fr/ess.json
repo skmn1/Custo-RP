@@ -572,6 +572,39 @@
       "retry": "Réessayer",
       "restricted": "Accès aux fiches de paie restreint",
       "notFound": "Fiche de paie introuvable"
+    },
+    "leave": {
+      "title": "Congés & Demandes",
+      "sectionLabel": "Gestion du personnel",
+      "annualLeave": "Congés annuels",
+      "sickDays": "Jours maladie",
+      "shiftSwaps": "Échanges de quart",
+      "daysLeft": "restants",
+      "daysUsedOf": "{{used}} sur {{total}} utilisés",
+      "noData": "Aucune donnée",
+      "newRequest": "Nouvelle demande",
+      "newRequestAriaLabel": "Nouvelle demande de congé",
+      "recentRequests": "Demandes récentes",
+      "noRequests": "Aucune demande de congé",
+      "leaveType": "Type de congé",
+      "startDate": "Date de début",
+      "endDate": "Date de fin",
+      "reason": "Motif (facultatif)",
+      "reasonPlaceholder": "Brève description...",
+      "submitRequest": "Soumettre la demande",
+      "validationEndDate": "La date de fin doit être identique ou postérieure à la date de début",
+      "types": {
+        "annual": "Congé annuel",
+        "sick": "Jour maladie",
+        "swap": "Échange de quart",
+        "personal": "Personnel"
+      },
+      "status": {
+        "approved": "Approuvé",
+        "pending": "En attente",
+        "declined": "Refusé",
+        "rejected": "Rejeté"
+      }
     }
   },
   "auth": {
