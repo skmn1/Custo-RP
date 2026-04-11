@@ -32,8 +32,8 @@ export default function EssOfflineBanner() {
           role="status"
           aria-live="assertive"
           data-testid="ess-offline-banner"
-          className="flex items-center gap-2 bg-amber-100 dark:bg-amber-900 px-4 py-2 text-sm
-                     text-amber-800 dark:text-amber-100"
+          className="flex items-center gap-2 bg-amber-100 px-4 py-2 text-sm
+                     text-amber-800"
         >
           <ExclamationTriangleIcon className="h-5 w-5 shrink-0" aria-hidden="true" />
           <span>{t('pwa.offline.banner', "You're offline \u2014 showing cached data")}</span>

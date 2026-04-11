@@ -30,7 +30,7 @@ const ActionRow = ({ icon: Icon, label, value, detail, onPress, chevron = true }
       </span>
     )}
     {chevron && (
-      <ChevronRightIcon className="h-5 w-5 text-gray-300 dark:text-gray-600 flex-shrink-0" />
+      <ChevronRightIcon className="h-5 w-5 text-gray-300 flex-shrink-0" />
     )}
   </div>
 );

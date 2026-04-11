@@ -129,7 +129,7 @@ const BottomSheet = ({ isOpen, onClose, title, children, snapPoints = ['50%', '9
         {/* Drag handle */}
         <div className="flex justify-center pt-2 pb-1">
           <div
-            className="w-9 h-[5px] rounded-full bg-gray-300 dark:bg-gray-600"
+            className="w-9 h-[5px] rounded-full bg-gray-300"
             aria-label={t('mobile.sheet.dragHint')}
           />
         </div>

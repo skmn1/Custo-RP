@@ -69,7 +69,7 @@ const EssPushPermissionPrompt = ({ onSubscribed }) => {
 
   return (
     <div
-      className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700
+      className="bg-blue-50 border border-blue-200
                  rounded-xl p-4 flex items-start gap-3 shadow-sm"
       role="banner"
       aria-label={t('pwa.push.title')}
@@ -77,15 +77,15 @@ const EssPushPermissionPrompt = ({ onSubscribed }) => {
     >
       {/* Icon */}
       <div className="flex-shrink-0 mt-0.5">
-        <BellIcon className="h-6 w-6 text-blue-500 dark:text-blue-400" aria-hidden="true" />
+        <BellIcon className="h-6 w-6 text-blue-500" aria-hidden="true" />
       </div>
 
       {/* Text */}
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-blue-900 dark:text-blue-100 leading-snug">
+        <p className="text-sm font-semibold text-blue-900 leading-snug">
           {t('pwa.push.title')}
         </p>
-        <p className="text-sm text-blue-700 dark:text-blue-300 mt-0.5 leading-relaxed">
+        <p className="text-sm text-blue-700 mt-0.5 leading-relaxed">
           {t('pwa.push.body')}
         </p>
 
@@ -103,7 +103,7 @@ const EssPushPermissionPrompt = ({ onSubscribed }) => {
           </button>
           <button
             onClick={handleDismiss}
-            className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+            className="text-xs text-blue-600 hover:underline"
             data-testid="ess-push-dismiss-btn"
           >
             {t('pwa.push.dismissBtn')}
@@ -114,7 +114,7 @@ const EssPushPermissionPrompt = ({ onSubscribed }) => {
       {/* Close */}
       <button
         onClick={handleDismiss}
-        className="flex-shrink-0 text-blue-400 hover:text-blue-600 dark:hover:text-blue-300
+        className="flex-shrink-0 text-blue-400 hover:text-blue-600
                    focus:outline-none"
         aria-label="Dismiss"
       >

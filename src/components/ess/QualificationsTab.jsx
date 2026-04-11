@@ -51,21 +51,21 @@ const QualificationsTab = ({ entries, onAdd, onUpdate, onDelete, t }) => {
 
   const expiryBadge = (entry) => {
     if (entry.isExpired) {
-      return <span className="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">{t('profile.qualifications.expired')}</span>;
+      return <span className="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">{t('profile.qualifications.expired')}</span>;
     }
     if (entry.isExpiringSoon) {
-      return <span className="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">{t('profile.qualifications.expiringSoon')}</span>;
+      return <span className="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">{t('profile.qualifications.expiringSoon')}</span>;
     }
     if (entry.expiryDate) {
-      return <span className="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">{t('profile.qualifications.valid')}</span>;
+      return <span className="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">{t('profile.qualifications.valid')}</span>;
     }
-    return <span className="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">{t('profile.qualifications.noExpiry')}</span>;
+    return <span className="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">{t('profile.qualifications.noExpiry')}</span>;
   };
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
           {t('profile.qualifications.title')}
         </h2>
         {editing === null && (
@@ -84,7 +84,7 @@ const QualificationsTab = ({ entries, onAdd, onUpdate, onDelete, t }) => {
       )}
 
       {entries.length === 0 && editing === null && (
-        <p className="text-sm text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+        <p className="text-sm text-gray-500 bg-white rounded-xl border border-gray-200 p-6">
           {t('profile.qualifications.noEntries')}
         </p>
       )}
@@ -92,7 +92,7 @@ const QualificationsTab = ({ entries, onAdd, onUpdate, onDelete, t }) => {
       {entries.map((entry) => (
         <div
           key={entry.id}
-          className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-5"
+          className="bg-white rounded-xl border border-gray-200 p-5"
           data-cy="qualification-entry"
         >
           {editing === entry.id ? null : (
@@ -100,21 +100,21 @@ const QualificationsTab = ({ entries, onAdd, onUpdate, onDelete, t }) => {
               <div className="flex items-start justify-between">
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">{entry.name}</h3>
+                    <h3 className="text-sm font-semibold text-gray-900">{entry.name}</h3>
                     {expiryBadge(entry)}
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{entry.issuingBody}</p>
+                  <p className="text-sm text-gray-600">{entry.issuingBody}</p>
                 </div>
                 <div className="flex gap-2">
-                  <button onClick={() => startEdit(entry)} className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline" data-cy="edit-qualification">
+                  <button onClick={() => startEdit(entry)} className="text-xs text-indigo-600 hover:underline" data-cy="edit-qualification">
                     {t('profile.qualifications.edit')}
                   </button>
-                  <button onClick={() => handleDelete(entry.id)} className="text-xs text-red-600 dark:text-red-400 hover:underline" data-cy="delete-qualification">
+                  <button onClick={() => handleDelete(entry.id)} className="text-xs text-red-600 hover:underline" data-cy="delete-qualification">
                     {t('profile.qualifications.delete')}
                   </button>
                 </div>
               </div>
-              <div className="mt-2 flex gap-6 text-xs text-gray-500 dark:text-gray-400">
+              <div className="mt-2 flex gap-6 text-xs text-gray-500">
                 <span>{t('profile.qualifications.dateObtained')}: {entry.dateObtained || '—'}</span>
                 {entry.expiryDate && <span>{t('profile.qualifications.expiryDate')}: {entry.expiryDate}</span>}
                 {entry.credentialNumber && <span>#{entry.credentialNumber}</span>}
@@ -128,7 +128,7 @@ const QualificationsTab = ({ entries, onAdd, onUpdate, onDelete, t }) => {
 };
 
 const QualificationForm = ({ form, setForm, saving, onSave, onCancel, t }) => (
-  <form onSubmit={onSave} className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-5 space-y-4" data-cy="qualification-form">
+  <form onSubmit={onSave} className="bg-white rounded-xl border border-gray-200 p-5 space-y-4" data-cy="qualification-form">
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <FormInput label={t('profile.qualifications.name')} value={form.name} onChange={(v) => setForm(f => ({ ...f, name: v }))} required />
       <FormInput label={t('profile.qualifications.issuingBody')} value={form.issuingBody} onChange={(v) => setForm(f => ({ ...f, issuingBody: v }))} required />
@@ -142,7 +142,7 @@ const QualificationForm = ({ form, setForm, saving, onSave, onCancel, t }) => (
         {t('profile.actions.save')}
       </button>
       <button type="button" onClick={onCancel}
-        className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors">
+        className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
         {t('profile.actions.cancel')}
       </button>
     </div>
@@ -151,13 +151,13 @@ const QualificationForm = ({ form, setForm, saving, onSave, onCancel, t }) => (
 
 const FormInput = ({ label, value, onChange, type = 'text', required = false }) => (
   <div>
-    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{label}</label>
+    <label className="block text-xs font-medium text-gray-500 mb-1">{label}</label>
     <input
       type={type}
       value={value}
       onChange={(e) => onChange(e.target.value)}
       required={required}
-      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
     />
   </div>
 );

@@ -83,16 +83,16 @@ const SectionHeader = ({ label }) => (
 const DetailSkeleton = () => (
   <div className="animate-pulse" data-testid="payslip-detail-skeleton">
     <div className="px-4 pt-4 space-y-3">
-      <div className="h-5 w-20 bg-gray-200 dark:bg-gray-700 rounded" />
-      <div className="h-10 w-40 bg-gray-200 dark:bg-gray-700 rounded mx-auto" />
-      <div className="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded mx-auto" />
+      <div className="h-5 w-20 bg-gray-200 rounded" />
+      <div className="h-10 w-40 bg-gray-200 rounded mx-auto" />
+      <div className="h-4 w-16 bg-gray-200 rounded mx-auto" />
     </div>
-    <div className="mx-4 mt-4 h-3 bg-gray-200 dark:bg-gray-700 rounded-full" />
+    <div className="mx-4 mt-4 h-3 bg-gray-200 rounded-full" />
     <div className="mt-6 space-y-3 px-4">
       {[1, 2, 3, 4, 5].map((i) => (
         <div key={i} className="flex justify-between">
-          <div className="h-4 w-28 bg-gray-200 dark:bg-gray-700 rounded" />
-          <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded" />
+          <div className="h-4 w-28 bg-gray-200 rounded" />
+          <div className="h-4 w-20 bg-gray-200 rounded" />
         </div>
       ))}
     </div>

@@ -42,19 +42,19 @@ const BankDetailsTab = ({ bankDetails, pendingRequests, onSubmitChange, t: tProp
   };
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-      <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-4">
+    <div className="bg-white rounded-xl border border-gray-200 p-6">
+      <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">
         {t('profile.bank.title')}
       </h2>
 
       {message && (
-        <div className="mb-4 p-3 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 text-sm">
+        <div className="mb-4 p-3 rounded-lg bg-green-50 text-green-700 text-sm">
           {message}
         </div>
       )}
 
       {pendingRequests > 0 && (
-        <div className="mb-4 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 text-sm">
+        <div className="mb-4 p-3 rounded-lg bg-amber-50 text-amber-700 text-sm">
           {t('profile.bank.pendingChange')}
         </div>
       )}
@@ -67,10 +67,10 @@ const BankDetailsTab = ({ bankDetails, pendingRequests, onSubmitChange, t: tProp
           <FieldDisplay label={t('profile.bank.accountHolder')} value={bankDetails.accountHolder} />
         </div>
       ) : (
-        <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{t('profile.bank.noDetails')}</p>
+        <p className="text-sm text-gray-500 mb-4">{t('profile.bank.noDetails')}</p>
       )}
 
-      <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">{t('profile.bank.maskedNotice')}</p>
+      <p className="text-xs text-gray-400 mb-4">{t('profile.bank.maskedNotice')}</p>
 
       {!showForm ? (
         <OfflineDisabled fallbackTooltip={t('pwa.offline.editDisabled', { defaultValue: 'Editing is unavailable offline' })}>
@@ -83,7 +83,7 @@ const BankDetailsTab = ({ bankDetails, pendingRequests, onSubmitChange, t: tProp
           </button>
         </OfflineDisabled>
       ) : (
-        <form onSubmit={handleSubmit} className="space-y-4 mt-4 border-t border-gray-200 dark:border-gray-700 pt-4" data-cy="bank-change-form">
+        <form onSubmit={handleSubmit} className="space-y-4 mt-4 border-t border-gray-200 pt-4" data-cy="bank-change-form">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <FormInput label={t('profile.bank.bankName')} value={form.bankName} onChange={(v) => setForm(f => ({ ...f, bankName: v }))} />
             <FormInput label={t('profile.bank.iban')} value={form.iban} onChange={(v) => setForm(f => ({ ...f, iban: v }))} />
@@ -103,7 +103,7 @@ const BankDetailsTab = ({ bankDetails, pendingRequests, onSubmitChange, t: tProp
             <button
               type="button"
               onClick={() => setShowForm(false)}
-              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
             >
               {t('profile.actions.cancel')}
             </button>
@@ -116,20 +116,20 @@ const BankDetailsTab = ({ bankDetails, pendingRequests, onSubmitChange, t: tProp
 
 const FieldDisplay = ({ label, value }) => (
   <div className="flex flex-col">
-    <span className="text-xs text-gray-500 dark:text-gray-400">{label}</span>
-    <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{value || '—'}</span>
+    <span className="text-xs text-gray-500">{label}</span>
+    <span className="text-sm font-medium text-gray-900">{value || '—'}</span>
   </div>
 );
 
 const FormInput = ({ label, value, onChange, required = false }) => (
   <div>
-    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{label}</label>
+    <label className="block text-xs font-medium text-gray-500 mb-1">{label}</label>
     <input
       type="text"
       value={value}
       onChange={(e) => onChange(e.target.value)}
       required={required}
-      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
     />
   </div>
 );

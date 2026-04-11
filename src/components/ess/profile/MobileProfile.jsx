@@ -94,7 +94,7 @@ const ProfileHeader = ({ profile, t }) => {
 
 const ProfileSection = ({ title, children }) => (
   <div className="mt-6" data-testid="profile-section">
-    <h3 className="mobile-section-header mobile-grain text-mobile-caption font-semibold text-[var(--mobile-label-secondary)] uppercase tracking-wide">
+    <h3 className="mobile-section-header text-mobile-caption font-semibold text-[var(--mobile-label-secondary)] uppercase tracking-wide">
       {title}
     </h3>
     <div className="bg-[var(--mobile-bg-elevated)] rounded-xl mx-4 divide-y divide-[var(--mobile-separator)]">
@@ -319,15 +319,15 @@ const ChangeRequestSheet = ({ field, onClose, onSubmit, onCancel, t }) => {
 const ProfileSkeleton = () => (
   <div className="animate-pulse" data-testid="profile-skeleton">
     <div className="flex flex-col items-center pt-6 pb-4">
-      <div className="h-20 w-20 rounded-full bg-gray-200 dark:bg-gray-700" />
-      <div className="h-5 w-32 bg-gray-200 dark:bg-gray-700 rounded mt-3" />
-      <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded mt-2" />
-      <div className="h-3 w-20 bg-gray-200 dark:bg-gray-700 rounded mt-2" />
+      <div className="h-20 w-20 rounded-full bg-gray-200" />
+      <div className="h-5 w-32 bg-gray-200 rounded mt-3" />
+      <div className="h-4 w-24 bg-gray-200 rounded mt-2" />
+      <div className="h-3 w-20 bg-gray-200 rounded mt-2" />
     </div>
     {[1, 2, 3].map((i) => (
       <div key={i} className="mt-6 mx-4">
-        <div className="h-3 w-28 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
-        <div className="rounded-xl bg-gray-200 dark:bg-gray-700 h-24" />
+        <div className="h-3 w-28 bg-gray-200 rounded mb-2" />
+        <div className="rounded-xl bg-gray-200 h-24" />
       </div>
     ))}
   </div>

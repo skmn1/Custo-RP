@@ -7,7 +7,7 @@ const DAY_NAMES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 /** Skeleton card shown while loading */
 const ShiftSkeleton = () => (
-  <div className="h-16 rounded-md bg-gray-100 dark:bg-gray-700 animate-pulse" />
+  <div className="h-16 rounded-md bg-gray-100 animate-pulse" />
 );
 
 /**
@@ -59,14 +59,14 @@ const WeekView = ({ anchor, shifts, leave, isLoading }) => {
   const hasAnyShifts = shifts.length > 0;
 
   return (
-    <div className="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden" data-testid="week-view">
+    <div className="rounded-xl border border-gray-200 overflow-hidden" data-testid="week-view">
       {/* Day headers */}
-      <div className="grid grid-cols-7 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+      <div className="grid grid-cols-7 bg-gray-50 border-b border-gray-200">
         {weekDays.map(({ date, dayName, dayNum, dateStr }) => {
           const isToday = dateStr === todayStr;
           return (
-            <div key={dateStr} className="px-1 py-2 text-center border-r last:border-r-0 border-gray-200 dark:border-gray-700">
-              <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{dayName}</p>
+            <div key={dateStr} className="px-1 py-2 text-center border-r last:border-r-0 border-gray-200">
+              <p className="text-xs font-medium text-gray-500 uppercase">{dayName}</p>
               <p className={`text-sm font-semibold mt-0.5 ${
                 isToday
                   ? 'w-6 h-6 rounded-xl flex items-center justify-center mx-auto text-white'
@@ -91,7 +91,7 @@ const WeekView = ({ anchor, shifts, leave, isLoading }) => {
           return (
             <div
               key={dateStr}
-              className="border-r last:border-r-0 border-gray-200 dark:border-gray-700 p-1.5 min-h-[120px] bg-white dark:bg-gray-900"
+              className="border-r last:border-r-0 border-gray-200 p-1.5 min-h-[120px] bg-white"
             >
               {isLoading ? (
                 <ShiftSkeleton />
@@ -118,7 +118,7 @@ const WeekView = ({ anchor, shifts, leave, isLoading }) => {
                       ))}
                     </div>
                   ) : !onLeave ? (
-                    <p className="text-[11px] text-gray-300 dark:text-gray-600 text-center pt-4">—</p>
+                    <p className="text-[11px] text-gray-300 text-center pt-4">—</p>
                   ) : null}
                 </>
               )}
@@ -129,7 +129,7 @@ const WeekView = ({ anchor, shifts, leave, isLoading }) => {
 
       {/* No shifts at all empty state */}
       {!isLoading && !hasAnyShifts && leave.length === 0 && (
-        <div className="col-span-7 py-6 text-center text-sm text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700">
+        <div className="col-span-7 py-6 text-center text-sm text-gray-500 border-t border-gray-200">
           {t('schedule.noShiftsWeek')}
         </div>
       )}

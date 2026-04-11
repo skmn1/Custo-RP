@@ -4,10 +4,10 @@ import { useTranslation } from 'react-i18next';
 import { CalendarDaysIcon } from '@heroicons/react/24/outline';
 
 const shiftTypeBadge = {
-  regular: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300',
-  overtime: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300',
-  split: 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300',
-  on_call: 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300',
+  regular: 'bg-blue-100 text-blue-700',
+  overtime: 'bg-amber-100 text-amber-700',
+  split: 'bg-purple-100 text-purple-700',
+  on_call: 'bg-gray-100 text-gray-700',
 };
 
 const UpcomingShiftsWidget = ({ shifts, error }) => {
@@ -25,14 +25,14 @@ const UpcomingShiftsWidget = ({ shifts, error }) => {
   const displayed = Array.isArray(shifts) ? shifts.slice(0, 5) : [];
 
   return (
-    <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 flex flex-col">
-      <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+    <div className="rounded-xl border border-gray-200 bg-white p-5 flex flex-col">
+      <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-2">
         <CalendarDaysIcon className="h-4 w-4" />
         {t('dashboard.upcomingShifts.title')}
       </h3>
 
       {displayed.length === 0 ? (
-        <p className="text-sm text-gray-400 dark:text-gray-500 py-4 text-center flex-1 flex items-center justify-center">
+        <p className="text-sm text-gray-400 py-4 text-center flex-1 flex items-center justify-center">
           {t('dashboard.upcomingShifts.empty')}
         </p>
       ) : (
@@ -40,13 +40,13 @@ const UpcomingShiftsWidget = ({ shifts, error }) => {
           {displayed.map((shift, idx) => (
             <li
               key={shift.id || idx}
-              className="flex items-center justify-between text-sm border-b border-gray-100 dark:border-gray-700 pb-2 last:border-0"
+              className="flex items-center justify-between text-sm border-b border-gray-100 pb-2 last:border-0"
             >
               <div>
-                <span className="font-medium text-gray-900 dark:text-gray-100">
+                <span className="font-medium text-gray-900">
                   {formatDate(shift.date)}
                 </span>
-                <span className="text-gray-500 dark:text-gray-400 ml-2">
+                <span className="text-gray-500 ml-2">
                   {shift.startTime}–{shift.endTime}
                 </span>
                 <div className="flex items-center gap-2 mt-0.5">
@@ -56,14 +56,14 @@ const UpcomingShiftsWidget = ({ shifts, error }) => {
                     </span>
                   )}
                   {shift.department && (
-                    <span className="text-xs text-gray-400 dark:text-gray-500">
+                    <span className="text-xs text-gray-400">
                       {shift.department}
                     </span>
                   )}
                 </div>
               </div>
               {shift.duration != null && (
-                <span className="text-xs font-medium text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                <span className="text-xs font-medium text-gray-500 whitespace-nowrap">
                   {shift.duration}h
                 </span>
               )}
@@ -74,7 +74,7 @@ const UpcomingShiftsWidget = ({ shifts, error }) => {
 
       <Link
         to="/app/ess/schedule"
-        className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 mt-4 inline-block"
+        className="text-sm font-medium text-indigo-600 hover:text-indigo-800 mt-4 inline-block"
       >
         {t('dashboard.upcomingShifts.viewAll')} →
       </Link>
@@ -84,11 +84,11 @@ const UpcomingShiftsWidget = ({ shifts, error }) => {
 
 function WidgetError({ title, t }) {
   return (
-    <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5">
-      <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">
+    <div className="rounded-xl border border-gray-200 bg-white p-5">
+      <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">
         {title}
       </h3>
-      <p className="text-sm text-red-500 dark:text-red-400 text-center py-4">{t('dashboard.unableToLoad')}</p>
+      <p className="text-sm text-red-500 text-center py-4">{t('dashboard.unableToLoad')}</p>
     </div>
   );
 }

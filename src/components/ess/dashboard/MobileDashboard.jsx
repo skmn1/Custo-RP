@@ -217,7 +217,7 @@ const ProfileCard = ({ completeness, pendingRequests, t }) => {
           {t('mobile.dashboard.complete', { percent: pct })}
         </p>
         <div className="flex items-center gap-3 mt-2">
-          <div className="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+          <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
             <div
               className="h-full bg-[var(--mobile-tint)] rounded-full transition-all duration-500"
               style={{ width: `${Math.min(pct, 100)}%` }}
@@ -267,16 +267,16 @@ const AttendanceCard = ({ attendance, t }) => {
 
 const DashboardSkeleton = () => (
   <div className="space-y-4 px-4 pt-4 animate-pulse" data-testid="mobile-dashboard-skeleton">
-    <div className="h-8 w-56 bg-gray-200 dark:bg-gray-700 rounded" />
-    <div className="h-4 w-40 bg-gray-200 dark:bg-gray-700 rounded" />
-    <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded-xl mt-4" />
+    <div className="h-8 w-56 bg-gray-200 rounded" />
+    <div className="h-4 w-40 bg-gray-200 rounded" />
+    <div className="h-32 bg-gray-200 rounded-xl mt-4" />
     <div className="flex gap-3 mt-4">
       {[1, 2, 3, 4].map((i) => (
-        <div key={i} className="h-16 w-20 bg-gray-200 dark:bg-gray-700 rounded-2xl flex-shrink-0" />
+        <div key={i} className="h-16 w-20 bg-gray-200 rounded-2xl flex-shrink-0" />
       ))}
     </div>
     {[1, 2, 3].map((i) => (
-      <div key={i} className="h-24 bg-gray-200 dark:bg-gray-700 rounded-xl" />
+      <div key={i} className="h-24 bg-gray-200 rounded-xl" />
     ))}
   </div>
 );

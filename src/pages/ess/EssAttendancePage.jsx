@@ -11,12 +11,12 @@ import MobileAttendance from '../../components/ess/attendance/MobileAttendance';
 // ─── Status badge colors ────────────────────────────────────
 
 const STATUS_COLORS = {
-  present:  'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-  absent:   'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-  late:     'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-  half_day: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400',
-  on_leave: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-  holiday:  'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
+  present:  'bg-green-100 text-green-800',
+  absent:   'bg-red-100 text-red-800',
+  late:     'bg-yellow-100 text-yellow-800',
+  half_day: 'bg-orange-100 text-orange-800',
+  on_leave: 'bg-blue-100 text-blue-800',
+  holiday:  'bg-purple-100 text-purple-800',
 };
 
 const ALL_STATUSES = ['present', 'absent', 'late', 'half_day', 'on_leave', 'holiday'];
@@ -89,7 +89,7 @@ const EssAttendancePage = () => {
   if (error) {
     return (
       <div className="p-6">
-        <div className="rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-4 text-red-700 dark:text-red-400">
+        <div className="rounded-lg bg-red-50 border border-red-200 p-4 text-red-700">
           {error}
         </div>
       </div>
@@ -104,7 +104,7 @@ const EssAttendancePage = () => {
     <div>
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+        <h1 className="text-2xl font-bold text-gray-900">
           {t('attendance.title')}
         </h1>
         <StaleDataIndicator isCached={isCached} fetchedAt={fetchedAt} />
@@ -125,20 +125,20 @@ const EssAttendancePage = () => {
       <div className="flex items-center justify-between mb-6">
         <button
           onClick={() => navigateMonth(monthOffset - 1)}
-          className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400"
+          className="p-2 rounded-lg hover:bg-gray-100 text-gray-600"
           aria-label={t('attendance.previousMonth')}
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
-        <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+        <span className="text-lg font-semibold text-gray-900">
           {formatMonthLabel(period.from)}
         </span>
         <button
           onClick={() => navigateMonth(monthOffset + 1)}
           disabled={monthOffset >= 0}
-          className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 disabled:opacity-30 disabled:cursor-not-allowed"
+          className="p-2 rounded-lg hover:bg-gray-100 text-gray-600 disabled:opacity-30 disabled:cursor-not-allowed"
           aria-label="Next month"
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -153,30 +153,30 @@ const EssAttendancePage = () => {
           <SummaryCard
             label={t('attendance.attendanceRate')}
             value={`${summary.attendanceRate}%`}
-            accent="text-indigo-600 dark:text-indigo-400"
+            accent="text-indigo-600"
           />
           <SummaryCard
             label={t('attendance.totalHours')}
             value={`${Number(summary.totalHours).toFixed(1)}h`}
-            accent="text-emerald-600 dark:text-emerald-400"
+            accent="text-emerald-600"
           />
           <SummaryCard
             label={t('attendance.overtimeHours')}
             value={`${Number(summary.overtimeHours).toFixed(1)}h`}
-            accent="text-amber-600 dark:text-amber-400"
+            accent="text-amber-600"
           />
           <SummaryCard
             label={t('attendance.daysAbsent')}
             value={summary.daysAbsent}
-            accent="text-red-600 dark:text-red-400"
+            accent="text-red-600"
           />
         </div>
       )}
 
       {/* Status Breakdown */}
       {summary?.breakdown && (
-        <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-5 mb-6">
-          <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+        <div className="rounded-xl border border-gray-200 bg-white p-5 mb-6">
+          <h2 className="text-sm font-semibold text-gray-700 mb-3">
             {t('attendance.statusBreakdown')}
           </h2>
           <div className="flex flex-wrap gap-3">
@@ -185,7 +185,7 @@ const EssAttendancePage = () => {
                 <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[s]}`}>
                   {t(`attendance.statusLabels.${s}`)}
                 </span>
-                <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                <span className="text-sm font-semibold text-gray-900">
                   {summary.breakdown[s] || 0}
                 </span>
               </div>
@@ -196,13 +196,13 @@ const EssAttendancePage = () => {
 
       {/* Status filter */}
       <div className="flex items-center gap-3 mb-4">
-        <label className="text-sm font-medium text-gray-600 dark:text-gray-400">
+        <label className="text-sm font-medium text-gray-600">
           {t('attendance.filterByStatus')}
         </label>
         <select
           value={statusFilter}
           onChange={(e) => handleStatusFilter(e.target.value)}
-          className="rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm px-3 py-1.5 text-gray-900 dark:text-gray-100"
+          className="rounded-lg border border-gray-300 bg-white text-sm px-3 py-1.5 text-gray-900"
         >
           <option value="">{t('attendance.allStatuses')}</option>
           {ALL_STATUSES.map((s) => (
@@ -212,39 +212,39 @@ const EssAttendancePage = () => {
       </div>
 
       {/* Daily log table */}
-      <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 overflow-hidden">
-        <div className="px-5 py-3 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+      <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
+        <div className="px-5 py-3 border-b border-gray-200">
+          <h2 className="text-sm font-semibold text-gray-700">
             {t('attendance.dailyLog')}
           </h2>
         </div>
 
         {isLoading ? (
-          <div className="p-8 text-center text-gray-500 dark:text-gray-400">
+          <div className="p-8 text-center text-gray-500">
             {t('attendance.loading')}
           </div>
         ) : displayRecords.length === 0 ? (
-          <div className="p-8 text-center text-gray-500 dark:text-gray-400">
+          <div className="p-8 text-center text-gray-500">
             {t('attendance.noRecords')}
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-gray-50 dark:bg-gray-800/50 text-left">
-                  <th className="px-4 py-3 font-medium text-gray-600 dark:text-gray-400">{t('attendance.date')}</th>
-                  <th className="px-4 py-3 font-medium text-gray-600 dark:text-gray-400">{t('attendance.status')}</th>
-                  <th className="px-4 py-3 font-medium text-gray-600 dark:text-gray-400">{t('attendance.scheduledTime')}</th>
-                  <th className="px-4 py-3 font-medium text-gray-600 dark:text-gray-400">{t('attendance.actualTime')}</th>
-                  <th className="px-4 py-3 font-medium text-gray-600 dark:text-gray-400 text-right">{t('attendance.hours')}</th>
-                  <th className="px-4 py-3 font-medium text-gray-600 dark:text-gray-400 text-right">{t('attendance.overtime')}</th>
-                  <th className="px-4 py-3 font-medium text-gray-600 dark:text-gray-400">{t('attendance.notes')}</th>
+                <tr className="bg-gray-50 text-left">
+                  <th className="px-4 py-3 font-medium text-gray-600">{t('attendance.date')}</th>
+                  <th className="px-4 py-3 font-medium text-gray-600">{t('attendance.status')}</th>
+                  <th className="px-4 py-3 font-medium text-gray-600">{t('attendance.scheduledTime')}</th>
+                  <th className="px-4 py-3 font-medium text-gray-600">{t('attendance.actualTime')}</th>
+                  <th className="px-4 py-3 font-medium text-gray-600 text-right">{t('attendance.hours')}</th>
+                  <th className="px-4 py-3 font-medium text-gray-600 text-right">{t('attendance.overtime')}</th>
+                  <th className="px-4 py-3 font-medium text-gray-600">{t('attendance.notes')}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+              <tbody className="divide-y divide-gray-100">
                 {displayRecords.map((rec) => (
-                  <tr key={rec.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/30">
-                    <td className="px-4 py-3 text-gray-900 dark:text-gray-100 whitespace-nowrap">
+                  <tr key={rec.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-3 text-gray-900 whitespace-nowrap">
                       {formatDate(rec.date)}
                     </td>
                     <td className="px-4 py-3">
@@ -252,23 +252,23 @@ const EssAttendancePage = () => {
                         {t(`attendance.statusLabels.${rec.status}`, rec.status)}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                    <td className="px-4 py-3 text-gray-600 whitespace-nowrap">
                       {rec.scheduledStart && rec.scheduledEnd
                         ? `${rec.scheduledStart} – ${rec.scheduledEnd}`
                         : '—'}
                     </td>
-                    <td className="px-4 py-3 text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                    <td className="px-4 py-3 text-gray-600 whitespace-nowrap">
                       {rec.actualStart && rec.actualEnd
                         ? `${rec.actualStart} – ${rec.actualEnd}`
                         : '—'}
                     </td>
-                    <td className="px-4 py-3 text-right text-gray-900 dark:text-gray-100">
+                    <td className="px-4 py-3 text-right text-gray-900">
                       {rec.actualHours != null ? `${Number(rec.actualHours).toFixed(1)}` : '—'}
                     </td>
-                    <td className="px-4 py-3 text-right text-amber-600 dark:text-amber-400 font-medium">
+                    <td className="px-4 py-3 text-right text-amber-600 font-medium">
                       {rec.overtimeHours > 0 ? `+${Number(rec.overtimeHours).toFixed(1)}` : ''}
                     </td>
-                    <td className="px-4 py-3 text-gray-500 dark:text-gray-400 max-w-[200px] truncate">
+                    <td className="px-4 py-3 text-gray-500 max-w-[200px] truncate">
                       {rec.notes || ''}
                     </td>
                   </tr>
@@ -285,8 +285,8 @@ const EssAttendancePage = () => {
 // ─── Sub-components ─────────────────────────────────────────
 
 const SummaryCard = ({ label, value, accent }) => (
-  <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-5">
-    <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">{label}</p>
+  <div className="rounded-xl border border-gray-200 bg-white p-5">
+    <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">{label}</p>
     <p className={`text-2xl font-bold ${accent}`}>{value}</p>
   </div>
 );

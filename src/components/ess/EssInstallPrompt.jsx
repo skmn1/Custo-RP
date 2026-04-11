@@ -83,7 +83,7 @@ export default function EssInstallPrompt() {
         role="region"
         aria-label={t('pwa.installBanner.ariaLabel', 'Install app banner')}
         className="fixed bottom-0 left-0 right-0 z-50 flex items-center gap-3 bg-blue-600 px-4 py-3 shadow-lg
-                   dark:bg-blue-700 sm:bottom-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:rounded-xl sm:max-w-sm sm:w-full"
+                   sm:bottom-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:rounded-xl sm:max-w-sm sm:w-full"
       >
         <img
           src="/icons/ess/icon-72.png"
@@ -127,10 +127,10 @@ export default function EssInstallPrompt() {
         aria-modal="true"
         aria-label={t('pwa.iosSheet.ariaLabel', 'iOS install instructions')}
         className="fixed bottom-0 left-0 right-0 z-50 rounded-t-2xl bg-white px-5 pb-8 pt-4 shadow-2xl
-                   dark:bg-slate-800"
+                  "
       >
         {/* drag handle */}
-        <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-slate-300 dark:bg-slate-600" />
+        <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-slate-300" />
 
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
@@ -141,10 +141,10 @@ export default function EssInstallPrompt() {
               className="h-12 w-12 rounded-xl shadow"
             />
             <div>
-              <p className="text-sm font-semibold text-slate-800 dark:text-white">
+              <p className="text-sm font-semibold text-slate-800">
                 {t('pwa.iosSheet.title', 'Install Employee Portal')}
               </p>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-slate-500">
                 {t('pwa.iosSheet.subtitle', 'Add to your home screen')}
               </p>
             </div>
@@ -152,7 +152,7 @@ export default function EssInstallPrompt() {
           <button
             onClick={dismiss}
             aria-label={t('pwa.installBanner.dismissAriaLabel', 'Dismiss install prompt')}
-            className="rounded-full p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200
+            className="rounded-full p-1 text-slate-400 hover:text-slate-600
                        focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <XMarkIcon className="h-5 w-5" />
@@ -160,8 +160,8 @@ export default function EssInstallPrompt() {
         </div>
 
         <ol className="mt-4 space-y-3">
-          <li className="flex items-center gap-3 text-sm text-slate-700 dark:text-slate-300">
-            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700 dark:bg-blue-900 dark:text-blue-300">
+          <li className="flex items-center gap-3 text-sm text-slate-700">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700">
               1
             </span>
             <span>
@@ -171,8 +171,8 @@ export default function EssInstallPrompt() {
               {t('pwa.iosSheet.step1Suffix', 'button in Safari')}
             </span>
           </li>
-          <li className="flex items-center gap-3 text-sm text-slate-700 dark:text-slate-300">
-            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700 dark:bg-blue-900 dark:text-blue-300">
+          <li className="flex items-center gap-3 text-sm text-slate-700">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700">
               2
             </span>
             <span>
@@ -181,8 +181,8 @@ export default function EssInstallPrompt() {
               &nbsp;<strong>{t('pwa.iosSheet.addToHomeScreen', 'Add to Home Screen')}</strong>
             </span>
           </li>
-          <li className="flex items-center gap-3 text-sm text-slate-700 dark:text-slate-300">
-            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700 dark:bg-blue-900 dark:text-blue-300">
+          <li className="flex items-center gap-3 text-sm text-slate-700">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700">
               3
             </span>
             <span>{t('pwa.iosSheet.step3', 'Tap Add to confirm')}</span>

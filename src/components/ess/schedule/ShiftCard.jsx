@@ -46,7 +46,7 @@ const ShiftCard = ({ shift }) => {
 
         {/* Department */}
         {shift.department && (
-          <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5 truncate">
+          <p className="text-[11px] text-gray-500 mt-0.5 truncate">
             {shift.department}
           </p>
         )}
@@ -56,13 +56,13 @@ const ShiftCard = ({ shift }) => {
           <div className="mt-1">
             <button
               type="button"
-              className="text-[10px] text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 underline underline-offset-2 transition-colors"
+              className="text-[10px] text-gray-400 hover:text-gray-600 underline underline-offset-2 transition-colors"
               onClick={() => setNotesExpanded(v => !v)}
             >
               {notesExpanded ? '▲' : '▼'} {t('schedule.notes')}
             </button>
             {notesExpanded && (
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 italic">
+              <p className="text-xs text-gray-500 mt-1 italic">
                 {shift.notes}
               </p>
             )}

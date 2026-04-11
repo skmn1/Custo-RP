@@ -97,8 +97,8 @@ export default function EssSyncStatusBanner() {
         role="status"
         aria-live="polite"
         data-testid="ess-sync-syncing-banner"
-        className="flex items-center gap-2 bg-indigo-50 dark:bg-indigo-900/30 border-b border-indigo-200
-                   dark:border-indigo-800 px-4 py-2 text-sm text-indigo-700 dark:text-indigo-300"
+        className="flex items-center gap-2 bg-indigo-50 border-b border-indigo-200
+                   px-4 py-2 text-sm text-indigo-700"
       >
         <ArrowPathIcon className="h-4 w-4 shrink-0 animate-spin" aria-hidden="true" />
         <span>{t('pwa.sync.syncing', { count: pendingCount })}</span>
@@ -118,8 +118,8 @@ export default function EssSyncStatusBanner() {
           role="status"
           aria-live="polite"
           data-testid="ess-sync-pending-banner"
-          className="flex items-center gap-2 bg-blue-50 dark:bg-blue-900/30 border-b border-blue-200
-                     dark:border-blue-800 px-4 py-2 text-sm text-blue-700 dark:text-blue-300"
+          className="flex items-center gap-2 bg-blue-50 border-b border-blue-200
+                     px-4 py-2 text-sm text-blue-700"
         >
           <PaperAirplaneIcon className="h-4 w-4 shrink-0" aria-hidden="true" />
           <span>{t('pwa.sync.pending', { count: pendingCount })}</span>
@@ -131,8 +131,8 @@ export default function EssSyncStatusBanner() {
         <div
           role="alert"
           data-testid="ess-sync-failed-banner"
-          className="border-b border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 px-4 py-3
-                     text-sm text-red-700 dark:text-red-300 space-y-2"
+          className="border-b border-red-200 bg-red-50 px-4 py-3
+                     text-sm text-red-700 space-y-2"
         >
           {/* Failed items */}
           {failedItems.map((m) => (
@@ -147,15 +147,15 @@ export default function EssSyncStatusBanner() {
               <span className="flex items-center gap-2 shrink-0">
                 <button
                   onClick={() => retry(m.id)}
-                  className="rounded px-2 py-0.5 text-xs font-medium bg-red-100 dark:bg-red-800
-                             hover:bg-red-200 dark:hover:bg-red-700 transition-colors"
+                  className="rounded px-2 py-0.5 text-xs font-medium bg-red-100
+                             hover:bg-red-200 transition-colors"
                 >
                   {t('pwa.sync.retryBtn')}
                 </button>
                 <button
                   onClick={() => handleDiscard(m.id)}
-                  className="rounded px-2 py-0.5 text-xs font-medium bg-gray-100 dark:bg-gray-700
-                             hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300
+                  className="rounded px-2 py-0.5 text-xs font-medium bg-gray-100
+                             hover:bg-gray-200 text-gray-700
                              transition-colors"
                 >
                   {discardConfirm === m.id
@@ -171,15 +171,15 @@ export default function EssSyncStatusBanner() {
             <div key={m.id} className="flex items-center justify-between gap-4">
               <span className="flex items-center gap-2">
                 <ExclamationTriangleIcon className="h-4 w-4 shrink-0 text-amber-500" aria-hidden="true" />
-                <span className="text-amber-700 dark:text-amber-300">
+                <span className="text-amber-700">
                   {t('pwa.sync.conflictBadge')}
                   {m.lastError && <span className="ml-1 text-xs opacity-75">— {m.lastError}</span>}
                 </span>
               </span>
               <button
                 onClick={() => handleDiscard(m.id)}
-                className="rounded px-2 py-0.5 text-xs font-medium bg-gray-100 dark:bg-gray-700
-                           hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300
+                className="rounded px-2 py-0.5 text-xs font-medium bg-gray-100
+                           hover:bg-gray-200 text-gray-700
                            transition-colors shrink-0"
               >
                 {discardConfirm === m.id

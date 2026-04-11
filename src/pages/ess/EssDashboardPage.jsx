@@ -40,7 +40,7 @@ const EssDashboardPage = () => {
   if (error && !dashboard) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <p className="text-gray-500 dark:text-gray-400 mb-4">{t('dashboard.unableToLoad')}</p>
+        <p className="text-gray-500 mb-4">{t('dashboard.unableToLoad')}</p>
         <button
           onClick={refetch}
           className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors"
@@ -57,20 +57,20 @@ const EssDashboardPage = () => {
     return (
       <div className="space-y-6 animate-pulse">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700" />
+          <div className="w-12 h-12 rounded-full bg-gray-200" />
           <div className="space-y-2">
-            <div className="h-6 w-48 bg-gray-200 dark:bg-gray-700 rounded" />
-            <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded" />
+            <div className="h-6 w-48 bg-gray-200 rounded" />
+            <div className="h-4 w-32 bg-gray-200 rounded" />
           </div>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-24 rounded-xl bg-gray-200 dark:bg-gray-700" />
+            <div key={i} className="h-24 rounded-xl bg-gray-200" />
           ))}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-48 rounded-xl bg-gray-200 dark:bg-gray-700" />
+            <div key={i} className="h-48 rounded-xl bg-gray-200" />
           ))}
         </div>
       </div>

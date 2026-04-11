@@ -38,11 +38,11 @@ const NotificationsWidget = ({ notifications, unreadCount, error }) => {
 
   if (error) {
     return (
-      <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5">
-        <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">
+      <div className="rounded-xl border border-gray-200 bg-white p-5">
+        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">
           {t('dashboard.notifications.title')}
         </h3>
-        <p className="text-sm text-red-500 dark:text-red-400 text-center py-4">{t('dashboard.unableToLoad')}</p>
+        <p className="text-sm text-red-500 text-center py-4">{t('dashboard.unableToLoad')}</p>
       </div>
     );
   }
@@ -50,8 +50,8 @@ const NotificationsWidget = ({ notifications, unreadCount, error }) => {
   const displayed = Array.isArray(notifications) ? notifications.slice(0, 5) : [];
 
   return (
-    <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 flex flex-col">
-      <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+    <div className="rounded-xl border border-gray-200 bg-white p-5 flex flex-col">
+      <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-2">
         <BellIcon className="h-4 w-4" />
         {t('dashboard.notifications.title')}
         {unreadCount > 0 && (
@@ -62,7 +62,7 @@ const NotificationsWidget = ({ notifications, unreadCount, error }) => {
       </h3>
 
       {displayed.length === 0 ? (
-        <p className="text-sm text-gray-400 dark:text-gray-500 py-4 text-center flex-1 flex items-center justify-center">
+        <p className="text-sm text-gray-400 py-4 text-center flex-1 flex items-center justify-center">
           {t('dashboard.notifications.empty')}
         </p>
       ) : (
@@ -74,14 +74,14 @@ const NotificationsWidget = ({ notifications, unreadCount, error }) => {
               role="button"
               tabIndex={0}
               onKeyDown={(e) => e.key === 'Enter' && handleClick(notif)}
-              className="flex items-start gap-2 text-sm p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-750 cursor-pointer transition-colors"
+              className="flex items-start gap-2 text-sm p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
             >
-              <span className={`mt-1.5 w-2 h-2 rounded-full flex-shrink-0 ${notif.isRead ? 'bg-gray-300 dark:bg-gray-600' : 'bg-indigo-500'}`} />
+              <span className={`mt-1.5 w-2 h-2 rounded-full flex-shrink-0 ${notif.isRead ? 'bg-gray-300' : 'bg-indigo-500'}`} />
               <div className="flex-1 min-w-0">
-                <p className={`truncate ${notif.isRead ? 'text-gray-500 dark:text-gray-400' : 'text-gray-900 dark:text-gray-100 font-medium'}`}>
+                <p className={`truncate ${notif.isRead ? 'text-gray-500' : 'text-gray-900 font-medium'}`}>
                   {notif.title}
                 </p>
-                <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                <p className="text-xs text-gray-400 mt-0.5">
                   {timeAgo(notif.createdAt, t)}
                 </p>
               </div>
@@ -92,7 +92,7 @@ const NotificationsWidget = ({ notifications, unreadCount, error }) => {
 
       <Link
         to="/app/ess/notifications"
-        className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 mt-4 inline-block"
+        className="text-sm font-medium text-indigo-600 hover:text-indigo-800 mt-4 inline-block"
       >
         {t('dashboard.notifications.viewAll')} →
       </Link>

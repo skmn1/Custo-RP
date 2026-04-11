@@ -17,9 +17,9 @@ function fmtCurrency(amount, currency = 'USD') {
 }
 
 const statusColors = {
-  paid: 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300',
-  processing: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300',
-  draft: 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400',
+  paid: 'bg-green-100 text-green-800',
+  processing: 'bg-yellow-100 text-yellow-800',
+  draft: 'bg-gray-100 text-gray-600',
 };
 
 /* ─── Page ────────────────────────────────────────────────── */
@@ -48,10 +48,10 @@ const EssPayslipDetailPage = () => {
   if (detailError) {
     return (
       <div className="max-w-2xl mx-auto">
-        <Link to="/app/ess/payslips" className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 text-sm mb-4 inline-block">
+        <Link to="/app/ess/payslips" className="text-indigo-600 hover:text-indigo-700 text-sm mb-4 inline-block">
           ← {t('payslips.backToList')}
         </Link>
-        <div className="rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-4 text-sm text-red-700 dark:text-red-300">
+        <div className="rounded-lg bg-red-50 border border-red-200 p-4 text-sm text-red-700">
           {detailError}
         </div>
       </div>
@@ -61,11 +61,11 @@ const EssPayslipDetailPage = () => {
   if (restricted) {
     return (
       <div className="max-w-2xl mx-auto">
-        <Link to="/app/ess/payslips" className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 text-sm mb-4 inline-block">
+        <Link to="/app/ess/payslips" className="text-indigo-600 hover:text-indigo-700 text-sm mb-4 inline-block">
           ← {t('payslips.backToList')}
         </Link>
-        <div className="rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 p-8 text-center">
-          <p className="text-amber-700 dark:text-amber-300 font-medium">{t('payslips.restricted')}</p>
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-8 text-center">
+          <p className="text-amber-700 font-medium">{t('payslips.restricted')}</p>
         </div>
       </div>
     );
@@ -75,7 +75,7 @@ const EssPayslipDetailPage = () => {
     if (!isOnline && !detailLoading) {
       return (
         <div className="max-w-2xl mx-auto">
-          <Link to="/app/ess/payslips" className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 text-sm mb-4 inline-block">
+          <Link to="/app/ess/payslips" className="text-indigo-600 hover:text-indigo-700 text-sm mb-4 inline-block">
             ← {t('payslips.backToList')}
           </Link>
           <EssOfflineFallback />
@@ -91,22 +91,22 @@ const EssPayslipDetailPage = () => {
     <div className="max-w-3xl mx-auto">
       {/* Back + actions */}
       <div className="flex items-center justify-between mb-6">
-        <Link to="/app/ess/payslips" className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 text-sm">
+        <Link to="/app/ess/payslips" className="text-indigo-600 hover:text-indigo-700 text-sm">
           ← {t('payslips.backToList')}
         </Link>
         <PayslipPdf detail={detail} t={t} />
       </div>
 
       {/* Header card */}
-      <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6 mb-6">
+      <div className="rounded-xl border border-gray-200 bg-white p-6 mb-6">
         <div className="flex items-start justify-between mb-4">
           <div>
-            <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">{detail.periodLabel}</h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            <h1 className="text-xl font-bold text-gray-900">{detail.periodLabel}</h1>
+            <p className="text-sm text-gray-500 mt-1">
               {t('payslips.periodRange', { start: detail.periodStart, end: detail.periodEnd })}
             </p>
             {detail.employeeName && (
-              <p className="text-sm text-gray-500 dark:text-gray-400">{detail.employeeName}</p>
+              <p className="text-sm text-gray-500">{detail.employeeName}</p>
             )}
             <StaleDataIndicator isCached={detailCached} fetchedAt={detailFetchedAt} />
           </div>
@@ -127,69 +127,69 @@ const EssPayslipDetailPage = () => {
       {/* Breakdown */}
       <div className="grid gap-6 md:grid-cols-2">
         {/* Earnings */}
-        <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-5">
-          <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3 uppercase tracking-wide">
+        <div className="rounded-xl border border-gray-200 bg-white p-5">
+          <h2 className="text-sm font-semibold text-gray-900 mb-3 uppercase tracking-wide">
             {t('payslips.earnings')}
           </h2>
           <div className="space-y-2">
             {(lines.earnings || []).map((line, i) => (
               <div key={i} className="flex justify-between text-sm">
-                <span className="text-gray-600 dark:text-gray-400">{line.label}</span>
-                <span className="font-medium text-gray-900 dark:text-gray-100">{fmtCurrency(line.amount, detail.currency)}</span>
+                <span className="text-gray-600">{line.label}</span>
+                <span className="font-medium text-gray-900">{fmtCurrency(line.amount, detail.currency)}</span>
               </div>
             ))}
             {(!lines.earnings || lines.earnings.length === 0) && (
               <p className="text-sm text-gray-400">—</p>
             )}
           </div>
-          <div className="border-t border-gray-200 dark:border-gray-700 mt-3 pt-3 flex justify-between text-sm font-semibold">
-            <span className="text-gray-700 dark:text-gray-300">{t('payslips.totalEarnings')}</span>
-            <span className="text-gray-900 dark:text-gray-100">{fmtCurrency(detail.grossPay, detail.currency)}</span>
+          <div className="border-t border-gray-200 mt-3 pt-3 flex justify-between text-sm font-semibold">
+            <span className="text-gray-700">{t('payslips.totalEarnings')}</span>
+            <span className="text-gray-900">{fmtCurrency(detail.grossPay, detail.currency)}</span>
           </div>
         </div>
 
         {/* Deductions */}
-        <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-5">
-          <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3 uppercase tracking-wide">
+        <div className="rounded-xl border border-gray-200 bg-white p-5">
+          <h2 className="text-sm font-semibold text-gray-900 mb-3 uppercase tracking-wide">
             {t('payslips.deductions')}
           </h2>
           <div className="space-y-2">
             {(lines.deductions || []).map((line, i) => (
               <div key={i} className="flex justify-between text-sm">
-                <span className="text-gray-600 dark:text-gray-400">{line.label}</span>
-                <span className="font-medium text-red-600 dark:text-red-400">−{fmtCurrency(Math.abs(line.amount), detail.currency)}</span>
+                <span className="text-gray-600">{line.label}</span>
+                <span className="font-medium text-red-600">−{fmtCurrency(Math.abs(line.amount), detail.currency)}</span>
               </div>
             ))}
             {(!lines.deductions || lines.deductions.length === 0) && (
               <p className="text-sm text-gray-400">—</p>
             )}
           </div>
-          <div className="border-t border-gray-200 dark:border-gray-700 mt-3 pt-3 flex justify-between text-sm font-semibold">
-            <span className="text-gray-700 dark:text-gray-300">{t('payslips.totalDeductions')}</span>
-            <span className="text-red-600 dark:text-red-400">−{fmtCurrency(detail.totalDeductions, detail.currency)}</span>
+          <div className="border-t border-gray-200 mt-3 pt-3 flex justify-between text-sm font-semibold">
+            <span className="text-gray-700">{t('payslips.totalDeductions')}</span>
+            <span className="text-red-600">−{fmtCurrency(detail.totalDeductions, detail.currency)}</span>
           </div>
         </div>
       </div>
 
       {/* Footer info */}
-      <div className="mt-6 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-5">
+      <div className="mt-6 rounded-xl border border-gray-200 bg-white p-5">
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
           {detail.paidAt && (
             <div>
-              <p className="text-gray-500 dark:text-gray-400 text-xs mb-1">{t('payslips.paidOn', { date: '' }).replace(' ', '')}</p>
-              <p className="font-medium text-gray-900 dark:text-gray-100">{new Date(detail.paidAt).toLocaleDateString()}</p>
+              <p className="text-gray-500 text-xs mb-1">{t('payslips.paidOn', { date: '' }).replace(' ', '')}</p>
+              <p className="font-medium text-gray-900">{new Date(detail.paidAt).toLocaleDateString()}</p>
             </div>
           )}
           {detail.paymentMethod && (
             <div>
-              <p className="text-gray-500 dark:text-gray-400 text-xs mb-1">Payment Method</p>
-              <p className="font-medium text-gray-900 dark:text-gray-100">{t(`payslips.paymentMethod.${detail.paymentMethod}`)}</p>
+              <p className="text-gray-500 text-xs mb-1">Payment Method</p>
+              <p className="font-medium text-gray-900">{t(`payslips.paymentMethod.${detail.paymentMethod}`)}</p>
             </div>
           )}
           {detail.employerContributions != null && (
             <div>
-              <p className="text-gray-500 dark:text-gray-400 text-xs mb-1">{t('payslips.employerContributions')}</p>
-              <p className="font-medium text-gray-900 dark:text-gray-100">{fmtCurrency(detail.employerContributions, detail.currency)}</p>
+              <p className="text-gray-500 text-xs mb-1">{t('payslips.employerContributions')}</p>
+              <p className="font-medium text-gray-900">{fmtCurrency(detail.employerContributions, detail.currency)}</p>
             </div>
           )}
         </div>
@@ -202,9 +202,9 @@ const EssPayslipDetailPage = () => {
 
 function SummaryBox({ label, value, negative, highlight }) {
   return (
-    <div className={`rounded-lg p-3 ${highlight ? 'bg-indigo-50 dark:bg-indigo-900/30' : 'bg-gray-50 dark:bg-gray-800'}`}>
-      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{label}</p>
-      <p className={`text-lg font-bold ${negative ? 'text-red-600 dark:text-red-400' : highlight ? 'text-indigo-700 dark:text-indigo-300' : 'text-gray-900 dark:text-gray-100'}`}>
+    <div className={`rounded-lg p-3 ${highlight ? 'bg-indigo-50' : 'bg-gray-50'}`}>
+      <p className="text-xs text-gray-500 mb-1">{label}</p>
+      <p className={`text-lg font-bold ${negative ? 'text-red-600' : highlight ? 'text-indigo-700' : 'text-gray-900'}`}>
         {value}
       </p>
     </div>

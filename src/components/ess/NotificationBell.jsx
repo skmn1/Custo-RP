@@ -85,7 +85,7 @@ const NotificationBell = () => {
       {/* Bell button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200"
+        className="relative p-2 text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-50 transition-all duration-200"
         aria-label={t('notifications.title')}
         data-cy="notification-bell"
       >
@@ -106,18 +106,18 @@ const NotificationBell = () => {
       {/* Dropdown */}
       {isOpen && (
         <div
-          className="absolute right-0 mt-2 w-96 bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 z-50 max-h-[480px] flex flex-col"
+          className="absolute right-0 mt-2 w-96 bg-white rounded-xl shadow-lg border border-gray-200 z-50 max-h-[480px] flex flex-col"
           data-cy="notification-dropdown"
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+            <h3 className="text-sm font-semibold text-gray-900">
               {t('notifications.title')}
             </h3>
             {unreadCount > 0 && (
               <button
                 onClick={handleMarkAllRead}
-                className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline font-medium"
+                className="text-xs text-indigo-600 hover:underline font-medium"
                 data-cy="mark-all-read"
               >
                 {t('notifications.markAllRead')}
@@ -128,7 +128,7 @@ const NotificationBell = () => {
           {/* List */}
           <div className="overflow-y-auto flex-1">
             {notifications.length === 0 ? (
-              <div className="px-4 py-8 text-center text-sm text-gray-400 dark:text-gray-500">
+              <div className="px-4 py-8 text-center text-sm text-gray-400">
                 {t('notifications.empty')}
               </div>
             ) : (
@@ -144,10 +144,10 @@ const NotificationBell = () => {
           </div>
 
           {/* Footer */}
-          <div className="border-t border-gray-200 dark:border-gray-700 px-4 py-2">
+          <div className="border-t border-gray-200 px-4 py-2">
             <button
               onClick={() => { navigate('/app/ess/notifications'); setIsOpen(false); }}
-              className="w-full text-center text-sm text-indigo-600 dark:text-indigo-400 hover:underline font-medium py-1"
+              className="w-full text-center text-sm text-indigo-600 hover:underline font-medium py-1"
               data-cy="view-all-notifications"
             >
               {t('notifications.viewAll')} →
@@ -167,8 +167,8 @@ const NotificationDropdownItem = ({ notification, onClick, t }) => {
   return (
     <button
       onClick={onClick}
-      className={`w-full text-left px-4 py-3 flex gap-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors border-b border-gray-100 dark:border-gray-800 last:border-0 ${
-        !notification.isRead ? 'bg-indigo-50/50 dark:bg-indigo-900/10' : ''
+      className={`w-full text-left px-4 py-3 flex gap-3 hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0 ${
+        !notification.isRead ? 'bg-indigo-50/50' : ''
       }`}
       data-cy="notification-item"
     >
@@ -188,13 +188,13 @@ const NotificationDropdownItem = ({ notification, onClick, t }) => {
           )}
           <p className={`text-sm leading-snug truncate ${
             notification.isRead
-              ? 'text-gray-600 dark:text-gray-400'
-              : 'text-gray-900 dark:text-gray-100 font-medium'
+              ? 'text-gray-600'
+              : 'text-gray-900 font-medium'
           }`}>
             {notification.title}
           </p>
         </div>
-        <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+        <p className="text-xs text-gray-400 mt-0.5">
           {formatTimeAgo(notification.createdAt, t)}
         </p>
       </div>

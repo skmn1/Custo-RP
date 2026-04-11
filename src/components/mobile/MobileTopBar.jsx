@@ -16,12 +16,19 @@ export const MobileTopBar = () => {
   const { unreadCount } = useEssNotificationCount();
 
   return (
-    <div
-      className="sticky top-0 z-40 bg-[var(--mobile-bg)]/80 backdrop-blur-lg border-b border-[var(--mobile-separator)] pt-safe"
+    <header
+      className="sticky top-0 z-40 pt-safe"
+      style={{
+        backgroundColor: 'var(--mobile-topbar-bg)',
+        borderBottom: '1px solid var(--mobile-topbar-border)',
+      }}
       data-testid="mobile-top-bar"
     >
       <div className="flex items-center justify-between px-4 h-11">
-        <span className="text-mobile-headline text-[var(--mobile-label-primary)]">
+        <span
+          className="text-mobile-headline font-semibold"
+          style={{ color: 'var(--mobile-label-primary)' }}
+        >
           {t('appName')}
         </span>
         <button
@@ -30,7 +37,7 @@ export const MobileTopBar = () => {
           aria-label={t('mobile.nav.notifications')}
           data-testid="mobile-notification-bell"
         >
-          <BellIcon className="h-6 w-6 text-[var(--mobile-label-primary)]" />
+          <BellIcon className="h-6 w-6" style={{ color: 'var(--mobile-topbar-icon)' }} />
           {unreadCount > 0 && (
             <span
               className="absolute -top-1 -right-1 bg-red-500 text-white text-mobile-caption font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1"
@@ -41,7 +48,7 @@ export const MobileTopBar = () => {
           )}
         </button>
       </div>
-    </div>
+    </header>
   );
 };
 

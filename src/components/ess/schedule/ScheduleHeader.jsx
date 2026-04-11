@@ -41,20 +41,20 @@ const ScheduleHeader = ({ viewMode, setViewMode, anchor, onPrev, onNext, onToday
   return (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
       {/* Title */}
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+      <h1 className="text-2xl font-bold text-gray-900">
         {t('schedule.title')}
       </h1>
 
       <div className="flex items-center gap-2 flex-wrap">
         {/* View toggle */}
-        <div className="flex rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden text-sm">
+        <div className="flex rounded-lg border border-gray-200 overflow-hidden text-sm">
           <button
             type="button"
             onClick={() => setViewMode('week')}
             className={`px-3 py-1.5 font-medium transition-colors ${
               viewMode === 'week'
                 ? 'bg-indigo-600 text-white'
-                : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
+                : 'bg-white text-gray-600 hover:bg-gray-50'
             }`}
           >
             {t('schedule.viewWeek')}
@@ -65,7 +65,7 @@ const ScheduleHeader = ({ viewMode, setViewMode, anchor, onPrev, onNext, onToday
             className={`px-3 py-1.5 font-medium transition-colors ${
               viewMode === 'month'
                 ? 'bg-indigo-600 text-white'
-                : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
+                : 'bg-white text-gray-600 hover:bg-gray-50'
             }`}
           >
             {t('schedule.viewMonth')}
@@ -76,7 +76,7 @@ const ScheduleHeader = ({ viewMode, setViewMode, anchor, onPrev, onNext, onToday
         <button
           type="button"
           onClick={onToday}
-          className="px-3 py-1.5 text-sm font-medium rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+          className="px-3 py-1.5 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
         >
           {t('schedule.today')}
         </button>
@@ -87,14 +87,14 @@ const ScheduleHeader = ({ viewMode, setViewMode, anchor, onPrev, onNext, onToday
             type="button"
             onClick={onPrev}
             aria-label="Previous period"
-            className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 transition-colors"
+            className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
 
-          <span className="min-w-[160px] text-center text-sm font-medium text-gray-700 dark:text-gray-300">
+          <span className="min-w-[160px] text-center text-sm font-medium text-gray-700">
             {rangeLabel}
           </span>
 
@@ -102,7 +102,7 @@ const ScheduleHeader = ({ viewMode, setViewMode, anchor, onPrev, onNext, onToday
             type="button"
             onClick={onNext}
             aria-label="Next period"
-            className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 transition-colors"
+            className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />

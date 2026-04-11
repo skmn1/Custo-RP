@@ -166,7 +166,7 @@ const WeekNavigator = ({ weekLabel, onPrev, onNext, canGoNext, t }) => (
   >
     <button
       onClick={onPrev}
-      className="p-2 rounded-lg active:bg-gray-100 dark:active:bg-gray-800 touch-target"
+      className="p-2 rounded-lg active:bg-gray-100 touch-target"
       aria-label={t('mobile.attendance.previousWeek')}
     >
       <ChevronLeftIcon className="h-5 w-5 text-[var(--mobile-tint)]" />
@@ -177,7 +177,7 @@ const WeekNavigator = ({ weekLabel, onPrev, onNext, canGoNext, t }) => (
     <button
       onClick={onNext}
       disabled={!canGoNext}
-      className="p-2 rounded-lg active:bg-gray-100 dark:active:bg-gray-800 touch-target disabled:opacity-30"
+      className="p-2 rounded-lg active:bg-gray-100 touch-target disabled:opacity-30"
       aria-label={t('mobile.attendance.nextWeek')}
     >
       <ChevronRightIcon className="h-5 w-5 text-[var(--mobile-tint)]" />
@@ -334,15 +334,15 @@ const SummaryRow = ({ label, value }) => (
 const AttendanceSkeleton = () => (
   <div className="animate-pulse" data-testid="attendance-skeleton">
     <div className="flex flex-col items-center py-6">
-      <div className="w-32 h-32 rounded-full bg-gray-200 dark:bg-gray-700" />
+      <div className="w-32 h-32 rounded-full bg-gray-200" />
     </div>
     <div className="px-4 space-y-2">
-      <div className="h-4 w-40 bg-gray-200 dark:bg-gray-700 rounded mx-auto" />
-      <div className="h-3 w-32 bg-gray-200 dark:bg-gray-700 rounded mx-auto" />
+      <div className="h-4 w-40 bg-gray-200 rounded mx-auto" />
+      <div className="h-3 w-32 bg-gray-200 rounded mx-auto" />
     </div>
     <div className="mt-6 space-y-3 px-4">
       {[1, 2, 3, 4, 5].map((i) => (
-        <div key={i} className="h-16 bg-gray-200 dark:bg-gray-700 rounded-xl" />
+        <div key={i} className="h-16 bg-gray-200 rounded-xl" />
       ))}
     </div>
   </div>

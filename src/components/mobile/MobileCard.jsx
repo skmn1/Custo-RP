@@ -9,7 +9,7 @@ const MobileCard = ({ children, onPress, className = '', testId }) => (
   <div
     className={`bg-[var(--mobile-bg-elevated)] rounded-xl px-4 py-3 ${
       onPress
-        ? 'active:bg-gray-100 dark:active:bg-gray-800 cursor-pointer transition-colors duration-150'
+        ? 'active:bg-gray-100 cursor-pointer transition-colors duration-150'
         : ''
     } ${className}`}
     onClick={onPress}

@@ -203,8 +203,8 @@ describe('MobileTopBar component structure', () => {
     expect(topBarSrc).toContain('z-40');
   });
 
-  it('has frosted-glass effect', () => {
-    expect(topBarSrc).toContain('backdrop-blur-lg');
+  it('has token-based background (Task 76)', () => {
+    expect(topBarSrc).toContain('mobile-topbar-bg');
   });
 
   it('clears status bar with pt-safe', () => {
@@ -265,8 +265,8 @@ describe('BottomNav component structure', () => {
     expect(navSrc).toContain('pb-safe');
   });
 
-  it('has frosted-glass effect', () => {
-    expect(navSrc).toContain('backdrop-blur-lg');
+  it('has token-based background (Task 76)', () => {
+    expect(navSrc).toContain('mobile-tab-bg');
   });
 
   it('uses aria-current="page" for active tab', () => {
@@ -279,20 +279,20 @@ describe('BottomNav component structure', () => {
     expect(navSrc).toContain('mx-auto');
   });
 
-  it('tab height is h-12 (48px)', () => {
-    expect(navSrc).toContain('h-12');
+  it('tab height is h-14 (56px)', () => {
+    expect(navSrc).toContain('h-14');
   });
 
-  it('tab labels use 10px font', () => {
-    expect(navSrc).toContain('text-[10px]');
+  it('tab labels use 11px font', () => {
+    expect(navSrc).toContain('text-[11px]');
   });
 
-  it('active state uses brand tint', () => {
-    expect(navSrc).toContain('var(--mobile-tint)');
+  it('active state uses brand tint icon token', () => {
+    expect(navSrc).toContain('var(--mobile-tab-active-icon)');
   });
 
-  it('inactive state uses tertiary label colour', () => {
-    expect(navSrc).toContain('var(--mobile-label-tertiary)');
+  it('inactive state uses tab-inactive colour', () => {
+    expect(navSrc).toContain('var(--mobile-tab-inactive)');
   });
 
   it('implements scroll-to-top on active tab tap', () => {

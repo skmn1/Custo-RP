@@ -10,7 +10,7 @@ const ReadOnlyBanner = () => {
 
   return (
     <div
-      className="flex items-start gap-2 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 px-4 py-3 mt-5 text-sm text-blue-700 dark:text-blue-300"
+      className="flex items-start gap-2 rounded-lg bg-blue-50 border border-blue-100 px-4 py-3 mt-5 text-sm text-blue-700"
       role="note"
       data-testid="read-only-banner"
     >

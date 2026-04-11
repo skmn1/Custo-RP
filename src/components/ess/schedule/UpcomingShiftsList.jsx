@@ -14,8 +14,8 @@ function fmtDate(dateStr) {
 /** Skeleton row */
 const SkeletonRow = () => (
   <li className="flex items-center gap-3 py-2">
-    <div className="w-20 h-4 rounded bg-gray-100 dark:bg-gray-700 animate-pulse" />
-    <div className="flex-1 h-4 rounded bg-gray-100 dark:bg-gray-700 animate-pulse" />
+    <div className="w-20 h-4 rounded bg-gray-100 animate-pulse" />
+    <div className="flex-1 h-4 rounded bg-gray-100 animate-pulse" />
   </li>
 );
 
@@ -28,41 +28,41 @@ const UpcomingShiftsList = ({ upcoming, isLoading }) => {
 
   return (
     <div
-      className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-5 mt-5"
+      className="rounded-xl border border-gray-200 bg-white p-5 mt-5"
       data-testid="upcoming-shifts"
     >
-      <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">
+      <h2 className="text-sm font-semibold text-gray-700 mb-3">
         {t('schedule.upcoming')}
       </h2>
 
       {isLoading ? (
-        <ul className="divide-y divide-gray-100 dark:divide-gray-800">
+        <ul className="divide-y divide-gray-100">
           {[1, 2, 3].map(i => <SkeletonRow key={i} />)}
         </ul>
       ) : upcoming.length === 0 ? (
-        <p className="text-sm text-gray-400 dark:text-gray-500 py-2">
+        <p className="text-sm text-gray-400 py-2">
           {t('schedule.noUpcoming')}
         </p>
       ) : (
-        <ul className="divide-y divide-gray-100 dark:divide-gray-800" data-testid="upcoming-list">
+        <ul className="divide-y divide-gray-100" data-testid="upcoming-list">
           {upcoming.map(shift => (
             <li key={shift.id} className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 py-2.5">
-              <span className="text-sm font-medium text-gray-800 dark:text-gray-100 w-28 shrink-0">
+              <span className="text-sm font-medium text-gray-800 w-28 shrink-0">
                 {fmtDate(shift.date)}
               </span>
-              <span className="text-sm text-gray-600 dark:text-gray-300">
+              <span className="text-sm text-gray-600">
                 {shift.startTime}–{shift.endTime}
               </span>
-              <span className="text-sm text-gray-400 dark:text-gray-500">
+              <span className="text-sm text-gray-400">
                 {t('schedule.duration', { hours: shift.duration })}
               </span>
               {shift.shiftType && (
-                <span className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-0.5 rounded-full">
+                <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
                   {shift.shiftType}
                 </span>
               )}
               {shift.department && (
-                <span className="text-xs text-gray-400 dark:text-gray-500">
+                <span className="text-xs text-gray-400">
                   {shift.department}
                 </span>
               )}

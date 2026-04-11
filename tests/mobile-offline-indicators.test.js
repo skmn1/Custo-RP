@@ -134,8 +134,8 @@ describe('QueuedActionsNotice component', () => {
     expect(indicatorsSrc).toContain('bg-amber-50');
   });
 
-  it('uses dark:bg-amber-900/20 for dark mode', () => {
-    expect(indicatorsSrc).toContain('dark:bg-amber-900/20');
+  it('does not use dark: mode classes (Task 76 removed dark mode)', () => {
+    expect(indicatorsSrc).not.toContain('dark:bg-amber-900/20');
   });
 
   it('renders ArrowUpTrayIcon', () => {

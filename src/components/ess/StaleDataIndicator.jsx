@@ -25,7 +25,7 @@ export default function StaleDataIndicator({ fetchedAt, isCached }) {
   return (
     <p
       data-testid="stale-data-indicator"
-      className="text-xs text-gray-500 dark:text-gray-400 mt-1"
+      className="text-xs text-gray-500 mt-1"
     >
       {t('pwa.offline.lastUpdated', { time: relativeTime })}
     </p>

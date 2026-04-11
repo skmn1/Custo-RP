@@ -1,11 +1,10 @@
 /*
- * ESS Mobile Design System — Task 63 / 74
+ * ESS Mobile Design System — Task 63 / 76
  *
  * Typography, colour tokens, spacing utilities, safe-area helpers,
  * and animation keyframes for the mobile ESS experience.
  *
- * Task 74: Warm design token system — terracotta accent (#C96A3A),
- * warm neutrals, Plus Jakarta Sans typography, card surface treatment.
+ * Task 76: Professional blue palette, light-mode only (dark mode removed).
  *
  * Imported by MobileShell.jsx — not loaded on desktop viewports.
  */
@@ -14,70 +13,93 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
 
-/* ───────────────────────────── Colour Tokens (Light) ────────────────── */
+/* ───────────────── Colour Tokens (Professional Blue, Light Only) ─────── */
 
 :root {
-  /* ── Backgrounds ─────────────────────────────── */
-  --mobile-bg:              #FAF9F6;   /* page background — warm off-white  */
-  --mobile-bg-grouped:      #F5F2EC;   /* subtle surface (stat pills, inputs)*/
-  --mobile-bg-card:         #EDE8DF;   /* card fill                          */
-  --mobile-bg-elevated:     #FFFFFF;   /* sheets, popovers                   */
-
-  /* ── Labels ──────────────────────────────────── */
-  --mobile-label-primary:   #1C1917;   /* near-black — rich, not harsh       */
-  --mobile-label-secondary: #78716C;   /* warm mid-gray                      */
-  --mobile-label-tertiary:  #A8A29E;   /* muted labels, placeholders         */
-
-  /* ── Accent (terracotta) ─────────────────────── */
-  --mobile-tint:            #C96A3A;   /* primary brand accent               */
-  --mobile-tint-subtle:     rgba(201, 106, 58, 0.12); /* soft pill fill       */
-  --mobile-tint-on:         #FFFFFF;   /* text on tint-filled buttons        */
-
-  /* ── Separators & borders ────────────────────── */
-  --mobile-separator:       #E7E0D5;   /* dividers, row borders              */
-  --mobile-border-card:     rgba(255, 255, 255, 0.60); /* inner card top edge */
-
-  /* ── Status ──────────────────────────────────── */
-  --mobile-success:         #6B9E78;   /* sage green — present, approved     */
-  --mobile-success-bg:      #EFF5F1;   /* success chip background            */
-  --mobile-warning:         #C4A35A;   /* warm amber — pending               */
-  --mobile-warning-bg:      #FDF6E7;   /* warning chip background            */
-  --mobile-destructive:     #C4867A;   /* dusty rose — absent, error         */
-  --mobile-destructive-bg:  #FAF0EE;   /* destructive chip background        */
-  --mobile-info:            #7EAAC8;   /* muted blue — informational         */
-  --mobile-info-bg:         #EEF4F9;   /* info chip background               */
-
-  /* ── Shadows ─────────────────────────────────── */
-  --mobile-shadow-card:       0 2px 8px rgba(28, 25, 23, 0.08);
-  --mobile-shadow-card-hover: 0 4px 16px rgba(28, 25, 23, 0.12);
-  --mobile-shadow-sheet:      0 -4px 32px rgba(28, 25, 23, 0.16);
-  --mobile-shadow-inner:      inset 0 1px 0 rgba(255, 255, 255, 0.60);
-
-  /* ── Sheet backdrop ──────────────────────────── */
-  --mobile-backdrop:        rgba(28, 25, 23, 0.40);  /* warm, not cold black */
-
-  /* ── Bottom tab bar ─────────────────────────── */
-  --mobile-tab-bg:           #FAF9F6;
-  --mobile-tab-border:       #E7E0D5;
-  --mobile-tab-active-icon:  var(--mobile-tint);
-  --mobile-tab-active-label: var(--mobile-tint);
-  --mobile-tab-active-pill:  var(--mobile-tint-subtle);
-  --mobile-tab-inactive:     #A8A29E;
-
-  /* ── Interaction ─────────────────────────────── */
-  --mobile-press-overlay:    rgba(28, 25, 23, 0.04);
-  --mobile-press-scale:      0.98;
-
-  /* ── Font ────────────────────────────────────── */
+  /* ── Font ────────────────────────────────────────────────────────── */
   --mobile-font-family:
     'Plus Jakarta Sans',
     -apple-system,
     BlinkMacSystemFont,
-    'Segoe UI',
+    'SF Pro Text',
     system-ui,
+    'Segoe UI',
     Roboto,
     'Helvetica Neue',
     sans-serif;
+
+  /* ── Backgrounds ─────────────────────────────── */
+  --mobile-bg:              #F8FAFC;   /* slate-50 — cool off-white page bg  */
+  --mobile-bg-grouped:      #F1F5F9;   /* slate-100 — subtle grouped surface */
+  --mobile-bg-card:         #FFFFFF;   /* pure white cards on slate page     */
+  --mobile-bg-elevated:     #FFFFFF;   /* sheets, popovers                   */
+
+  /* ── Labels ──────────────────────────────────── */
+  --mobile-label-primary:   #0F172A;   /* slate-900 — near-black, cool edge  */
+  --mobile-label-secondary: #64748B;   /* slate-500 — calm, readable         */
+  --mobile-label-tertiary:  #94A3B8;   /* slate-400 — placeholders, hints    */
+  --mobile-label-disabled:  #CBD5E1;   /* slate-300 — disabled states        */
+
+  /* ── Accent (professional blue) ─────────────── */
+  --mobile-tint:            #2563EB;   /* blue-600 — universally trusted CTA */
+  --mobile-tint-subtle:     rgba(37, 99, 235, 0.10);  /* soft pill fill      */
+  --mobile-tint-surface:    #EFF6FF;   /* blue-50 — unread rows, highlights  */
+  --mobile-tint-border:     #BFDBFE;   /* blue-200 — accent chip borders     */
+  --mobile-tint-on:         #FFFFFF;   /* text on filled tint buttons        */
+
+  /* ── Separators & card borders ───────────────── */
+  --mobile-separator:       #E2E8F0;   /* slate-200                          */
+  --mobile-border-card:     #E2E8F0;   /* explicit card border               */
+
+  /* ── Status: success ─────────────────────────── */
+  --mobile-success:         #16A34A;   /* green-600                          */
+  --mobile-success-bg:      #F0FDF4;   /* green-50                           */
+  --mobile-success-border:  #BBF7D0;   /* green-200                          */
+
+  /* ── Status: warning / pending ───────────────── */
+  --mobile-warning:         #D97706;   /* amber-600                          */
+  --mobile-warning-bg:      #FFFBEB;   /* amber-50                           */
+  --mobile-warning-border:  #FDE68A;   /* amber-200                          */
+
+  /* ── Status: danger / error ──────────────────── */
+  --mobile-destructive:     #DC2626;   /* red-600                            */
+  --mobile-destructive-bg:  #FEF2F2;   /* red-50                             */
+  --mobile-destructive-border: #FECACA; /* red-200                           */
+
+  /* ── Status: info / neutral ──────────────────── */
+  --mobile-info:            #0369A1;   /* sky-700                            */
+  --mobile-info-bg:         #F0F9FF;   /* sky-50                             */
+  --mobile-info-border:     #BAE6FD;   /* sky-200                            */
+
+  /* ── Card shadows ────────────────────────────── */
+  --mobile-shadow-card:
+    0 1px 3px rgba(15, 23, 42, 0.06),
+    0 1px 2px rgba(15, 23, 42, 0.04);
+  --mobile-shadow-card-hover:
+    0 4px 12px rgba(15, 23, 42, 0.10),
+    0 2px 4px  rgba(15, 23, 42, 0.06);
+  --mobile-shadow-sheet:    0 -4px 32px rgba(15, 23, 42, 0.12);
+  --mobile-shadow-inner:    none;      /* no inner glow on professional cards */
+
+  /* ── Sheet backdrop ──────────────────────────── */
+  --mobile-backdrop:        rgba(15, 23, 42, 0.40);  /* slate-900 @ 40%     */
+
+  /* ── Bottom tab bar ──────────────────────────── */
+  --mobile-tab-bg:          #FFFFFF;
+  --mobile-tab-border:      #E2E8F0;
+  --mobile-tab-active-icon: #2563EB;
+  --mobile-tab-active-label:#2563EB;
+  --mobile-tab-active-pill: rgba(37, 99, 235, 0.10);
+  --mobile-tab-inactive:    #94A3B8;
+
+  /* ── Top bar ─────────────────────────────────── */
+  --mobile-topbar-bg:       #FFFFFF;
+  --mobile-topbar-border:   #E2E8F0;
+  --mobile-topbar-icon:     #64748B;
+
+  /* ── Interaction ─────────────────────────────── */
+  --mobile-press-overlay:   rgba(15, 23, 42, 0.04);
+  --mobile-press-scale:     0.98;
 
   /* ── Spacing (4px base-unit grid) ────────────── */
   --space-1:  4px;
@@ -90,56 +112,6 @@
   --space-10: 40px;
   --space-12: 48px;
   --space-safe: env(safe-area-inset-bottom);
-}
-
-/* ───────────────────────────── Colour Tokens (Dark) ─────────────────── */
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* ── Backgrounds ─────────────────────────────── */
-    --mobile-bg:              #1C1410;   /* deep warm brown — not pure black  */
-    --mobile-bg-grouped:      #241B14;   /* subtle grouped surface            */
-    --mobile-bg-card:         #2E2218;   /* card fill                         */
-    --mobile-bg-elevated:     #382A1E;   /* sheets, popovers                  */
-
-    /* ── Labels ──────────────────────────────────── */
-    --mobile-label-primary:   #F5F0E8;   /* warm near-white                   */
-    --mobile-label-secondary: #9C9189;   /* warm mid                          */
-    --mobile-label-tertiary:  #6B6059;   /* muted in dark                     */
-
-    /* ── Accent ──────────────────────────────────── */
-    --mobile-tint:            #E07B4A;   /* lighter terracotta — legible on dark */
-    --mobile-tint-subtle:     rgba(224, 123, 74, 0.16);
-    --mobile-tint-on:         #FFFFFF;
-
-    /* ── Separators ──────────────────────────────── */
-    --mobile-separator:       #3A2E24;
-    --mobile-border-card:     rgba(255, 255, 255, 0.06);
-
-    /* ── Status ──────────────────────────────────── */
-    --mobile-success:         #7DB88A;
-    --mobile-success-bg:      rgba(107, 158, 120, 0.16);
-    --mobile-warning:         #D4B46A;
-    --mobile-warning-bg:      rgba(196, 163, 90, 0.16);
-    --mobile-destructive:     #D4978D;
-    --mobile-destructive-bg:  rgba(196, 134, 122, 0.16);
-    --mobile-info:            #8EBDD6;
-    --mobile-info-bg:         rgba(126, 170, 200, 0.16);
-
-    /* ── Shadows (dark mode: use rings, not box-shadows) */
-    --mobile-shadow-card:       0 0 0 1px rgba(255, 255, 255, 0.06);
-    --mobile-shadow-card-hover: 0 0 0 1px rgba(255, 255, 255, 0.10);
-    --mobile-shadow-sheet:      0 -4px 32px rgba(0, 0, 0, 0.40);
-    --mobile-shadow-inner:      inset 0 1px 0 rgba(255, 255, 255, 0.06);
-
-    /* ── Sheet backdrop ──────────────────────────── */
-    --mobile-backdrop:        rgba(0, 0, 0, 0.60);
-
-    /* ── Bottom tab bar ─────────────────────────── */
-    --mobile-tab-bg:          #1C1410;
-    --mobile-tab-border:      #3A2E24;
-    --mobile-tab-inactive:    #6B6059;
-  }
 }
 
 /* ───────────────────────────── Typography ───────────────────────────── */
@@ -212,37 +184,35 @@
   .pt-safe { padding-top: env(safe-area-inset-top); }
 }
 
-/* ───────────────────────────── Card Surfaces ─────────────────────────── */
+/* ─────────────────────────── Card Surface Utilities ─────────────────── */
 
 @layer utilities {
   .mobile-card {
     background-color: var(--mobile-bg-card);
-    border-radius: 16px;
-    box-shadow:
-      var(--mobile-shadow-inner),
-      var(--mobile-shadow-card);
-    /* No border — the inner shadow creates the edge definition */
+    border-radius: 12px;
+    border: 1px solid var(--mobile-border-card);
+    box-shadow: var(--mobile-shadow-card);
+    /* Inner glow removed — --mobile-shadow-inner is now `none` */
   }
 
   .mobile-card-press {
-    transform: scale(0.98);
-    background-color: var(--mobile-bg-card);
-    filter: brightness(0.97);
-    transition: transform 150ms cubic-bezier(0.32, 0.72, 0, 1),
-                filter 150ms ease;
+    transform: scale(var(--mobile-press-scale));
+    filter: brightness(0.98);
+    transition:
+      transform 150ms cubic-bezier(0.32, 0.72, 0, 1),
+      filter    150ms ease;
   }
 
   .mobile-section-header {
     background-color: var(--mobile-bg-grouped);
-    border-top: 1px solid var(--mobile-separator);
+    border-top:    1px solid var(--mobile-separator);
     border-bottom: 1px solid var(--mobile-separator);
     padding: 6px 16px;
+    /* .mobile-grain removed — grain texture dropped in task 76 */
   }
 
-  /* Grain texture overlay via inline SVG filter (defined in MobileShell):
-     Only applied to .mobile-section-header — never to cards or body copy. */
-  .mobile-grain {
-    filter: url(#mobile-grain);
+  .animate-fade-out {
+    animation: fade-in 200ms ease-out reverse forwards;
   }
 }
 

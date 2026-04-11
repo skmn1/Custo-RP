@@ -33,7 +33,7 @@ function groupByYear(payslips) {
 
 const PayslipRow = ({ payslip, onTap, formatCurrency, formatDate, t }) => (
   <div
-    className="flex items-center gap-3 px-4 py-3 min-h-[44px] active:bg-gray-50 dark:active:bg-gray-800/50 transition-colors duration-150 cursor-pointer"
+    className="flex items-center gap-3 px-4 py-3 min-h-[44px] active:bg-gray-50 transition-colors duration-150 cursor-pointer"
     onClick={() => onTap(payslip.id)}
     onKeyDown={(e) => {
       if (e.key === 'Enter' || e.key === ' ') {
@@ -56,7 +56,7 @@ const PayslipRow = ({ payslip, onTap, formatCurrency, formatDate, t }) => (
         {t('mobile.payslips.paidOn', { date: formatDate(payslip.paidAt, 'dd MMM') })}
       </p>
     </div>
-    <ChevronRightIcon className="h-5 w-5 text-gray-300 dark:text-gray-600 flex-shrink-0" />
+    <ChevronRightIcon className="h-5 w-5 text-gray-300 flex-shrink-0" />
   </div>
 );
 
@@ -79,9 +79,9 @@ const PayslipListSkeleton = () => (
   <div className="space-y-1 animate-pulse" data-testid="payslip-list-skeleton">
     {[1, 2, 3].map((i) => (
       <div key={i} className="px-4 py-3">
-        <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded" />
-        <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded mt-2" />
-        <div className="h-3 w-20 bg-gray-200 dark:bg-gray-700 rounded mt-2" />
+        <div className="h-4 w-32 bg-gray-200 rounded" />
+        <div className="h-4 w-24 bg-gray-200 rounded mt-2" />
+        <div className="h-3 w-20 bg-gray-200 rounded mt-2" />
       </div>
     ))}
   </div>

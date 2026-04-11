@@ -60,7 +60,7 @@ export default function EssUpdateBanner() {
       aria-live="polite"
       aria-label={t('pwa.update.available', 'A new version is available')}
       className="relative z-40 flex items-center gap-3 bg-blue-600 px-4 py-2.5 text-sm text-white
-                 dark:bg-blue-700"
+                "
     >
       <ArrowPathIcon className="h-4 w-4 shrink-0" aria-hidden="true" />
       <span className="flex-1 font-medium">

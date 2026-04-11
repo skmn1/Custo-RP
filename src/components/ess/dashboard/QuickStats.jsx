@@ -16,10 +16,10 @@ function getAttendanceStatus(rate) {
 }
 
 const statusBg = {
-  normal: 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700',
-  green: 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800',
-  amber: 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800',
-  red: 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800',
+  normal: 'bg-white border-gray-200',
+  green: 'bg-green-50 border-green-200',
+  amber: 'bg-amber-50 border-amber-200',
+  red: 'bg-red-50 border-red-200',
 };
 
 const statusIcon = {
@@ -89,8 +89,8 @@ const QuickStats = ({ shifts, payslip, attendance, restricted }) => {
             <div className="flex items-center justify-between mb-2">
               <Icon className={`h-6 w-6 ${statusIcon[card.status]}`} />
             </div>
-            <p className="text-xl font-bold text-gray-900 dark:text-gray-100">{card.value}</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{card.label}</p>
+            <p className="text-xl font-bold text-gray-900">{card.value}</p>
+            <p className="text-xs text-gray-500 mt-1">{card.label}</p>
           </Link>
         );
       })}

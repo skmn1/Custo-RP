@@ -27,19 +27,6 @@ const MobileShell = () => {
       className="flex flex-col h-screen h-[100dvh] bg-[var(--mobile-bg)] font-system"
       data-testid="mobile-shell"
     >
-      {/* SVG grain filter — zero-size, aria-hidden, no layout impact.
-          Applied to .mobile-section-header via the .mobile-grain class. */}
-      <svg aria-hidden="true" style={{ position: 'absolute', width: 0, height: 0 }}>
-        <defs>
-          <filter id="mobile-grain">
-            <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3"
-                          stitchTiles="stitch" result="noise" />
-            <feColorMatrix type="saturate" values="0" in="noise" result="gray" />
-            <feBlend in="SourceGraphic" in2="gray" mode="overlay" result="blend" />
-            <feComposite in="blend" in2="SourceGraphic" operator="in" />
-          </filter>
-        </defs>
-      </svg>
       <MobileTopBar />
       <main className="flex-1 overflow-y-auto pb-20" data-testid="mobile-content">
         <ScreenTransition>

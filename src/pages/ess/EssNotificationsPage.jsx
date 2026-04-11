@@ -179,14 +179,14 @@ const EssNotificationsPage = () => {
     <div>
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+        <h1 className="text-2xl font-bold text-gray-900">
           {t('notifications.title')}
         </h1>
         <div className="flex items-center gap-3">
           {unreadCount > 0 && (
             <button
               onClick={markAllRead}
-              className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline font-medium"
+              className="text-sm text-indigo-600 hover:underline font-medium"
               data-cy="page-mark-all-read"
             >
               {t('notifications.markAllRead')}
@@ -200,7 +200,7 @@ const EssNotificationsPage = () => {
         <select
           value={typeFilter}
           onChange={(e) => setTypeFilter(e.target.value)}
-          className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+          className="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-900"
           data-cy="type-filter"
         >
           <option value="all">{t('notifications.filter.all')}</option>
@@ -210,12 +210,12 @@ const EssNotificationsPage = () => {
           <option value="leave">{t('notifications.filter.leave')}</option>
         </select>
 
-        <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+        <label className="flex items-center gap-2 text-sm text-gray-700">
           <input
             type="checkbox"
             checked={unreadOnly}
             onChange={(e) => setUnreadOnly(e.target.checked)}
-            className="rounded border-gray-300 dark:border-gray-600 text-indigo-600 focus:ring-indigo-500"
+            className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
             data-cy="unread-toggle"
           />
           {t('notifications.unreadOnly')}
@@ -230,18 +230,18 @@ const EssNotificationsPage = () => {
           <div className="w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />
         </div>
       ) : filtered.length === 0 ? (
-        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-12 text-center">
-          <svg className="w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
+          <svg className="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5"
               d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
           </svg>
-          <p className="text-gray-400 dark:text-gray-500">{t('notifications.empty')}</p>
+          <p className="text-gray-400">{t('notifications.empty')}</p>
         </div>
       ) : (
         <div className="space-y-6" data-cy="notification-list">
           {dateGroups.map((group) => (
             <div key={group.label}>
-              <h2 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
+              <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
                 {group.label}
               </h2>
               <div className="space-y-2">
@@ -264,7 +264,7 @@ const EssNotificationsPage = () => {
               <button
                 onClick={handleLoadMore}
                 disabled={isLoading}
-                className="px-4 py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:underline disabled:opacity-50"
+                className="px-4 py-2 text-sm font-medium text-indigo-600 hover:underline disabled:opacity-50"
                 data-cy="load-more"
               >
                 {t('notifications.loadMore')}
@@ -276,13 +276,13 @@ const EssNotificationsPage = () => {
 
       {/* ── Notification Preferences ── */}
       <div className="mt-10" data-cy="notification-preferences">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">
           {t('notifications.preferences.title')}
         </h2>
 
         {pushPermission === 'denied' ? (
           <div
-            className="flex items-start gap-3 rounded-xl border border-amber-200 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/30 p-4 text-sm text-amber-800 dark:text-amber-300"
+            className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800"
             data-cy="push-blocked-banner"
           >
             <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -296,9 +296,9 @@ const EssNotificationsPage = () => {
             <div className="w-6 h-6 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />
           </div>
         ) : (
-          <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
             {/* Header row */}
-            <div className="grid grid-cols-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide px-4 py-2 border-b border-gray-100 dark:border-gray-800">
+            <div className="grid grid-cols-3 text-xs font-semibold text-gray-500 uppercase tracking-wide px-4 py-2 border-b border-gray-100">
               <span>{t('notifications.preferences.category')}</span>
               <span className="text-center">{t('notifications.preferences.inApp')}</span>
               <span className="text-center">{t('pwa.push.settingsLabel')}</span>
@@ -309,10 +309,10 @@ const EssNotificationsPage = () => {
               return (
                 <div
                   key={key}
-                  className="grid grid-cols-3 items-center px-4 py-3 border-b border-gray-50 dark:border-gray-800 last:border-0"
+                  className="grid grid-cols-3 items-center px-4 py-3 border-b border-gray-50 last:border-0"
                   data-cy={`pref-row-${key}`}
                 >
-                  <span className="text-sm text-gray-700 dark:text-gray-300">{t(labelKey)}</span>
+                  <span className="text-sm text-gray-700">{t(labelKey)}</span>
 
                   {/* In-App toggle */}
                   <div className="flex justify-center">
@@ -322,7 +322,7 @@ const EssNotificationsPage = () => {
                       onClick={() => handleTogglePref(key, 'inAppEnabled', !pref.inAppEnabled)}
                       data-cy={`pref-inapp-${key}`}
                       className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 ${
-                        pref.inAppEnabled ? 'bg-indigo-600' : 'bg-gray-300 dark:bg-gray-600'
+                        pref.inAppEnabled ? 'bg-indigo-600' : 'bg-gray-300'
                       }`}
                     >
                       <span
@@ -344,7 +344,7 @@ const EssNotificationsPage = () => {
                         onClick={() => handleTogglePref(key, 'pushEnabled', !pref.pushEnabled)}
                         data-cy={`pref-push-${key}`}
                         className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 ${
-                          pref.pushEnabled ? 'bg-indigo-600' : 'bg-gray-300 dark:bg-gray-600'
+                          pref.pushEnabled ? 'bg-indigo-600' : 'bg-gray-300'
                         }`}
                       >
                         <span
@@ -372,7 +372,7 @@ const NotificationCard = ({ notification, onClick, onDelete, t }) => {
 
   return (
     <div
-      className={`bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-4 flex gap-3 ${
+      className={`bg-white rounded-xl border border-gray-200 p-4 flex gap-3 ${
         !notification.isRead ? 'border-l-4 border-l-indigo-500' : ''
       }`}
       data-cy="notification-card"
@@ -390,20 +390,20 @@ const NotificationCard = ({ notification, onClick, onDelete, t }) => {
           <div className="min-w-0">
             <p className={`text-sm leading-snug ${
               notification.isRead
-                ? 'text-gray-600 dark:text-gray-400'
-                : 'text-gray-900 dark:text-gray-100 font-medium'
+                ? 'text-gray-600'
+                : 'text-gray-900 font-medium'
             }`}>
               {notification.title}
             </p>
             {notification.body && (
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{notification.body}</p>
+              <p className="text-xs text-gray-500 mt-1">{notification.body}</p>
             )}
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
             {!notification.isRead && (
               <span className="w-2 h-2 rounded-full bg-indigo-500" data-cy="unread-dot" />
             )}
-            <span className="text-xs text-gray-400 dark:text-gray-500 whitespace-nowrap">
+            <span className="text-xs text-gray-400 whitespace-nowrap">
               {formatTimeAgo(notification.createdAt, t)}
             </span>
           </div>
@@ -413,7 +413,7 @@ const NotificationCard = ({ notification, onClick, onDelete, t }) => {
           {notification.link ? (
             <button
               onClick={onClick}
-              className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline font-medium"
+              className="text-xs text-indigo-600 hover:underline font-medium"
               data-cy="notification-link"
             >
               {t(`notifications.types.${notification.type}`)} →
@@ -423,7 +423,7 @@ const NotificationCard = ({ notification, onClick, onDelete, t }) => {
           )}
           <button
             onClick={(e) => { e.stopPropagation(); onDelete(); }}
-            className="text-xs text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors"
+            className="text-xs text-gray-400 hover:text-red-500 transition-colors"
             data-cy="delete-notification"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
