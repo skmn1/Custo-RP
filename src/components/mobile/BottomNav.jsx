@@ -38,13 +38,13 @@ export const BottomNav = () => {
       className="
         fixed bottom-0 left-0 w-full z-50
         flex justify-around items-center
-        px-4 pb-6 pt-2
+        px-4 pt-2
         bg-white/80 backdrop-blur-md
         border-t border-zinc-200
         rounded-t-xl
         shadow-[0_-2px_10px_rgba(0,0,0,0.05)]
-        pb-safe
       "
+      style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom, 0px))' }}
       data-testid="mobile-tab-bar"
     >
       {TAB_ITEMS.map(({ id, label, icon, to }) => {

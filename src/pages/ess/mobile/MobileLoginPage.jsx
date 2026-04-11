@@ -7,7 +7,7 @@
  * No <MobileShell> wrapper — standalone route.
  */
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../../hooks/useAuth';
 
@@ -178,13 +178,13 @@ export const MobileLoginPage = () => {
                 >
                   {t('auth.password', { defaultValue: 'Password' })}
                 </label>
-                <a
-                  href="/forgot-password"
+                <Link
+                  to="/forgot-password"
                   className="text-xs font-bold text-[#da336b] hover:opacity-80 transition-opacity tracking-wide"
                   style={{ fontFamily: 'var(--mobile-font-body, Manrope, sans-serif)' }}
                 >
                   {t('auth.forgotPassword', { defaultValue: 'Forgot Password?' })}
-                </a>
+                </Link>
               </div>
               <div className="relative group">
                 <span

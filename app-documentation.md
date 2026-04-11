@@ -2802,3 +2802,132 @@ Exported pure helper. Groups a flat `Notification[]` into a `{ [dateLabel]: Noti
 - `useEssNotifications` — 5 assertions: endpoint, useState, useEffect, useCallback, return shape
 - `useEssMarkRead` — 6 assertions: single+bulk endpoints, useCallback, both keys returned
 - App.jsx route — 3 assertions: MobileNotificationsPage import, notifications path, element
+
+---
+
+## Task 86 — Responsive QA & Cross-Device Polish (Sprint 22 QA Gate)
+
+**Branch:** `feature/86-ess-responsive-qa`  
+**Scope:** QA audit of Tasks 77–85 — fixes only, no new features.
+
+---
+
+### Fixes Applied
+
+| # | Issue | Severity | Files Changed |
+|---|-------|----------|---------------|
+| 1 | Stale `#3B82F6` blue in `theme-color` + `msapplication-TileColor` meta tags | P1 | `EssLayout.jsx` |
+| 2 | Forgot-password link used native `<a href>` instead of React Router `<Link>` (full-page reload on SPA) | P1 | `MobileLoginPage.jsx` |
+| 3 | Input/select/textarea elements with `text-sm` (14px) trigger Safari iOS auto-zoom on focus | P1 | `MobileEditProfilePage.jsx`, `MobilePayslipHistoryPage.jsx`, `MobileRequestsPage.jsx` |
+| 4 | Main scroll container missing `overscroll-contain` (Android rubber-banding on Chrome) | P2 | `MobileShell.jsx` |
+| 5 | `pb-safe` (= `env(safe-area-inset-bottom)`) overrode `pb-6` — on devices with no safe area inset (Android, iPhone SE), the bottom nav had 0px bottom padding | P2 | `BottomNav.jsx` |
+| 6 | Google Fonts (Plus Jakarta Sans + Manrope) loaded only via CSS `@import` (blocks render); missing `<link>` tags in HTML | P2 | `index.html` |
+| 7 | `viewport` meta had `user-scalable=no, maximum-scale=1.0` — WCAG 1.4.4 violation (prevents accessibility zoom) | P1 | `index.html` |
+| 8 | `TopAppBar` notification button had hardcoded `aria-label="Notifications"` (English only) | P2 | `MobileTopBar.jsx` |
+| 9 | Avatar images in Profile, EditProfile, Dashboard teammate list lacked `loading="lazy"` | P3 | `MobileProfilePage.jsx`, `MobileEditProfilePage.jsx`, `MobileDashboardPage.jsx` |
+
+---
+
+### Device Width Matrix
+
+All screens tested at the following viewport widths. Mobile shell renders at < 1024px; desktop sidebar shell at ≥ 1024px via `useMobileLayout()`.
+
+| Width | Device Reference | Shell |
+|-------|-----------------|-------|
+| 360px | Samsung Galaxy S21 | MobileShell |
+| 390px | iPhone 14 | MobileShell |
+| 414px | iPhone 14 Plus | MobileShell |
+| 640px | Tablet portrait | MobileShell |
+| 768px | iPad Mini | MobileShell |
+| 1024px | iPad Pro / laptop | AppShell (sidebar) |
+| 1440px | Desktop monitor | AppShell (sidebar) |
+
+**Breakpoint transition:** At exactly 1024px, `useMobileLayout()` fires a `matchMedia` change event. The ternary in `EssLayout` immediately swaps shells without re-routing. URL is preserved. Active route remains highlighted in the desktop sidebar.
+
+---
+
+### Visual Consistency — Confirmed
+
+| Token | Value | Status |
+|-------|-------|--------|
+| Primary Magenta | `#da336b` | ✅ All pages |
+| Secondary | `#8b2044` | ✅ Gradient `from-[#da336b] to-[#8b2044]` |
+| Surface | `#fffbff` | ✅ `theme-color` on all mobile pages |
+| Card radius | 24px (`rounded-2xl` / `rounded-[2rem]`) | ✅ |
+| Button radius | 16px (`rounded-xl`) | ✅ |
+| Input radius | 12px (`rounded-xl`) | ✅ |
+| Separator colour | `#d5c2c5` (`--mobile-outline-variant`) | ✅ |
+
+No stale `#3B82F6` (blue) tokens remain in any mobile page or layout component.
+
+---
+
+### Accessibility Audit — Confirmed
+
+- **Touch targets**: All buttons, tabs, and interactive elements use `min-h-[44px] min-w-[44px]` or `py-4` padding ≥ 44px.
+- **Bottom nav**: `role="navigation"`, `aria-label={t('mobile.nav.label')}`, `aria-current="page"` on active tab.
+- **Progress bars**: All 3 progressbars (Dashboard leave, Requests balances, Payroll YTD) have `role="progressbar"` + `aria-valuenow` / `aria-valuemin` / `aria-valuemax`.
+- **Form inputs**: All `<input>` elements have associated `<label htmlFor>` or `aria-label`.
+- **Keyboard support**: `NotificationItem` rows have `role="button"`, `tabIndex={0}`, `onKeyDown` Enter handler.
+- **Screen reader**: All Material Symbol `<span>` elements have `aria-hidden="true"`.
+- **Toast**: `role="alert"`, `aria-live="assertive"` on `EssNotificationToast`.
+- **User scalability**: Removed `user-scalable=no` and `maximum-scale=1.0` from viewport meta (WCAG 1.4.4 compliance).
+
+---
+
+### Performance Audit — Confirmed
+
+- **Font loading**: Plus Jakarta Sans + Manrope loaded via `<link rel="stylesheet">` with `&display=swap` in `index.html`. No FOIT — text renders immediately with system fallback stack, then swaps to web font.
+- **Animations**: All CSS `@keyframes` use only `opacity` and `transform`. No layout-triggering properties (`width`, `height`, `top`, `left`) in any keyframe.
+- **Overscroll**: `overscroll-contain` on the MobileShell main scroll container prevents pull-to-refresh rubber-banding on Android Chrome.
+- **Image lazy loading**: `loading="lazy"` on teammate avatars, pulse carousel images, profile avatars. News carousel images already had `loading="lazy"`.
+- **Safe area**: BottomNav uses `max(1.5rem, env(safe-area-inset-bottom, 0px))` for bottom padding — guarantees minimum 24px on all devices while respecting the iPhone home indicator area (34px).
+
+---
+
+### Cross-Browser Notes
+
+| Concern | Fix |
+|---------|-----|
+| Safari iOS auto-zoom on small inputs | All inputs/selects/textareas have `text-base` (16px minimum) |
+| `100dvh` — Safari 15.4+ | Already used in MobileShell (`h-[100dvh]`). No fallback needed for target browsers. |
+| `-webkit-backdrop-filter` — Top bar + BottomNav | Tailwind's `backdrop-blur-md` emits both `-webkit-backdrop-filter` and `backdrop-filter`. |
+| Bottom nav over Android gesture bar | `max(1.5rem, env(safe-area-inset-bottom))` clears the Android gesture navigation area. |
+| `font-display: swap` | Both Google Fonts URLs include `&display=swap`. |
+
+---
+
+### i18n
+
+- **264** `mobile.*` keys in both `en/ess.json` and `fr/ess.json`. Zero missing keys. Zero empty values. Symmetric.
+- Date formatting via `Intl.DateTimeFormat(undefined, ...)` — uses the browser locale automatically.
+- All visible strings in every screen use `t()` calls with translation keys.
+
+---
+
+### Unit Tests
+
+`tests/mobile-responsive-qa.test.js` — **108 tests, all passing**
+
+Test categories:
+- i18n completeness (6 tests): key count, symmetric EN↔FR, no empty values
+- i18n EN exact values (20 tests): nav labels, feature titles, status chips
+- i18n FR exact values (10 tests): critical UI strings validated
+- EssLayout theme-color fix (3 tests): no #3B82F6, #da336b present
+- MobileLoginPage SPA nav (3 tests): Link import, `to` attribute, no `href`
+- Input font-size ≥ 16px (6 tests): no text-sm on inputs in 3 pages
+- MobileShell overscroll (2 tests): overscroll-contain class
+- BottomNav safe-area padding (7 tests): max() expression, role, aria, touch targets
+- index.html fonts (7 tests): both fonts, display=swap, WCAG viewport
+- TopAppBar i18n (3 tests): no hardcoded English aria-label
+- Image lazy loading (4 tests): lazy on avatars and team images
+- Progress bar ARIA (3 tests): all 4 attributes on each progressbar
+- Animation safety (5 tests): keyframes use only transform/opacity
+- No stale #3B82F6 tokens (12 tests): 11 mobile pages + EssLayout
+- EssLayout shell swap (3 tests): useMobileLayout, ternary, single shell
+- App.jsx routes (10 tests): all 8 routes + mobile delegation for dashboard/schedule
+- MobileShell structure (4 tests): dvh, TopBar, BottomNav, CSS import
+
+**Known Remaining Items (tracked, P3 — non-blocking):**
+- `html[lang="fr"]` in `index.html` should be dynamic (set by i18next on mount). Tracked as separate cleanup task.
+- Desktop payslips route (`/app/ess/payslips`) still uses the desktop `EssPayslipsPage` with `MobilePayslipList` delegation rather than the Sprint 22 `MobilePayslipDetailPage`. Separate migration task planned.

@@ -146,6 +146,7 @@ export const MobileEditProfilePage = () => {
               <img
                 src={profile?.avatar || '/default-avatar.png'}
                 alt={t('mobile.profile.avatarAlt')}
+                loading="lazy"
                 className="w-full h-full rounded-full object-cover"
                 data-testid="edit-avatar"
               />
@@ -185,7 +186,7 @@ export const MobileEditProfilePage = () => {
                     type={field.type}
                     value={field.value}
                     onChange={(e) => field.onChange(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3.5 bg-surface-container-lowest rounded-xl outline-none border-b-2 border-transparent focus:border-primary transition-all text-on-surface font-body text-sm"
+                    className="w-full pl-12 pr-4 py-3.5 bg-surface-container-lowest rounded-xl outline-none border-b-2 border-transparent focus:border-primary transition-all text-on-surface font-body text-base"
                     data-testid={field.testid}
                     autoComplete={field.key === 'email' ? 'email' : field.key === 'phone' ? 'tel' : 'off'}
                   />

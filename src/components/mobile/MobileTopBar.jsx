@@ -61,6 +61,7 @@ export const MobileTopBar = () => {
  * on the left and a notification bell on the right.
  */
 export const TopAppBar = ({ showNotifications = true }) => {
+  const { t } = useTranslation('ess');
   const navigate = useNavigate();
   const { unreadCount } = useEssNotificationCount();
 
@@ -79,7 +80,7 @@ export const TopAppBar = ({ showNotifications = true }) => {
           onClick={() => navigate('/app/ess/notifications')}
           className="relative p-2 rounded-full transition-colors active:scale-95"
           style={{ color: 'var(--mobile-label-secondary)' }}
-          aria-label="Notifications"
+          aria-label={t('mobile.nav.notifications')}
         >
           <span className="material-symbols-outlined">notifications</span>
           {unreadCount > 0 && (

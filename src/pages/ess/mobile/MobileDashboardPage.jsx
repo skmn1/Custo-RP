@@ -131,6 +131,7 @@ const NextShiftHero = ({ shift }) => {
               key={tm.id}
               src={tm.avatar}
               alt={tm.name}
+              loading="lazy"
               className="w-7 h-7 rounded-full border-2 border-surface-container-lowest object-cover"
             />
           ))}

@@ -57,6 +57,7 @@ const ProfileHeader = ({ profile, t }) => {
           <img
             src={profile.avatar || '/default-avatar.png'}
             alt={`${profile.firstName} ${profile.lastName}`}
+            loading="lazy"
             className="relative z-10 w-full h-full rounded-[2rem] object-cover -rotate-2 shadow-lg"
             data-testid="profile-avatar"
           />

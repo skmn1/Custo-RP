@@ -326,7 +326,7 @@ const NewRequestSheet = ({ isOpen, onClose, onSubmit, isSubmitting, submitError,
               value={startDate}
               min={todayString()}
               onChange={e => setStartDate(e.target.value)}
-              className="w-full px-4 py-3 bg-surface-container-lowest rounded-xl outline-none border-b-2 border-transparent focus:border-primary transition-all text-on-surface font-body text-sm"
+              className="w-full px-4 py-3 bg-surface-container-lowest rounded-xl outline-none border-b-2 border-transparent focus:border-primary transition-all text-on-surface font-body text-base"
               required
               data-testid="start-date-input"
             />
@@ -344,7 +344,7 @@ const NewRequestSheet = ({ isOpen, onClose, onSubmit, isSubmitting, submitError,
               value={endDate}
               min={startDate || todayString()}
               onChange={e => setEndDate(e.target.value)}
-              className="w-full px-4 py-3 bg-surface-container-lowest rounded-xl outline-none border-b-2 border-transparent focus:border-primary transition-all text-on-surface font-body text-sm"
+              className="w-full px-4 py-3 bg-surface-container-lowest rounded-xl outline-none border-b-2 border-transparent focus:border-primary transition-all text-on-surface font-body text-base"
               required
               data-testid="end-date-input"
             />
@@ -372,7 +372,7 @@ const NewRequestSheet = ({ isOpen, onClose, onSubmit, isSubmitting, submitError,
             value={reason}
             onChange={e => setReason(e.target.value)}
             placeholder={t('mobile.leave.reasonPlaceholder')}
-            className="w-full px-4 py-3 bg-surface-container-lowest rounded-xl outline-none border-b-2 border-transparent focus:border-primary transition-all text-on-surface font-body text-sm min-h-[80px] resize-none"
+            className="w-full px-4 py-3 bg-surface-container-lowest rounded-xl outline-none border-b-2 border-transparent focus:border-primary transition-all text-on-surface font-body text-base min-h-[80px] resize-none"
             data-testid="reason-input"
           />
         </div>

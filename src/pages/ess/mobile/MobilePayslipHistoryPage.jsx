@@ -126,7 +126,7 @@ export const MobilePayslipHistoryPage = () => {
               placeholder={t('mobile.payroll.searchPayslips')}
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-surface-container-lowest rounded-xl outline-none border-b-2 border-transparent focus:border-primary transition-all text-on-surface placeholder:text-outline-variant font-body text-sm"
+              className="w-full pl-10 pr-4 py-3 bg-surface-container-lowest rounded-xl outline-none border-b-2 border-transparent focus:border-primary transition-all text-on-surface placeholder:text-outline-variant font-body text-base"
               aria-label={t('mobile.payroll.searchPayslips')}
               data-testid="search-input"
             />
@@ -135,7 +135,7 @@ export const MobilePayslipHistoryPage = () => {
             <select
               value={selectedYear ?? ''}
               onChange={e => setSelectedYear(e.target.value ? Number(e.target.value) : null)}
-              className="px-3 py-3 bg-surface-container-lowest rounded-xl outline-none border-b-2 border-transparent focus:border-primary transition-all text-on-surface font-body text-sm"
+              className="px-3 py-3 bg-surface-container-lowest rounded-xl outline-none border-b-2 border-transparent focus:border-primary transition-all text-on-surface font-body text-base"
               aria-label={t('mobile.payroll.filterByYear')}
               data-testid="year-filter"
             >

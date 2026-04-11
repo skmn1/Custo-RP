@@ -57,8 +57,8 @@ export default function EssLayout() {
         {/* PWA manifest scoped to /app/ess/ */}
         <link rel="manifest" href="/ess-manifest.json" />
 
-        {/* Theme colour for browser chrome */}
-        <meta name="theme-color" content="#3B82F6" />
+        {/* Theme colour for browser chrome — Nexus Kinetic Magenta */}
+        <meta name="theme-color" content="#da336b" />
 
         {/* Apple-specific PWA meta tags */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -70,7 +70,7 @@ export default function EssLayout() {
 
         {/* Microsoft tiles */}
         <meta name="msapplication-TileImage" content="/icons/ess/icon-144.png" />
-        <meta name="msapplication-TileColor" content="#3B82F6" />
+        <meta name="msapplication-TileColor" content="#da336b" />
       </Helmet>
 
       {/* Offline status banner (amber, above sync banner) */}
