@@ -211,7 +211,7 @@ public class AdminUserController {
         UUID assignedBy = (UUID) authentication.getPrincipal();
         PosAssignment assignment = PosAssignment.builder()
                 .userId(id)
-                .posLocationId(posLocationId)
+                .posTerminalId(posLocationId)
                 .assignedBy(assignedBy)
                 .build();
         posAssignmentRepository.save(assignment);
