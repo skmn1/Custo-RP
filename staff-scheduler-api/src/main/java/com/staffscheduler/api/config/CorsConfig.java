@@ -19,6 +19,7 @@ public class CorsConfig {
         // setAllowedOriginPatterns supports '*' wildcards; setAllowedOrigins does not.
         config.setAllowedOriginPatterns(Arrays.asList(
                 "http://localhost:*",
+                "http://192.168.120.156:*",
                 "http://127.0.0.1:*"
         ));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));

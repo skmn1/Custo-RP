@@ -53,4 +53,7 @@ free_port 5173
 
 echo "🚀  Starting frontend dev server (port 5173)..."
 echo "    API proxy → http://localhost:8080/api"
-exec npm run dev
+# exec npm run dev
+
+# Use --host to allow access from other devices on the network (e.g. mobile testing)
+exec npm run dev -- --host
