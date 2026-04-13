@@ -218,7 +218,7 @@ public class AdminManagementController {
             m.put("description", t.getType());
 
             // Get assigned managers
-            List<PosAssignment> assignments = posAssignmentRepository.findByPosTerminalId(t.getId());
+            List<PosAssignment> assignments = posAssignmentRepository.findByPosLocationId(t.getId());
             List<Map<String, Object>> managers = assignments.stream().map(a -> {
                 Map<String, Object> mgr = new LinkedHashMap<>();
                 mgr.put("id", a.getUserId());

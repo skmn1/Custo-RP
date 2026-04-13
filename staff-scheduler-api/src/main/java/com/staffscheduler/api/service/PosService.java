@@ -73,72 +73,102 @@ public class PosService {
                         .build())
                 .build();
     }
-    // ── Terminal-scoped queries ──
+    // ── PoS Location-scoped queries ──
 
     /**
-     * Returns terminals the current user has access to.
-     * SUPER_ADMIN sees all active terminals; POS_MANAGER sees only assigned ones.
+     * Returns PoS locations the current user has access to.
+     * SUPER_ADMIN sees all active locations; POS_MANAGER sees only assigned ones.
      */
-    public List<PosDto> findMyTerminals(UUID userId, String role) {
+    public List<PosDto> findMyPosLocations(UUID userId, String role) {
         String normalised = RoleConstants.normalise(role);
         if (RoleConstants.SUPER_ADMIN.equals(normalised)) {
             return findAll(false);
         }
         List<PosAssignment> assignments = posAssignmentRepository.findByUserId(userId);
-        List<Long> terminalIds = assignments.stream()
-                .map(PosAssignment::getPosTerminalId)
+        List<Long> locationIds = assignments.stream()
+                .map(PosAssignment::getPosLocationId)
                 .toList();
-        if (terminalIds.isEmpty()) return List.of();
-        return posRepository.findByIdInAndIsActiveTrue(terminalIds).stream()
+        if (locationIds.isEmpty()) return List.of();
+        return posRepository.findByIdInAndIsActiveTrue(locationIds).stream()
                 .map(this::toDto)
                 .toList();
     }
 
-    /**
-     * Checks that the given user has access to a specific terminal.
-     * Throws AccessDeniedException if not.
-     */
-    public void enforceTerminalAccess(UUID userId, String role, Long terminalId) {
-        String normalised = RoleConstants.normalise(role);
-        if (RoleConstants.SUPER_ADMIN.equals(normalised)) return;
-        if (!posAssignmentRepository.existsByUserIdAndPosTerminalId(userId, terminalId)) {
-            throw new AccessDeniedException("You do not have access to this terminal");
-        }
+    /** @deprecated Use {@link #findMyPosLocations(UUID, String)} instead. */
+    @Deprecated
+    public List<PosDto> findMyTerminals(UUID userId, String role) {
+        return findMyPosLocations(userId, role);
     }
 
     /**
-     * Returns dashboard KPIs for a terminal.
+     * Checks that the given user has access to a specific PoS location.
+     * Throws AccessDeniedException if not.
      */
+    public void enforcePosLocationAccess(UUID userId, String role, Long posLocationId) {
+        String normalised = RoleConstants.normalise(role);
+        if (RoleConstants.SUPER_ADMIN.equals(normalised)) return;
+        if (!posAssignmentRepository.existsByUserIdAndPosLocationId(userId, posLocationId)) {
+            throw new AccessDeniedException("You do not have access to this PoS location");
+        }
+    }
+
+    /** @deprecated Use {@link #enforcePosLocationAccess(UUID, String, Long)} instead. */
+    @Deprecated
+    public void enforceTerminalAccess(UUID userId, String role, Long terminalId) {
+        enforcePosLocationAccess(userId, role, terminalId);
+    }
+
+    /**
+     * Returns expanded dashboard KPIs for a PoS location — Sales, Operations and People rows.
+     */
+    public Map<String, Object> getPosLocationDashboardKpis(Long posLocationId) {
+        PointOfSale pos = posRepository.findByIdAndIsActiveTrue(posLocationId)
+                .orElseThrow(() -> new ResourceNotFoundException("PoS", String.valueOf(posLocationId)));
+
+        List<EmployeeDto> employees = employeeService.findByPosId(posLocationId);
+        long openIncidents = incidentService.countOpen(posLocationId);
+
+        // Build a LinkedHashMap to support more than 10 entries (Map.of limit)
+        java.util.Map<String, Object> kpis = new java.util.LinkedHashMap<>();
+        kpis.put("posLocationId", pos.getId());
+        kpis.put("posLocationName", pos.getName());
+        // Row 1 — Sales
+        kpis.put("sessionOpen", false);
+        kpis.put("sessionOpenedAt", null);
+        kpis.put("salesToday", 0);
+        kpis.put("transactionCount", 0);
+        kpis.put("avgBasket", 0);
+        // Row 2 — Operations
+        kpis.put("openPurchaseOrders", 0);
+        kpis.put("lowStockAlerts", 0);
+        kpis.put("openApInvoices", 0);
+        kpis.put("openArInvoices", 0);
+        // Row 3 — People
+        kpis.put("staffOnShift", 0);
+        kpis.put("upcomingShifts", 0);
+        kpis.put("pendingLeave", 0);
+        kpis.put("nextPayrollDate", null);
+        // Legacy fields kept for backwards compatibility
+        kpis.put("employeeCount", employees.size());
+        kpis.put("openIncidents", openIncidents);
+        return kpis;
+    }
+
+    /** @deprecated Use {@link #getPosLocationDashboardKpis(Long)} instead. */
+    @Deprecated
     public Map<String, Object> getTerminalDashboardKpis(Long terminalId) {
-        PointOfSale pos = posRepository.findByIdAndIsActiveTrue(terminalId)
-                .orElseThrow(() -> new ResourceNotFoundException("PoS", String.valueOf(terminalId)));
-
-        List<EmployeeDto> employees = employeeService.findByPosId(terminalId);
-        long openIncidents = incidentService.countOpen(terminalId);
-
-        return Map.of(
-                "terminalId", pos.getId(),
-                "terminalName", pos.getName(),
-                "employeeCount", employees.size(),
-                "openIncidents", openIncidents,
-                "shiftsToday", 0,
-                "salesToday", 0,
-                "transactionCount", 0,
-                "avgBasket", 0,
-                "lowStockAlerts", 0
-        );
+        return getPosLocationDashboardKpis(terminalId);
     }
 
     /**
      * Returns a daily sales report (placeholder with structure).
      */
-    public Map<String, Object> getDailySales(Long terminalId, LocalDate date) {
-        posRepository.findByIdAndIsActiveTrue(terminalId)
-                .orElseThrow(() -> new ResourceNotFoundException("PoS", String.valueOf(terminalId)));
+    public Map<String, Object> getDailySales(Long posLocationId, LocalDate date) {
+        posRepository.findByIdAndIsActiveTrue(posLocationId)
+                .orElseThrow(() -> new ResourceNotFoundException("PoS", String.valueOf(posLocationId)));
 
-        // Placeholder — real implementation would query transaction table
         return Map.of(
-                "terminalId", terminalId,
+                "posLocationId", posLocationId,
                 "date", date.toString(),
                 "totalSales", 0,
                 "transactionCount", 0,
@@ -149,12 +179,12 @@ public class PosService {
     /**
      * Returns a period summary report (placeholder with structure).
      */
-    public Map<String, Object> getPeriodSummary(Long terminalId, LocalDate from, LocalDate to) {
-        posRepository.findByIdAndIsActiveTrue(terminalId)
-                .orElseThrow(() -> new ResourceNotFoundException("PoS", String.valueOf(terminalId)));
+    public Map<String, Object> getPeriodSummary(Long posLocationId, LocalDate from, LocalDate to) {
+        posRepository.findByIdAndIsActiveTrue(posLocationId)
+                .orElseThrow(() -> new ResourceNotFoundException("PoS", String.valueOf(posLocationId)));
 
         return Map.of(
-                "terminalId", terminalId,
+                "posLocationId", posLocationId,
                 "from", from.toString(),
                 "to", to.toString(),
                 "totalSales", 0,

@@ -12,13 +12,19 @@ import EmployeesPage from './pages/EmployeesPage';
 import PayrollPage from './pages/PayrollPage';
 import PosListPage from './pages/PosListPage';
 import PosDetailPage from './pages/PosDetailPage';
-import MyTerminalsPage from './pages/MyTerminalsPage';
-import PosTerminalDashboard from './pages/PosTerminalDashboard';
-import PosStockLookup from './pages/PosStockLookup';
-import PosReportsPage from './pages/PosReportsPage';
+import MyPosLocationsPage from './pages/MyPosLocationsPage';
+import PosLocationDashboard from './pages/PosLocationDashboard';
+import PosLocationStock from './pages/PosLocationStock';
+import PosLocationPurchases from './pages/PosLocationPurchases';
+import PosLocationHr from './pages/PosLocationHr';
+import PosLocationSchedule from './pages/PosLocationSchedule';
+import PosLocationPayroll from './pages/PosLocationPayroll';
+import PosLocationAccounting from './pages/PosLocationAccounting';
+import PosLocationReports from './pages/PosLocationReports';
+import PosSession from './pages/PosSession';
 import PosTerminalAssignmentsPage from './pages/PosTerminalAssignmentsPage';
 import PosAppShell from './components/pos/PosAppShell';
-import TerminalGuard from './components/pos/TerminalGuard';
+import PosLocationGuard from './components/pos/PosLocationGuard';
 import UserManagementPage from './pages/UserManagementPage';
 import SettingsPage from './pages/SettingsPage';
 import AccessDeniedPage from './pages/AccessDeniedPage';
@@ -249,14 +255,30 @@ const App = () => {
 
           {/* ═══ POS app ═══ */}
           <Route path="/app/pos" element={<EmployeeRoleGuard><PosAppShell /></EmployeeRoleGuard>}>
-            <Route index element={<MyTerminalsPage />} />
-            {/* Admin-only routes — must be before :terminalId to avoid param collision */}
+            <Route index element={<MyPosLocationsPage />} />
+            {/* Admin-only routes — must be before :posLocationId to avoid param collision */}
             <Route path="admin/assignments" element={<PosTerminalAssignmentsPage />} />
             <Route path="admin/terminals" element={<PosListPage />} />
-            <Route path=":terminalId/dashboard" element={<TerminalGuard><PosTerminalDashboard /></TerminalGuard>} />
-            <Route path=":terminalId/detail" element={<TerminalGuard><PosDetailPage /></TerminalGuard>} />
-            <Route path=":terminalId/stock" element={<TerminalGuard><PosStockLookup /></TerminalGuard>} />
-            <Route path=":terminalId/reports" element={<TerminalGuard><PosReportsPage /></TerminalGuard>} />
+            {/* 301-style redirects: old terminal routes → new posLocation routes */}
+            <Route path="terminals" element={<Navigate to="/app/pos/pos-locations" replace />} />
+            <Route path="my-terminals" element={<Navigate to="/app/pos" replace />} />
+            <Route path="pos-locations" element={<MyPosLocationsPage />} />
+            {/* New posLocationId-scoped routes */}
+            <Route path=":posLocationId/dashboard" element={<PosLocationGuard><PosLocationDashboard /></PosLocationGuard>} />
+            <Route path=":posLocationId/session" element={<PosLocationGuard><PosSession /></PosLocationGuard>} />
+            <Route path=":posLocationId/transactions" element={<PosLocationGuard><PosLocationReports /></PosLocationGuard>} />
+            <Route path=":posLocationId/invoices" element={<PosLocationGuard><PosDetailPage /></PosLocationGuard>} />
+            <Route path=":posLocationId/invoices/new" element={<PosLocationGuard><PosDetailPage /></PosLocationGuard>} />
+            <Route path=":posLocationId/invoices/:id" element={<PosLocationGuard><PosDetailPage /></PosLocationGuard>} />
+            <Route path=":posLocationId/stock" element={<PosLocationGuard><PosLocationStock /></PosLocationGuard>} />
+            <Route path=":posLocationId/purchases" element={<PosLocationGuard><PosLocationPurchases /></PosLocationGuard>} />
+            <Route path=":posLocationId/hr" element={<PosLocationGuard><PosLocationHr /></PosLocationGuard>} />
+            <Route path=":posLocationId/schedule" element={<PosLocationGuard><PosLocationSchedule /></PosLocationGuard>} />
+            <Route path=":posLocationId/payroll" element={<PosLocationGuard><PosLocationPayroll /></PosLocationGuard>} />
+            <Route path=":posLocationId/accounting" element={<PosLocationGuard><PosLocationAccounting /></PosLocationGuard>} />
+            <Route path=":posLocationId/reports" element={<PosLocationGuard><PosLocationReports /></PosLocationGuard>} />
+            {/* Backwards compatibility: old :terminalId routes → redirect to posLocationId equivalents */}
+            <Route path=":terminalId/detail" element={<Navigate to="/app/pos" replace />} />
           </Route>
 
           {/* ═══ Admin app ═══ */}
@@ -307,6 +329,9 @@ const App = () => {
           <Route path="/payroll/export" element={<Navigate to="/app/payroll/export" replace />} />
           <Route path="/pos" element={<Navigate to="/app/pos" replace />} />
           <Route path="/pos/:id" element={<Navigate to="/app/pos" replace />} />
+          {/* Legacy terminal routes → redirect to new posLocation routes */}
+          <Route path="/app/pos/terminals" element={<Navigate to="/app/pos/pos-locations" replace />} />
+          <Route path="/app/pos/my-terminals" element={<Navigate to="/app/pos" replace />} />
           <Route path="/admin/users" element={<Navigate to="/app/admin/users" replace />} />
           <Route path="/settings" element={<Navigate to="/app/admin/settings" replace />} />
           <Route path="/stock/*" element={<Navigate to="/app/stock" replace />} />

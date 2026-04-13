@@ -183,7 +183,7 @@ public class AdminUserController {
         List<Map<String, Object>> assignments = posAssignmentRepository.findByUserId(id).stream()
                 .map(a -> Map.<String, Object>of(
                         "id", a.getId(),
-                        "posTerminalId", a.getPosTerminalId(),
+                        "posLocationId", a.getPosLocationId(),
                         "assignedBy", a.getAssignedBy() != null ? a.getAssignedBy().toString() : "",
                         "assignedAt", a.getAssignedAt().toString()
                 ))
@@ -192,7 +192,7 @@ public class AdminUserController {
     }
 
     @PostMapping("/{id}/pos-assignments")
-    @Operation(summary = "Assign a PoS terminal to a user")
+    @Operation(summary = "Assign a PoS location to a user")
     @Transactional
     public ResponseEntity<Map<String, Object>> assignTerminal(
             @PathVariable UUID id,
@@ -200,39 +200,39 @@ public class AdminUserController {
             Authentication authentication) {
         userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User", id.toString()));
-        Long terminalId = body.get("posTerminalId");
-        if (terminalId == null) {
-            throw new IllegalArgumentException("posTerminalId is required");
+        Long posLocationId = body.get("posLocationId") != null ? body.get("posLocationId") : body.get("posTerminalId");
+        if (posLocationId == null) {
+            throw new IllegalArgumentException("posLocationId is required");
         }
-        if (posAssignmentRepository.existsByUserIdAndPosTerminalId(id, terminalId)) {
-            throw new DuplicateResourceException("User already assigned to this terminal");
+        if (posAssignmentRepository.existsByUserIdAndPosLocationId(id, posLocationId)) {
+            throw new DuplicateResourceException("User already assigned to this location");
         }
 
         UUID assignedBy = (UUID) authentication.getPrincipal();
         PosAssignment assignment = PosAssignment.builder()
                 .userId(id)
-                .posTerminalId(terminalId)
+                .posLocationId(posLocationId)
                 .assignedBy(assignedBy)
                 .build();
         posAssignmentRepository.save(assignment);
-        log.info("Admin assigned terminal {} to user {}", terminalId, id);
+        log.info("Admin assigned PoS location {} to user {}", posLocationId, id);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
                 "id", assignment.getId(),
-                "posTerminalId", assignment.getPosTerminalId(),
+                "posLocationId", assignment.getPosLocationId(),
                 "assignedAt", assignment.getAssignedAt().toString()
         ));
     }
 
-    @DeleteMapping("/{userId}/pos-assignments/{terminalId}")
-    @Operation(summary = "Remove a PoS terminal assignment from a user")
+    @DeleteMapping("/{userId}/pos-assignments/{posLocationId}")
+    @Operation(summary = "Remove a PoS location assignment from a user")
     @Transactional
     public ResponseEntity<Map<String, String>> removeTerminalAssignment(
             @PathVariable UUID userId,
-            @PathVariable Long terminalId) {
-        posAssignmentRepository.deleteByUserIdAndPosTerminalId(userId, terminalId);
-        log.info("Admin removed terminal {} assignment from user {}", terminalId, userId);
-        return ResponseEntity.ok(Map.of("message", "Terminal assignment removed"));
+            @PathVariable Long posLocationId) {
+        posAssignmentRepository.deleteByUserIdAndPosLocationId(userId, posLocationId);
+        log.info("Admin removed PoS location {} assignment from user {}", posLocationId, userId);
+        return ResponseEntity.ok(Map.of("message", "PoS location assignment removed"));
     }
 
     // ── Helpers ──

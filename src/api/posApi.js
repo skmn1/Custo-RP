@@ -5,23 +5,61 @@ import { api } from './config';
  * Replaces the in-memory posApi mock from data/pos.js.
  */
 export const posApi = {
-  // ── Terminal-scoped endpoints ──
+  // ── PoS Location endpoints ──
 
-  /** List terminals assigned to the current user. */
-  myTerminals: () => api.get('/pos/my-terminals'),
+  /** List PoS locations assigned to the current user. */
+  myPosLocations: () => api.get('/pos/my-pos-locations'),
 
-  /** Get dashboard KPIs for a terminal. */
-  dashboardKpis: (terminalId) => api.get(`/pos/${terminalId}/dashboard-kpis`),
+  /** @deprecated Use myPosLocations() instead. */
+  myTerminals: () => api.get('/pos/my-pos-locations'),
 
-  /** Get daily sales report for a terminal. */
-  dailySales: (terminalId, date) => {
+  /** Get expanded dashboard KPIs for a PoS location (Sales + Operations + People rows). */
+  dashboardKpis: (posLocationId) => api.get(`/pos/${posLocationId}/dashboard-kpis`),
+
+  /** Get daily sales report for a PoS location. */
+  dailySales: (posLocationId, date) => {
     const qs = date ? `?date=${date}` : '';
-    return api.get(`/pos/${terminalId}/reports/daily-sales${qs}`);
+    return api.get(`/pos/${posLocationId}/reports/daily-sales${qs}`);
   },
 
-  /** Get period summary report for a terminal. */
-  periodSummary: (terminalId, from, to) =>
-    api.get(`/pos/${terminalId}/reports/period-summary?from=${from}&to=${to}`),
+  /** Get period summary report for a PoS location. */
+  periodSummary: (posLocationId, from, to) =>
+    api.get(`/pos/${posLocationId}/reports/period-summary?from=${from}&to=${to}`),
+
+  // ── Scoped sub-domain endpoints ──
+
+  /** Get stock items for a PoS location. */
+  getStock: (posLocationId, search) => {
+    const qs = search ? `?search=${encodeURIComponent(search)}&posLocationId=${posLocationId}` : `?posLocationId=${posLocationId}`;
+    return api.get(`/stock/items${qs}`);
+  },
+
+  /** Get purchase orders for a PoS location. */
+  getPurchases: (posLocationId) => api.get(`/pos/${posLocationId}/purchases`),
+
+  /** Create a purchase order for a PoS location. */
+  createPurchase: (posLocationId, data) => api.post(`/pos/${posLocationId}/purchases`, data),
+
+  /** Get staff list for a PoS location. */
+  getHrStaff: (posLocationId) => api.get(`/pos/${posLocationId}/hr/staff`),
+
+  /** Get schedule for a PoS location. */
+  getSchedule: (posLocationId, from, to) =>
+    api.get(`/pos/${posLocationId}/schedule?from=${from}&to=${to}`),
+
+  /** Get payroll summary for a PoS location. */
+  getPayrollSummary: (posLocationId) => api.get(`/pos/${posLocationId}/payroll/summary`),
+
+  /** Get accounting summary for a PoS location. */
+  getAccountingSummary: (posLocationId) => api.get(`/pos/${posLocationId}/accounting/summary`),
+
+  /** Get staff hours report for a PoS location. */
+  getStaffHoursReport: (posLocationId, from, to) =>
+    api.get(`/pos/${posLocationId}/reports/staff-hours?from=${from}&to=${to}`),
+
+  /** Get stock summary report for a PoS location. */
+  getStockSummaryReport: (posLocationId, from, to) =>
+    api.get(`/pos/${posLocationId}/reports/stock-summary?from=${from}&to=${to}`),
 
   // ── PoS CRUD ──
 
@@ -116,4 +154,8 @@ export const posApi = {
   /** Search stock items (pos_manager read access). */
   searchStock: (search) =>
     api.get(`/stock/items${search ? `?search=${encodeURIComponent(search)}` : ''}`),
+
+  /** List all PoS locations with status — super_admin only. */
+  listAllPosLocations: (includeInactive = false) =>
+    api.get(`/pos${includeInactive ? '?includeInactive=true' : ''}`),
 };

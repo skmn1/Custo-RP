@@ -43,51 +43,163 @@ public class PosController {
     private final EmployeeService employeeService;
     private final IncidentService incidentService;
 
-    // ── Terminal-scoped endpoints ──
+    // ── PoS Location-scoped endpoints ──
 
-    @GetMapping("/my-terminals")
-    @Operation(summary = "List terminals assigned to the current user",
-            description = "Returns PoS terminals the authenticated user has access to. "
-                    + "SUPER_ADMIN sees all active terminals; POS_MANAGER sees only assigned ones.")
-    @ApiResponse(responseCode = "200", description = "User's terminals",
+    @GetMapping("/my-pos-locations")
+    @Operation(summary = "List PoS locations assigned to the current user",
+            description = "Returns PoS locations the authenticated user has access to. "
+                    + "SUPER_ADMIN sees all active locations; POS_MANAGER sees only assigned ones.")
+    @ApiResponse(responseCode = "200", description = "User's PoS locations",
             content = @Content(array = @ArraySchema(schema = @Schema(implementation = PosDto.class))))
-    public ResponseEntity<List<PosDto>> myTerminals(Authentication authentication) {
+    public ResponseEntity<List<PosDto>> myPosLocations(Authentication authentication) {
         UUID userId = UUID.fromString(authentication.getName());
         String role = authentication.getAuthorities().iterator().next()
                 .getAuthority().replace("ROLE_", "");
-        return ResponseEntity.ok(posService.findMyTerminals(userId, role));
+        return ResponseEntity.ok(posService.findMyPosLocations(userId, role));
     }
 
-    @GetMapping("/{terminalId}/dashboard-kpis")
-    @Operation(summary = "Get terminal dashboard KPIs",
-            description = "Returns key performance indicators for a terminal: employee count, open incidents, etc.")
+    /** @deprecated Use GET /my-pos-locations instead. Kept for backwards compatibility. */
+    @GetMapping("/my-terminals")
+    @Operation(summary = "List terminals assigned to the current user (deprecated)",
+            description = "Deprecated — use /my-pos-locations. Returns PoS locations assigned to the user.")
+    public ResponseEntity<List<PosDto>> myTerminals(Authentication authentication) {
+        return myPosLocations(authentication);
+    }
+
+    @GetMapping("/{posLocationId}/dashboard-kpis")
+    @Operation(summary = "Get expanded dashboard KPIs for a PoS location",
+            description = "Returns Sales, Operations and People KPI rows for the PoS location.")
     public ResponseEntity<Map<String, Object>> dashboardKpis(
             Authentication authentication,
-            @PathVariable Long terminalId) {
-        enforceAccess(authentication, terminalId);
-        return ResponseEntity.ok(posService.getTerminalDashboardKpis(terminalId));
+            @PathVariable Long posLocationId) {
+        enforceAccess(authentication, posLocationId);
+        return ResponseEntity.ok(posService.getPosLocationDashboardKpis(posLocationId));
     }
 
-    @GetMapping("/{terminalId}/reports/daily-sales")
-    @Operation(summary = "Get daily sales report for a terminal")
+    @GetMapping("/{posLocationId}/reports/daily-sales")
+    @Operation(summary = "Get daily sales report for a PoS location")
     public ResponseEntity<Map<String, Object>> dailySales(
             Authentication authentication,
-            @PathVariable Long terminalId,
+            @PathVariable Long posLocationId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        enforceAccess(authentication, terminalId);
+        enforceAccess(authentication, posLocationId);
         if (date == null) date = LocalDate.now();
-        return ResponseEntity.ok(posService.getDailySales(terminalId, date));
+        return ResponseEntity.ok(posService.getDailySales(posLocationId, date));
     }
 
-    @GetMapping("/{terminalId}/reports/period-summary")
-    @Operation(summary = "Get period summary report for a terminal")
+    @GetMapping("/{posLocationId}/reports/period-summary")
+    @Operation(summary = "Get period summary report for a PoS location")
     public ResponseEntity<Map<String, Object>> periodSummary(
             Authentication authentication,
-            @PathVariable Long terminalId,
+            @PathVariable Long posLocationId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
-        enforceAccess(authentication, terminalId);
-        return ResponseEntity.ok(posService.getPeriodSummary(terminalId, from, to));
+        enforceAccess(authentication, posLocationId);
+        return ResponseEntity.ok(posService.getPeriodSummary(posLocationId, from, to));
+    }
+
+    @GetMapping("/{posLocationId}/hr/staff")
+    @Operation(summary = "Get staff list for a PoS location")
+    public ResponseEntity<List<EmployeeDto>> hrStaff(
+            Authentication authentication,
+            @PathVariable Long posLocationId) {
+        enforceAccess(authentication, posLocationId);
+        return ResponseEntity.ok(employeeService.findByPosId(posLocationId));
+    }
+
+    @GetMapping("/{posLocationId}/schedule")
+    @Operation(summary = "Get shifts for a PoS location scoped to a date range")
+    public ResponseEntity<Map<String, Object>> schedule(
+            Authentication authentication,
+            @PathVariable Long posLocationId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+        enforceAccess(authentication, posLocationId);
+        return ResponseEntity.ok(Map.of(
+                "posLocationId", posLocationId,
+                "from", from != null ? from.toString() : LocalDate.now().toString(),
+                "to", to != null ? to.toString() : LocalDate.now().plusDays(6).toString(),
+                "shifts", List.of()
+        ));
+    }
+
+    @GetMapping("/{posLocationId}/payroll/summary")
+    @Operation(summary = "Get payroll summary for a PoS location")
+    public ResponseEntity<Map<String, Object>> payrollSummary(
+            Authentication authentication,
+            @PathVariable Long posLocationId) {
+        enforceAccess(authentication, posLocationId);
+        return ResponseEntity.ok(Map.of(
+                "posLocationId", posLocationId,
+                "periodLabel", "Current Period",
+                "status", "open",
+                "employeeCount", employeeService.findByPosId(posLocationId).size(),
+                "totalCost", 0
+        ));
+    }
+
+    @GetMapping("/{posLocationId}/accounting/summary")
+    @Operation(summary = "Get accounting summary for a PoS location")
+    public ResponseEntity<Map<String, Object>> accountingSummary(
+            Authentication authentication,
+            @PathVariable Long posLocationId) {
+        enforceAccess(authentication, posLocationId);
+        return ResponseEntity.ok(Map.of(
+                "posLocationId", posLocationId,
+                "revenue", 0,
+                "expenses", 0
+        ));
+    }
+
+    @GetMapping("/{posLocationId}/purchases")
+    @Operation(summary = "Get purchase orders for a PoS location")
+    public ResponseEntity<List<Map<String, Object>>> purchases(
+            Authentication authentication,
+            @PathVariable Long posLocationId) {
+        enforceAccess(authentication, posLocationId);
+        return ResponseEntity.ok(List.of());
+    }
+
+    @PostMapping("/{posLocationId}/purchases")
+    @Operation(summary = "Create a purchase order for a PoS location")
+    public ResponseEntity<Map<String, Object>> createPurchase(
+            Authentication authentication,
+            @PathVariable Long posLocationId,
+            @RequestBody Map<String, Object> body) {
+        enforceAccess(authentication, posLocationId);
+        return ResponseEntity.status(201).body(Map.of("posLocationId", posLocationId, "status", "created"));
+    }
+
+    @GetMapping("/{posLocationId}/reports/staff-hours")
+    @Operation(summary = "Get staff hours report for a PoS location")
+    public ResponseEntity<Map<String, Object>> staffHoursReport(
+            Authentication authentication,
+            @PathVariable Long posLocationId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+        enforceAccess(authentication, posLocationId);
+        return ResponseEntity.ok(Map.of(
+                "posLocationId", posLocationId,
+                "from", from != null ? from.toString() : "",
+                "to", to != null ? to.toString() : "",
+                "rows", List.of()
+        ));
+    }
+
+    @GetMapping("/{posLocationId}/reports/stock-summary")
+    @Operation(summary = "Get stock summary report for a PoS location")
+    public ResponseEntity<Map<String, Object>> stockSummaryReport(
+            Authentication authentication,
+            @PathVariable Long posLocationId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+        enforceAccess(authentication, posLocationId);
+        return ResponseEntity.ok(Map.of(
+                "posLocationId", posLocationId,
+                "from", from != null ? from.toString() : "",
+                "to", to != null ? to.toString() : "",
+                "rows", List.of()
+        ));
     }
 
     // ── PoS CRUD ──
@@ -373,10 +485,10 @@ public class PosController {
 
     // ── Helpers ──
 
-    private void enforceAccess(Authentication authentication, Long terminalId) {
+    private void enforceAccess(Authentication authentication, Long posLocationId) {
         UUID userId = UUID.fromString(authentication.getName());
         String role = authentication.getAuthorities().iterator().next()
                 .getAuthority().replace("ROLE_", "");
-        posService.enforceTerminalAccess(userId, role, terminalId);
+        posService.enforcePosLocationAccess(userId, role, posLocationId);
     }
 }

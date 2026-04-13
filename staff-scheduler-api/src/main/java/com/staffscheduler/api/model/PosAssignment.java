@@ -8,8 +8,8 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "pos_assignments", uniqueConstraints = {
-    @UniqueConstraint(name = "uq_pos_assignments_user_terminal",
-                      columnNames = {"user_id", "pos_terminal_id"})
+    @UniqueConstraint(name = "uq_pos_assignments_user_location",
+                      columnNames = {"user_id", "pos_location_id"})
 })
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class PosAssignment {
@@ -21,8 +21,8 @@ public class PosAssignment {
     @Column(name = "user_id", nullable = false)
     private UUID userId;
 
-    @Column(name = "pos_terminal_id", nullable = false)
-    private Long posTerminalId;
+    @Column(name = "pos_location_id", nullable = false)
+    private Long posLocationId;
 
     @Column(name = "assigned_by")
     private UUID assignedBy;

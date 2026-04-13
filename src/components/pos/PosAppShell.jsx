@@ -6,20 +6,21 @@ import { getAppColor } from '../../apps/colors';
 import GlobalTopBar from '../shell/GlobalTopBar';
 import AppSidebar from '../shell/AppSidebar';
 import AppGuard from '../shell/AppGuard';
-import TerminalSelector from './TerminalSelector';
-import { PosTerminalProvider } from '../../hooks/usePosTerminal';
+import PosLocationSelector from './PosLocationSelector';
+import { PosLocationProvider } from '../../hooks/usePosLocation';
 import { useAuth } from '../../hooks/useAuth';
 
 const SIDEBAR_KEY = 'app-sidebar-collapsed';
 
 /**
  * Custom app shell for the PoS app.
- * Wraps content in PosTerminalProvider and injects TerminalSelector into the sidebar.
+ * Wraps content in PosLocationProvider and injects PosLocationSelector into the sidebar.
+ * Provides a grouped sidebar: Sales, Operations, People, Finance.
  */
 const PosAppShell = () => {
   const app = getAppById('pos');
   const appColor = app ? getAppColor(app.color) : null;
-  const { terminalId } = useParams();
+  const { posLocationId } = useParams();
   const { user } = useAuth();
   const isSuperAdmin = user?.role === 'super_admin';
 
@@ -52,21 +53,55 @@ const PosAppShell = () => {
 
   useEffect(() => {
     setMobileSidebarOpen(false);
-  }, [terminalId]);
+  }, [posLocationId]);
 
-  // Dynamic sidebar items scoped to the current terminal and role
+  // Dynamic sidebar items scoped to the selected PoS location and role
   const sidebarItems = useMemo(() => {
-    const terminalLabel = isSuperAdmin ? 'pos:sidebar.allTerminals' : 'pos:sidebar.myTerminals';
+    const locationsLabel = isSuperAdmin
+      ? 'pos:nav.allLocations'
+      : 'pos:myLocations';
+
     const items = [
-      { label: terminalLabel, icon: 'ShoppingCartIcon', to: '/app/pos' },
+      { label: locationsLabel, icon: 'ShoppingCartIcon', to: '/app/pos' },
     ];
 
-    if (terminalId) {
+    if (posLocationId) {
       items.push(
-        { label: 'pos:sidebar.dashboard', icon: 'Squares2X2Icon', to: `/app/pos/${terminalId}/dashboard` },
-        { label: 'pos:sidebar.terminal', icon: 'BuildingStorefrontIcon', to: `/app/pos/${terminalId}/detail` },
-        { label: 'pos:sidebar.stockLookup', icon: 'ArchiveBoxIcon', to: `/app/pos/${terminalId}/stock` },
-        { label: 'pos:sidebar.reports', icon: 'ChartBarIcon', to: `/app/pos/${terminalId}/reports` },
+        { label: 'pos:nav.dashboard', icon: 'Squares2X2Icon', to: `/app/pos/${posLocationId}/dashboard` },
+        {
+          label: 'pos:nav.group.sales',
+          icon: 'CurrencyDollarIcon',
+          children: [
+            { label: 'pos:nav.session',      icon: 'PlayCircleIcon',     to: `/app/pos/${posLocationId}/session` },
+            { label: 'pos:nav.transactions', icon: 'ListBulletIcon',     to: `/app/pos/${posLocationId}/transactions` },
+            { label: 'pos:nav.invoices',     icon: 'ReceiptPercentIcon', to: `/app/pos/${posLocationId}/invoices` },
+          ],
+        },
+        {
+          label: 'pos:nav.group.operations',
+          icon: 'ArchiveBoxIcon',
+          children: [
+            { label: 'pos:nav.stock',     icon: 'ArchiveBoxIcon', to: `/app/pos/${posLocationId}/stock` },
+            { label: 'pos:nav.purchases', icon: 'TruckIcon',      to: `/app/pos/${posLocationId}/purchases` },
+          ],
+        },
+        {
+          label: 'pos:nav.group.people',
+          icon: 'UsersIcon',
+          children: [
+            { label: 'pos:nav.hr',       icon: 'UsersIcon',     to: `/app/pos/${posLocationId}/hr` },
+            { label: 'pos:nav.schedule', icon: 'CalendarIcon',  to: `/app/pos/${posLocationId}/schedule` },
+            { label: 'pos:nav.payroll',  icon: 'BanknotesIcon', to: `/app/pos/${posLocationId}/payroll` },
+          ],
+        },
+        {
+          label: 'pos:nav.group.finance',
+          icon: 'CalculatorIcon',
+          children: [
+            { label: 'pos:nav.accounting', icon: 'CalculatorIcon', to: `/app/pos/${posLocationId}/accounting` },
+            { label: 'pos:nav.reports',    icon: 'ChartBarIcon',   to: `/app/pos/${posLocationId}/reports` },
+          ],
+        },
       );
     }
 
@@ -77,11 +112,11 @@ const PosAppShell = () => {
     }
 
     return items;
-  }, [terminalId, isSuperAdmin]);
+  }, [posLocationId, isSuperAdmin]);
 
   return (
     <AppGuard appId="pos">
-      <PosTerminalProvider>
+      <PosLocationProvider>
         <BreadcrumbProvider>
           <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
             <GlobalTopBar
@@ -96,7 +131,7 @@ const PosAppShell = () => {
                 items={sidebarItems}
                 collapsed={sidebarCollapsed}
                 onToggle={toggleSidebar}
-                headerSlot={<TerminalSelector collapsed={sidebarCollapsed} />}
+                headerSlot={<PosLocationSelector collapsed={sidebarCollapsed} />}
               />
             </div>
 
@@ -114,7 +149,7 @@ const PosAppShell = () => {
                   collapsed={false}
                   onToggle={() => setMobileSidebarOpen(false)}
                   mobile
-                  headerSlot={<TerminalSelector collapsed={false} />}
+                  headerSlot={<PosLocationSelector collapsed={false} />}
                 />
               </>
             )}
@@ -131,7 +166,7 @@ const PosAppShell = () => {
             </main>
           </div>
         </BreadcrumbProvider>
-      </PosTerminalProvider>
+      </PosLocationProvider>
     </AppGuard>
   );
 };

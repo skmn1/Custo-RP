@@ -49,7 +49,7 @@ public class AppAccessService {
      * Check if a user is assigned to a specific PoS terminal.
      */
     public boolean hasTerminalAccess(UUID userId, Long terminalId) {
-        return posAssignmentRepository.existsByUserIdAndPosTerminalId(userId, terminalId);
+        return posAssignmentRepository.existsByUserIdAndPosLocationId(userId, terminalId);
     }
 
     private boolean meetsLevel(String actual, String required) {

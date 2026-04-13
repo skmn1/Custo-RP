@@ -12,9 +12,9 @@ public interface PosAssignmentRepository extends JpaRepository<PosAssignment, UU
 
     List<PosAssignment> findByUserId(UUID userId);
 
-    List<PosAssignment> findByPosTerminalId(Long posTerminalId);
+    List<PosAssignment> findByPosLocationId(Long posLocationId);
 
-    boolean existsByUserIdAndPosTerminalId(UUID userId, Long posTerminalId);
+    boolean existsByUserIdAndPosLocationId(UUID userId, Long posLocationId);
 
-    void deleteByUserIdAndPosTerminalId(UUID userId, Long posTerminalId);
+    void deleteByUserIdAndPosLocationId(UUID userId, Long posLocationId);
 }
