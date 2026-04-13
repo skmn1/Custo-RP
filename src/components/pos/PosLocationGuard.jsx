@@ -1,7 +1,5 @@
 import React from 'react';
 import { Navigate, useParams } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { toast } from 'react-hot-toast';
 import { usePosLocation } from '../../hooks/usePosLocation';
 
 /**
@@ -12,7 +10,6 @@ import { usePosLocation } from '../../hooks/usePosLocation';
 const PosLocationGuard = ({ children }) => {
   const { posLocationId } = useParams();
   const { hasAccess, isLoading } = usePosLocation();
-  const { t } = useTranslation(['pos']);
 
   if (isLoading) {
     return (
@@ -23,7 +20,6 @@ const PosLocationGuard = ({ children }) => {
   }
 
   if (!hasAccess(posLocationId)) {
-    toast.error(t('pos:notAssignedToLocation'));
     return <Navigate to="/app/pos" replace />;
   }
 
