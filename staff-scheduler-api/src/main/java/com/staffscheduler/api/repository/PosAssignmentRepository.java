@@ -2,9 +2,11 @@ package com.staffscheduler.api.repository;
 
 import com.staffscheduler.api.model.PosAssignment;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -28,9 +30,13 @@ public interface PosAssignmentRepository extends JpaRepository<PosAssignment, UU
     @Query("SELECT CASE WHEN COUNT(p) > 0 THEN true ELSE false END FROM PosAssignment p WHERE p.userId = :userId AND p.posTerminalId = :terminalId")
     boolean existsByUserIdAndPosTerminalId(@Param("userId") UUID userId, @Param("terminalId") Long terminalId);
 
+    @Modifying
+    @Transactional
     @Query("DELETE FROM PosAssignment p WHERE p.userId = :userId AND p.posTerminalId = :posLocationId")
     void deleteByUserIdAndPosLocationId(@Param("userId") UUID userId, @Param("posLocationId") Long posLocationId);
 
+    @Modifying
+    @Transactional
     @Query("DELETE FROM PosAssignment p WHERE p.userId = :userId AND p.posTerminalId = :terminalId")
     void deleteByUserIdAndPosTerminalId(@Param("userId") UUID userId, @Param("terminalId") Long terminalId);
 }

@@ -50,7 +50,7 @@ const PosTerminalDashboard = () => {
     setIsLoading(true);
     posApi
       .dashboardKpis(terminalId)
-      .then(({ data }) => {
+      .then((data) => {
         if (!cancelled) setKpis(data);
       })
       .catch(() => {

@@ -15,7 +15,7 @@ const PosSession = () => {
     setIsLoading(true);
     posApi
       .dashboardKpis(posLocationId)
-      .then(({ data }) => { if (!cancelled) setKpis(data); })
+      .then((data) => { if (!cancelled) setKpis(data); })
       .catch(() => { if (!cancelled) setKpis(null); })
       .finally(() => { if (!cancelled) setIsLoading(false); });
     return () => { cancelled = true; };

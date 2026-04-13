@@ -67,7 +67,7 @@ const PosLocationDashboard = () => {
     setIsLoading(true);
     posApi
       .dashboardKpis(posLocationId)
-      .then(({ data }) => {
+      .then((data) => {
         if (!cancelled) setKpis(data);
       })
       .catch(() => {
