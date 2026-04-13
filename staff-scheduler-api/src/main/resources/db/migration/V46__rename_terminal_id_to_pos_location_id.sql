@@ -7,6 +7,10 @@
 ALTER TABLE pos_assignments
     RENAME COLUMN pos_terminal_id TO pos_location_id;
 
+-- Ensure NOT NULL constraint on the renamed column
+ALTER TABLE pos_assignments
+    ALTER COLUMN pos_location_id SET NOT NULL;
+
 -- Drop old unique constraint and recreate with the new column name
 ALTER TABLE pos_assignments
     DROP CONSTRAINT IF EXISTS uq_pos_assignments_user_terminal;
