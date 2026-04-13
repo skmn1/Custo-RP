@@ -52,8 +52,8 @@ const DETAIL_TABS = ['overview', 'identity', 'google', 'incidents', 'history'];
 
 const PosDetailPage = () => {
   const { t } = useTranslation(['pos', 'common']);
-  const { id, terminalId } = useParams();
-  const posId = terminalId || id;
+  const { id, terminalId, posLocationId } = useParams();
+  const posId = posLocationId || terminalId || id;
   const navigate = useNavigate();
   const {
     selectedPos,
