@@ -1,16 +1,15 @@
 import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ShoppingCartIcon, MapPinIcon, PhoneIcon, UserIcon, UsersIcon, StarIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
-import { StarIcon as StarSolid } from '@heroicons/react/24/solid';
+import { ShoppingCartIcon, MapPinIcon, UsersIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import { usePosLocation } from '../hooks/usePosLocation';
 import { useAuth } from '../hooks/useAuth';
 
-const TYPE_COLORS = {
-  BUTCHER:    { bg: 'bg-red-50 dark:bg-red-900/20',    text: 'text-red-700 dark:text-red-300',    dot: 'bg-red-400' },
-  GROCERY:    { bg: 'bg-green-50 dark:bg-green-900/20', text: 'text-green-700 dark:text-green-300', dot: 'bg-green-400' },
-  FAST_FOOD:  { bg: 'bg-orange-50 dark:bg-orange-900/20', text: 'text-orange-700 dark:text-orange-300', dot: 'bg-orange-400' },
-  MIXED:      { bg: 'bg-purple-50 dark:bg-purple-900/20', text: 'text-purple-700 dark:text-purple-300', dot: 'bg-purple-400' },
+const TYPE_BADGE = {
+  BUTCHER:   'bg-red-100 text-red-700 border-red-200',
+  GROCERY:   'bg-green-100 text-green-700 border-green-200',
+  FAST_FOOD: 'bg-orange-100 text-orange-700 border-orange-200',
+  MIXED:     'bg-purple-100 text-purple-700 border-purple-200',
 };
 const TYPE_KEY_MAP = { BUTCHER: 'butcher', GROCERY: 'grocery', FAST_FOOD: 'fastFood', MIXED: 'mixed' };
 
@@ -18,18 +17,24 @@ const StarRatingMini = ({ rating, reviewCount }) => {
   const full = Math.floor(rating);
   const half = rating - full >= 0.5;
   return (
-    <span className="inline-flex items-center gap-1">
-      {[1, 2, 3, 4, 5].map((i) => (
-        <StarSolid
-          key={i}
-          className={`w-3.5 h-3.5 ${i <= full ? 'text-yellow-400' : i === full + 1 && half ? 'text-yellow-300' : 'text-gray-200 dark:text-gray-600'}`}
-        />
-      ))}
-      <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 ml-0.5">{rating.toFixed(1)}</span>
+    <div className="flex items-center gap-1.5">
+      <div className="flex items-center gap-0.5">
+        {[1, 2, 3, 4, 5].map((i) => (
+          <svg
+            key={i}
+            className={`w-3.5 h-3.5 ${i <= full ? 'text-yellow-400' : i === full + 1 && half ? 'text-yellow-300' : 'text-gray-300 dark:text-gray-600'}`}
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+          </svg>
+        ))}
+      </div>
+      <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{rating.toFixed(1)}</span>
       {reviewCount != null && (
         <span className="text-xs text-gray-400 dark:text-gray-500">({reviewCount})</span>
       )}
-    </span>
+    </div>
   );
 };
 
@@ -103,74 +108,116 @@ const MyPosLocationsPage = () => {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {posLocations.map((location) => {
-          const tc = TYPE_COLORS[location.type] || TYPE_COLORS.MIXED;
           const hasIncidents = location.openIncidentsCount > 0;
+          const badgeColor = TYPE_BADGE[location.type] || TYPE_BADGE.MIXED;
+
           return (
-            <button
+            <div
               key={location.id}
               onClick={() => navigate(`/app/pos/${location.id}/dashboard`)}
-              className="group text-left bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-0 hover:border-teal-300 dark:hover:border-teal-600 hover:shadow-lg transition-all overflow-hidden"
+              className={`bg-white dark:bg-gray-900 rounded-xl shadow-sm hover:shadow-md border border-gray-100 dark:border-gray-800 overflow-hidden flex flex-col cursor-pointer transition-all duration-300 hover:scale-[1.02] ${
+                location.isActive === false ? 'opacity-60' : ''
+              }`}
             >
-              {/* Coloured top strip */}
-              <div className={`h-1.5 w-full ${tc.dot}`} />
+              {/* Image / Thumbnail Section */}
+              <div className="relative h-40 bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
+                <svg className="w-16 h-16 text-gray-400 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 22V12h6v10" />
+                </svg>
 
-              <div className="p-5">
-                {/* Header row: type badge + incidents badge */}
-                <div className="flex items-center justify-between mb-3">
-                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${tc.bg} ${tc.text}`}>
+                {/* Rating Pill — top right */}
+                {location.googleRating != null && (
+                  <div className="absolute top-3 right-3 bg-white dark:bg-gray-800 rounded-full px-2.5 py-1 shadow-md border border-gray-100 dark:border-gray-700 flex items-center gap-1.5">
+                    <svg className="w-3.5 h-3.5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                    <span className="text-sm font-bold text-gray-900 dark:text-gray-100">{location.googleRating.toFixed(1)}</span>
+                  </div>
+                )}
+
+                {/* Category Badge — bottom left */}
+                <div className="absolute bottom-3 left-3 flex items-center gap-2">
+                  <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border ${badgeColor}`}>
                     {t(`pos:type.${TYPE_KEY_MAP[location.type] || location.type?.toLowerCase()}`)}
                   </span>
                   {hasIncidents && (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800">
+                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800">
                       <ExclamationTriangleIcon className="w-3 h-3" />
                       {location.openIncidentsCount}
                     </span>
                   )}
                 </div>
 
-                {/* Name */}
-                <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 truncate mb-3 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+                {/* Inactive overlay */}
+                {location.isActive === false && (
+                  <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                    <span className="text-white text-xs font-semibold px-3 py-1 bg-black/50 rounded-full">
+                      {t('pos:status.inactive')}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Card Body */}
+              <div className="p-5 flex flex-col flex-1">
+                {/* Title */}
+                <h3 className="text-base font-bold text-gray-900 dark:text-gray-50 mb-2 line-clamp-2">
                   {location.name}
                 </h3>
 
-                {/* Info lines */}
-                <div className="space-y-1.5 text-sm text-gray-500 dark:text-gray-400">
-                  {location.address && (
-                    <div className="flex items-center gap-2">
-                      <MapPinIcon className="w-4 h-4 shrink-0 text-gray-400" />
-                      <span className="truncate">{location.address}</span>
-                    </div>
-                  )}
-                  {location.phone && (
-                    <div className="flex items-center gap-2">
-                      <PhoneIcon className="w-4 h-4 shrink-0 text-gray-400" />
-                      <span>{location.phone}</span>
-                    </div>
-                  )}
-                  {location.managerName && (
-                    <div className="flex items-center gap-2">
-                      <UserIcon className="w-4 h-4 shrink-0 text-gray-400" />
-                      <span className="truncate">{location.managerName}</span>
-                    </div>
-                  )}
-                </div>
+                {/* Address */}
+                {location.address && (
+                  <p className="text-xs text-gray-500 dark:text-gray-400 flex items-start gap-2 mb-4 leading-relaxed">
+                    <MapPinIcon className="w-4 h-4 text-gray-400 dark:text-gray-500 shrink-0 mt-0.5" />
+                    <span>{location.address}</span>
+                  </p>
+                )}
 
-                {/* Footer: rating + CTA */}
-                <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
-                  {location.googleRating != null ? (
-                    <StarRatingMini rating={location.googleRating} reviewCount={location.googleReviewCount} />
-                  ) : (
-                    <span className="text-xs text-gray-300 dark:text-gray-600 flex items-center gap-1">
-                      <StarIcon className="w-3.5 h-3.5" />
-                      {t('pos:locationCard.noRating', 'No rating yet')}
-                    </span>
-                  )}
-                  <span className="text-sm font-medium text-teal-600 dark:text-teal-400 group-hover:text-teal-700 dark:group-hover:text-teal-300">
-                    {t('pos:locationCard.openButton')} →
-                  </span>
+                {/* Two-column info grid */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <p className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-1">
+                      {t('pos:card.managerLabel')}
+                    </p>
+                    <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
+                      {location.managerName || t('pos:detail.unassigned')}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-1">
+                      {t('pos:card.phoneLabel', 'Phone')}
+                    </p>
+                    <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
+                      {location.phone || '—'}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </button>
+
+              {/* Divider */}
+              <div className="border-t border-gray-100 dark:border-gray-800" />
+
+              {/* Footer */}
+              <div className="px-5 py-4 flex items-center justify-between">
+                {/* Rating or placeholder */}
+                {location.googleRating != null ? (
+                  <StarRatingMini rating={location.googleRating} reviewCount={location.googleReviewCount} />
+                ) : (
+                  <span className="text-xs text-gray-300 dark:text-gray-600">
+                    {t('pos:locationCard.noRating', 'No rating yet')}
+                  </span>
+                )}
+
+                {/* Ghost-pill CTA */}
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs font-medium transition-colors">
+                  {t('pos:locationCard.openButton', 'Open')}
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" />
+                  </svg>
+                </span>
+              </div>
+            </div>
           );
         })}
       </div>
