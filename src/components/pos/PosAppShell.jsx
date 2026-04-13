@@ -58,8 +58,8 @@ const PosAppShell = () => {
   // Dynamic sidebar items scoped to the selected PoS location and role
   const sidebarItems = useMemo(() => {
     const locationsLabel = isSuperAdmin
-      ? 'pos:nav.allLocations'
-      : 'pos:nav.myLocations';
+      ? 'pos:sidebar.allTerminals'
+      : 'pos:sidebar.myTerminals';
 
     const items = [
       { label: locationsLabel, icon: 'ShoppingCartIcon', to: '/app/pos' },
@@ -67,9 +67,10 @@ const PosAppShell = () => {
 
     if (posLocationId) {
       items.push(
-        { label: 'pos:nav.dashboard', icon: 'Squares2X2Icon', to: `/app/pos/${posLocationId}/dashboard` },
-        { label: 'pos:nav.stock', icon: 'ArchiveBoxIcon', to: `/app/pos/${posLocationId}/stock` },
-        { label: 'pos:nav.reports', icon: 'ChartBarIcon', to: `/app/pos/${posLocationId}/reports` },
+        { label: 'pos:sidebar.dashboard', icon: 'Squares2X2Icon', to: `/app/pos/${posLocationId}/dashboard` },
+        { label: 'pos:sidebar.terminal', icon: 'BuildingStorefrontIcon', to: `/app/pos/${posLocationId}/detail` },
+        { label: 'pos:sidebar.stockLookup', icon: 'ArchiveBoxIcon', to: `/app/pos/${posLocationId}/stock` },
+        { label: 'pos:sidebar.reports', icon: 'ChartBarIcon', to: `/app/pos/${posLocationId}/reports` },
       );
     }
 
