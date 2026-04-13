@@ -296,6 +296,7 @@
   "locationCard.noSession": "No active session",
   "locationCard.salesToday": "Sales today",
   "locationCard.openButton": "Open",
+  "locationCard.noRating": "No rating yet",
   "myLocations.title": "My Locations",
   "myLocations.subtitle": "Select a PoS location to manage",
   "myLocations.titleAdmin": "All Locations",

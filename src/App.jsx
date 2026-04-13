@@ -266,6 +266,10 @@ const App = () => {
             {/* New posLocationId-scoped routes */}
             <Route path=":posLocationId/dashboard" element={<PosLocationGuard><PosLocationDashboard /></PosLocationGuard>} />
             <Route path=":posLocationId/detail" element={<PosLocationGuard><PosDetailPage /></PosLocationGuard>} />
+            <Route path=":posLocationId/detail/identity" element={<PosLocationGuard><PosDetailPage /></PosLocationGuard>} />
+            <Route path=":posLocationId/detail/google" element={<PosLocationGuard><PosDetailPage /></PosLocationGuard>} />
+            <Route path=":posLocationId/detail/incidents" element={<PosLocationGuard><PosDetailPage /></PosLocationGuard>} />
+            <Route path=":posLocationId/detail/history" element={<PosLocationGuard><PosDetailPage /></PosLocationGuard>} />
             <Route path=":posLocationId/session" element={<PosLocationGuard><PosSession /></PosLocationGuard>} />
             <Route path=":posLocationId/transactions" element={<PosLocationGuard><PosLocationReports /></PosLocationGuard>} />
             <Route path=":posLocationId/invoices" element={<PosLocationGuard><PosDetailPage /></PosLocationGuard>} />

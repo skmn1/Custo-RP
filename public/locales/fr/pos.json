@@ -296,6 +296,7 @@
   "locationCard.noSession": "Aucune session active",
   "locationCard.salesToday": "Ventes aujourd'hui",
   "locationCard.openButton": "Ouvrir",
+  "locationCard.noRating": "Pas encore noté",
   "myLocations.title": "Mes points de vente",
   "myLocations.subtitle": "Sélectionnez un point de vente à gérer",
   "myLocations.titleAdmin": "Tous les points de vente",

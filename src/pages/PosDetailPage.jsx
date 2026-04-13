@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import PosDashboard from '../components/pos/PosDashboard';
 import PosEmployeeList from '../components/pos/PosEmployeeList';
@@ -48,13 +48,29 @@ const STATUS_COLORS = {
   closed: 'bg-gray-100 text-gray-600',
 };
 
-const DETAIL_TABS = ['overview', 'identity', 'google', 'incidents', 'history'];
+const DETAIL_TABS = [
+  { id: 'overview',  icon: '🏠', path: '' },
+  { id: 'identity',  icon: '🏢', path: '/identity' },
+  { id: 'google',    icon: '⭐', path: '/google' },
+  { id: 'incidents', icon: '⚠️', path: '/incidents' },
+  { id: 'history',   icon: '🕒', path: '/history' },
+];
 
 const PosDetailPage = () => {
   const { t } = useTranslation(['pos', 'common']);
   const { id, terminalId, posLocationId } = useParams();
   const posId = posLocationId || terminalId || id;
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+
+  // Derive active tab from URL path segment
+  const activeTab = (() => {
+    if (pathname.endsWith('/identity')) return 'identity';
+    if (pathname.endsWith('/google')) return 'google';
+    if (pathname.endsWith('/incidents')) return 'incidents';
+    if (pathname.endsWith('/history')) return 'history';
+    return 'overview';
+  })();
   const {
     selectedPos,
     managers,
@@ -80,7 +96,6 @@ const PosDetailPage = () => {
 
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
-  const [activeTab, setActiveTab] = useState('overview');
 
   // Identity edit state
   const [editingIdentity, setEditingIdentity] = useState(false);
@@ -319,21 +334,25 @@ const PosDetailPage = () => {
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-gray-200 mb-6">
-        <nav className="flex gap-6">
-          {DETAIL_TABS.map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`pb-3 text-sm font-medium border-b-2 transition-colors ${
-                activeTab === tab
-                  ? 'border-indigo-600 text-indigo-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              {t(`pos:detail.tab.${tab}`)}
-            </button>
-          ))}
+      <div className="border-b border-gray-200 dark:border-gray-700 mb-6 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8">
+        <nav className="flex gap-1 overflow-x-auto scrollbar-none">
+          {DETAIL_TABS.map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => navigate(`/app/pos/${posId}/detail${tab.path}`)}
+                className={`inline-flex items-center gap-1.5 px-4 py-3 text-sm font-medium border-b-2 whitespace-nowrap transition-colors ${
+                  isActive
+                    ? 'border-teal-600 text-teal-600 dark:text-teal-400'
+                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300'
+                }`}
+              >
+                <span>{tab.icon}</span>
+                {t(`pos:detail.tab.${tab.id}`)}
+              </button>
+            );
+          })}
         </nav>
       </div>
 
@@ -426,9 +445,12 @@ const PosDetailPage = () => {
 
       {/* ═══ Identity & Fiscal Tab ═══ */}
       {activeTab === 'identity' && (
-        <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">{t('pos:profile.identity')}</h2>
+        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between bg-gray-50 dark:bg-gray-800/50">
+            <div>
+              <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">{t('pos:profile.identity')}</h2>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Legal and fiscal information</p>
+            </div>
             {!editingIdentity ? (
               <Button variant="secondary" size="sm" onClick={() => setEditingIdentity(true)}>
                 {t('pos:btn.edit')}
@@ -444,154 +466,184 @@ const PosDetailPage = () => {
               </div>
             )}
           </div>
-
-          {editingIdentity ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {[
-                { key: 'legalName', label: t('pos:profile.field.legalName') },
-                { key: 'siret', label: t('pos:profile.field.siret') },
-                { key: 'vatNumber', label: t('pos:profile.field.vatNumber') },
-                { key: 'nafCode', label: t('pos:profile.field.nafCode') },
-                { key: 'addressLine1', label: t('pos:profile.field.addressLine1') },
-                { key: 'addressLine2', label: t('pos:profile.field.addressLine2') },
-                { key: 'city', label: t('pos:profile.field.city') },
-                { key: 'postalCode', label: t('pos:profile.field.postalCode') },
-                { key: 'country', label: t('pos:profile.field.country') },
-                { key: 'phone', label: t('pos:profile.field.phone') },
-                { key: 'launchedAt', label: t('pos:profile.field.launchedAt'), type: 'date' },
-              ].map(({ key, label, type }) => (
-                <div key={key}>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">{label}</label>
-                  <input
-                    type={type || 'text'}
-                    value={identityForm[key] || ''}
-                    onChange={(e) => setIdentityForm((prev) => ({ ...prev, [key]: e.target.value }))}
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                  />
-                </div>
-              ))}
-            </div>
-          ) : (
-            <dl className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {[
-                ['legalName', profile?.legalName],
-                ['siret', profile?.siret],
-                ['vatNumber', profile?.vatNumber],
-                ['nafCode', profile?.nafCode],
-                ['addressLine1', profile?.addressLine1],
-                ['addressLine2', profile?.addressLine2],
-                ['city', profile?.city],
-                ['postalCode', profile?.postalCode],
-                ['country', profile?.country],
-                ['phone', profile?.phone],
-                ['launchedAt', profile?.launchedAt],
-              ].map(([key, val]) => (
-                <div key={key}>
-                  <dt className="text-xs font-medium text-gray-500">{t(`pos:profile.field.${key}`)}</dt>
-                  <dd className="text-sm text-gray-900 mt-0.5">{val || '—'}</dd>
-                </div>
-              ))}
-            </dl>
-          )}
+          <div className="p-6">
+            {editingIdentity ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {[
+                  { key: 'legalName', label: t('pos:profile.field.legalName') },
+                  { key: 'siret', label: t('pos:profile.field.siret') },
+                  { key: 'vatNumber', label: t('pos:profile.field.vatNumber') },
+                  { key: 'nafCode', label: t('pos:profile.field.nafCode') },
+                  { key: 'addressLine1', label: t('pos:profile.field.addressLine1') },
+                  { key: 'addressLine2', label: t('pos:profile.field.addressLine2') },
+                  { key: 'city', label: t('pos:profile.field.city') },
+                  { key: 'postalCode', label: t('pos:profile.field.postalCode') },
+                  { key: 'country', label: t('pos:profile.field.country') },
+                  { key: 'phone', label: t('pos:profile.field.phone') },
+                  { key: 'launchedAt', label: t('pos:profile.field.launchedAt'), type: 'date' },
+                ].map(({ key, label, type }) => (
+                  <div key={key}>
+                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{label}</label>
+                    <input
+                      type={type || 'text'}
+                      value={identityForm[key] || ''}
+                      onChange={(e) => setIdentityForm((prev) => ({ ...prev, [key]: e.target.value }))}
+                      className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-teal-500 focus:border-transparent focus:outline-none"
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-0 divide-y md:divide-y-0 md:divide-x divide-gray-100 dark:divide-gray-800">
+                <dl className="space-y-4 md:pr-8">
+                  {[
+                    ['legalName', profile?.legalName],
+                    ['siret', profile?.siret],
+                    ['vatNumber', profile?.vatNumber],
+                    ['nafCode', profile?.nafCode],
+                    ['launchedAt', profile?.launchedAt],
+                  ].map(([key, val]) => (
+                    <div key={key} className="flex flex-col gap-0.5">
+                      <dt className="text-xs font-medium uppercase tracking-wide text-gray-400 dark:text-gray-500">{t(`pos:profile.field.${key}`)}</dt>
+                      <dd className="text-sm font-medium text-gray-900 dark:text-gray-100">{val || <span className="text-gray-300 dark:text-gray-600 font-normal">—</span>}</dd>
+                    </div>
+                  ))}
+                </dl>
+                <dl className="space-y-4 pt-4 md:pt-0 md:pl-8">
+                  {[
+                    ['addressLine1', profile?.addressLine1],
+                    ['addressLine2', profile?.addressLine2],
+                    ['city', profile?.city],
+                    ['postalCode', profile?.postalCode],
+                    ['country', profile?.country],
+                    ['phone', profile?.phone],
+                  ].map(([key, val]) => (
+                    <div key={key} className="flex flex-col gap-0.5">
+                      <dt className="text-xs font-medium uppercase tracking-wide text-gray-400 dark:text-gray-500">{t(`pos:profile.field.${key}`)}</dt>
+                      <dd className="text-sm font-medium text-gray-900 dark:text-gray-100">{val || <span className="text-gray-300 dark:text-gray-600 font-normal">—</span>}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
       {/* ═══ Google Reviews Tab ═══ */}
       {activeTab === 'google' && (
-        <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">{t('pos:profile.googleReviews')}</h2>
-            {!editingGoogle ? (
-              <Button variant="secondary" size="sm" onClick={() => setEditingGoogle(true)}>
-                {t('pos:btn.edit')}
-              </Button>
-            ) : (
-              <div className="flex gap-2">
-                <Button variant="secondary" size="sm" onClick={() => setEditingGoogle(false)}>
-                  {t('common:actions.cancel')}
-                </Button>
-                <Button variant="primary" size="sm" onClick={handleSaveGoogle}>
-                  {t('common:actions.save')}
-                </Button>
+        <div className="space-y-6">
+          {/* Rating hero card */}
+          {profile?.googleRating != null && (
+            <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 flex flex-col sm:flex-row sm:items-center gap-6">
+              <div className="text-center sm:text-left">
+                <p className="text-5xl font-bold text-gray-900 dark:text-gray-100">{profile.googleRating.toFixed(1)}</p>
+                <StarRating rating={profile.googleRating} size="w-5 h-5" />
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  {profile.googleReviewCount || 0} {t('pos:profile.reviews')}
+                </p>
               </div>
-            )}
-          </div>
-
-          {editingGoogle ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {[
-                { key: 'googlePlaceId', label: t('pos:profile.field.googlePlaceId') },
-                { key: 'googleMapsUrl', label: t('pos:profile.field.googleMapsUrl') },
-                { key: 'googleRating', label: t('pos:profile.field.googleRating'), type: 'number' },
-                { key: 'googleReviewCount', label: t('pos:profile.field.googleReviewCount'), type: 'number' },
-              ].map(({ key, label, type }) => (
-                <div key={key}>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">{label}</label>
-                  <input
-                    type={type || 'text'}
-                    value={googleForm[key] || ''}
-                    onChange={(e) => setGoogleForm((prev) => ({ ...prev, [key]: e.target.value }))}
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                    step={key === 'googleRating' ? '0.1' : undefined}
-                    min={key === 'googleRating' ? '0' : undefined}
-                    max={key === 'googleRating' ? '5' : undefined}
-                  />
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {profile?.googleRating != null && (
-                <div>
-                  <StarRating rating={profile.googleRating} />
-                  <p className="text-sm text-gray-500 mt-1">
-                    {profile.googleReviewCount || 0} {t('pos:profile.reviews')}
-                  </p>
-                </div>
+              {profile.googleMapsUrl && (
+                <a
+                  href={profile.googleMapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white text-sm font-medium rounded-lg transition-colors sm:ml-auto"
+                >
+                  🗺️ {t('pos:profile.viewOnMaps')}
+                </a>
               )}
-              <dl className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <dt className="text-xs font-medium text-gray-500">{t('pos:profile.field.googlePlaceId')}</dt>
-                  <dd className="text-sm text-gray-900 mt-0.5">{profile?.googlePlaceId || '—'}</dd>
-                </div>
-                <div>
-                  <dt className="text-xs font-medium text-gray-500">{t('pos:profile.field.googleMapsUrl')}</dt>
-                  <dd className="text-sm mt-0.5">
-                    {profile?.googleMapsUrl ? (
-                      <a
-                        href={profile.googleMapsUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-indigo-600 hover:underline"
-                      >
-                        {t('pos:profile.viewOnMaps')}
-                      </a>
-                    ) : '—'}
-                  </dd>
-                </div>
-              </dl>
-              {profile?.googleReviewsUpdatedAt && (
-                <p className="text-xs text-gray-400">
-                  {t('pos:profile.lastUpdated')}: {new Date(profile.googleReviewsUpdatedAt).toLocaleDateString()}
+              {profile.googleReviewsUpdatedAt && (
+                <p className="text-xs text-gray-400 dark:text-gray-500 sm:ml-auto sm:text-right">
+                  {t('pos:profile.lastUpdated')}:<br />
+                  {new Date(profile.googleReviewsUpdatedAt).toLocaleDateString()}
                 </p>
               )}
+            </div>
+          )}
 
-              {/* Reviews list */}
-              {Array.isArray(profile?.googleReviewsJson) && profile.googleReviewsJson.length > 0 && (
-                <div className="mt-4 space-y-3">
-                  <h3 className="text-sm font-semibold text-gray-700">{t('pos:profile.recentReviews')}</h3>
-                  {profile.googleReviewsJson.map((review, idx) => (
-                    <div key={idx} className="border border-gray-100 rounded-lg p-3">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-sm font-medium text-gray-900">{review.author || t('pos:profile.anonymous')}</span>
-                        {review.rating && <StarRating rating={review.rating} />}
-                      </div>
-                      {review.text && <p className="text-sm text-gray-600">{review.text}</p>}
-                      {review.date && <p className="text-xs text-gray-400 mt-1">{review.date}</p>}
+          {/* Edit card */}
+          <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between bg-gray-50 dark:bg-gray-800/50">
+              <div>
+                <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">{t('pos:profile.googleReviews')}</h2>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Google Place & review data</p>
+              </div>
+              {!editingGoogle ? (
+                <Button variant="secondary" size="sm" onClick={() => setEditingGoogle(true)}>
+                  {t('pos:btn.edit')}
+                </Button>
+              ) : (
+                <div className="flex gap-2">
+                  <Button variant="secondary" size="sm" onClick={() => setEditingGoogle(false)}>
+                    {t('common:actions.cancel')}
+                  </Button>
+                  <Button variant="primary" size="sm" onClick={handleSaveGoogle}>
+                    {t('common:actions.save')}
+                  </Button>
+                </div>
+              )}
+            </div>
+            <div className="p-6">
+              {editingGoogle ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {[
+                    { key: 'googlePlaceId', label: t('pos:profile.field.googlePlaceId') },
+                    { key: 'googleMapsUrl', label: t('pos:profile.field.googleMapsUrl') },
+                    { key: 'googleRating', label: t('pos:profile.field.googleRating'), type: 'number' },
+                    { key: 'googleReviewCount', label: t('pos:profile.field.googleReviewCount'), type: 'number' },
+                  ].map(({ key, label, type }) => (
+                    <div key={key}>
+                      <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{label}</label>
+                      <input
+                        type={type || 'text'}
+                        value={googleForm[key] || ''}
+                        onChange={(e) => setGoogleForm((prev) => ({ ...prev, [key]: e.target.value }))}
+                        className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-teal-500 focus:border-transparent focus:outline-none"
+                        step={key === 'googleRating' ? '0.1' : undefined}
+                        min={key === 'googleRating' ? '0' : undefined}
+                        max={key === 'googleRating' ? '5' : undefined}
+                      />
                     </div>
                   ))}
                 </div>
+              ) : (
+                <dl className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-0.5">
+                    <dt className="text-xs font-medium uppercase tracking-wide text-gray-400">{t('pos:profile.field.googlePlaceId')}</dt>
+                    <dd className="text-sm font-medium text-gray-900 dark:text-gray-100">{profile?.googlePlaceId || <span className="text-gray-300 font-normal">—</span>}</dd>
+                  </div>
+                  <div className="flex flex-col gap-0.5">
+                    <dt className="text-xs font-medium uppercase tracking-wide text-gray-400">{t('pos:profile.field.googleMapsUrl')}</dt>
+                    <dd className="text-sm mt-0.5">
+                      {profile?.googleMapsUrl ? (
+                        <a href={profile.googleMapsUrl} target="_blank" rel="noopener noreferrer" className="text-teal-600 hover:underline truncate block max-w-xs">
+                          {profile.googleMapsUrl}
+                        </a>
+                      ) : <span className="text-gray-300 dark:text-gray-600 font-normal">—</span>}
+                    </dd>
+                  </div>
+                </dl>
               )}
+            </div>
+          </div>
+
+          {/* Reviews list */}
+          {Array.isArray(profile?.googleReviewsJson) && profile.googleReviewsJson.length > 0 && (
+            <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+              <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-4">{t('pos:profile.recentReviews')}</h3>
+              <div className="space-y-4">
+                {profile.googleReviewsJson.map((review, idx) => (
+                  <div key={idx} className="border border-gray-100 dark:border-gray-800 rounded-lg p-4 bg-gray-50 dark:bg-gray-800/40">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">{review.author || t('pos:profile.anonymous')}</span>
+                      {review.rating && <StarRating rating={review.rating} size="w-4 h-4" />}
+                    </div>
+                    {review.text && <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{review.text}</p>}
+                    {review.date && <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">{review.date}</p>}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>
@@ -599,14 +651,17 @@ const PosDetailPage = () => {
 
       {/* ═══ Incidents Tab ═══ */}
       {activeTab === 'incidents' && (
-        <div className="space-y-4">
-          {/* Filters + Add button */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="flex gap-2">
+        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gray-50 dark:bg-gray-800/50">
+            <div>
+              <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">{t('pos:detail.tab.incidents')}</h2>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{t('pos:incident.subtitle', 'Active issues at this location')}</p>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
               <select
                 value={incidentFilter.status}
                 onChange={(e) => setIncidentFilter((p) => ({ ...p, status: e.target.value }))}
-                className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                className="rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-1.5 text-xs text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-teal-500 focus:outline-none"
               >
                 <option value="">{t('pos:incident.allStatuses')}</option>
                 <option value="open">{t('pos:incident.status.open')}</option>
@@ -617,7 +672,7 @@ const PosDetailPage = () => {
               <select
                 value={incidentFilter.severity}
                 onChange={(e) => setIncidentFilter((p) => ({ ...p, severity: e.target.value }))}
-                className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                className="rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-1.5 text-xs text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-teal-500 focus:outline-none"
               >
                 <option value="">{t('pos:incident.allSeverities')}</option>
                 <option value="low">{t('pos:incident.severity.low')}</option>
@@ -628,31 +683,31 @@ const PosDetailPage = () => {
               <select
                 value={incidentFilter.category}
                 onChange={(e) => setIncidentFilter((p) => ({ ...p, category: e.target.value }))}
-                className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                className="rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-1.5 text-xs text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-teal-500 focus:outline-none"
               >
                 <option value="">{t('pos:incident.allCategories')}</option>
                 {['hardware', 'software', 'connectivity', 'payment', 'power', 'safety', 'other'].map((c) => (
                   <option key={c} value={c}>{t(`pos:incident.category.${c}`)}</option>
                 ))}
               </select>
+              <Button variant="primary" size="sm" onClick={() => setIncidentModalOpen(true)}>
+                + {t('pos:incident.declare')}
+              </Button>
             </div>
-            <Button variant="primary" size="sm" onClick={() => setIncidentModalOpen(true)}>
-              + {t('pos:incident.declare')}
-            </Button>
           </div>
 
           {/* Incidents list */}
           {incidents.length === 0 ? (
-            <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-8 text-center">
-              <p className="text-gray-500">{t('pos:incident.noIncidents')}</p>
+            <div className="p-10 text-center">
+              <p className="text-sm text-gray-400 dark:text-gray-500">{t('pos:incident.noIncidents')}</p>
             </div>
           ) : (
-            <div className="bg-white rounded-xl shadow-lg border border-gray-100 divide-y divide-gray-100">
+            <div className="divide-y divide-gray-100 dark:divide-gray-800">
               {incidents.map((inc) => (
                 <button
                   key={inc.id}
                   onClick={() => setSelectedIncident(inc)}
-                  className="w-full text-left px-6 py-4 hover:bg-gray-50 transition-colors flex items-center justify-between"
+                  className="w-full text-left px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors flex items-center justify-between"
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
@@ -662,16 +717,16 @@ const PosDetailPage = () => {
                       <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${SEVERITY_COLORS[inc.severity] || ''}`}>
                         {t(`pos:incident.severity.${inc.severity}`)}
                       </span>
-                      <span className="text-xs text-gray-400">
+                      <span className="text-xs text-gray-400 dark:text-gray-500">
                         {t(`pos:incident.category.${inc.category}`)}
                       </span>
                     </div>
-                    <p className="text-sm font-medium text-gray-900 truncate">{inc.title}</p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{inc.title}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                       {inc.declaredByName} · {inc.declaredAt ? new Date(inc.declaredAt).toLocaleDateString() : ''}
                     </p>
                   </div>
-                  <svg className="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 text-gray-400 shrink-0 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                   </svg>
                 </button>
@@ -683,49 +738,56 @@ const PosDetailPage = () => {
 
       {/* ═══ History Tab ═══ */}
       {activeTab === 'history' && (
-        <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('pos:profile.history')}</h2>
-          <div className="space-y-4">
-            {profile?.createdAt && (
-              <div className="flex items-start gap-3">
-                <div className="w-2.5 h-2.5 bg-green-400 rounded-full mt-1.5 shrink-0" />
-                <div>
-                  <p className="text-sm font-medium text-gray-900">{t('pos:profile.event.created')}</p>
-                  <p className="text-xs text-gray-500">{new Date(profile.createdAt).toLocaleString()}</p>
+        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50">
+            <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">{t('pos:profile.history')}</h2>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{t('pos:history.subtitle', 'Timeline of changes and events')}</p>
+          </div>
+          <div className="p-6">
+            <div className="relative pl-4 space-y-6">
+              {/* vertical line */}
+              <div className="absolute left-[7px] top-2 bottom-2 w-px bg-gray-200 dark:bg-gray-700" />
+              {profile?.createdAt && (
+                <div className="relative flex items-start gap-4">
+                  <div className="w-3.5 h-3.5 bg-green-400 rounded-full mt-0.5 shrink-0 ring-2 ring-white dark:ring-gray-900 -ml-0.5" />
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{t('pos:profile.event.created')}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{new Date(profile.createdAt).toLocaleString()}</p>
+                  </div>
                 </div>
-              </div>
-            )}
-            {profile?.launchedAt && (
-              <div className="flex items-start gap-3">
-                <div className="w-2.5 h-2.5 bg-blue-400 rounded-full mt-1.5 shrink-0" />
-                <div>
-                  <p className="text-sm font-medium text-gray-900">{t('pos:profile.event.launched')}</p>
-                  <p className="text-xs text-gray-500">{profile.launchedAt}</p>
+              )}
+              {profile?.launchedAt && (
+                <div className="relative flex items-start gap-4">
+                  <div className="w-3.5 h-3.5 bg-blue-400 rounded-full mt-0.5 shrink-0 ring-2 ring-white dark:ring-gray-900 -ml-0.5" />
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{t('pos:profile.event.launched')}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{profile.launchedAt}</p>
+                  </div>
                 </div>
-              </div>
-            )}
-            {profile?.updatedAt && (
-              <div className="flex items-start gap-3">
-                <div className="w-2.5 h-2.5 bg-yellow-400 rounded-full mt-1.5 shrink-0" />
-                <div>
-                  <p className="text-sm font-medium text-gray-900">{t('pos:profile.event.updated')}</p>
-                  <p className="text-xs text-gray-500">{new Date(profile.updatedAt).toLocaleString()}</p>
+              )}
+              {profile?.updatedAt && (
+                <div className="relative flex items-start gap-4">
+                  <div className="w-3.5 h-3.5 bg-yellow-400 rounded-full mt-0.5 shrink-0 ring-2 ring-white dark:ring-gray-900 -ml-0.5" />
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{t('pos:profile.event.updated')}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{new Date(profile.updatedAt).toLocaleString()}</p>
+                  </div>
                 </div>
-              </div>
-            )}
-            {incidents.filter((i) => i.status === 'resolved' || i.status === 'closed').map((inc) => (
-              <div key={inc.id} className="flex items-start gap-3">
-                <div className="w-2.5 h-2.5 bg-gray-400 rounded-full mt-1.5 shrink-0" />
-                <div>
-                  <p className="text-sm font-medium text-gray-900">
-                    {t('pos:profile.event.incidentResolved')}: {inc.title}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    {inc.resolvedAt ? new Date(inc.resolvedAt).toLocaleString() : inc.declaredAt ? new Date(inc.declaredAt).toLocaleString() : ''}
-                  </p>
+              )}
+              {incidents.filter((i) => i.status === 'resolved' || i.status === 'closed').map((inc) => (
+                <div key={inc.id} className="relative flex items-start gap-4">
+                  <div className="w-3.5 h-3.5 bg-gray-400 rounded-full mt-0.5 shrink-0 ring-2 ring-white dark:ring-gray-900 -ml-0.5" />
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                      {t('pos:profile.event.incidentResolved')}: {inc.title}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                      {inc.resolvedAt ? new Date(inc.resolvedAt).toLocaleString() : inc.declaredAt ? new Date(inc.declaredAt).toLocaleString() : ''}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       )}

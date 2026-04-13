@@ -122,7 +122,11 @@ const SidebarItem = ({ item, collapsed, appColor, currentPath }) => {
   const Icon = item.icon ? getIconComponent(item.icon, 'outline') : null;
   const SolidIcon = item.icon ? getIconComponent(item.icon, 'solid') : null;
 
-  const isActive = item.to ? currentPath === item.to || currentPath.startsWith(item.to + '/') : false;
+  const isActive = item.to
+    ? item.exact
+      ? currentPath === item.to
+      : (currentPath === item.to || currentPath.startsWith(item.to + '/'))
+    : false;
   const hasChildren = item.children && item.children.length > 0;
 
   // Auto-expand if a child is active

@@ -46,6 +46,9 @@ public class PosDto {
     @Schema(description = "Number of Google reviews", example = "127", accessMode = Schema.AccessMode.READ_ONLY)
     private Integer googleReviewCount;
 
+    @Schema(description = "Number of open incidents", example = "2", accessMode = Schema.AccessMode.READ_ONLY)
+    private Integer openIncidentsCount;
+
     @Schema(description = "Creation timestamp (ISO 8601)", accessMode = Schema.AccessMode.READ_ONLY)
     private String createdAt;
 

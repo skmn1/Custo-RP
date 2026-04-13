@@ -409,6 +409,7 @@ public class PosService {
                 .isActive(pos.getIsActive())
                 .googleRating(pos.getGoogleRating())
                 .googleReviewCount(pos.getGoogleReviewCount())
+                .openIncidentsCount((int) incidentService.countOpen(pos.getId()))
                 .createdAt(pos.getCreatedAt() != null ? pos.getCreatedAt().toString() : null)
                 .updatedAt(pos.getUpdatedAt() != null ? pos.getUpdatedAt().toString() : null)
                 .build();

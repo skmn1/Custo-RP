@@ -68,7 +68,18 @@ const PosAppShell = () => {
     if (posLocationId) {
       items.push(
         { label: 'pos:sidebar.dashboard', icon: 'Squares2X2Icon', to: `/app/pos/${posLocationId}/dashboard` },
-        { label: 'pos:sidebar.terminal', icon: 'BuildingStorefrontIcon', to: `/app/pos/${posLocationId}/detail` },
+        {
+          label: 'pos:sidebar.terminal',
+          icon: 'BuildingStorefrontIcon',
+          to: `/app/pos/${posLocationId}/detail`,
+          children: [
+            { label: 'pos:detail.tab.overview',  icon: 'HomeIcon',         to: `/app/pos/${posLocationId}/detail`,           exact: true },
+            { label: 'pos:detail.tab.identity',  icon: 'DocumentTextIcon', to: `/app/pos/${posLocationId}/detail/identity` },
+            { label: 'pos:detail.tab.google',    icon: 'StarIcon',         to: `/app/pos/${posLocationId}/detail/google` },
+            { label: 'pos:detail.tab.incidents', icon: 'BellIcon',         to: `/app/pos/${posLocationId}/detail/incidents` },
+            { label: 'pos:detail.tab.history',   icon: 'ClockIcon',        to: `/app/pos/${posLocationId}/detail/history` },
+          ],
+        },
         { label: 'pos:sidebar.stockLookup', icon: 'ArchiveBoxIcon', to: `/app/pos/${posLocationId}/stock` },
         { label: 'pos:sidebar.reports', icon: 'ChartBarIcon', to: `/app/pos/${posLocationId}/reports` },
       );
