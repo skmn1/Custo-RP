@@ -59,7 +59,7 @@ const PosAppShell = () => {
   const sidebarItems = useMemo(() => {
     const locationsLabel = isSuperAdmin
       ? 'pos:nav.allLocations'
-      : 'pos:myLocations';
+      : 'pos:nav.myLocations';
 
     const items = [
       { label: locationsLabel, icon: 'ShoppingCartIcon', to: '/app/pos' },
@@ -68,40 +68,8 @@ const PosAppShell = () => {
     if (posLocationId) {
       items.push(
         { label: 'pos:nav.dashboard', icon: 'Squares2X2Icon', to: `/app/pos/${posLocationId}/dashboard` },
-        {
-          label: 'pos:nav.group.sales',
-          icon: 'CurrencyDollarIcon',
-          children: [
-            { label: 'pos:nav.session',      icon: 'PlayCircleIcon',     to: `/app/pos/${posLocationId}/session` },
-            { label: 'pos:nav.transactions', icon: 'ListBulletIcon',     to: `/app/pos/${posLocationId}/transactions` },
-            { label: 'pos:nav.invoices',     icon: 'ReceiptPercentIcon', to: `/app/pos/${posLocationId}/invoices` },
-          ],
-        },
-        {
-          label: 'pos:nav.group.operations',
-          icon: 'ArchiveBoxIcon',
-          children: [
-            { label: 'pos:nav.stock',     icon: 'ArchiveBoxIcon', to: `/app/pos/${posLocationId}/stock` },
-            { label: 'pos:nav.purchases', icon: 'TruckIcon',      to: `/app/pos/${posLocationId}/purchases` },
-          ],
-        },
-        {
-          label: 'pos:nav.group.people',
-          icon: 'UsersIcon',
-          children: [
-            { label: 'pos:nav.hr',       icon: 'UsersIcon',     to: `/app/pos/${posLocationId}/hr` },
-            { label: 'pos:nav.schedule', icon: 'CalendarIcon',  to: `/app/pos/${posLocationId}/schedule` },
-            { label: 'pos:nav.payroll',  icon: 'BanknotesIcon', to: `/app/pos/${posLocationId}/payroll` },
-          ],
-        },
-        {
-          label: 'pos:nav.group.finance',
-          icon: 'CalculatorIcon',
-          children: [
-            { label: 'pos:nav.accounting', icon: 'CalculatorIcon', to: `/app/pos/${posLocationId}/accounting` },
-            { label: 'pos:nav.reports',    icon: 'ChartBarIcon',   to: `/app/pos/${posLocationId}/reports` },
-          ],
-        },
+        { label: 'pos:nav.stock', icon: 'ArchiveBoxIcon', to: `/app/pos/${posLocationId}/stock` },
+        { label: 'pos:nav.reports', icon: 'ChartBarIcon', to: `/app/pos/${posLocationId}/reports` },
       );
     }
 
