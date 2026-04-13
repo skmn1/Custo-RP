@@ -98,6 +98,8 @@
   "detail.tab.history": "Historique",
   "table.rating": "Note",
   "card.managerLabel": "Responsable",
+  "card.phoneLabel": "Téléphone",
+  "card.rating": "Note",
   "table.location": "Point de vente",
   "table.type": "Type",
   "table.address": "Adresse",

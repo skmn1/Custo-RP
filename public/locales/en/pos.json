@@ -98,6 +98,8 @@
   "detail.tab.history": "History",
   "table.rating": "Rating",
   "card.managerLabel": "Manager",
+  "card.phoneLabel": "Phone",
+  "card.rating": "Rating",
   "table.location": "Location",
   "table.type": "Type",
   "table.address": "Address",
